@@ -1,11 +1,11 @@
-import HosseinSaveMarket from "./myCode/HosseinSaveMarket1";
 import "./App.css";
+import Navbar from "./components/Navbar/Navbar"
 
 function App() {
   return (
-    <div className="App">
-      <HosseinSaveMarket />
-    </div>
+    <>
+    <Navbar  />
+    </>
   );
 }
 
