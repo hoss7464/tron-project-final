@@ -500,8 +500,6 @@ export const OedersPaginationWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 50px;
-  background-color: orange;
   margin-top: 0.5rem;
 `;
 

@@ -1,5 +1,6 @@
-import React from "react";
-import "./mainPage.css"
+import React, { useEffect, useState } from "react";
+import "./mainPage.css";
+import { colors } from "../../core-UI/Theme";
 import { useTranslation } from "react-i18next";
 import {
   OrdersWrapper,
@@ -29,9 +30,41 @@ import {
   OrdersSell,
 } from "./mainPageElements";
 import LinearProgress from "@mui/material/LinearProgress";
+import useGetData from "../../hooks/useGetData";
+import Pagination from "@mui/material/Pagination";
+
+type Post = {
+  orderId: number;
+  orderTime: string;
+  orderDate: string;
+  orderResource: string;
+  orderRentTime: string;
+  orderPrice: string;
+  orderAPY: string;
+  orderPayment: string;
+  orderFulfilled: number;
+};
 
 export const OrdersComponent: React.FC = () => {
   const { t } = useTranslation();
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 6;
+  const { data, isLoading, error, getData, totalCount } = useGetData<Post>();
+
+  useEffect(() => {
+    getData(
+      `http://localhost:3001/post?_page=${currentPage}&_limit=${rowsPerPage}`
+    );
+  }, [currentPage]);
+
+  const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+  };
+
+  const totalPages = Math.max(10, Math.ceil(totalCount / rowsPerPage));
+
+  if (isLoading) return <p>Loading...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <>
@@ -41,7 +74,6 @@ export const OrdersComponent: React.FC = () => {
             <AccountHeader>{t("orders")}</AccountHeader>
           </OrdersNavHeaderWrapper>
           <OrderNavTextWrapper1>
-
             <OrderNavTextWrapper2>
               <OrderNavText>{t("date")}</OrderNavText>
             </OrderNavTextWrapper2>
@@ -68,66 +100,79 @@ export const OrdersComponent: React.FC = () => {
           </OrderNavTextWrapper1>
         </OrderNavWrapper>
 
-
-
         <OrdersWrapper2>
-          <OrdersCardWrapper>
-            <OrdersCardTextWrap1>
-              <OrdersCardTextWrapper2>
-                <OrdersCardText1>13 : 38</OrdersCardText1>
-              </OrdersCardTextWrapper2>
-              <OrdersCardTextWrapper2>
-                <OrdersCardText2>28/04</OrdersCardText2>
-              </OrdersCardTextWrapper2>
-            </OrdersCardTextWrap1>
+          {data?.map((myData) => (
+            <OrdersCardWrapper key={myData.orderId}>
+              <OrdersCardTextWrap1>
+                <OrdersCardTextWrapper2>
+                  <OrdersCardText1>{myData.orderTime}</OrdersCardText1>
+                </OrdersCardTextWrapper2>
+                <OrdersCardTextWrapper2>
+                  <OrdersCardText2>{myData.orderDate}</OrdersCardText2>
+                </OrdersCardTextWrapper2>
+              </OrdersCardTextWrap1>
 
-            <OrdersCardTextWrap2>
-              <OrdersCardTextWrapper2>
-                <OrdersCardText1>1,000,000</OrdersCardText1>
-              </OrdersCardTextWrapper2>
-              <OrdersCardTextWrapper2>
-                <OrdersCardText2>3/ days</OrdersCardText2>
-              </OrdersCardTextWrapper2>
-            </OrdersCardTextWrap2>
+              <OrdersCardTextWrap2>
+                <OrdersCardTextWrapper2>
+                  <OrdersCardText1>{myData.orderResource}</OrdersCardText1>
+                </OrdersCardTextWrapper2>
+                <OrdersCardTextWrapper2>
+                  <OrdersCardText2>{myData.orderRentTime}</OrdersCardText2>
+                </OrdersCardTextWrapper2>
+              </OrdersCardTextWrap2>
 
-            <OrdersCardTextWrap3>
-              <OrdersCardTextWrapper2>
-                <OrdersCardText1>55 SUN</OrdersCardText1>
-              </OrdersCardTextWrapper2>
-              <OrdersCardTextWrapper2>
-                <OrdersCardText2>APY: 29.09 %</OrdersCardText2>
-              </OrdersCardTextWrapper2>
-            </OrdersCardTextWrap3>
+              <OrdersCardTextWrap3>
+                <OrdersCardTextWrapper2>
+                  <OrdersCardText1>{myData.orderPrice} SUN</OrdersCardText1>
+                </OrdersCardTextWrapper2>
+                <OrdersCardTextWrapper2>
+                  <OrdersCardText2>APY: {myData.orderAPY} %</OrdersCardText2>
+                </OrdersCardTextWrapper2>
+              </OrdersCardTextWrap3>
 
-            <OrdersCardTextWrap4>
-              <OrdersCardTextWrapper2>
-                <OrdersCardText1>1,403.17</OrdersCardText1>
-              </OrdersCardTextWrapper2>
-            </OrdersCardTextWrap4>
-            
-            <OrderCardLinearWrapper>
-              <LinearProgress
-                variant="determinate"
-                value={30}
-                sx={{
-                  height: 5,
-                  borderRadius: 5,
-                  "& .MuiLinearProgress-bar": {
-                    backgroundColor: "#433BFF",
-                  },
-                }}
-              />
-            </OrderCardLinearWrapper>
-            <OrdersSellBtnWrapper>
+              <OrdersCardTextWrap4>
+                <OrdersCardTextWrapper2>
+                  <OrdersCardText1>{myData.orderPayment}</OrdersCardText1>
+                </OrdersCardTextWrapper2>
+              </OrdersCardTextWrap4>
+
+              <OrderCardLinearWrapper>
+                <LinearProgress
+                  variant="determinate"
+                  value={myData.orderFulfilled}
+                  sx={{
+                    height: 5,
+                    borderRadius: 5,
+                    "& .MuiLinearProgress-bar": {
+                      backgroundColor: "#433BFF",
+                    },
+                  }}
+                />
+              </OrderCardLinearWrapper>
+              <OrdersSellBtnWrapper>
                 <OrdersSell>Sell</OrdersSell>
-            </OrdersSellBtnWrapper>
-          </OrdersCardWrapper>
+              </OrdersSellBtnWrapper>
+            </OrdersCardWrapper>
+          ))}
         </OrdersWrapper2>
 
-
-
-
-        <OedersPaginationWrapper></OedersPaginationWrapper>
+        <OedersPaginationWrapper>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            sx={{
+              '& .Mui-selected': {
+                backgroundColor: '#433BFF', // or any custom color
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'primary.dark',
+                },
+              },
+            }}
+          />
+        </OedersPaginationWrapper>
       </OrdersWrapper>
     </>
   );
