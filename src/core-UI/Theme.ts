@@ -12,6 +12,7 @@ export const colors = {
     border3 : "#FFF441",
     border4 : "#BDBDBD",
     border5 : "#BDBDBD",
+    border6 : "#E2E8F7",
     text1 : "#000000",
     text2 : "#BDBDBD",
     text3 : "#241DB6",

@@ -1,0 +1,9 @@
+{
+    "post": [
+      { "id": 1, "name": "Alice" },
+      { "id": 2, "name": "Bob" }
+    ],
+    "get": [
+      { "id": 1, "title": "Hello World", "author": "Alice" }
+    ]
+  }

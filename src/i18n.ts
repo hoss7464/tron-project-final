@@ -20,6 +20,13 @@ const resources = {
       "ready_resource": "Ready resource",
       "recovery_24h": "24h Recovery",
       "apy_for_seller": "APY for seller",
+      "orders": "Orders",
+      "date": "Date",
+      "resource": "Resource",
+      "price": "Price",
+      "payment": "Payment",
+      "fulfilled": "Fulfilled",
+      "operate": "Operate",
     }
   },
   ja: {
@@ -39,7 +46,13 @@ const resources = {
       "ready_resource": "利用可能なリソース",
       "recovery_24h": "24時間回復",
       "apy_for_seller": "販売者のAPY",
-      
+      "orders": "注文",
+      "date": "日付",
+      "resource": "リソース",
+      "price": "価格",
+      "payment": "支払い",
+      "fulfilled": "完了",
+      "operate": "操作",
     }
   },
   ru: {
@@ -59,6 +72,13 @@ const resources = {
       "ready_resource": "Готовый ресурс",
       "recovery_24h": "Восстановление за 24ч",
       "apy_for_seller": "APY для продавца",
+      "orders": "Заказы",
+      "date": "Дата",
+      "resource": "Ресурс",
+      "price": "Цена",
+      "payment": "Платеж",
+      "fulfilled": "Исполнено",
+      "operate": "Управлять",
     }
   }
 };
