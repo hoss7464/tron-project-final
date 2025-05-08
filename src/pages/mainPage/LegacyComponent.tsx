@@ -31,13 +31,13 @@ const LegacyComponent: React.FC = () => {
   return (
     <>
       <LegacyContainer>
-        <AccountWrapper>
+        <AccountWrapper  >
           <AccountHeaderIconWrapper>
             <AccountIconWrapper>
               <AccountIcon alt="account" src={accountIcon} />
             </AccountIconWrapper>
             <AccountHeaderWrapper>
-              <AccountHeader style={{ color: "#241DB6" }}>
+              <AccountHeader style={{ color: "#1E650F" }}>
                 {t("account")}
               </AccountHeader>
             </AccountHeaderWrapper>
@@ -52,32 +52,32 @@ const LegacyComponent: React.FC = () => {
           </AccountAddCopyWrapper>
           <AccountTextNumberWrapper>
             <AccountTextWrapper>
-              <AccountText style={{ color: "#8CA1ED" }}>
+              <AccountText style={{ color: "#1E650F" }}>
                 {t("balance_trx")}
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#241DB6" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
           <AccountTextNumberWrapper>
             <AccountTextWrapper>
-              <AccountText style={{ color: "#8CA1ED" }}>
+              <AccountText style={{ color: "#1E650F" }}>
                 {t("freeze_trx")}
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#241DB6" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
           <AccountTextNumberWrapper>
             <AccountTextWrapper>
-              <AccountText style={{ color: "#8CA1ED" }}>
+              <AccountText style={{ color: "#1E650F" }}>
                 {t("all_trx")}
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#241DB6" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
         </AccountWrapper>
@@ -100,7 +100,7 @@ const LegacyComponent: React.FC = () => {
           </EnergyResourceWrapper>
           <AccountTextNumberWrapper>
             <AccountTextWrapper>
-              <AccountText style={{ color: "#8B8B8B" }}>
+              <AccountText style={{ color: "#1E650F" }}>
                 {t("delegable_energy")}
               </AccountText>
             </AccountTextWrapper>
@@ -110,7 +110,7 @@ const LegacyComponent: React.FC = () => {
           </AccountTextNumberWrapper>
           <AccountTextNumberWrapper>
             <AccountTextWrapper>
-              <AccountText style={{ color: "#8B8B8B" }}>
+              <AccountText style={{ color: "#1E650F" }}>
                 {t("delegated_energy")}
               </AccountText>
             </AccountTextWrapper>
@@ -126,34 +126,34 @@ const LegacyComponent: React.FC = () => {
               <AccountIcon alt="bandwidth" src={bandwidthIcon} />
             </AccountIconWrapper>
             <AccountHeaderWrapper>
-              <AccountHeader style={{ color: "#89580A" }}>
+              <AccountHeader style={{ color: "#1E650F" }}>
                 {t("bandwidth")}
               </AccountHeader>
             </AccountHeaderWrapper>
           </AccountHeaderIconWrapper>
           <EnergyResourceWrapper>
             <AccountNumberWrapper style={{ marginLeft: "0.5rem" }}>
-              <AccountNumber style={{ color: "#89580A" }}>0 / <span style={{color: "#989898"}} >0</span></AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>0 / <span style={{color: "#989898"}} >0</span></AccountNumber>
             </AccountNumberWrapper>
           </EnergyResourceWrapper>
           <AccountTextNumberWrapper>
             <AccountTextWrapper>
-              <AccountText style={{ color: "#8B8B8B" }}>
+              <AccountText style={{ color: "#1E650F" }}>
                 {t("delegable_bandwidth")}
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#89580A" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
           <AccountTextNumberWrapper>
             <AccountTextWrapper>
-              <AccountText style={{ color: "#8B8B8B" }}>
+              <AccountText style={{ color: "#1E650F" }}>
                 {t("delegated_bandwidth")}
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#89580A" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
         </BandwidthWrapper>

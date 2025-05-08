@@ -25,7 +25,7 @@ const ResourceComponent: React.FC = () => {
           <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
             <ResourceWrapper2
               style={{
-                backgroundColor: "#F0F5FF",
+                backgroundColor: "#F8F8F8",
                 borderRadius: "24px",
                 padding: "0.5rem",
               }}
@@ -65,7 +65,7 @@ const ResourceComponent: React.FC = () => {
           <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
             <ResourceWrapper2
               style={{
-                backgroundColor: "#F0F5FF",
+                backgroundColor: "#F8F8F8",
                 borderRadius: "24px",
                 padding: "0.5rem",
               }}
@@ -98,7 +98,7 @@ const ResourceComponent: React.FC = () => {
           <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
             <ResourceWrapper2
               style={{
-                backgroundColor: "#F0F5FF",
+                backgroundColor: "#F8F8F8",
                 borderRadius: "24px",
                 padding: "0.5rem",
               }}

@@ -1,4 +1,5 @@
 import React from "react";
+import "./mainPage.css"
 import { useTranslation } from "react-i18next";
 import {
   MainPageContainer,
@@ -7,12 +8,12 @@ import {
   MainRightSection,
   FormWrapper,
   Form,
-  MyOrdersWrapper,
 } from "./mainPageElements";
 import ResourceComponent from "./ResourceComponent";
 import LegacyComponent from "./LegacyComponent";
 import MobileResourceComponent from "./MobileResourceComponent";
 import OrdersComponent from "./OrdersComponent";
+import MyOrdersComponent from "./MyOrdersComponent";
 
 const MainPage: React.FC = () => {
   const { t } = useTranslation();
@@ -23,15 +24,15 @@ const MainPage: React.FC = () => {
         <MainPageWrapper>
           <MainLeftSection>
             <LegacyComponent />
-            <FormWrapper>
-              <Form></Form>
+            <FormWrapper >
+              <Form className="order-bg"></Form>
             </FormWrapper>
           </MainLeftSection>
           <MainRightSection>
             <MobileResourceComponent />
             <ResourceComponent />
             <OrdersComponent />
-            <MyOrdersWrapper></MyOrdersWrapper>
+            <MyOrdersComponent />
           </MainRightSection>
         </MainPageWrapper>
       </MainPageContainer>

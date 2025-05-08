@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "./mainPage.css";
-import { colors } from "../../core-UI/Theme";
 import { useTranslation } from "react-i18next";
 import {
   OrdersWrapper,
@@ -26,6 +25,9 @@ import {
   OrdersCardText1,
   OrdersCardText2,
   OrderCardLinearWrapper,
+  OrderCardLinearWrapper2,
+  OrderCardLineraPercentWrapper,
+  OrderCardLineraPercent,
   OrdersSellBtnWrapper,
   OrdersSell,
 } from "./mainPageElements";
@@ -63,12 +65,11 @@ export const OrdersComponent: React.FC = () => {
 
   const totalPages = Math.max(10, Math.ceil(totalCount / rowsPerPage));
 
-  if (isLoading) return <p>Loading...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <>
-      <OrdersWrapper>
+      <OrdersWrapper className="order-bg">
         <OrderNavWrapper>
           <OrdersNavHeaderWrapper>
             <AccountHeader>{t("orders")}</AccountHeader>
@@ -100,7 +101,7 @@ export const OrdersComponent: React.FC = () => {
           </OrderNavTextWrapper1>
         </OrderNavWrapper>
 
-        <OrdersWrapper2>
+        <OrdersWrapper2 >
           {data?.map((myData) => (
             <OrdersCardWrapper key={myData.orderId}>
               <OrdersCardTextWrap1>
@@ -136,19 +137,26 @@ export const OrdersComponent: React.FC = () => {
                 </OrdersCardTextWrapper2>
               </OrdersCardTextWrap4>
 
-              <OrderCardLinearWrapper>
-                <LinearProgress
-                  variant="determinate"
-                  value={myData.orderFulfilled}
-                  sx={{
-                    height: 5,
-                    borderRadius: 5,
-                    "& .MuiLinearProgress-bar": {
-                      backgroundColor: "#433BFF",
-                    },
-                  }}
-                />
-              </OrderCardLinearWrapper>
+              <OrderCardLinearWrapper2>
+                <OrderCardLineraPercentWrapper>
+                  <OrderCardLineraPercent>{myData.orderFulfilled}%</OrderCardLineraPercent>
+                </OrderCardLineraPercentWrapper>
+                <OrderCardLinearWrapper>
+                  <LinearProgress
+                    variant="determinate"
+                    value={myData.orderFulfilled}
+                    sx={{
+                      height: 5,
+                      borderRadius: 5,
+                      backgroundColor: "#8DB186",
+                      "& .MuiLinearProgress-bar": {
+                        backgroundColor: "#1E650F",
+                      },
+                    }}
+                  />
+                </OrderCardLinearWrapper>
+              </OrderCardLinearWrapper2>
+
               <OrdersSellBtnWrapper>
                 <OrdersSell>Sell</OrdersSell>
               </OrdersSellBtnWrapper>
@@ -163,11 +171,11 @@ export const OrdersComponent: React.FC = () => {
             onChange={handlePageChange}
             color="primary"
             sx={{
-              '& .Mui-selected': {
-                backgroundColor: '#433BFF', // or any custom color
-                color: 'white',
-                '&:hover': {
-                  backgroundColor: 'primary.dark',
+              "& .MuiPaginationItem-root.Mui-selected": {
+                backgroundColor: "#1E650F",
+                color: "white",
+                "&:hover": {
+                  backgroundColor: "#1E650F",
                 },
               },
             }}

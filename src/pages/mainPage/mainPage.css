@@ -1,0 +1,6 @@
+.order-bg {
+    background-image: url("../../assets/png/bg.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}

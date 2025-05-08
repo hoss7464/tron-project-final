@@ -6,7 +6,7 @@ export const NavContainer = styled.div`
   height: 80px;
   position: fixed;
   z-index: 1000;
-  background-color: ${colors.navbar};
+  background-color: ${colors.bg1};
   @media only screen and (min-width: 280px) and (max-width: 768px) {
     padding: 0 24px 0 24px;
     height: 80px;
@@ -46,7 +46,7 @@ export const NavbarLogoWrapper = styled.div`
   width: 62px;
   height: 62px;
   border-radius: 50%;
-  background-color: ${colors.prmary2};
+  background-color: ${colors.primary1};
 `;
 
 export const NavbarRightSection = styled.div`
@@ -79,12 +79,11 @@ export const ConnectWrapper = styled.div`
 
 export const ConnectBtn = styled.div`
   padding: 8px 12px;
-
   cursor: pointer;
 `;
 
 export const ConnectText = styled.p`
-  color: ${colors.navbar};
+  color: ${colors.text2};
   font-weight: 600;
   font-size: 16px;
 `;

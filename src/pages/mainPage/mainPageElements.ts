@@ -10,7 +10,7 @@ export const MainPageContainer = styled.div`
   flex-direction: column;
   width: 100%;
   min-height: 720px;
-  background-color: ${colors.bg1};
+  background-color: ${colors.bg2};
   @media only screen and (min-width: 280px) and (max-width: 768px) {
     padding: 0 24px 0 24px;
   }
@@ -93,17 +93,17 @@ export const AccountWrapper = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  background-color: ${colors.navbar};
+  background-color: ${colors.bg1};
+  border: solid 1px ${colors.primary1};
   border-radius: 32px;
-  border: solid 1px ${colors.border1};
   padding: 0.5rem;
 `;
 
 export const MobileAccountWrapper = styled.div`
   width: 100%;
-  background-color: ${colors.navbar};
+  background-color: ${colors.bg1};
+  border: solid 1px ${colors.primary1};
   border-radius: 24px;
-  border: solid 1px ${colors.border1};
   padding: 0.5rem;
   margin-bottom: 1rem;
 
@@ -137,8 +137,8 @@ export const AccountIcon = styled.img`
     height: 32px;
   }
   @media only screen and (min-width: 993px) {
-    width: 40px;
-    height: 42px;
+    width: 35px;
+    height: 37px;
   }
 `;
 
@@ -186,7 +186,7 @@ export const AccountCopyWrapper = styled.div`
 export const AccountCopyIcon = styled(IoCopy)`
   width: 16px;
   height: 16px;
-  color: ${colors.text3};
+  color: ${colors.primary1};
 `;
 export const AccountTextNumberWrapper = styled.div`
   display: flex;
@@ -224,9 +224,9 @@ export const EnergyWrapper = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  background-color: ${colors.bg3};
+  background-color: ${colors.bg1};
+  border: solid 1px ${colors.primary1};
   border-radius: 32px;
-  border: solid 1px ${colors.border2};
   margin-top: 1.2rem;
   padding: 0.5rem;
 `;
@@ -243,9 +243,9 @@ export const BandwidthWrapper = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  background-color: ${colors.bg4};
+  background-color: ${colors.bg1};
+  border: solid 1px ${colors.primary1};
   border-radius: 32px;
-  border: solid 1px ${colors.border3};
   margin-top: 1.2rem;
   padding: 0.5rem;
 `;
@@ -262,8 +262,8 @@ export const FormWrapper = styled.div`
 export const Form = styled.form`
   width: 100%;
   height: 600px;
-  background-color: ${colors.bg2};
   border-radius: 32px;
+  border: solid 2px ${colors.primary1};
 `;
 //-------------------------------------------------------------------------
 //Resource section styles
@@ -277,6 +277,7 @@ export const ResourceWrapper2 = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  border: solid 1px ${colors.primary1};
 `;
 
 export const ResourceIconTextWrapper = styled.div`
@@ -308,7 +309,6 @@ export const OrdersWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  background-color: ${colors.bg2};
   border-radius: 32px;
   width: 100%;
   margin-top: 1.2rem;
@@ -324,7 +324,7 @@ export const OrderNavWrapper = styled.div`
   padding: 0.5rem;
   border-radius: 24px;
   background-color: ${colors.bg1};
-  border: solid 1px ${colors.border4};
+  border: solid 2px ${colors.primary1};
 `;
 
 export const OrdersNavHeaderWrapper = styled.div`
@@ -341,7 +341,7 @@ export const OrderNavTextWrapper1 = styled.div`
   align-items: center;
   width: 100%;
   padding-left: 1rem;
-  padding-right: 2rem;
+  padding-right: 3rem;
 `;
 
 export const OrderNavTextWrapper2 = styled.div`
@@ -393,7 +393,7 @@ export const OrderNavTextWrapper7 = styled.div`
 export const OrderNavText = styled.p`
   font-size: 14px;
   font-weight: 700;
-  color: ${colors.text2};
+  color: ${colors.text3};
 `;
 
 export const OrdersWrapper2 = styled.div`
@@ -414,7 +414,7 @@ export const OrdersCardWrapper = styled.div`
   width: 100%;
   height: 75px;
   border-radius: 24px;
-  border: solid 1px ${colors.border6};
+  border: solid 1px ${colors.border1};
   margin-bottom: 0.5rem;
   padding-left: 1rem;
   padding-right: 1rem;
@@ -472,25 +472,43 @@ export const OrdersCardText2 = styled.p`
 `;
 
 export const OrderCardLinearWrapper = styled.div`
-
-  width: 90px;
+  width: 80px;
   @media only screen and (max-width: 630px) {
     display: none;
   }
+`;
+
+export const OrderCardLinearWrapper2 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  @media only screen and (max-width: 630px) {
+    display: none;
+  }
+`;
+
+export const OrderCardLineraPercentWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+export const OrderCardLineraPercent = styled.p`
+  font-size: 14px;
+  font-weight: 500;
 `;
 
 export const OrdersSellBtnWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 8px 24px;
+  padding: 6px 16px;
   background-color: ${colors.primary1};
   border-radius: 8px;
   cursor: pointer;
 `;
 
 export const OrdersSell = styled.p`
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: ${colors.text9};
 `;
@@ -507,13 +525,24 @@ export const OedersPaginationWrapper = styled.div`
 //My orders section styles
 export const MyOrdersWrapper = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  background-color: ${colors.bg2};
+  flex-direction: column;
   border-radius: 32px;
   width: 100%;
-  height: 300px;
+  height: 355px;
   margin-top: 1.2rem;
+  padding: 0.5rem;
+`;
+
+export const MyOrdersWrapper2 = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  margin-top: 0.5rem;
 `;
 //-------------------------------------------------------------------------
 //Footer section styles
