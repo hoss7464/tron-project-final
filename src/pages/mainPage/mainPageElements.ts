@@ -542,6 +542,7 @@ export const MyOrdersWrapper2 = styled.div`
   flex-direction: column;
   height: 100%;
   width: 100%;
+  overflow: auto;
   margin-top: 0.5rem;
 `;
 //-------------------------------------------------------------------------

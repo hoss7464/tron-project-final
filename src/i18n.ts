@@ -21,12 +21,17 @@ const resources = {
       "recovery_24h": "24h Recovery",
       "apy_for_seller": "APY for seller",
       "orders": "Orders",
+      "my_orders": "My Orders",
       "date": "Date",
       "resource": "Resource",
       "price": "Price",
       "payment": "Payment",
       "fulfilled": "Fulfilled",
       "operate": "Operate",
+      "day": "Day",
+      "days": "Days",
+      "month": "Month",
+      "months": "Months",
     }
   },
   ja: {
@@ -47,12 +52,17 @@ const resources = {
       "recovery_24h": "24時間回復",
       "apy_for_seller": "販売者のAPY",
       "orders": "注文",
+      "my_orders": "私の注文",
       "date": "日付",
       "resource": "リソース",
       "price": "価格",
       "payment": "支払い",
       "fulfilled": "完了",
       "operate": "操作",
+      "day": "日",
+      "days": "日々",
+      "month": "月",
+      "months": "ヶ月",
     }
   },
   ru: {
@@ -73,12 +83,17 @@ const resources = {
       "recovery_24h": "Восстановление за 24ч",
       "apy_for_seller": "APY для продавца",
       "orders": "Заказы",
+      "my_orders": "Мои заказы",
       "date": "Дата",
       "resource": "Ресурс",
       "price": "Цена",
       "payment": "Платеж",
       "fulfilled": "Исполнено",
       "operate": "Управлять",
+      "day": "День",
+      "days": "Дни",
+      "month": "Месяц",
+      "months": "Месяцы",
     }
   }
 };

@@ -41,6 +41,8 @@ type Post = {
   orderDate: string;
   orderResource: string;
   orderRentTime: string;
+  orderRentTimeNumber: number;
+  orderRentTimeDate: string;
   orderPrice: string;
   orderAPY: string;
   orderPayment: string;
@@ -51,7 +53,7 @@ export const OrdersComponent: React.FC = () => {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 6;
-  const { data, isLoading, error, getData, totalCount } = useGetData<Post>();
+  const { data, error, getData, totalCount } = useGetData<Post>();
 
   useEffect(() => {
     getData(
@@ -101,7 +103,7 @@ export const OrdersComponent: React.FC = () => {
           </OrderNavTextWrapper1>
         </OrderNavWrapper>
 
-        <OrdersWrapper2 >
+        <OrdersWrapper2>
           {data?.map((myData) => (
             <OrdersCardWrapper key={myData.orderId}>
               <OrdersCardTextWrap1>
@@ -118,7 +120,10 @@ export const OrdersComponent: React.FC = () => {
                   <OrdersCardText1>{myData.orderResource}</OrdersCardText1>
                 </OrdersCardTextWrapper2>
                 <OrdersCardTextWrapper2>
-                  <OrdersCardText2>{myData.orderRentTime}</OrdersCardText2>
+                  <OrdersCardText2>
+                    {myData.orderRentTimeNumber} 
+                    {t(`${myData.orderRentTimeDate}`)}
+                  </OrdersCardText2>
                 </OrdersCardTextWrapper2>
               </OrdersCardTextWrap2>
 
@@ -139,7 +144,9 @@ export const OrdersComponent: React.FC = () => {
 
               <OrderCardLinearWrapper2>
                 <OrderCardLineraPercentWrapper>
-                  <OrderCardLineraPercent>{myData.orderFulfilled}%</OrderCardLineraPercent>
+                  <OrderCardLineraPercent>
+                    {myData.orderFulfilled}%
+                  </OrderCardLineraPercent>
                 </OrderCardLineraPercentWrapper>
                 <OrderCardLinearWrapper>
                   <LinearProgress
