@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { colors } from "../../core-UI/Theme";
 import { IoCopy } from "react-icons/io5";
+import { MdOutlineAccountBalanceWallet } from "react-icons/md";
 //--------------------------------------------------------------------------
 //Main page styles :
 export const MainPageContainer = styled.div`
@@ -137,8 +138,8 @@ export const AccountIcon = styled.img`
     height: 32px;
   }
   @media only screen and (min-width: 993px) {
-    width: 35px;
-    height: 37px;
+    width: 38px;
+    height: 40px;
   }
 `;
 
@@ -260,10 +261,163 @@ export const FormWrapper = styled.div`
 `;
 
 export const Form = styled.form`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
   width: 100%;
-  height: 600px;
+  min-height: 600px;
   border-radius: 32px;
   border: solid 2px ${colors.primary1};
+  padding: 16px;
+`;
+
+export const FormHeaderSwitchWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 2rem;
+`;
+export const FormHeaderIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+export const FormHeaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+export const FormIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.5rem;
+`;
+export const FormSwitchWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const FormAddInputLabelWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 1rem;
+
+`;
+export const FormAddLabelWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+`;
+export const FormAddLabel = styled.label`
+  color: ${colors.text1};
+  font-weight: 700;
+  font-size: 16px;
+`;
+export const FormAddInputWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  border-radius: 24px;
+  border: solid 2px ${colors.primary1};
+  padding-top: 0.3rem;
+  padding-left: 0.3rem;
+  padding-bottom: 0.3rem;
+  padding-right: 0.7rem;
+`;
+export const FormAddInputIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`;
+export const FormAddIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: ${colors.primary1};
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+`;
+export const FormAddIcon = styled(MdOutlineAccountBalanceWallet)`
+  width: 24px;
+  height: 24px;
+  color: ${colors.bg2};
+`;
+
+export const FormIcon2 = styled.img`
+  width: 24px;
+  height: 24px;
+  color: ${colors.bg2};
+`;
+export const FormAddInputWrapper2 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`;
+export const FormAddInput = styled.input`
+  height: 100%;
+  width: 100%;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 16px;
+  &:active {
+    border: none;
+    outline: none;
+  }
+
+  &:hover {
+    border: none;
+    outline: none;
+  }
+`;
+
+export const InputMiniBtnWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  padding-left: 0.5rem;
+`;
+
+export const InputMiniBtnWrapper2 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.3rem;
+`;
+
+export const InputMiniBtn = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${colors.text7};
+  border: solid 0.5px ${colors.text7};
+  cursor: pointer;
+  border-radius: 6px;
+
+  &:hover {
+    background-color: ${colors.primary1};
+    color: ${colors.text2};
+    border: solid 0.5px ${colors.primary1};
+  }
 `;
 //-------------------------------------------------------------------------
 //Resource section styles
@@ -402,7 +556,7 @@ export const OrdersWrapper2 = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  height: 500px;
+  height: 450px;
   border-radius: 24px;
   margin-top: 0.5rem;
 `;
@@ -412,7 +566,7 @@ export const OrdersCardWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 75px;
+  height: 60px;
   border-radius: 24px;
   border: solid 1px ${colors.border1};
   margin-bottom: 0.5rem;
@@ -530,7 +684,7 @@ export const MyOrdersWrapper = styled.div`
   flex-direction: column;
   border-radius: 32px;
   width: 100%;
-  height: 355px;
+  height: 403px;
   margin-top: 1.2rem;
   padding: 0.5rem;
 `;

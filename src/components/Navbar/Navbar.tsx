@@ -41,6 +41,15 @@ const Navbar: React.FC = () => {
                     displayEmpty
                     inputProps={{ "aria-label": "Without label" }}
                     sx={{ width: 70, height: 42 }}
+                    MenuProps={{
+                      disableScrollLock: true,
+                      PaperProps: {
+                        sx: {
+                          width: 70,
+                          
+                        },
+                      },
+                    }}
                   >
                     <MenuItem
                       value="EN"

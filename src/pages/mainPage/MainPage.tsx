@@ -1,32 +1,26 @@
 import React from "react";
-import "./mainPage.css"
-import { useTranslation } from "react-i18next";
+import "./mainPage.css";
 import {
   MainPageContainer,
   MainPageWrapper,
   MainLeftSection,
   MainRightSection,
-  FormWrapper,
-  Form,
 } from "./mainPageElements";
 import ResourceComponent from "./ResourceComponent";
 import LegacyComponent from "./LegacyComponent";
 import MobileResourceComponent from "./MobileResourceComponent";
 import OrdersComponent from "./OrdersComponent";
 import MyOrdersComponent from "./MyOrdersComponent";
+import OrderFormComponent from "./OrderFormComponent";
 
 const MainPage: React.FC = () => {
-  const { t } = useTranslation();
-
   return (
     <>
       <MainPageContainer>
         <MainPageWrapper>
           <MainLeftSection>
             <LegacyComponent />
-            <FormWrapper >
-              <Form className="order-bg"></Form>
-            </FormWrapper>
+            <OrderFormComponent />
           </MainLeftSection>
           <MainRightSection>
             <MobileResourceComponent />
