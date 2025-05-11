@@ -194,7 +194,7 @@ export const AccountTextNumberWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-top: 0.5rem;
+  margin-top: 0.2rem;
 `;
 export const AccountTextWrapper = styled.div`
   display: flex;
@@ -277,7 +277,7 @@ export const FormHeaderSwitchWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 `;
 export const FormHeaderIconWrapper = styled.div`
   display: flex;
@@ -307,14 +307,13 @@ export const FormAddInputLabelWrapper = styled.div`
   align-items: flex-start;
   flex-direction: column;
   width: 100%;
-  margin-bottom: 1rem;
-
+  margin-bottom: 0.5rem;
 `;
 export const FormAddLabelWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 `;
 export const FormAddLabel = styled.label`
   color: ${colors.text1};
@@ -419,6 +418,59 @@ export const InputMiniBtn = styled.button`
     border: solid 0.5px ${colors.primary1};
   }
 `;
+
+export const OrderInfoWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+`;
+
+export const OrderInfoHeaderWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+`;
+
+export const OrderInfoTextWrapper = styled.div`
+ display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+export const OrderInfoTextWrapper2 = styled.div`
+ display: flex;
+  justify-content:center;
+  align-items: center;
+`
+
+export const OrderInfoText = styled.div`
+font-size: 18px;
+`
+
+export const OrderSubmitBtnWrapper = styled.div`
+ display: flex;
+  justify-content:center;
+  align-items: center;
+  width:100%;
+  margin-top: 1rem;
+`
+export const OrderSubmitBtn = styled.button`
+border: none;
+font-size: 20px;
+font-weight: 700;
+padding-top: 10px;
+padding-bottom: 10px;
+width: 100%;
+border-radius: 55px;
+background-color: ${colors.primary1};
+color: ${colors.bg2};
+cursor: pointer;
+`
+
 //-------------------------------------------------------------------------
 //Resource section styles
 export const ResourceWrapper = styled.div`

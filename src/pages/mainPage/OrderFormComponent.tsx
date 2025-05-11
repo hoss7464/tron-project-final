@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import "./mainPage.css";
 import {
   FormControl,
@@ -8,6 +9,7 @@ import {
   Typography,
   Grid,
   ClickAwayListener,
+  Divider,
 } from "@mui/material";
 import {
   FormWrapper,
@@ -32,6 +34,13 @@ import {
   InputMiniBtnWrapper,
   InputMiniBtnWrapper2,
   InputMiniBtn,
+  OrderInfoWrapper,
+  OrderInfoHeaderWrapper,
+  OrderInfoTextWrapper,
+  OrderInfoTextWrapper2,
+  OrderInfoText,
+  OrderSubmitBtnWrapper,
+  OrderSubmitBtn,
 } from "./mainPageElements";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -75,7 +84,7 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   },
 }));
 //-------------------------------------------------------------------------------------
-//Dropdown menu material ui components:
+//Price input components:
 const DropdownIconWithText: React.FC = () => {
   return (
     <div
@@ -108,6 +117,7 @@ const DropdownIconWithText: React.FC = () => {
 
 const OrderFormComponent: React.FC = () => {
   //States :
+  const { t } = useTranslation();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Amount input states:
@@ -116,7 +126,7 @@ const OrderFormComponent: React.FC = () => {
   //Duration dropdown states :
   const [durationValue, setDurationValue] = useState("");
   const [open, setOpen] = useState(false);
-  const anchorRef = useRef<HTMLInputElement | null>(null);
+  const anchorRef = useRef<HTMLInputElement | null>(null); //to get a refrence to the actual dom node
   //Dynamic Price dropdown options state:
   const [priceOptions, setPriceOptions] = useState<any[]>([]);
   //--------------------------------------------------------------------------------------
@@ -143,21 +153,23 @@ const OrderFormComponent: React.FC = () => {
       rawValue = value.target.value;
     }
 
-    // Optional: Allow commas for display but store as numeric
+    //Allow commas for display but store as numeric
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     // You may also validate here if needed
     if (!isNaN(numericValue)) {
-      setAmount(numericValue.toString()); // keep displaying it as string
-      // Optionally store numericValue in another state if needed for sending
+      setAmount(numericValue.toString()); // just display it as a string
     }
-    console.log(numericValue);
   };
 
   //--------------------------------------------------------------------------------------
   //Duration input functions :
+
+  //To create an array of 30 days
   const days = Array.from({ length: 30 }, (_, i) => i + 1);
+  //To create an array of 1 & 3 hours
   const hours = [1, 3];
+  //To create an array for 15 min
   const minutes = [15];
 
   const handleOptionClick = (value: string) => {
@@ -167,13 +179,15 @@ const OrderFormComponent: React.FC = () => {
 
   //--------------------------------------------------------------------------------------
   //Price input functions :
+
+  //To set min max dynamic options :
   const minOption = Math.min(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
   );
   const maxOption = Math.max(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
   );
-
+  //To change the color of the options :
   const getOptionStyle = (option: string) => {
     const inputNum = parseInt(inputValue, 10);
     const optionNum = parseInt(option, 10);
@@ -216,23 +230,35 @@ const OrderFormComponent: React.FC = () => {
     }
   };
   //--------------------------------------------------------------------------------------
+  //To fetch dynamic options data for price dropdown based on duration dropdown :
   const fetchOptionsForDuration = async (duration: string) => {
+    let endPoint = "";
+    if (switchBtn === "energy") {
+      endPoint = `http://localhost:3001/energyPrices?duration=${encodeURIComponent(
+        duration
+      )}`;
+    } else {
+      endPoint = `http://localhost:3001/bandwidthPrices?duration=${encodeURIComponent(
+        duration
+      )}`;
+    }
+
     try {
-      const res = await fetch(
-        `http://localhost:3001/prices?duration=${encodeURIComponent(duration)}`
-      );
+      const res = await fetch(endPoint);
       const data = await res.json();
 
       if (data.length > 0) {
-        setPriceOptions(data[0].options); // options array inside matched duration
+        // options array inside matched duration
+        setPriceOptions(data[0].options);
       } else {
-        setPriceOptions([]); // No options found
+        // No options found
+        setPriceOptions([]);
       }
     } catch (err) {
       console.error("Failed to fetch price options:", err);
     }
   };
-
+  //To render dynamic options in price dropdown :
   useEffect(() => {
     if (durationValue) {
       fetchOptionsForDuration(durationValue);
@@ -248,6 +274,7 @@ const OrderFormComponent: React.FC = () => {
     <>
       <FormWrapper className="order-bg">
         <Form onSubmit={handleSubmit}>
+          {/** Form header and switch btn component */}
           <FormHeaderSwitchWrapper>
             <FormHeaderIconWrapper>
               <FormIconWrapper>
@@ -259,11 +286,11 @@ const OrderFormComponent: React.FC = () => {
               <FormHeaderWrapper>
                 {switchBtn === "energy" ? (
                   <AccountHeader style={{ color: "#1E650F" }}>
-                    Energy
+                    {t("energy")}
                   </AccountHeader>
                 ) : (
                   <AccountHeader style={{ color: "#1E650F" }}>
-                    Bandwidth
+                    {t("bandwidth")}
                   </AccountHeader>
                 )}
               </FormHeaderWrapper>
@@ -274,14 +301,16 @@ const OrderFormComponent: React.FC = () => {
                 exclusive
                 onChange={handleChange}
               >
-                <CustomToggleButton value="energy">Energy</CustomToggleButton>
+                <CustomToggleButton value="energy">
+                  {t("energy")}
+                </CustomToggleButton>
                 <CustomToggleButton value="bandwidth">
-                  Bandwidth
+                  {t("bandwidth")}
                 </CustomToggleButton>
               </ToggleButtonGroup>
             </FormSwitchWrapper>
           </FormHeaderSwitchWrapper>
-
+          {/** Form wallet address input component */}
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
               <FormAddLabel>Wallet Address</FormAddLabel>
@@ -300,7 +329,7 @@ const OrderFormComponent: React.FC = () => {
               </FormAddInputIconWrapper>
             </FormAddInputWrapper>
           </FormAddInputLabelWrapper>
-
+          {/** Form amount input component */}
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
               <FormAddLabel>Amount</FormAddLabel>
@@ -331,6 +360,7 @@ const OrderFormComponent: React.FC = () => {
             </FormAddInputWrapper>
             {switchBtn === "energy" ? (
               <InputMiniBtnWrapper>
+                {/** Form input mini btns component */}
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
                     onClick={() => amountHandleChange("64,350")}
@@ -409,7 +439,7 @@ const OrderFormComponent: React.FC = () => {
               </InputMiniBtnWrapper>
             )}
           </FormAddInputLabelWrapper>
-
+          {/** Form duration dropdown component */}
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>Duration</FormAddLabel>
@@ -472,7 +502,6 @@ const OrderFormComponent: React.FC = () => {
                           </Grid>
                         ))}
                       </Grid>
-
                       <Typography fontWeight="bold">Hours</Typography>
                       <Grid container spacing={1} mb={2}>
                         {hours.map((hr) => (
@@ -489,7 +518,6 @@ const OrderFormComponent: React.FC = () => {
                           </Grid>
                         ))}
                       </Grid>
-
                       <Typography fontWeight="bold">Days</Typography>
                       <Grid container spacing={1}>
                         {days.map((day) => (
@@ -515,7 +543,7 @@ const OrderFormComponent: React.FC = () => {
               </ClickAwayListener>
             </FormControl>
           </FormAddInputLabelWrapper>
-
+          {/** Form price component */}
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>Price</FormAddLabel>
@@ -583,6 +611,63 @@ const OrderFormComponent: React.FC = () => {
               />
             </FormControl>
           </FormAddInputLabelWrapper>
+          <Divider orientation="horizontal" flexItem sx={{ my: 2 }} />
+          <OrderInfoWrapper>
+            <OrderInfoHeaderWrapper style={{ marginBottom: "0.5rem" }}>
+              <AccountHeader style={{ color: "#989898" }}>
+                Order Info
+              </AccountHeader>
+            </OrderInfoHeaderWrapper>
+            <OrderInfoTextWrapper>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#989898" }}>
+                  Amount
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#989898" }}>
+                  65000
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+            </OrderInfoTextWrapper>
+
+            <OrderInfoTextWrapper>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#989898" }}>
+                  Duration
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#989898" }}>
+                  / 3 days
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+            </OrderInfoTextWrapper>
+
+            <OrderInfoTextWrapper>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#989898" }}>
+                  Payout
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+
+              <OrderInfoTextWrapper2>
+                <OrderInfoText
+                  style={{
+                    color: "#1E650F",
+                    fontSize: "24px",
+                    fontWeight: "800",
+                  }}
+                >
+                  65000 TRX
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+            </OrderInfoTextWrapper>
+          </OrderInfoWrapper>
+
+          <OrderSubmitBtnWrapper>
+            <OrderSubmitBtn type="submit">Create Order</OrderSubmitBtn>
+          </OrderSubmitBtnWrapper>
         </Form>
       </FormWrapper>
     </>
