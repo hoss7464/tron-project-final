@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./mainPage.css";
 import {
   FormControl,
@@ -41,10 +41,7 @@ import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import singleEnergy from "../../assets/svg/SingleEnergy.svg";
 import singleBandwidth from "../../assets/svg/SingleBandwidth.svg";
 //-------------------------------------------------------------------------------------
-const days = Array.from({ length: 30 }, (_, i) => i + 1);
-const hours = [1, 3];
-const minutes = [15];
-
+//Duration input components :
 const boxStyle = {
   px: 1,
   py: 0.5,
@@ -78,8 +75,7 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   },
 }));
 //-------------------------------------------------------------------------------------
-//Dropdown menu material ui styles
-
+//Dropdown menu material ui components:
 const DropdownIconWithText: React.FC = () => {
   return (
     <div
@@ -111,30 +107,20 @@ const DropdownIconWithText: React.FC = () => {
 //-------------------------------------------------------------------------------------
 
 const OrderFormComponent: React.FC = () => {
+  //States :
+  //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
-  
+  //Amount input states:
   const [inputValue, setInputValue] = useState<string>("");
   const [amount, setAmount] = useState("");
-
-  const [inputValue2, setInputValue2] = useState("");
+  //Duration dropdown states :
+  const [durationValue, setDurationValue] = useState("");
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLInputElement | null>(null);
-
-  const options = [
-    { id: 1, col1: "100", col2: "Red" },
-    { id: 2, col1: "200", col2: "Orange" },
-    { id: 3, col1: "300", col2: "Yellow" },
-    { id: 4, col1: "400", col2: "Green" },
-    { id: 5, col1: "500", col2: "Purple" },
-  ];
-
-  const minOption = Math.min(
-    ...options.map((option) => parseInt(option.col1, 10))
-  );
-  const maxOption = Math.max(
-    ...options.map((option) => parseInt(option.col1, 10))
-  );
-
+  //Dynamic Price dropdown options state:
+  const [priceOptions, setPriceOptions] = useState<any[]>([]);
+  //--------------------------------------------------------------------------------------
+  //Switch button handleChange function :
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
     switchBtn: string | null
@@ -144,11 +130,8 @@ const OrderFormComponent: React.FC = () => {
     }
   };
 
-  const handleOptionClick = (value: string) => {
-    setInputValue2(value);
-    setOpen(false);
-  };
-
+  //--------------------------------------------------------------------------------------
+  //Amount input handleChange function :
   const amountHandleChange = (
     value: string | React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -171,6 +154,26 @@ const OrderFormComponent: React.FC = () => {
     console.log(numericValue);
   };
 
+  //--------------------------------------------------------------------------------------
+  //Duration input functions :
+  const days = Array.from({ length: 30 }, (_, i) => i + 1);
+  const hours = [1, 3];
+  const minutes = [15];
+
+  const handleOptionClick = (value: string) => {
+    setDurationValue(value);
+    setOpen(false);
+  };
+
+  //--------------------------------------------------------------------------------------
+  //Price input functions :
+  const minOption = Math.min(
+    ...priceOptions.map((option) => parseInt(option.col1, 10))
+  );
+  const maxOption = Math.max(
+    ...priceOptions.map((option) => parseInt(option.col1, 10))
+  );
+
   const getOptionStyle = (option: string) => {
     const inputNum = parseInt(inputValue, 10);
     const optionNum = parseInt(option, 10);
@@ -183,7 +186,7 @@ const OrderFormComponent: React.FC = () => {
       return { color: "gray" }; // Outside of range
     }
 
-    const parsedOptions = options.map((o) => parseInt(o.col1, 10));
+    const parsedOptions = priceOptions.map((o) => parseInt(o.col1, 10));
     const exactMatch = parsedOptions.includes(inputNum);
 
     if (exactMatch) {
@@ -212,7 +215,31 @@ const OrderFormComponent: React.FC = () => {
       }
     }
   };
+  //--------------------------------------------------------------------------------------
+  const fetchOptionsForDuration = async (duration: string) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/prices?duration=${encodeURIComponent(duration)}`
+      );
+      const data = await res.json();
 
+      if (data.length > 0) {
+        setPriceOptions(data[0].options); // options array inside matched duration
+      } else {
+        setPriceOptions([]); // No options found
+      }
+    } catch (err) {
+      console.error("Failed to fetch price options:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (durationValue) {
+      fetchOptionsForDuration(durationValue);
+    }
+  }, [durationValue]);
+  //--------------------------------------------------------------------------------------
+  //Submit form function :
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
@@ -383,139 +410,179 @@ const OrderFormComponent: React.FC = () => {
             )}
           </FormAddInputLabelWrapper>
 
-          <FormControl fullWidth style={{ marginBottom: '1rem' }}>
-            <ClickAwayListener onClickAway={() => setOpen(false)}>
-              <Box>
-                <TextField
-                  placeholder="Duration"
-                  value={inputValue2}
-                  onChange={(e) => setInputValue2(e.target.value)}
-                  onFocus={() => setOpen(true)}
-                  inputRef={anchorRef}
-                  fullWidth
-                />
-                <Popper
-                  open={open}
-                  anchorEl={anchorRef.current}
-                  placement="bottom-start"
-                  style={{ zIndex: 1300 }}
-                >
-                  <Box
+          <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
+            <FormAddLabelWrapper>
+              <FormAddLabel>Duration</FormAddLabel>
+            </FormAddLabelWrapper>
+            <FormControl fullWidth style={{ marginBottom: "1rem" }}>
+              <ClickAwayListener onClickAway={() => setOpen(false)}>
+                <Box>
+                  <TextField
+                    placeholder="Duration"
+                    value={durationValue}
+                    onChange={(e) => setDurationValue(e.target.value)}
+                    onFocus={() => setOpen(true)}
+                    inputRef={anchorRef}
+                    fullWidth
                     sx={{
-                      bgcolor: "background.paper",
-                      border: "1px solid #ccc",
-                      p: 2,
-                      mt: 1,
-                      width: 300,
-                      boxShadow: 4,
-                      borderRadius: 2,
+                      "& .MuiOutlinedInput-root": {
+                        height: "52px",
+                        border: "2px solid #1E650F",
+                        borderRadius: "55px",
+
+                        "&.Mui-focused fieldset": {
+                          borderColor: "transparent",
+                        },
+                        "& fieldset": {
+                          border: "none",
+                        },
+                      },
+                    }}
+                  />
+                  <Popper
+                    open={open}
+                    anchorEl={anchorRef.current}
+                    placement="bottom-start"
+                    style={{ zIndex: 1300 }}
+                  >
+                    <Box
+                      sx={{
+                        bgcolor: "background.paper",
+                        border: "1px solid #ccc",
+                        p: 2,
+                        mt: 1,
+                        width: 300,
+                        boxShadow: 4,
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Typography fontWeight="bold">Minutes</Typography>
+                      <Grid container spacing={1} mb={2}>
+                        {minutes.map((min) => (
+                          <Grid key={min}>
+                            <Box
+                              sx={boxStyle}
+                              onClick={(e) => {
+                                e.stopPropagation(); // prevent triggering events on other components
+                                handleOptionClick(`${min} minutes`);
+                              }}
+                            >
+                              {min}
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+
+                      <Typography fontWeight="bold">Hours</Typography>
+                      <Grid container spacing={1} mb={2}>
+                        {hours.map((hr) => (
+                          <Grid key={hr}>
+                            <Box
+                              sx={boxStyle}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOptionClick(`${hr} hours`);
+                              }}
+                            >
+                              {hr}
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+
+                      <Typography fontWeight="bold">Days</Typography>
+                      <Grid container spacing={1}>
+                        {days.map((day) => (
+                          <Grid size={2} key={day}>
+                            <Box
+                              sx={boxStyle}
+                              onMouseDown={(e) => {
+                                e.preventDefault(); // Prevent focus shift
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOptionClick(`${day} days`);
+                              }}
+                            >
+                              {day}
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Box>
+                  </Popper>
+                </Box>
+              </ClickAwayListener>
+            </FormControl>
+          </FormAddInputLabelWrapper>
+
+          <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
+            <FormAddLabelWrapper>
+              <FormAddLabel>Price</FormAddLabel>
+            </FormAddLabelWrapper>
+            <FormControl fullWidth>
+              <Autocomplete
+                freeSolo
+                disableClearable
+                openOnFocus
+                options={priceOptions}
+                inputValue={inputValue}
+                onInputChange={(_, newInputValue) =>
+                  setInputValue(newInputValue)
+                }
+                getOptionLabel={(option) => {
+                  if (typeof option === "string") return option;
+                  return `${option.col1} - ${option.col2}`;
+                }}
+                filterOptions={(options) => options}
+                renderOption={(props, option) => (
+                  <li
+                    {...props}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      ...getOptionStyle(option.col1),
+                      pointerEvents: "none", // disable interaction
                     }}
                   >
-                    <Typography fontWeight="bold">Minutes</Typography>
-                    <Grid container spacing={1} mb={2}>
-                      {minutes.map((min) => (
-                        <Grid key={min}>
-                          <Box
-                            sx={boxStyle}
-                            onClick={(e) => {
-                              e.stopPropagation(); // prevent triggering events on other components
-                              handleOptionClick(`${min} minutes`);
-                            }}
-                          >
-                            {min}
-                          </Box>
-                        </Grid>
-                      ))}
-                    </Grid>
+                    <span>{option.col1}</span>
+                    <span style={{ marginLeft: "auto" }}>{option.col2}</span>
+                  </li>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Price"
+                    variant="outlined"
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        height: "52px",
+                        border: "2px solid #1E650F",
+                        borderRadius: "55px",
 
-                    <Typography fontWeight="bold">Hours</Typography>
-                    <Grid container spacing={1} mb={2}>
-                      {hours.map((hr) => (
-                        <Grid key={hr}>
-                          <Box
-                            sx={boxStyle}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOptionClick(`${hr} hours`);
-                            }}
-                          >
-                            {hr}
-                          </Box>
-                        </Grid>
-                      ))}
-                    </Grid>
-
-                    <Typography fontWeight="bold">Days</Typography>
-                    <Grid container spacing={1}>
-                      {days.map((day) => (
-                        <Grid size={2} key={day}>
-                          <Box
-                            sx={boxStyle}
-                            onMouseDown={(e) => {
-                              e.preventDefault(); // Prevent focus shift
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOptionClick(`${day} days`);
-                            }}
-                          >
-                            {day}
-                          </Box>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Box>
-                </Popper>
-              </Box>
-            </ClickAwayListener>
-          </FormControl>
-
-          <FormControl fullWidth>
-            <Autocomplete
-              freeSolo
-              disableClearable
-              openOnFocus
-              options={options}
-              inputValue={inputValue}
-              onInputChange={(_, newInputValue) => setInputValue(newInputValue)}
-              getOptionLabel={(option) => {
-                if (typeof option === "string") return option;
-                return `${option.col1} - ${option.col2}`;
-              }}
-              filterOptions={(options) => options}
-              renderOption={(props, option) => (
-                <li
-                  {...props}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    ...getOptionStyle(option.col1),
-                    pointerEvents: "none", // disable interaction
-                  }}
-                >
-                  <span>{option.col1}</span>
-                  <span style={{ marginLeft: "auto" }}>{option.col2}</span>
-                </li>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="Price"
-                  variant="outlined"
-                  InputProps={{
-                    ...params.InputProps,
-                    type: "text",
-                    endAdornment: (
-                      <div>
-                        <DropdownIconWithText />
-                      </div>
-                    ),
-                  }}
-                />
-              )}
-            />
-          </FormControl>
+                        "&.Mui-focused fieldset": {
+                          borderColor: "transparent",
+                        },
+                        "& fieldset": {
+                          border: "none",
+                        },
+                      },
+                    }}
+                    InputProps={{
+                      ...params.InputProps,
+                      type: "text",
+                      endAdornment: (
+                        <div>
+                          <DropdownIconWithText />
+                        </div>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </FormControl>
+          </FormAddInputLabelWrapper>
         </Form>
       </FormWrapper>
     </>
