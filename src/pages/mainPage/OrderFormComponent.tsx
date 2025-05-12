@@ -68,9 +68,9 @@ const boxStyle = {
 const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   textTransform: "none",
   fontWeight: "bold",
-  fontSize: "14px",
+  fontSize: "12px",
   border: "2px solid #1E650F",
-  borderRadius: 24,
+  borderRadius: 8,
   padding: "6px 8px",
   "&.Mui-selected": {
     backgroundColor: "#1E650F",
@@ -244,7 +244,7 @@ const OrderFormComponent: React.FC = () => {
     }
   
     if (isNaN(numValue) || numValue < minOption || numValue > maxOption) {
-      return `${minOption} - ${maxOption}.`;
+      return `between ${minOption} - ${maxOption}.`;
     }
   
     return ""; // No error
@@ -477,8 +477,8 @@ const OrderFormComponent: React.FC = () => {
 
   return (
     <>
-      <FormWrapper className="order-bg">
-        <Form onSubmit={handleSubmit}>
+      <FormWrapper >
+        <Form onSubmit={handleSubmit} className="order-bg">
           {/** Form header and switch btn component */}
           <FormHeaderSwitchWrapper>
             <FormHeaderIconWrapper>
@@ -543,7 +543,7 @@ const OrderFormComponent: React.FC = () => {
                 <p
                   style={{
                     color: "red",
-                    marginTop: "4px",
+                    marginBottom: "4px",
                     marginLeft: "0.5rem",
                     fontSize: "16px",
                   }}
@@ -675,7 +675,7 @@ const OrderFormComponent: React.FC = () => {
                 <p
                   style={{
                     color: "red",
-                    marginTop: "4px",
+                    marginBottom: "4px",
                     marginLeft: "0.5rem",
                     fontSize: "16px",
                   }}
@@ -684,7 +684,7 @@ const OrderFormComponent: React.FC = () => {
                 </p>
               )}
             </FormAddLabelWrapper>
-            <FormControl fullWidth style={{ marginBottom: "1rem" }}>
+            <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
               <ClickAwayListener onClickAway={() => setOpen(false)}>
                 <Box>
                   <TextField
@@ -696,7 +696,7 @@ const OrderFormComponent: React.FC = () => {
                     fullWidth
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        height: "52px",
+                        height: "49px",
                         border: "2px solid #1E650F",
                         borderRadius: "55px",
 
@@ -720,7 +720,7 @@ const OrderFormComponent: React.FC = () => {
                         bgcolor: "background.paper",
                         border: "1px solid #ccc",
                         p: 2,
-                        mt: 1,
+                        mt: 0.5,
                         width: 300,
                         boxShadow: 4,
                         borderRadius: 2,
@@ -791,7 +791,7 @@ const OrderFormComponent: React.FC = () => {
                 <p
                   style={{
                     color: "red",
-                    marginTop: "4px",
+                    marginBottom: "4px",
                     marginLeft: "0.5rem",
                     fontSize: "16px",
                   }}
@@ -846,7 +846,7 @@ const OrderFormComponent: React.FC = () => {
                       }}
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        height: "52px",
+                        height: "49px",
                         border: "2px solid #1E650F",
                         borderRadius: "55px",
 
@@ -875,7 +875,7 @@ const OrderFormComponent: React.FC = () => {
           <Divider orientation="horizontal" flexItem sx={{ my: 2 }} />
           <OrderInfoWrapper>
             <OrderInfoHeaderWrapper style={{ marginBottom: "0.5rem" }}>
-              <AccountHeader style={{ color: "#989898" }}>
+              <AccountHeader style={{ color: "#989898", fontSize: "16px", fontWeight : "800" }}>
                 Order Info
               </AccountHeader>
             </OrderInfoHeaderWrapper>
@@ -916,7 +916,7 @@ const OrderFormComponent: React.FC = () => {
                 <OrderInfoText
                   style={{
                     color: "#1E650F",
-                    fontSize: "24px",
+                    fontSize: "20px",
                     fontWeight: "800",
                   }}
                 >

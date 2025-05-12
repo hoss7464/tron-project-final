@@ -1,4 +1,5 @@
 import React from "react";
+import "./mainPage.css"
 import { useTranslation } from "react-i18next";
 import {
   LegacyContainer,
@@ -31,7 +32,7 @@ const LegacyComponent: React.FC = () => {
   return (
     <>
       <LegacyContainer>
-        <AccountWrapper  >
+        <AccountWrapper className="order-bg"  >
           <AccountHeaderIconWrapper>
             <AccountIconWrapper>
               <AccountIcon alt="account" src={accountIcon} />
@@ -82,7 +83,7 @@ const LegacyComponent: React.FC = () => {
           </AccountTextNumberWrapper>
         </AccountWrapper>
 
-        <EnergyWrapper>
+        <EnergyWrapper className="order-bg">
           <AccountHeaderIconWrapper>
             <AccountIconWrapper>
               <AccountIcon alt="energy" src={energyIcon} />
@@ -120,7 +121,7 @@ const LegacyComponent: React.FC = () => {
           </AccountTextNumberWrapper>
         </EnergyWrapper>
 
-        <BandwidthWrapper>
+        <BandwidthWrapper className="order-bg">
           <AccountHeaderIconWrapper>
             <AccountIconWrapper>
               <AccountIcon alt="bandwidth" src={bandwidthIcon} />

@@ -1,4 +1,5 @@
 import React from "react";
+import "./mainPage.css"
 import { Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import {
@@ -22,10 +23,10 @@ const ResourceComponent: React.FC = () => {
     <>
       <ResourceWrapper>
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4 }} >
             <ResourceWrapper2
+            className="order-bg"
               style={{
-                backgroundColor: "#F8F8F8",
                 borderRadius: "24px",
                 padding: "0.5rem",
               }}
@@ -64,8 +65,8 @@ const ResourceComponent: React.FC = () => {
 
           <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
             <ResourceWrapper2
+            className="order-bg"
               style={{
-                backgroundColor: "#F8F8F8",
                 borderRadius: "24px",
                 padding: "0.5rem",
               }}
@@ -97,8 +98,8 @@ const ResourceComponent: React.FC = () => {
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 6, lg: 4 }}>
             <ResourceWrapper2
+            className="order-bg"
               style={{
-                backgroundColor: "#F8F8F8",
                 borderRadius: "24px",
                 padding: "0.5rem",
               }}
