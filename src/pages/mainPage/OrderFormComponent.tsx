@@ -120,15 +120,20 @@ const OrderFormComponent: React.FC = () => {
   const { t } = useTranslation();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
+  //Wallet address states :
+  const [walletAdd, setWalletAdd] = useState("XzWPJDLR3jXzWPJDLR3jzWPJDLR3jzW");
   //Amount input states:
-  const [inputValue, setInputValue] = useState<string>("");
   const [amount, setAmount] = useState("");
+  const [amountError, setAmountError] = useState("");
   //Duration dropdown states :
   const [durationValue, setDurationValue] = useState("");
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLInputElement | null>(null); //to get a refrence to the actual dom node
-  //Dynamic Price dropdown options state:
+  const [durationError, setDurationError] = useState("");
+  //Price dropdown states :
+  const [inputValue, setInputValue] = useState<string>("");
   const [priceOptions, setPriceOptions] = useState<any[]>([]);
+  const [priceError, setPriceError] = useState("")
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -141,7 +146,23 @@ const OrderFormComponent: React.FC = () => {
   };
 
   //--------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------
   //Amount input handleChange function :
+  //Function for amount validation :
+  const validateAmount = (rawValue: string): string => {
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+
+    if (rawValue.trim() === "") {
+      return "*";
+    } else if (isNaN(numericValue)) {
+      return "*";
+    } else if (numericValue < 1000 || numericValue > 300000) {
+      return "*";
+    }
+
+    return "";
+  };
+
   const amountHandleChange = (
     value: string | React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -160,6 +181,15 @@ const OrderFormComponent: React.FC = () => {
     if (!isNaN(numericValue)) {
       setAmount(numericValue.toString()); // just display it as a string
     }
+
+    // Validate input
+    const errorMessage = validateAmount(rawValue);
+    setAmountError(errorMessage);
+  };
+
+  //Function for getting numeric value out of amount input :
+  const getNumericAmount = (amount: string): number => {
+    return Number(amount.replace(/,/g, ""));
   };
 
   //--------------------------------------------------------------------------------------
@@ -172,14 +202,32 @@ const OrderFormComponent: React.FC = () => {
   //To create an array for 15 min
   const minutes = [15];
 
+  //Duration inout validation :
+  const validateDuration = (value: string): string => {
+    if (value.trim() === "") {
+      return "*";
+    }
+    return "";
+  };
+  //handleOption function on click :
   const handleOptionClick = (value: string) => {
     setDurationValue(value);
     setOpen(false);
+    anchorRef.current?.blur();
+
+    const errorMessage = validateDuration(value);
+    setDurationError(errorMessage);
+  };
+
+  //Function for getting the digit part out of duration options :
+  const getNumericDuration = (value: string): number | null => {
+    const match = value.match(/^(\d+)/); // Matches digits at the start
+    return match ? Number(match[1]) : null;
   };
 
   //--------------------------------------------------------------------------------------
   //Price input functions :
-
+  
   //To set min max dynamic options :
   const minOption = Math.min(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
@@ -187,6 +235,20 @@ const OrderFormComponent: React.FC = () => {
   const maxOption = Math.max(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
   );
+  //Price input validation : 
+  const validatePrice = (value: string): string => {
+    const numValue = parseInt(value, 10);
+  
+    if (value.trim() === "") {
+      return "*";
+    }
+  
+    if (isNaN(numValue) || numValue < minOption || numValue > maxOption) {
+      return `${minOption} - ${maxOption}.`;
+    }
+  
+    return ""; // No error
+  };
   //To change the color of the options :
   const getOptionStyle = (option: string) => {
     const inputNum = parseInt(inputValue, 10);
@@ -229,6 +291,40 @@ const OrderFormComponent: React.FC = () => {
       }
     }
   };
+
+  //Function to select a nearest samller number when we enter a number which doesn't exists in price values but is in min max range:
+  const getNearestSmallerOption = (input: string): number | null => {
+    const inputNum = parseInt(input, 10);
+    if (isNaN(inputNum)) return null;
+
+    const numericOptions = priceOptions
+      .map((opt) => parseInt(opt.col1, 10))
+      .filter((n) => !isNaN(n))
+      .sort((a, b) => b - a); // Sort descending
+
+    for (let num of numericOptions) {
+      if (num <= inputNum) {
+        return num;
+      }
+    }
+
+    return null;
+  };
+  //Function for getting nearest smaller selected price value in price options and getting the numeric value out of that.
+  const getNumericSelectedPrice = (selectedPrice: string): number | null => {
+    const exactMatch = priceOptions.some((opt) => opt.col1 === selectedPrice);
+
+    if (!exactMatch) {
+      const fallback = getNearestSmallerOption(selectedPrice);
+      if (fallback) {
+        selectedPrice = fallback.toString();
+      } else {
+        return null;
+      }
+    }
+
+    return Number(selectedPrice); // Return the numeric value
+  };
   //--------------------------------------------------------------------------------------
   //To fetch dynamic options data for price dropdown based on duration dropdown :
   const fetchOptionsForDuration = async (duration: string) => {
@@ -265,9 +361,118 @@ const OrderFormComponent: React.FC = () => {
     }
   }, [durationValue]);
   //--------------------------------------------------------------------------------------
+  //To calculate payout amount :
+  const calculateTotalPrice = () => {
+    const numericAmount = getNumericAmount(amount);
+    const pricePerUnit = getNumericSelectedPrice(inputValue);
+    const durationNumeric = getNumericDuration(durationValue);
+    const SUN = 1000000;
+
+    if (pricePerUnit === null || durationNumeric === null) {
+      return null; // can't calculate without valid inputs
+    }
+
+    let totalPrice = 0;
+
+    if (durationValue === "15 minutes") {
+      totalPrice = (numericAmount / SUN) * 67 * 1;
+    } else if (durationValue === "1 hours") {
+      totalPrice = (numericAmount / SUN) * 70 * 1;
+    } else if (durationValue === "3 hours") {
+      totalPrice = (numericAmount / SUN) * 80 * 1;
+    } else if (durationValue.endsWith("days")) {
+      // Handle "1 days" to "30 days"
+      const daysMatch = durationValue.match(/^(\d+)\s+days$/);
+      if (daysMatch) {
+        const numberOfDays = parseInt(daysMatch[1], 10);
+        if (!isNaN(numberOfDays)) {
+          totalPrice = (numericAmount / SUN) * minOption * numberOfDays;
+        }
+      } else {
+        return null; // Invalid format
+      }
+    } else {
+      return null; // Not a recognized duration
+    }
+
+    return totalPrice;
+  };
+
+  let myPrice = calculateTotalPrice();
+  //--------------------------------------------------------------------------------------
   //Submit form function :
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    //Switch button value :
+    let formBtn = switchBtn;
+    //Wallet address :
+    let walletAddress = walletAdd;
+    //numeric value of amount input
+    const numericAmount = getNumericAmount(amount);
+    //duration input value :
+    const durationNumericValue = getNumericDuration(durationValue);
+    //Price input value :
+    let stringSelectedPrice = inputValue;
+    let numericSelectedPrice = getNumericSelectedPrice(stringSelectedPrice);
+    //Total price value :
+    let myPrice = calculateTotalPrice();
+    //Time and date for submitted form :
+    const now = new Date();
+    const formattedDate = now.toISOString().split("T")[0];
+    const formattedTime = now.toTimeString().split(" ")[0].slice(0, 5);
+
+    //Amount input validation :
+    const amountValidationError = validateAmount(amount);
+    setAmountError(amountValidationError);
+    //Duration input validation : 
+    const durationValidationError = validateDuration(durationValue);
+    setDurationError(durationValidationError);
+    //Price input validation : 
+    const priceValidationError = validatePrice(inputValue);
+    setPriceError(priceValidationError);
+
+
+    if (
+      formBtn === null ||
+      numericAmount === null ||
+      durationNumericValue === null ||
+      numericSelectedPrice === null
+    ) {
+      return;
+    }
+
+    // Data object to send
+    const postData = {
+      formHeader: formBtn,
+      formAddress: walletAddress,
+      formAmount: numericAmount,
+      formDuration: durationNumericValue,
+      formPrice: numericSelectedPrice,
+      formDate: formattedDate,
+      formTime: formattedTime,
+      formTotalPrice: myPrice,
+    };
+
+    //Amount validation for submiting the form :
+
+    //Fetch data towards server :
+    try {
+      const response = await fetch("http://localhost:3001/formData", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+    } catch (error) {
+      console.error("Failed to submit data:", error);
+    }
   };
 
   return (
@@ -323,7 +528,8 @@ const OrderFormComponent: React.FC = () => {
                 <FormAddInputWrapper2>
                   <FormAddInput
                     readOnly
-                    value="XzWPJDLR3jXzWPJDLR3jzWPJDLR3jzW"
+                    value={walletAdd}
+                    onChange={(e) => setWalletAdd(e.target.value)}
                   />
                 </FormAddInputWrapper2>
               </FormAddInputIconWrapper>
@@ -333,6 +539,18 @@ const OrderFormComponent: React.FC = () => {
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
               <FormAddLabel>Amount</FormAddLabel>
+              {amountError && (
+                <p
+                  style={{
+                    color: "red",
+                    marginTop: "4px",
+                    marginLeft: "0.5rem",
+                    fontSize: "16px",
+                  }}
+                >
+                  {amountError}
+                </p>
+              )}
             </FormAddLabelWrapper>
             <FormAddInputWrapper>
               <FormAddInputIconWrapper>
@@ -358,19 +576,22 @@ const OrderFormComponent: React.FC = () => {
                 </FormAddInputWrapper2>
               </FormAddInputIconWrapper>
             </FormAddInputWrapper>
+
             {switchBtn === "energy" ? (
               <InputMiniBtnWrapper>
                 {/** Form input mini btns component */}
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
-                    onClick={() => amountHandleChange("64,350")}
-                    value="64,350"
+                    type="button"
+                    onClick={() => amountHandleChange("65,000")}
+                    value="65,000"
                   >
                     USDT Tsf
                   </InputMiniBtn>
                 </InputMiniBtnWrapper2>
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
+                    type="button"
                     onClick={() => amountHandleChange("100,000")}
                     value="100,000"
                   >
@@ -379,6 +600,7 @@ const OrderFormComponent: React.FC = () => {
                 </InputMiniBtnWrapper2>
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
+                    type="button"
                     onClick={() => amountHandleChange("1,000,000")}
                     value="1,000,000"
                   >
@@ -387,6 +609,7 @@ const OrderFormComponent: React.FC = () => {
                 </InputMiniBtnWrapper2>
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
+                    type="button"
                     onClick={() => amountHandleChange("2,000,000")}
                     value="2,000,000"
                   >
@@ -395,6 +618,7 @@ const OrderFormComponent: React.FC = () => {
                 </InputMiniBtnWrapper2>
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
+                    type="button"
                     onClick={() => amountHandleChange("10,000,000")}
                     value="10,000,000"
                   >
@@ -406,6 +630,7 @@ const OrderFormComponent: React.FC = () => {
               <InputMiniBtnWrapper>
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
+                    type="button"
                     onClick={() => amountHandleChange("1,000")}
                     value="1,000"
                   >
@@ -414,6 +639,7 @@ const OrderFormComponent: React.FC = () => {
                 </InputMiniBtnWrapper2>
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
+                    type="button"
                     onClick={() => amountHandleChange("2,000")}
                     value="2,000"
                   >
@@ -422,6 +648,7 @@ const OrderFormComponent: React.FC = () => {
                 </InputMiniBtnWrapper2>
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
+                    type="button"
                     onClick={() => amountHandleChange("5,000")}
                     value="5,000"
                   >
@@ -430,6 +657,7 @@ const OrderFormComponent: React.FC = () => {
                 </InputMiniBtnWrapper2>
                 <InputMiniBtnWrapper2>
                   <InputMiniBtn
+                    type="button"
                     onClick={() => amountHandleChange("10,000")}
                     value="10,000"
                   >
@@ -443,6 +671,18 @@ const OrderFormComponent: React.FC = () => {
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>Duration</FormAddLabel>
+              {durationError && (
+                <p
+                  style={{
+                    color: "red",
+                    marginTop: "4px",
+                    marginLeft: "0.5rem",
+                    fontSize: "16px",
+                  }}
+                >
+                  {durationError}
+                </p>
+              )}
             </FormAddLabelWrapper>
             <FormControl fullWidth style={{ marginBottom: "1rem" }}>
               <ClickAwayListener onClickAway={() => setOpen(false)}>
@@ -547,6 +787,18 @@ const OrderFormComponent: React.FC = () => {
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>Price</FormAddLabel>
+              {priceError && (
+                <p
+                  style={{
+                    color: "red",
+                    marginTop: "4px",
+                    marginLeft: "0.5rem",
+                    fontSize: "16px",
+                  }}
+                >
+                  {priceError}
+                </p>
+              )}
             </FormAddLabelWrapper>
             <FormControl fullWidth>
               <Autocomplete
@@ -563,26 +815,35 @@ const OrderFormComponent: React.FC = () => {
                   return `${option.col1} - ${option.col2}`;
                 }}
                 filterOptions={(options) => options}
-                renderOption={(props, option) => (
-                  <li
-                    {...props}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      ...getOptionStyle(option.col1),
-                      pointerEvents: "none", // disable interaction
-                    }}
-                  >
-                    <span>{option.col1}</span>
-                    <span style={{ marginLeft: "auto" }}>{option.col2}</span>
-                  </li>
-                )}
+                renderOption={(props, option) => {
+                  // Destructure the 'key' out of 'props' before spreading the rest
+                  const { key, ...restProps } = props;
+                  return (
+                    <li
+                      key={key}
+                      {...restProps} // Spread the remaining props
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        ...getOptionStyle(option.col1),
+                        pointerEvents: "none", // disable interaction
+                      }}
+                    >
+                      <span>{option.col1}</span>
+                      <span style={{ marginLeft: "auto" }}>{option.col2}</span>
+                    </li>
+                  );
+                }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     placeholder="Price"
                     variant="outlined"
+                    onBlur={() => {
+                        const errorMsg = validatePrice(inputValue);
+                        setPriceError(errorMsg);
+                      }}
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         height: "52px",
@@ -626,7 +887,7 @@ const OrderFormComponent: React.FC = () => {
               </OrderInfoTextWrapper2>
               <OrderInfoTextWrapper2>
                 <OrderInfoText style={{ color: "#989898" }}>
-                  65000
+                  {amount}
                 </OrderInfoText>
               </OrderInfoTextWrapper2>
             </OrderInfoTextWrapper>
@@ -639,7 +900,7 @@ const OrderFormComponent: React.FC = () => {
               </OrderInfoTextWrapper2>
               <OrderInfoTextWrapper2>
                 <OrderInfoText style={{ color: "#989898" }}>
-                  / 3 days
+                  {durationValue}
                 </OrderInfoText>
               </OrderInfoTextWrapper2>
             </OrderInfoTextWrapper>
@@ -659,7 +920,7 @@ const OrderFormComponent: React.FC = () => {
                     fontWeight: "800",
                   }}
                 >
-                  65000 TRX
+                  {myPrice} TRX
                 </OrderInfoText>
               </OrderInfoTextWrapper2>
             </OrderInfoTextWrapper>

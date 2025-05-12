@@ -55,17 +55,19 @@ export const OrdersComponent: React.FC = () => {
   const rowsPerPage = 6;
   const { data, error, getData, totalCount } = useGetData<Post>();
 
-  useEffect(() => {
-    getData(
-      `http://localhost:3001/post?_page=${currentPage}&_limit=${rowsPerPage}`
-    );
-  }, [currentPage]);
+
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
   };
 
   const totalPages = Math.max(10, Math.ceil(totalCount / rowsPerPage));
+
+  useEffect(() => {
+    getData(
+      `http://localhost:3001/post?_page=${currentPage}&_limit=${rowsPerPage}`
+    );
+  }, [currentPage]);
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
