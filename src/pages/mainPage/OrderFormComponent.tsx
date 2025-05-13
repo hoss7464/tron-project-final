@@ -49,6 +49,8 @@ import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import singleEnergy from "../../assets/svg/SingleEnergy.svg";
 import singleBandwidth from "../../assets/svg/SingleBandwidth.svg";
+import { useDispatch } from "react-redux";
+import { toggleRefresh } from "../../redux/actions/refreshSlice";
 //-------------------------------------------------------------------------------------
 //Duration input components :
 const boxStyle = {
@@ -118,6 +120,7 @@ const DropdownIconWithText: React.FC = () => {
 const OrderFormComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
@@ -133,7 +136,7 @@ const OrderFormComponent: React.FC = () => {
   //Price dropdown states :
   const [inputValue, setInputValue] = useState<string>("");
   const [priceOptions, setPriceOptions] = useState<any[]>([]);
-  const [priceError, setPriceError] = useState("")
+  const [priceError, setPriceError] = useState("");
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -145,7 +148,6 @@ const OrderFormComponent: React.FC = () => {
     }
   };
 
-  //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
   //Amount input handleChange function :
   //Function for amount validation :
@@ -227,7 +229,7 @@ const OrderFormComponent: React.FC = () => {
 
   //--------------------------------------------------------------------------------------
   //Price input functions :
-  
+
   //To set min max dynamic options :
   const minOption = Math.min(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
@@ -235,18 +237,18 @@ const OrderFormComponent: React.FC = () => {
   const maxOption = Math.max(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
   );
-  //Price input validation : 
+  //Price input validation :
   const validatePrice = (value: string): string => {
     const numValue = parseInt(value, 10);
-  
+
     if (value.trim() === "") {
       return "*";
     }
-  
+
     if (isNaN(numValue) || numValue < minOption || numValue > maxOption) {
       return `between ${minOption} - ${maxOption}.`;
     }
-  
+
     return ""; // No error
   };
   //To change the color of the options :
@@ -374,6 +376,10 @@ const OrderFormComponent: React.FC = () => {
 
     let totalPrice = 0;
 
+    // Extract duration unit (e.g., "minutes", "hours", "days")
+    const parts = durationValue.trim().split(" ");
+    const unit = parts[1]; // This will be "minutes", "hours", or "days"
+
     if (durationValue === "15 minutes") {
       totalPrice = (numericAmount / SUN) * 67 * 1;
     } else if (durationValue === "1 hours") {
@@ -394,8 +400,8 @@ const OrderFormComponent: React.FC = () => {
     } else {
       return null; // Not a recognized duration
     }
-
-    return totalPrice;
+    console.log("Duration unit:", unit);
+    return { totalPrice, unit };
   };
 
   let myPrice = calculateTotalPrice();
@@ -403,6 +409,18 @@ const OrderFormComponent: React.FC = () => {
   //Submit form function :
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    //Amount input validation :
+    const amountValidationError = validateAmount(amount);
+    setAmountError(amountValidationError);
+    //Duration input validation :
+    const durationValidationError = validateDuration(durationValue);
+    setDurationError(durationValidationError);
+    //Price input validation :
+    const priceValidationError = validatePrice(inputValue);
+    setPriceError(priceValidationError);
+
+    
     //Switch button value :
     let formBtn = switchBtn;
     //Wallet address :
@@ -416,21 +434,14 @@ const OrderFormComponent: React.FC = () => {
     let numericSelectedPrice = getNumericSelectedPrice(stringSelectedPrice);
     //Total price value :
     let myPrice = calculateTotalPrice();
+    if (!myPrice) {
+      return;
+    }
+    const { totalPrice, unit } = myPrice;
     //Time and date for submitted form :
     const now = new Date();
     const formattedDate = now.toISOString().split("T")[0];
     const formattedTime = now.toTimeString().split(" ")[0].slice(0, 5);
-
-    //Amount input validation :
-    const amountValidationError = validateAmount(amount);
-    setAmountError(amountValidationError);
-    //Duration input validation : 
-    const durationValidationError = validateDuration(durationValue);
-    setDurationError(durationValidationError);
-    //Price input validation : 
-    const priceValidationError = validatePrice(inputValue);
-    setPriceError(priceValidationError);
-
 
     if (
       formBtn === null ||
@@ -450,7 +461,8 @@ const OrderFormComponent: React.FC = () => {
       formPrice: numericSelectedPrice,
       formDate: formattedDate,
       formTime: formattedTime,
-      formTotalPrice: myPrice,
+      formTotalPrice: totalPrice,
+      formDurationUnit: unit,
     };
 
     //Amount validation for submiting the form :
@@ -470,6 +482,14 @@ const OrderFormComponent: React.FC = () => {
       }
 
       const responseData = await response.json();
+      dispatch(toggleRefresh());
+
+      setAmount("");
+      setDurationValue("");
+      setInputValue("");
+      setAmountError("");
+      setDurationError("");
+      setPriceError("");
     } catch (error) {
       console.error("Failed to submit data:", error);
     }
@@ -477,7 +497,7 @@ const OrderFormComponent: React.FC = () => {
 
   return (
     <>
-      <FormWrapper >
+      <FormWrapper>
         <Form onSubmit={handleSubmit} className="order-bg">
           {/** Form header and switch btn component */}
           <FormHeaderSwitchWrapper>
@@ -696,8 +716,8 @@ const OrderFormComponent: React.FC = () => {
                     fullWidth
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        height: "49px",
-                        border: "2px solid #1E650F",
+                        height: "40px",
+                        border: "1px solid #1E650F",
                         borderRadius: "55px",
 
                         "&.Mui-focused fieldset": {
@@ -706,6 +726,9 @@ const OrderFormComponent: React.FC = () => {
                         "& fieldset": {
                           border: "none",
                         },
+                      },
+                      "& input::placeholder": {
+                        fontSize: "14px",
                       },
                     }}
                   />
@@ -841,13 +864,13 @@ const OrderFormComponent: React.FC = () => {
                     placeholder="Price"
                     variant="outlined"
                     onBlur={() => {
-                        const errorMsg = validatePrice(inputValue);
-                        setPriceError(errorMsg);
-                      }}
+                      const errorMsg = validatePrice(inputValue);
+                      setPriceError(errorMsg);
+                    }}
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        height: "49px",
-                        border: "2px solid #1E650F",
+                        height: "40px",
+                        border: "1px solid #1E650F",
                         borderRadius: "55px",
 
                         "&.Mui-focused fieldset": {
@@ -856,6 +879,9 @@ const OrderFormComponent: React.FC = () => {
                         "& fieldset": {
                           border: "none",
                         },
+                      },
+                      "& input::placeholder": {
+                        fontSize: "14px",
                       },
                     }}
                     InputProps={{
@@ -875,7 +901,13 @@ const OrderFormComponent: React.FC = () => {
           <Divider orientation="horizontal" flexItem sx={{ my: 2 }} />
           <OrderInfoWrapper>
             <OrderInfoHeaderWrapper style={{ marginBottom: "0.5rem" }}>
-              <AccountHeader style={{ color: "#989898", fontSize: "16px", fontWeight : "800" }}>
+              <AccountHeader
+                style={{
+                  color: "#989898",
+                  fontSize: "16px",
+                  fontWeight: "800",
+                }}
+              >
                 Order Info
               </AccountHeader>
             </OrderInfoHeaderWrapper>
@@ -920,7 +952,7 @@ const OrderFormComponent: React.FC = () => {
                     fontWeight: "800",
                   }}
                 >
-                  {myPrice} TRX
+                  {myPrice?.totalPrice ?? 0} TRX
                 </OrderInfoText>
               </OrderInfoTextWrapper2>
             </OrderInfoTextWrapper>

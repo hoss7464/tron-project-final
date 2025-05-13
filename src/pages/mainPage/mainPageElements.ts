@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { colors } from "../../core-UI/Theme";
 import { IoCopy } from "react-icons/io5";
 import { MdOutlineAccountBalanceWallet } from "react-icons/md";
+
 //--------------------------------------------------------------------------
 //Main page styles :
 export const MainPageContainer = styled.div`
@@ -44,14 +45,14 @@ export const MainLeftSection = styled.div`
   @media only screen and (min-width: 280px) and (max-width: 992px) {
     display: none;
   }
-  @media only screen and (min-width: 993px) and (max-width: 1080px) {
+  @media only screen and (min-width: 993px) and (max-width: 1200px) {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    width: 30%;
+    width: 35%;
   }
-  @media only screen and (min-width: 1081px) {
+  @media only screen and (min-width: 1201px) {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -71,11 +72,11 @@ export const MainRightSection = styled.div`
     width: 100%;
     padding-left: 0;
   }
-  @media only screen and (min-width: 993px) and (max-width: 1080px) {
-    width: 70%;
+  @media only screen and (min-width: 993px) and (max-width: 1200px) {
+    width: 65%;
     padding-left: 1rem;
   }
-  @media only screen and (min-width: 1081px) {
+  @media only screen and (min-width: 1201px) {
     width: 73%;
     padding-left: 1rem;
   }
@@ -102,8 +103,7 @@ export const AccountWrapper = styled.div`
 
 export const MobileAccountWrapper = styled.div`
   width: 100%;
-  background-color: ${colors.bg1};
-  border: solid 1px ${colors.primary1};
+  border: solid 2px ${colors.bg1};
   border-radius: 24px;
   padding: 0.5rem;
   margin-bottom: 1rem;
@@ -264,7 +264,6 @@ export const Form = styled.form`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  min-height: 600px;
   border-radius: 32px;
   border: solid 2px ${colors.bg1};
   padding: 16px;
@@ -276,7 +275,6 @@ export const FormHeaderSwitchWrapper = styled.div`
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;
-
 `;
 export const FormHeaderIconWrapper = styled.div`
   display: flex;
@@ -325,7 +323,7 @@ export const FormAddInputWrapper = styled.div`
   align-items: center;
   width: 100%;
   border-radius: 24px;
-  border: solid 2px ${colors.primary1};
+  border: solid 1px ${colors.primary1};
   padding-top: 0.3rem;
   padding-left: 0.3rem;
   padding-bottom: 0.3rem;
@@ -344,18 +342,18 @@ export const FormAddIconWrapper = styled.div`
   align-items: center;
   border-radius: 50%;
   background-color: ${colors.primary1};
-  padding: 0.5rem;
-  margin-right: 0.5rem;
+  padding: 0.3rem;
+  margin-right: 0.3rem;
 `;
 export const FormAddIcon = styled(MdOutlineAccountBalanceWallet)`
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   color: ${colors.bg2};
 `;
 
 export const FormIcon2 = styled.img`
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   color: ${colors.bg2};
 `;
 export const FormAddInputWrapper2 = styled.div`
@@ -371,7 +369,7 @@ export const FormAddInput = styled.input`
   border: none;
   outline: none;
   background-color: transparent;
-  font-size: 16px;
+  font-size: 14px;
   &:active {
     border: none;
     outline: none;
@@ -380,6 +378,9 @@ export const FormAddInput = styled.input`
   &:hover {
     border: none;
     outline: none;
+  }
+  &::placeholder {
+    font-size: 14px;
   }
 `;
 
@@ -434,41 +435,41 @@ export const OrderInfoHeaderWrapper = styled.div`
 `;
 
 export const OrderInfoTextWrapper = styled.div`
- display: flex;
+  display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
 `;
 
 export const OrderInfoTextWrapper2 = styled.div`
- display: flex;
-  justify-content:center;
+  display: flex;
+  justify-content: center;
   align-items: center;
-`
+`;
 
 export const OrderInfoText = styled.p`
-font-size: 16px;
-`
+  font-size: 16px;
+`;
 
 export const OrderSubmitBtnWrapper = styled.div`
- display: flex;
-  justify-content:center;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  width:100%;
+  width: 100%;
   margin-top: 1rem;
-`
+`;
 export const OrderSubmitBtn = styled.button`
-border: none;
-font-size: 20px;
-font-weight: 700;
-padding-top: 10px;
-padding-bottom: 10px;
-width: 100%;
-border-radius: 55px;
-background-color: ${colors.primary1};
-color: ${colors.bg2};
-cursor: pointer;
-`
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  width: 100%;
+  border-radius: 55px;
+  background-color: ${colors.primary1};
+  color: ${colors.bg2};
+  cursor: pointer;
+`;
 
 //-------------------------------------------------------------------------
 //Resource section styles
@@ -516,21 +517,70 @@ export const OrdersWrapper = styled.div`
   flex-direction: column;
   border-radius: 32px;
   width: 100%;
+
   margin-top: 1.2rem;
   padding: 0.5rem;
   border: solid 2px ${colors.bg1};
 `;
 
-export const OrderNavWrapper = styled.div`
+export const OrderMainWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 24px;
+`;
+
+export const OrdersCarouselWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   width: 100%;
+  overflow-x: auto;
+  position: relative;
+`;
+
+export const OrdersScroll = styled.div`
+  overflow-x: auto;
+  width: 100%;
+  height: 500px;
+`;
+
+export const OrdersCard = styled.div`
+  width: 100%;
+  min-width: 700px;
+  color: white;
+  border-radius: 10px;
+  flex-shrink: 0;
+`;
+
+export const OrdersDetail = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  border-radius: 16px;
+  border: solid 1px ${colors.border1};
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.5rem;
+`;
+
+export const OrderNavWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 100%;
+  min-width: 700px;
   padding: 0.5rem;
   border-radius: 24px;
   background-color: ${colors.bg1};
-  border: solid 2px ${colors.primary1};
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  border: solid 1px ${colors.primary1};
 `;
 
 export const OrdersNavHeaderWrapper = styled.div`
@@ -538,62 +588,31 @@ export const OrdersNavHeaderWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: 1rem;
 `;
 
 export const OrderNavTextWrapper1 = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
-  padding-left: 1rem;
-  padding-right: 3rem;
 `;
 
-export const OrderNavTextWrapper2 = styled.div`
+export const OrderNavTextWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 20%;
+`;
+
+export const OrderCardIconWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  @media only screen and (max-width: 380px) {
-    display: none;
-  }
+  margin-right: 0.2rem;
 `;
-
-export const OrderNavTextWrapper3 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-export const OrderNavTextWrapper4 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-export const OrderNavTextWrapper5 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-export const OrderNavTextWrapper6 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  @media only screen and (max-width: 430px) {
-    display: none;
-  }
-`;
-
-export const OrderNavTextWrapper7 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  @media only screen and (max-width: 630px) {
-    display: none;
-  }
+export const OrderCardIcon = styled.img`
+  width: 20px;
+  height: 20px;
 `;
 
 export const OrderNavText = styled.p`
@@ -602,62 +621,13 @@ export const OrderNavText = styled.p`
   color: ${colors.text3};
 `;
 
-export const OrdersWrapper2 = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-  height: 500px;
-  border-radius: 24px;
-  margin-top: 0.5rem;
-`;
 
-export const OrdersCardWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 70px;
-  border-radius: 24px;
-  border: solid 1px ${colors.border1};
-  margin-bottom: 0.5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-`;
-
-export const OrdersCardTextWrap1 = styled.div`
+export const OrdersCardTextWrap = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
-`;
-
-export const OrdersCardTextWrap2 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
-
-export const OrdersCardTextWrap3 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  @media only screen and (max-width: 380px) {
-    display: none;
-  }
-`;
-
-export const OrdersCardTextWrap4 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  @media only screen and (max-width: 430px) {
-    display: none;
-  }
+  width: 20%;
 `;
 
 export const OrdersCardTextWrapper2 = styled.div`
@@ -679,8 +649,9 @@ export const OrdersCardText2 = styled.p`
 
 export const OrderCardLinearWrapper = styled.div`
   width: 80px;
-  @media only screen and (max-width: 630px) {
-    display: none;
+  @media only screen and (min-width: 280px) and (max-width: 1120px) {
+    margin-right: 1rem;
+    width: 65px;
   }
 `;
 
@@ -688,19 +659,18 @@ export const OrderCardLinearWrapper2 = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  @media only screen and (max-width: 630px) {
-    display: none;
-  }
 `;
 
 export const OrderCardLineraPercentWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-right: 0.2rem;
 `;
 export const OrderCardLineraPercent = styled.p`
   font-size: 14px;
   font-weight: 500;
+  color: ${colors.primary1};
 `;
 
 export const OrdersSellBtnWrapper = styled.div`
@@ -711,6 +681,8 @@ export const OrdersSellBtnWrapper = styled.div`
   background-color: ${colors.primary1};
   border-radius: 8px;
   cursor: pointer;
+  position: absolute;
+  right: 0.5rem;
 `;
 
 export const OrdersSell = styled.p`
@@ -736,21 +708,76 @@ export const MyOrdersWrapper = styled.div`
   flex-direction: column;
   border-radius: 32px;
   width: 100%;
-  height: 400px;
   margin-top: 1.2rem;
   padding: 0.5rem;
   border: solid 2px ${colors.bg1};
 `;
 
-export const MyOrdersWrapper2 = styled.div`
+export const MyOrdersNavWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 100%;
+  min-width: 700px;
+  padding: 0.5rem;
+  border-radius: 24px;
+  background-color: ${colors.bg1};
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  border: solid 1px ${colors.primary1};
+`;
+
+export const MyOrdersScroll = styled.div`
+  overflow-x: auto;
+  width: 100%;
+  height: 330px;
+`;
+
+export const MyOrdersNavTextWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+export const MyOrdersCarouselWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
+  background-color: khaki;
+`;
+
+export const MyOrdersTextWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  flex-direction: column;
+  width: 25%;
   height: 100%;
+`;
+
+export const MyOrderDetails = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   width: 100%;
-  overflow: auto;
-  margin-top: 0.5rem;
+  border-radius: 16px;
+  border: solid 1px ${colors.border1};
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.5rem;
+`;
+
+export const MyOrderCardTextWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 25%;
+  height: 100%;
 `;
 //-------------------------------------------------------------------------
 //Footer section styles

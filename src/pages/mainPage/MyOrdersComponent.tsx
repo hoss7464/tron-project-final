@@ -2,121 +2,138 @@ import React, { useEffect } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
 import useGetData from "../../hooks/MyOrdersSection/useGetData";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store/store";
 import {
   MyOrdersWrapper,
-  MyOrdersWrapper2,
-  OrderNavWrapper,
+  OrderMainWrapper,
+  OrdersCarouselWrapper,
+  MyOrdersScroll,
+  MyOrderDetails,
+  MyOrderCardTextWrap,
+  OrdersCard,
+  MyOrdersNavWrapper,
   OrdersNavHeaderWrapper,
   AccountHeader,
-  OrderNavTextWrapper1,
-  OrderNavTextWrapper2,
+  MyOrdersNavTextWrapper,
   OrderNavText,
-  OrderNavTextWrapper3,
-  OrderNavTextWrapper4,
-  OrderNavTextWrapper5,
-  OrdersCardWrapper,
-  OrdersCardTextWrap1,
+  OrderCardIconWrapper,
+  OrderCardIcon,
   OrdersCardTextWrapper2,
   OrdersCardText1,
   OrdersCardText2,
-  OrdersCardTextWrap2,
-  OrdersCardTextWrap3,
-  OrdersCardTextWrap4,
+  MyOrdersTextWrapper,
 } from "./mainPageElements";
+import singleEnergy2 from "../../assets/svg/SingleEnergy2.svg";
+import singleBandwidth2 from "../../assets/svg/SingleBandwidth2.svg";
 
 type Post = {
   orderId: number;
-  orderTime: string;
-  orderDate: string;
-  orderResource: string;
-  orderRentTime: string;
-  orderRentTimeNumber: number;
-  orderRentTimeDate: string;
-  orderPrice: string;
-  orderAPY: string;
-  orderPayment: string;
-  orderFulfilled: number;
+  formDate: string;
+  formTime: string;
+  formTotalPrice: number;
+  formAmount: number;
+  formHeader: string;
+  formDuration: number;
+  formPrice: number;
+  formDurationUnit: string;
 };
 
 const MyOrdersComponent: React.FC = () => {
   const { t } = useTranslation();
   const { data, error, getData } = useGetData<Post[]>();
+  const refreshTrigger = useSelector(
+    (state: RootState) => state.refresh.refreshTrigger
+  );
 
   useEffect(() => {
-    getData("http://localhost:3001/post");
-  }, []);
+    getData("http://localhost:3001/formData");
+  }, [refreshTrigger]);
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <>
       <MyOrdersWrapper className="order-bg">
-        <OrderNavWrapper>
+        <OrderMainWrapper>
           <OrdersNavHeaderWrapper>
-            <AccountHeader>{t("my_orders")}</AccountHeader>
+            <AccountHeader>My Orders</AccountHeader>
           </OrdersNavHeaderWrapper>
-          <OrderNavTextWrapper1>
-            <OrderNavTextWrapper2>
-              <OrderNavText>{t("date")}</OrderNavText>
-            </OrderNavTextWrapper2>
+          <OrdersCarouselWrapper>
+            <MyOrdersScroll>
+              <MyOrdersNavWrapper>
+                <MyOrdersNavTextWrapper>
+                  <MyOrdersTextWrapper>
+                    <OrderNavText>{t("date")}</OrderNavText>
+                  </MyOrdersTextWrapper>
 
-            <OrderNavTextWrapper3>
-              <OrderNavText>{t("resource")}</OrderNavText>
-            </OrderNavTextWrapper3>
+                  <MyOrdersTextWrapper>
+                    <OrderNavText>amount</OrderNavText>
+                  </MyOrdersTextWrapper>
 
-            <OrderNavTextWrapper4>
-              <OrderNavText>{t("price")}</OrderNavText>
-            </OrderNavTextWrapper4>
+                  <MyOrdersTextWrapper>
+                    <OrderNavText>{t("price")}</OrderNavText>
+                  </MyOrdersTextWrapper>
 
-            <OrderNavTextWrapper5>
-              <OrderNavText>{t("payment")}</OrderNavText>
-            </OrderNavTextWrapper5>
-          </OrderNavTextWrapper1>
-        </OrderNavWrapper>
-        <MyOrdersWrapper2>
-          {data?.map((myData2) => (
-            <OrdersCardWrapper
-              key={myData2.orderId}
-              style={{ paddingTop: "1rem", paddingBottom: "1rem" }}
-            >
-              <OrdersCardTextWrap1>
-                <OrdersCardTextWrapper2>
-                  <OrdersCardText1>{myData2.orderTime}</OrdersCardText1>
-                </OrdersCardTextWrapper2>
-                <OrdersCardTextWrapper2>
-                  <OrdersCardText2>{myData2.orderDate}</OrdersCardText2>
-                </OrdersCardTextWrapper2>
-              </OrdersCardTextWrap1>
+                  <MyOrdersTextWrapper>
+                    <OrderNavText>{t("payment")}</OrderNavText>
+                  </MyOrdersTextWrapper>
+                </MyOrdersNavTextWrapper>
+              </MyOrdersNavWrapper>
+              <OrdersCard>
+                {data?.map((myData) => (
+                  <>
+                    <MyOrderDetails key={myData.orderId}>
+                      <MyOrderCardTextWrap>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText1>{myData.formDate}</OrdersCardText1>
+                        </OrdersCardTextWrapper2>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText2>{myData.formTime}</OrdersCardText2>
+                        </OrdersCardTextWrapper2>
+                      </MyOrderCardTextWrap>
 
-              <OrdersCardTextWrap2>
-                <OrdersCardTextWrapper2>
-                  <OrdersCardText1>{myData2.orderResource}</OrdersCardText1>
-                </OrdersCardTextWrapper2>
-                <OrdersCardTextWrapper2>
-                  <OrdersCardText2>
-                    {myData2.orderRentTimeNumber}
-                    {t(`${myData2.orderRentTimeDate}`)}
-                  </OrdersCardText2>
-                </OrdersCardTextWrapper2>
-              </OrdersCardTextWrap2>
+                      <MyOrderCardTextWrap>
+                        <OrdersCardTextWrapper2>
+                          <OrderCardIconWrapper>
+                            <OrderCardIcon
+                              alt="energy"
+                              src={
+                                myData.formHeader === "energy"
+                                  ? singleEnergy2
+                                  : singleBandwidth2
+                              }
+                            />
+                          </OrderCardIconWrapper>
+                          <OrdersCardText1>{myData.formAmount}</OrdersCardText1>
+                        </OrdersCardTextWrapper2>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText2>
+                            {myData.formDuration}/ {myData.formDurationUnit}
+                          </OrdersCardText2>
+                        </OrdersCardTextWrapper2>
+                      </MyOrderCardTextWrap>
 
-              <OrdersCardTextWrap3>
-                <OrdersCardTextWrapper2>
-                  <OrdersCardText1>{myData2.orderPrice} SUN</OrdersCardText1>
-                </OrdersCardTextWrapper2>
-                <OrdersCardTextWrapper2>
-                  <OrdersCardText2>APY: {myData2.orderAPY} %</OrdersCardText2>
-                </OrdersCardTextWrapper2>
-              </OrdersCardTextWrap3>
+                      <MyOrderCardTextWrap>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText1>{myData.formPrice}</OrdersCardText1>
+                        </OrdersCardTextWrapper2>
+                      </MyOrderCardTextWrap>
 
-              <OrdersCardTextWrap4>
-                <OrdersCardTextWrapper2>
-                  <OrdersCardText1>{myData2.orderPayment}</OrdersCardText1>
-                </OrdersCardTextWrapper2>
-              </OrdersCardTextWrap4>
-            </OrdersCardWrapper>
-          ))}
-        </MyOrdersWrapper2>
+                      <MyOrderCardTextWrap>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText1>
+                            {myData.formTotalPrice} TRX
+                          </OrdersCardText1>
+                        </OrdersCardTextWrapper2>
+                      </MyOrderCardTextWrap>
+                    </MyOrderDetails>
+                  </>
+                ))}
+              </OrdersCard>
+            </MyOrdersScroll>
+          </OrdersCarouselWrapper>
+        </OrderMainWrapper>
       </MyOrdersWrapper>
     </>
   );

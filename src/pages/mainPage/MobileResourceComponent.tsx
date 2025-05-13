@@ -1,4 +1,5 @@
 import React from "react";
+import "./mainPage.css";
 import { useTranslation } from "react-i18next";
 import {
   AccountHeaderIconWrapper,
@@ -19,13 +20,13 @@ const MobileResourceComponent: React.FC = () => {
   const { t } = useTranslation();
   return (
     <>
-      <MobileAccountWrapper>
+      <MobileAccountWrapper className="order-bg">
         <AccountHeaderIconWrapper>
           <AccountIconWrapper>
             <AccountIcon alt="account" src={accountIcon} />
           </AccountIconWrapper>
           <AccountHeaderWrapper>
-            <AccountHeader style={{ color: "#241DB6" }}>
+            <AccountHeader  style={{ color: "#1E650F" }}>
               {t("account")}
             </AccountHeader>
           </AccountHeaderWrapper>
@@ -33,32 +34,32 @@ const MobileResourceComponent: React.FC = () => {
 
         <AccountTextNumberWrapper>
           <AccountTextWrapper>
-            <AccountText style={{ color: "#8CA1ED" }}>
+            <AccountText style={{ color: "#1E650F" }} >
               {t("balance_trx")}
             </AccountText>
           </AccountTextWrapper>
           <AccountNumberWrapper>
-            <AccountNumber style={{ color: "#241DB6" }}>0</AccountNumber>
+            <AccountNumber style={{ color: "#1E650F" }} >0</AccountNumber>
           </AccountNumberWrapper>
         </AccountTextNumberWrapper>
         <AccountTextNumberWrapper>
           <AccountTextWrapper>
-            <AccountText style={{ color: "#8CA1ED" }}>
+            <AccountText style={{ color: "#1E650F" }} >
               {t("energy")}
             </AccountText>
           </AccountTextWrapper>
           <AccountNumberWrapper>
-            <AccountNumber style={{ color: "#241DB6" }}>0</AccountNumber>
+            <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
           </AccountNumberWrapper>
         </AccountTextNumberWrapper>
         <AccountTextNumberWrapper>
           <AccountTextWrapper>
-            <AccountText style={{ color: "#8CA1ED" }}>
+            <AccountText style={{ color: "#1E650F" }} >
               {t("bandwidth")}
             </AccountText>
           </AccountTextWrapper>
           <AccountNumberWrapper>
-            <AccountNumber style={{ color: "#241DB6" }}>0</AccountNumber>
+            <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
           </AccountNumberWrapper>
         </AccountTextNumberWrapper>
       </MobileAccountWrapper>
