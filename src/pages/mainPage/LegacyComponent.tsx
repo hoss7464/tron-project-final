@@ -26,9 +26,11 @@ import {
 import accountIcon from "../../assets/svg/AccountIcon.svg";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
+import { useTronWallet } from "../../contexts/TronWalletContext";
 
 const LegacyComponent: React.FC = () => {
   const { t } = useTranslation();
+  const {address, balance, energy, bandwidth} = useTronWallet()
   return (
     <>
       <LegacyContainer>
@@ -45,7 +47,7 @@ const LegacyComponent: React.FC = () => {
           </AccountHeaderIconWrapper>
           <AccountAddCopyWrapper>
             <AccountAddWrapper>
-              <AccountAdd>XzWPJDLR3jXzWPJDLR3j zWPJDLR3jzW</AccountAdd>
+              <AccountAdd>{address}</AccountAdd>
             </AccountAddWrapper>
             <AccountCopyWrapper>
               <AccountCopyIcon />
@@ -58,7 +60,7 @@ const LegacyComponent: React.FC = () => {
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>{balance}</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
           <AccountTextNumberWrapper>
@@ -96,7 +98,7 @@ const LegacyComponent: React.FC = () => {
           </AccountHeaderIconWrapper>
           <EnergyResourceWrapper>
             <AccountNumberWrapper style={{ marginLeft: "0.5rem" }}>
-              <AccountNumber style={{ color: "#1E650F" }}>0 / <span style={{color: "#989898"}} >0</span></AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>{energy} / <span style={{color: "#989898"}} >0</span></AccountNumber>
             </AccountNumberWrapper>
           </EnergyResourceWrapper>
           <AccountTextNumberWrapper>
@@ -134,7 +136,7 @@ const LegacyComponent: React.FC = () => {
           </AccountHeaderIconWrapper>
           <EnergyResourceWrapper>
             <AccountNumberWrapper style={{ marginLeft: "0.5rem" }}>
-              <AccountNumber style={{ color: "#1E650F" }}>0 / <span style={{color: "#989898"}} >0</span></AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>{bandwidth} / <span style={{color: "#989898"}} >0</span></AccountNumber>
             </AccountNumberWrapper>
           </EnergyResourceWrapper>
           <AccountTextNumberWrapper>

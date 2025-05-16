@@ -1,5 +1,7 @@
 import React from "react";
 import "./mainPage.css";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store/store";
 import {
   MainPageContainer,
   MainPageWrapper,
@@ -12,11 +14,21 @@ import MobileResourceComponent from "./MobileResourceComponent";
 import OrdersComponent from "./OrdersComponent";
 import MyOrdersComponent from "./MyOrdersComponent";
 import OrderFormComponent from "./OrderFormComponent";
+import PopUp from "../../components/Popup/PopUp";
+import SelectWalletComponent from "../../components/SelectWalletComponent/SelectWalletComponent";
 
 const MainPage: React.FC = () => {
+  const popUpVisible = useSelector((state: RootState) => state.toggle.toggles.popUp);
+
   return (
     <>
       <MainPageContainer>
+        {popUpVisible && (
+          <PopUp>
+           <SelectWalletComponent />
+          </PopUp>
+        )}
+
         <MainPageWrapper>
           <MainLeftSection>
             <LegacyComponent />

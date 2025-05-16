@@ -51,6 +51,7 @@ import singleEnergy from "../../assets/svg/SingleEnergy.svg";
 import singleBandwidth from "../../assets/svg/SingleBandwidth.svg";
 import { useDispatch } from "react-redux";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
+import { useTronWallet } from "../../contexts/TronWalletContext";
 //-------------------------------------------------------------------------------------
 //Duration input components :
 const boxStyle = {
@@ -121,10 +122,11 @@ const OrderFormComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const {address} = useTronWallet()
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
-  const [walletAdd, setWalletAdd] = useState("XzWPJDLR3jXzWPJDLR3jzWPJDLR3jzW");
+  const [walletAdd, setWalletAdd] = useState("");
   //Amount input states:
   const [amount, setAmount] = useState("");
   const [amountError, setAmountError] = useState("");
@@ -548,7 +550,7 @@ const OrderFormComponent: React.FC = () => {
                 <FormAddInputWrapper2>
                   <FormAddInput
                     readOnly
-                    value={walletAdd}
+                    value={address ?? ""}
                     onChange={(e) => setWalletAdd(e.target.value)}
                   />
                 </FormAddInputWrapper2>

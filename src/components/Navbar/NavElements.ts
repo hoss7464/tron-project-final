@@ -5,7 +5,7 @@ export const NavContainer = styled.div`
   width: 100%;
   height: 80px;
   position: fixed;
-  z-index: 1000;
+  z-index: 95;
   background-color: ${colors.bg1};
   @media only screen and (min-width: 280px) and (max-width: 768px) {
     padding: 0 24px 0 24px;

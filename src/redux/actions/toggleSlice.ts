@@ -9,7 +9,8 @@ interface ToggleState {
 
 const initialState: ToggleState = {
   toggles: {
-    languageDropdown : false
+    popUp : false,
+    avatarToggle : false,
   },
 }
 
