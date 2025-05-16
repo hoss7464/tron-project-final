@@ -16,22 +16,26 @@ import MyOrdersComponent from "./MyOrdersComponent";
 import OrderFormComponent from "./OrderFormComponent";
 import PopUp from "../../components/Popup/PopUp";
 import SelectWalletComponent from "../../components/SelectWalletComponent/SelectWalletComponent";
+import { useTronWallet } from "../../contexts/TronWalletContext";
 
 const MainPage: React.FC = () => {
-  const popUpVisible = useSelector((state: RootState) => state.toggle.toggles.popUp);
+  const popUpVisible = useSelector(
+    (state: RootState) => state.toggle.toggles.popUp
+  );
+  const { address } = useTronWallet();
 
   return (
     <>
       <MainPageContainer>
         {popUpVisible && (
           <PopUp>
-           <SelectWalletComponent />
+            <SelectWalletComponent />
           </PopUp>
         )}
 
         <MainPageWrapper>
           <MainLeftSection>
-            <LegacyComponent />
+            {address ? <LegacyComponent /> : null}
             <OrderFormComponent />
           </MainLeftSection>
           <MainRightSection>

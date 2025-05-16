@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
-import { TronWeb } from "tronweb";
 
 // Context interface
 interface TronWalletContextProps {
@@ -14,9 +13,7 @@ interface TronWalletContextProps {
 }
 
 // Create context
-const TronWalletContext = createContext<TronWalletContextProps | undefined>(
-  undefined
-);
+const TronWalletContext = createContext<TronWalletContextProps | undefined>(undefined);
 
 // Custom hook
 export const useTronWallet = () => {
@@ -28,9 +25,7 @@ export const useTronWallet = () => {
 };
 
 // Provider component
-export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [energy, setEnergy] = useState<number | null>(null);
@@ -40,54 +35,45 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const connectWallet = async () => {
     try {
-    await adapter.connect();
-    const addr = adapter.address;
-    if (!addr) throw new Error("No wallet address found");
+      await adapter.connect();
+      const addr = adapter.address;
+      if (!addr) throw new Error("No wallet address found");
 
-    // Get tronWeb instance
-    const tronWeb = (window as any).tronWeb || new TronWeb({ fullHost: "https://api.trongrid.io" });
+      // Dynamically import TronWeb
+      const { TronWeb } = await import("tronweb");
 
-    // Prepare a message for signing
-    const message = `Please sign this message to connect your wallet: ${addr}`;
+      // Get tronWeb instance (prefer injected, fallback to remote node)
+      const tronWeb = (window as any).tronWeb || new TronWeb({ fullHost: "https://api.trongrid.io" });
 
-    // Convert message to hex
-    const hexMessage = tronWeb.toHex(message);
+      // Sign a message
+      const message = `Please sign this message to connect your wallet: ${new Date().toISOString()}`;
+      const hexMessage = tronWeb.toHex(message);
+      const signature = await tronWeb.trx.signMessage(hexMessage);
 
-    // Prompt user to sign message
-    const signature = await tronWeb.trx.signMessage(hexMessage);
+      if (!signature) {
+        throw new Error("User rejected signing message");
+      }
 
-    if (!signature) {
-      throw new Error("User rejected signing message");
+      // Send signature to backend
+      await fetch("http://localhost:3001/walletSignature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: addr, message, signature }),
+      });
+
+      // Set address and fetch balance/resources
+      setAddress(addr);
+
+      const balanceInSun = await tronWeb.trx.getBalance(addr);
+      setBalance(tronWeb.fromSun(balanceInSun).toString());
+
+      const accountResource = await tronWeb.trx.getAccountResources(addr);
+      setEnergy(accountResource.EnergyLimit ?? 0);
+      setBandwidth(accountResource.freeNetLimit ?? 0);
+    } catch (err) {
+      console.error("Wallet connection or signing error:", err);
+      disconnectWallet();
     }
-
-    // Send the signature towards JSON server
-    await fetch("http://localhost:3001/walletSignature", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        address: addr,
-        message,
-        signature,
-      }),
-    });
-
-    // If signed successfully, proceed to set address and fetch balance/resources
-    setAddress(addr);
-
-    const balanceInSun = await tronWeb.trx.getBalance(addr);
-    setBalance(tronWeb.fromSun(balanceInSun).toString());
-
-    const accountResource = await tronWeb.trx.getAccountResources(addr);
-    setEnergy(accountResource.EnergyLimit ?? 0);
-    setBandwidth(accountResource.freeNetLimit ?? 0);
-
-  } catch (err) {
-    console.error("Wallet connection or signing error:", err);
-    // Optional: clear all if something fails
-    disconnectWallet();
-  }
   };
 
   const disconnectWallet = () => {
@@ -97,15 +83,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     setBandwidth(null);
   };
 
-  // Sign a message for authentication
   const signMessage = async (message: string): Promise<string | null> => {
     try {
       const tronWeb = (window as any).tronWeb;
       if (!tronWeb) throw new Error("TronWeb not found");
 
       const hexMessage = tronWeb.toHex(message);
-
-     
       const signature = await tronWeb.trx.signMessage(hexMessage);
       return signature;
     } catch (error) {
@@ -114,7 +97,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  // Optional cleanup on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       disconnectWallet();

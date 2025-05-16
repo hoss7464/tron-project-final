@@ -50,6 +50,7 @@ import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import singleEnergy from "../../assets/svg/SingleEnergy.svg";
 import singleBandwidth from "../../assets/svg/SingleBandwidth.svg";
 import { useDispatch } from "react-redux";
+import { clickToggle } from "../../redux/actions/toggleSlice";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 //-------------------------------------------------------------------------------------
@@ -122,7 +123,8 @@ const OrderFormComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const {address} = useTronWallet()
+  const { address } = useTronWallet();
+
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
@@ -208,8 +210,21 @@ const OrderFormComponent: React.FC = () => {
 
   //Duration inout validation :
   const validateDuration = (value: string): string => {
-    if (value.trim() === "") {
+    const trimmed = value.trim();
+
+    if (trimmed === "") {
       return "*";
+    }
+    //valid time between options :
+    const validDurations = [
+      "15 minutes",
+      "1 hours",
+      "3 hours",
+      ...Array.from({ length: 30 }, (_, i) => `${i + 1} days`),
+    ];
+
+    if (!validDurations.includes(trimmed)) {
+      return "invalid time";
     }
     return "";
   };
@@ -231,7 +246,6 @@ const OrderFormComponent: React.FC = () => {
 
   //--------------------------------------------------------------------------------------
   //Price input functions :
-
   //To set min max dynamic options :
   const minOption = Math.min(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
@@ -247,11 +261,11 @@ const OrderFormComponent: React.FC = () => {
       return "*";
     }
 
-    if (isNaN(numValue) || numValue < minOption || numValue > maxOption) {
-      return `between ${minOption} - ${maxOption}.`;
+    if (isNaN(numValue) || numValue < minOption) {
+      return `more than ${minOption}`;
     }
 
-    return ""; // No error
+    return ""; // Accept anything equal or above minOption
   };
   //To change the color of the options :
   const getOptionStyle = (option: string) => {
@@ -262,24 +276,28 @@ const OrderFormComponent: React.FC = () => {
       return { color: "black" }; // Default color
     }
 
-    if (inputNum < minOption || inputNum > maxOption) {
-      return { color: "gray" }; // Outside of range
+    // First handle custom price (above max range)
+    if (inputNum > maxOption) {
+      return { color: "black" }; // Custom user price
+    }
+
+    // Then handle below min range
+    if (inputNum < minOption) {
+      return { color: "gray" }; // Below range
     }
 
     const parsedOptions = priceOptions.map((o) => parseInt(o.col1, 10));
     const exactMatch = parsedOptions.includes(inputNum);
 
     if (exactMatch) {
-      // Input exists in list
       if (optionNum === inputNum) {
         return { color: "green", fontWeight: "bold" };
       } else if (optionNum > inputNum) {
-        return { color: "grey" }; // Fix: grey for greater numbers
+        return { color: "grey" };
       } else {
         return { color: "black" };
       }
     } else {
-      // Input does not exist in list → highlight nearest smaller number
       const smallerOptions = parsedOptions
         .filter((num) => num < inputNum)
         .sort((a, b) => b - a); // Descending
@@ -314,17 +332,48 @@ const OrderFormComponent: React.FC = () => {
 
     return null;
   };
+
+  //Function to filter the dropdown to shows nothing if the entered value was more than max-price :
+  const filterPriceOptions = (
+    options: typeof priceOptions,
+    state: { inputValue: string }
+  ) => {
+    const inputNum = parseInt(state.inputValue, 10);
+
+    if (!state.inputValue || isNaN(inputNum)) {
+      return options; // Show all options if input is empty or invalid
+    }
+
+    if (inputNum > maxOption) {
+      return []; // Hide all options
+    }
+
+    return options;
+  };
   //Function for getting nearest smaller selected price value in price options and getting the numeric value out of that.
   const getNumericSelectedPrice = (selectedPrice: string): number | null => {
+    const inputNum = parseInt(selectedPrice, 10);
+    if (isNaN(inputNum)) return null;
+
     const exactMatch = priceOptions.some((opt) => opt.col1 === selectedPrice);
 
+    if (exactMatch) {
+      return inputNum;
+    }
+
+    if (inputNum > maxOption) {
+      return inputNum; // Accept price > max without fallback
+    }
+
+    const fallback = getNearestSmallerOption(selectedPrice);
     if (!exactMatch) {
+      // Fallback only if between min and max
       const fallback = getNearestSmallerOption(selectedPrice);
-      if (fallback) {
-        selectedPrice = fallback.toString();
-      } else {
-        return null;
+      if (fallback !== null) {
+        return fallback;
       }
+
+      return null;
     }
 
     return Number(selectedPrice); // Return the numeric value
@@ -412,6 +461,12 @@ const OrderFormComponent: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!address) {
+      alert("Please connect your Tron wallet before submitting.");
+      dispatch(clickToggle("popUp"));
+      return
+    }
+
     //Amount input validation :
     const amountValidationError = validateAmount(amount);
     setAmountError(amountValidationError);
@@ -422,11 +477,10 @@ const OrderFormComponent: React.FC = () => {
     const priceValidationError = validatePrice(inputValue);
     setPriceError(priceValidationError);
 
-    
     //Switch button value :
     let formBtn = switchBtn;
     //Wallet address :
-    let walletAddress = walletAdd;
+    let walletAddress = address ?? "";
     //numeric value of amount input
     const numericAmount = getNumericAmount(amount);
     //duration input value :
@@ -483,7 +537,7 @@ const OrderFormComponent: React.FC = () => {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      const responseData = await response.json();
+      await response.json();
       dispatch(toggleRefresh());
 
       setAmount("");
@@ -715,6 +769,9 @@ const OrderFormComponent: React.FC = () => {
                     onChange={(e) => setDurationValue(e.target.value)}
                     onFocus={() => setOpen(true)}
                     inputRef={anchorRef}
+                    onBlur={() =>
+                      setDurationError(validateDuration(durationValue))
+                    }
                     fullWidth
                     sx={{
                       "& .MuiOutlinedInput-root": {
@@ -839,7 +896,7 @@ const OrderFormComponent: React.FC = () => {
                   if (typeof option === "string") return option;
                   return `${option.col1} - ${option.col2}`;
                 }}
-                filterOptions={(options) => options}
+                filterOptions={filterPriceOptions}
                 renderOption={(props, option) => {
                   // Destructure the 'key' out of 'props' before spreading the rest
                   const { key, ...restProps } = props;

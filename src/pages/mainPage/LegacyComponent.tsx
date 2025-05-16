@@ -85,7 +85,7 @@ const LegacyComponent: React.FC = () => {
           </AccountTextNumberWrapper>
         </AccountWrapper>
 
-        <EnergyWrapper className="order-bg">
+        <EnergyWrapper className="order-bg" >
           <AccountHeaderIconWrapper>
             <AccountIconWrapper>
               <AccountIcon alt="energy" src={energyIcon} />

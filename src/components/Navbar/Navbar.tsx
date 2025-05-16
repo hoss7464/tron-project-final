@@ -19,7 +19,7 @@ import {
   ConnectBtn,
   ConnectText,
 } from "./NavElements";
-import { Avatar, Menu, Box, Typography, IconButton } from "@mui/material";
+import { Avatar, Menu, Box, IconButton } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";

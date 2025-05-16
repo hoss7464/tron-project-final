@@ -13,6 +13,7 @@ export const MainPageContainer = styled.div`
   width: 100%;
   min-height: 720px;
   background-color: ${colors.bg2};
+
   @media only screen and (min-width: 280px) and (max-width: 768px) {
     padding: 0 24px 0 24px;
   }
@@ -32,7 +33,6 @@ export const MainPageWrapper = styled.div`
   align-items: flex-start;
   width: 100%;
   margin-bottom: 1rem;
-
   @media only screen and (min-width: 280px) and (max-width: 1920px) {
     margin-top: 6rem;
   }
@@ -89,6 +89,7 @@ export const LegacyContainer = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
+  margin-bottom: 1.2rem;
 `;
 export const AccountWrapper = styled.div`
   display: flex;
@@ -255,7 +256,6 @@ export const FormWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-top: 1.2rem;
 `;
 
 export const Form = styled.form`

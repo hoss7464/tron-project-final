@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import { colors } from "../../core-UI/Theme";
-import { IoClose } from "react-icons/io5";
+
 
 export const PopUpContainer = styled.div`
   display: flex;
