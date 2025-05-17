@@ -13,7 +13,9 @@ interface TronWalletContextProps {
 }
 
 // Create context
-const TronWalletContext = createContext<TronWalletContextProps | undefined>(undefined);
+const TronWalletContext = createContext<TronWalletContextProps | undefined>(
+  undefined
+);
 
 // Custom hook
 export const useTronWallet = () => {
@@ -25,7 +27,9 @@ export const useTronWallet = () => {
 };
 
 // Provider component
-export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [energy, setEnergy] = useState<number | null>(null);
@@ -43,12 +47,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const { TronWeb } = await import("tronweb");
 
       // Get tronWeb instance (prefer injected, fallback to remote node)
-      const tronWeb = (window as any).tronWeb || new TronWeb({ fullHost: "https://api.trongrid.io" });
+      const tronWeb =
+        (window as any).tronWeb ||
+        new TronWeb({ fullHost: "https://api.trongrid.io" });
 
       // Sign a message
-      const message = `Please sign this message to connect your wallet: ${new Date().toISOString()}`;
-      const hexMessage = tronWeb.toHex(message);
-      const signature = await tronWeb.trx.signMessage(hexMessage);
+      const message = `Log into your wallet : ${addr} - Time: ${new Date().toISOString()}`;
+      tronWeb.toHex(message);
+      const signature = await tronWeb.trx.signMessageV2(message);
 
       if (!signature) {
         throw new Error("User rejected signing message");
@@ -60,6 +66,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ address: addr, message, signature }),
       });
+
+      // Save to localStorage
+      localStorage.setItem("tronWalletAddress", addr);
 
       // Set address and fetch balance/resources
       setAddress(addr);
@@ -96,9 +105,33 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return null;
     }
   };
-
-  // Cleanup on unmount
+  //Function to remains log in when the user logged in once on reloading the page :
   useEffect(() => {
+    const autoConnect = async () => {
+      const savedAddr = localStorage.getItem("tronWalletAddress");
+      if (savedAddr) {
+        try {
+          await adapter.connect();
+          const { TronWeb } = await import("tronweb");
+          const tronWeb = (window as any).tronWeb || new TronWeb({ fullHost: "https://api.trongrid.io" });
+
+          setAddress(savedAddr);
+
+          const balanceInSun = await tronWeb.trx.getBalance(savedAddr);
+          setBalance(tronWeb.fromSun(balanceInSun).toString());
+
+          const accountResource = await tronWeb.trx.getAccountResources(savedAddr);
+          setEnergy(accountResource.EnergyLimit ?? 0);
+          setBandwidth(accountResource.freeNetLimit ?? 0);
+        } catch (e) {
+          console.error("Auto-connect failed:", e);
+          disconnectWallet();
+        }
+      }
+    };
+
+    autoConnect();
+
     return () => {
       disconnectWallet();
     };
