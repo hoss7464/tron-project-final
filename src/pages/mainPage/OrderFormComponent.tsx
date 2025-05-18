@@ -41,6 +41,8 @@ import {
   OrderInfoText,
   OrderSubmitBtnWrapper,
   OrderSubmitBtn,
+  FormErrorWrapper,
+  FormError,
 } from "./mainPageElements";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -153,17 +155,30 @@ const OrderFormComponent: React.FC = () => {
   };
 
   //--------------------------------------------------------------------------------------
-  //Amount input handleChange function :
+  //Amount input functions :
   //Function for amount validation :
-  const validateAmount = (rawValue: string): string => {
+  const validateAmount = (
+    rawValue: string,
+    switchBtn: string | null
+  ): string => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     if (rawValue.trim() === "") {
-      return "*";
+      return "required";
     } else if (isNaN(numericValue)) {
-      return "*";
-    } else if (numericValue < 1000 || numericValue > 300000) {
-      return "*";
+      return "required";
+    }
+
+    if (switchBtn === "energy") {
+      if (numericValue < 64350) {
+        return "Minimum amount limitation";
+      } else if (numericValue > 100000000) {
+        return "Maximum amount limitation";
+      }
+    } else if (switchBtn === "bandwidth") {
+      if (numericValue < 1000) {
+        return "Minimum amount limitation";
+      }
     }
 
     return "";
@@ -189,7 +204,7 @@ const OrderFormComponent: React.FC = () => {
     }
 
     // Validate input
-    const errorMessage = validateAmount(rawValue);
+    const errorMessage = validateAmount(rawValue, switchBtn);
     setAmountError(errorMessage);
   };
 
@@ -213,7 +228,7 @@ const OrderFormComponent: React.FC = () => {
     const trimmed = value.trim();
 
     if (trimmed === "") {
-      return "*";
+      return "required";
     }
     //valid time between options :
     const validDurations = [
@@ -258,7 +273,7 @@ const OrderFormComponent: React.FC = () => {
     const numValue = parseInt(value, 10);
 
     if (value.trim() === "") {
-      return "*";
+      return "required";
     }
 
     if (isNaN(numValue) || numValue < minOption) {
@@ -314,25 +329,6 @@ const OrderFormComponent: React.FC = () => {
     }
   };
 
-  //Function to select a nearest samller number when we enter a number which doesn't exists in price values but is in min max range:
-  const getNearestSmallerOption = (input: string): number | null => {
-    const inputNum = parseInt(input, 10);
-    if (isNaN(inputNum)) return null;
-
-    const numericOptions = priceOptions
-      .map((opt) => parseInt(opt.col1, 10))
-      .filter((n) => !isNaN(n))
-      .sort((a, b) => b - a); // Sort descending
-
-    for (let num of numericOptions) {
-      if (num <= inputNum) {
-        return num;
-      }
-    }
-
-    return null;
-  };
-
   //Function to filter the dropdown to shows nothing if the entered value was more than max-price :
   const filterPriceOptions = (
     options: typeof priceOptions,
@@ -363,17 +359,6 @@ const OrderFormComponent: React.FC = () => {
 
     if (inputNum > maxOption) {
       return inputNum; // Accept price > max without fallback
-    }
-
-    const fallback = getNearestSmallerOption(selectedPrice);
-    if (!exactMatch) {
-      // Fallback only if between min and max
-      const fallback = getNearestSmallerOption(selectedPrice);
-      if (fallback !== null) {
-        return fallback;
-      }
-
-      return null;
     }
 
     return Number(selectedPrice); // Return the numeric value
@@ -464,11 +449,11 @@ const OrderFormComponent: React.FC = () => {
     if (!address) {
       alert("Please connect your Tron wallet before submitting.");
       dispatch(clickToggle("popUp"));
-      return
+      return;
     }
 
     //Amount input validation :
-    const amountValidationError = validateAmount(amount);
+    const amountValidationError = validateAmount(amount, switchBtn);
     setAmountError(amountValidationError);
     //Duration input validation :
     const durationValidationError = validateDuration(durationValue);
@@ -476,6 +461,14 @@ const OrderFormComponent: React.FC = () => {
     //Price input validation :
     const priceValidationError = validatePrice(inputValue);
     setPriceError(priceValidationError);
+
+    if (
+      amountValidationError ||
+      durationValidationError ||
+      priceValidationError
+    ) {
+      return;
+    }
 
     //Switch button value :
     let formBtn = switchBtn;
@@ -503,7 +496,8 @@ const OrderFormComponent: React.FC = () => {
       formBtn === null ||
       numericAmount === null ||
       durationNumericValue === null ||
-      numericSelectedPrice === null
+      numericSelectedPrice === null ||
+      !myPrice
     ) {
       return;
     }
@@ -520,8 +514,6 @@ const OrderFormComponent: React.FC = () => {
       formTotalPrice: totalPrice,
       formDurationUnit: unit,
     };
-
-    //Amount validation for submiting the form :
 
     //Fetch data towards server :
     try {
@@ -615,18 +607,6 @@ const OrderFormComponent: React.FC = () => {
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
               <FormAddLabel>Amount</FormAddLabel>
-              {amountError && (
-                <p
-                  style={{
-                    color: "red",
-                    marginBottom: "4px",
-                    marginLeft: "0.5rem",
-                    fontSize: "16px",
-                  }}
-                >
-                  {amountError}
-                </p>
-              )}
             </FormAddLabelWrapper>
             <FormAddInputWrapper>
               <FormAddInputIconWrapper>
@@ -645,8 +625,8 @@ const OrderFormComponent: React.FC = () => {
                     onChange={amountHandleChange}
                     placeholder={`Amount of ${
                       switchBtn === "energy"
-                        ? "energy (32,000 - 1,000,000)"
-                        : "bandwidth (1000 - 10000)"
+                        ? "energy (64,350 - 100,000,000)"
+                        : "bandwidth (1000 - ...)"
                     }`}
                   />
                 </FormAddInputWrapper2>
@@ -742,23 +722,16 @@ const OrderFormComponent: React.FC = () => {
                 </InputMiniBtnWrapper2>
               </InputMiniBtnWrapper>
             )}
+            {amountError && (
+              <FormErrorWrapper>
+                <FormError>{amountError}</FormError>
+              </FormErrorWrapper>
+            )}
           </FormAddInputLabelWrapper>
           {/** Form duration dropdown component */}
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>Duration</FormAddLabel>
-              {durationError && (
-                <p
-                  style={{
-                    color: "red",
-                    marginBottom: "4px",
-                    marginLeft: "0.5rem",
-                    fontSize: "16px",
-                  }}
-                >
-                  {durationError}
-                </p>
-              )}
             </FormAddLabelWrapper>
             <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
               <ClickAwayListener onClickAway={() => setOpen(false)}>
@@ -864,23 +837,16 @@ const OrderFormComponent: React.FC = () => {
                 </Box>
               </ClickAwayListener>
             </FormControl>
+            {durationError && (
+              <FormErrorWrapper>
+                <FormError>{durationError}</FormError>
+              </FormErrorWrapper>
+            )}
           </FormAddInputLabelWrapper>
           {/** Form price component */}
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>Price</FormAddLabel>
-              {priceError && (
-                <p
-                  style={{
-                    color: "red",
-                    marginBottom: "4px",
-                    marginLeft: "0.5rem",
-                    fontSize: "16px",
-                  }}
-                >
-                  {priceError}
-                </p>
-              )}
             </FormAddLabelWrapper>
             <FormControl fullWidth>
               <Autocomplete
@@ -956,6 +922,11 @@ const OrderFormComponent: React.FC = () => {
                 )}
               />
             </FormControl>
+            {priceError && (
+              <FormErrorWrapper>
+                <FormError>{priceError}</FormError>
+              </FormErrorWrapper>
+            )}
           </FormAddInputLabelWrapper>
           <Divider orientation="horizontal" flexItem sx={{ my: 2 }} />
           <OrderInfoWrapper>

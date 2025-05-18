@@ -33,6 +33,7 @@ import useGetData from "../../hooks/useGetData";
 import Pagination from "@mui/material/Pagination";
 import singleEnergy2 from "../../assets/svg/SingleEnergy2.svg";
 import singleBandwidth2 from "../../assets/svg/SingleBandwidth2.svg";
+import { sortByDateTime2 } from "../../utils/sortByDateAndTime2";
 
 type Post = {
   orderId: number;
@@ -102,7 +103,7 @@ export const OrdersComponent: React.FC = () => {
                 </OrderNavTextWrapper1>
               </OrderNavWrapper>
               <OrdersCard>
-                {data?.map((myData) => (
+                {sortByDateTime2(data || []).map((myData) => (
                   <>
                     <OrdersDetail key={myData.orderId}>
                       <OrdersCardTextWrap>

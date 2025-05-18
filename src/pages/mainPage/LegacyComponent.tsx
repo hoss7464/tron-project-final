@@ -1,5 +1,5 @@
 import React from "react";
-import "./mainPage.css"
+import "./mainPage.css";
 import { useTranslation } from "react-i18next";
 import {
   LegacyContainer,
@@ -30,11 +30,22 @@ import { useTronWallet } from "../../contexts/TronWalletContext";
 
 const LegacyComponent: React.FC = () => {
   const { t } = useTranslation();
-  const {address, balance, energy, bandwidth} = useTronWallet()
+  const {
+    address,
+    balance,
+    energy,
+    bandwidth,
+    frozenTRX,
+    totalTRX,
+    delegableEnergy,
+    delegatedEnergy,
+    delegableBandwidth,
+    delegatedBandwidth,
+  } = useTronWallet();
   return (
     <>
       <LegacyContainer>
-        <AccountWrapper className="order-bg"  >
+        <AccountWrapper className="order-bg">
           <AccountHeaderIconWrapper>
             <AccountIconWrapper>
               <AccountIcon alt="account" src={accountIcon} />
@@ -60,7 +71,9 @@ const LegacyComponent: React.FC = () => {
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#1E650F" }}>{balance}</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>
+                {balance}
+              </AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
           <AccountTextNumberWrapper>
@@ -70,7 +83,9 @@ const LegacyComponent: React.FC = () => {
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>
+                {frozenTRX}
+              </AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
           <AccountTextNumberWrapper>
@@ -80,12 +95,14 @@ const LegacyComponent: React.FC = () => {
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>
+                {totalTRX}
+              </AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
         </AccountWrapper>
 
-        <EnergyWrapper className="order-bg" >
+        <EnergyWrapper className="order-bg">
           <AccountHeaderIconWrapper>
             <AccountIconWrapper>
               <AccountIcon alt="energy" src={energyIcon} />
@@ -98,7 +115,9 @@ const LegacyComponent: React.FC = () => {
           </AccountHeaderIconWrapper>
           <EnergyResourceWrapper>
             <AccountNumberWrapper style={{ marginLeft: "0.5rem" }}>
-              <AccountNumber style={{ color: "#1E650F" }}>{energy} / <span style={{color: "#989898"}} >0</span></AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>
+                {delegableEnergy} / <span style={{ color: "#989898" }}>{energy}</span>
+              </AccountNumber>
             </AccountNumberWrapper>
           </EnergyResourceWrapper>
           <AccountTextNumberWrapper>
@@ -108,7 +127,7 @@ const LegacyComponent: React.FC = () => {
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>{delegableEnergy}</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
           <AccountTextNumberWrapper>
@@ -118,7 +137,7 @@ const LegacyComponent: React.FC = () => {
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>{delegatedEnergy}</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
         </EnergyWrapper>
@@ -136,7 +155,9 @@ const LegacyComponent: React.FC = () => {
           </AccountHeaderIconWrapper>
           <EnergyResourceWrapper>
             <AccountNumberWrapper style={{ marginLeft: "0.5rem" }}>
-              <AccountNumber style={{ color: "#1E650F" }}>{bandwidth} / <span style={{color: "#989898"}} >0</span></AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>
+                {delegableBandwidth} / <span style={{ color: "#989898" }}>{bandwidth}</span>
+              </AccountNumber>
             </AccountNumberWrapper>
           </EnergyResourceWrapper>
           <AccountTextNumberWrapper>
@@ -146,7 +167,7 @@ const LegacyComponent: React.FC = () => {
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>{delegableBandwidth}</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
           <AccountTextNumberWrapper>
@@ -156,7 +177,7 @@ const LegacyComponent: React.FC = () => {
               </AccountText>
             </AccountTextWrapper>
             <AccountNumberWrapper>
-              <AccountNumber style={{ color: "#1E650F" }}>0</AccountNumber>
+              <AccountNumber style={{ color: "#1E650F" }}>{delegatedBandwidth}</AccountNumber>
             </AccountNumberWrapper>
           </AccountTextNumberWrapper>
         </BandwidthWrapper>

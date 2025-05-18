@@ -35,7 +35,7 @@ const MainPage: React.FC = () => {
 
         <MainPageWrapper>
           <MainLeftSection>
-            {address ? <LegacyComponent /> : null}
+            <LegacyComponent />
             <OrderFormComponent />
           </MainLeftSection>
           <MainRightSection>

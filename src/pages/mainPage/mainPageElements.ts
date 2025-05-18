@@ -471,6 +471,18 @@ export const OrderSubmitBtn = styled.button`
   cursor: pointer;
 `;
 
+export const FormErrorWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0.5rem;
+`;
+export const FormError = styled.p`
+  font-size: 12px;
+  font-weight: 400;
+  color: red;
+`;
+
 //-------------------------------------------------------------------------
 //Resource section styles
 export const ResourceWrapper = styled.div`
@@ -620,7 +632,6 @@ export const OrderNavText = styled.p`
   font-weight: 700;
   color: ${colors.text3};
 `;
-
 
 export const OrdersCardTextWrap = styled.div`
   display: flex;

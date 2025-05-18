@@ -26,6 +26,7 @@ import {
 } from "./mainPageElements";
 import singleEnergy2 from "../../assets/svg/SingleEnergy2.svg";
 import singleBandwidth2 from "../../assets/svg/SingleBandwidth2.svg";
+import { sortByDateTime } from "../../utils/sortByDateAndTime";
 
 type Post = {
   orderId: number;
@@ -81,7 +82,7 @@ const MyOrdersComponent: React.FC = () => {
                 </MyOrdersNavTextWrapper>
               </MyOrdersNavWrapper>
               <OrdersCard>
-                {data?.map((myData) => (
+                {sortByDateTime(data || []).map((myData) => (
                   <>
                     <MyOrderDetails key={myData.orderId}>
                       <MyOrderCardTextWrap>
