@@ -27,9 +27,10 @@ import {
 import singleEnergy2 from "../../assets/svg/SingleEnergy2.svg";
 import singleBandwidth2 from "../../assets/svg/SingleBandwidth2.svg";
 import { sortByDateTime } from "../../utils/sortByDateAndTime";
+import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
 
 type Post = {
-  orderId: number;
+  id: number;
   formDate: string;
   formTime: string;
   formTotalPrice: number;
@@ -46,10 +47,19 @@ const MyOrdersComponent: React.FC = () => {
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
   );
+  const selectedFilter = useSelector(
+    (state: RootState) => state.filters["myOrders"] || "All"
+  );
 
   useEffect(() => {
     getData("http://localhost:3001/formData");
   }, [refreshTrigger]);
+
+  const sortedData = sortByDateTime(data || []);
+  const filteredData =
+    selectedFilter === "All"
+      ? sortedData
+      : sortedData.filter((item) => item.formHeader === selectedFilter);
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
@@ -59,6 +69,11 @@ const MyOrdersComponent: React.FC = () => {
         <OrderMainWrapper>
           <OrdersNavHeaderWrapper>
             <AccountHeader>My Orders</AccountHeader>
+            <MyFilterComponent
+              listKey="myOrders"
+              options={["All", "energy", "bandwidth"]}
+              label="Product"
+            />
           </OrdersNavHeaderWrapper>
           <OrdersCarouselWrapper>
             <MyOrdersScroll>
@@ -82,9 +97,9 @@ const MyOrdersComponent: React.FC = () => {
                 </MyOrdersNavTextWrapper>
               </MyOrdersNavWrapper>
               <OrdersCard>
-                {sortByDateTime(data || []).map((myData) => (
+                {filteredData.map((myData) => (
                   <>
-                    <MyOrderDetails key={myData.orderId}>
+                    <MyOrderDetails key={myData.id}>
                       <MyOrderCardTextWrap>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>{myData.formDate}</OrdersCardText1>

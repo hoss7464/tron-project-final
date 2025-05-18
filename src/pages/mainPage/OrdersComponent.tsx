@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store/store";
+import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
 import {
   OrdersWrapper,
   OrderMainWrapper,
@@ -51,22 +54,36 @@ type Post = {
 };
 
 export const OrdersComponent: React.FC = () => {
+  //States :
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 6;
-  const { data, error, getData, totalCount } = useGetData<Post>();
+  const { data, error, getData } = useGetData<Post>();
+  //Selectors :
+  const selectedFilter = useSelector(
+    (state: RootState) => state.filters["orders"] || "All"
+  );
 
+  //Function for pagination :
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
   };
-
-  const totalPages = Math.max(10, Math.ceil(totalCount / rowsPerPage));
-
+  //Filter and sort data based on Date/Time & energy/bandwidth
+  const sortedData = sortByDateTime2(data || []);
+  const filteredData = sortedData.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
+  );
+  //Pagination
+  const totalPages = Math.ceil((data?.length || 0) / rowsPerPage);
+  //Function to get data from server :
   useEffect(() => {
-    getData(
-      `http://localhost:3001/post?_page=${currentPage}&_limit=${rowsPerPage}`
-    );
-  }, [currentPage]);
+    const filterParam =
+      selectedFilter === "All" ? "" : `orderProduct=${selectedFilter}`;
+
+    //Fetch all filtered data first
+    getData(`http://localhost:3001/post?${filterParam}`);
+  }, [selectedFilter]);
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
@@ -76,7 +93,13 @@ export const OrdersComponent: React.FC = () => {
         <OrderMainWrapper>
           <OrdersNavHeaderWrapper>
             <AccountHeader>{t("orders")}</AccountHeader>
+            <MyFilterComponent
+              listKey="orders"
+              options={["All", "energy", "bandwidth"]}
+              label="Product"
+            />
           </OrdersNavHeaderWrapper>
+
           <OrdersCarouselWrapper>
             <OrdersScroll>
               <OrderNavWrapper>
@@ -103,7 +126,7 @@ export const OrdersComponent: React.FC = () => {
                 </OrderNavTextWrapper1>
               </OrderNavWrapper>
               <OrdersCard>
-                {sortByDateTime2(data || []).map((myData) => (
+                {filteredData.map((myData) => (
                   <>
                     <OrdersDetail key={myData.orderId}>
                       <OrdersCardTextWrap>
@@ -191,25 +214,24 @@ export const OrdersComponent: React.FC = () => {
               </OrdersCard>
             </OrdersScroll>
           </OrdersCarouselWrapper>
-          
         </OrderMainWrapper>
         <OedersPaginationWrapper>
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-              sx={{
-                "& .MuiPaginationItem-root.Mui-selected": {
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            sx={{
+              "& .MuiPaginationItem-root.Mui-selected": {
+                backgroundColor: "#1E650F",
+                color: "white",
+                "&:hover": {
                   backgroundColor: "#1E650F",
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "#1E650F",
-                  },
                 },
-              }}
-            />
-          </OedersPaginationWrapper>
+              },
+            }}
+          />
+        </OedersPaginationWrapper>
       </OrdersWrapper>
     </>
   );

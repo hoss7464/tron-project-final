@@ -558,7 +558,7 @@ export const OrdersCarouselWrapper = styled.div`
 export const OrdersScroll = styled.div`
   overflow-x: auto;
   width: 100%;
-  height: 500px;
+  height: 496px;
 `;
 
 export const OrdersCard = styled.div`
@@ -597,9 +597,10 @@ export const OrderNavWrapper = styled.div`
 
 export const OrdersNavHeaderWrapper = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
+ 
 `;
 
 export const OrderNavTextWrapper1 = styled.div`
