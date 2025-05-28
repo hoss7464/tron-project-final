@@ -21,6 +21,13 @@ export const colors = {
     text7 : "#989898",
     text8 : "#89580A",
     text9 : "#ffffff",
-   
     footer : "#E2E8F7",
+}
+
+export const ThemeColor = {
+    bg1 : "#003543",
+    bg3 : "#406872",
+    border1 : "#D9E1E3",
+    primary1 : "#003543",
+    secondary1 : "#430E00"
 }

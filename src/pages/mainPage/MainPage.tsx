@@ -1,5 +1,6 @@
 import React from "react";
 import "./mainPage.css";
+import { LightMainContainerWrapper } from "../../core-UI/mainContainer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
 import {

@@ -1,25 +1,50 @@
 import styled from "styled-components";
-import { colors } from "../../core-UI/Theme";
+import { colors, ThemeColor } from "../../core-UI/Theme";
+import { MdOutlineAccountBalanceWallet } from "react-icons/md";
+
 
 export const NavContainer = styled.div`
-  width: 100%;
-  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: fixed;
   z-index: 95;
-  background-color: ${colors.bg1};
-  @media only screen and (min-width: 280px) and (max-width: 768px) {
-    padding: 0 24px 0 24px;
-    height: 80px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    padding: 8px;
+    width: 100%;
+    border-radius: 0;
+    border-bottom: solid 2px ${ThemeColor.border1};
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1920px) {
-    padding: 0 32px 0 32px;
-    height: 80px;
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    padding: 8px;
+    width: 100%;
+    border-radius: 0;
+    border-bottom: solid 2px ${ThemeColor.border1};
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    padding: 8px;
+    width: 80%;
+    border-radius: 1rem;
+    border: solid 2px ${ThemeColor.border1};
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    padding: 8px;
+    width: 75%;
+    border-radius: 1rem;
+    border: solid 2px ${ThemeColor.border1};
   }
 
   @media only screen and (min-width: 1921px) {
-    padding: 0 56px 0 56px;
-    height: 124px;
+    padding: 8px;
+    width: 75%;
+    border-radius: 1rem;
+    border: solid 2px ${ThemeColor.border1};
   }
 `;
 
@@ -43,8 +68,8 @@ export const NavbarLogoWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 62px;
-  height: 62px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background-color: ${colors.primary1};
 `;
@@ -54,7 +79,7 @@ export const NavbarRightSection = styled.div`
   justify-content: center;
   align-items: center;
   height: 100%;
-  position: relative;
+  margin-right: 4px;
 `;
 
 export const TranslateConnectWrapper = styled.div`
@@ -72,13 +97,26 @@ export const ConnectWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: ${colors.primary1};
-  border-radius: 4px;
-  border: solid 2px ${colors.primary1};
+  background-color: ${ThemeColor.secondary1};
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 8px 10px;
 `;
 
+export const ConnectIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.5rem;
+`
+
+export const ConnectIcon = styled(MdOutlineAccountBalanceWallet)`
+width: 24px;
+height: 24px;
+color: #ffffff;
+`
+
 export const ConnectBtn = styled.div`
-  padding: 8px 12px;
   cursor: pointer;
 `;
 

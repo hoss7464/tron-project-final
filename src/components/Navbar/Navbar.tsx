@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { ThemeColor } from "../../core-UI/Theme";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -18,6 +19,8 @@ import {
   ConnectWrapper,
   ConnectBtn,
   ConnectText,
+  ConnectIconWrapper,
+  ConnectIcon,
 } from "./NavElements";
 import { Avatar, Menu, Box, IconButton } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
@@ -31,6 +34,24 @@ const Navbar: React.FC = () => {
   const dispatch = useDispatch();
   const avatarRef = useRef<HTMLButtonElement | null>(null);
   const { address, disconnectWallet } = useTronWallet();
+
+  const languages =[
+    {
+      code : "en",
+      name : "EN",
+      country_code : "gb"
+    },
+    {
+      code : "ja",
+      name : "ジャ",
+      country_code : "ja"
+    },
+    {
+      code : "ru",
+      name : " РУ",
+      country_code : "ru"
+    },
+  ]
 
   const avatarOpen = useSelector(
     (state: RootState) => state.toggle.toggles["avatarToggle"]
@@ -67,7 +88,25 @@ const Navbar: React.FC = () => {
                     onChange={handleChange}
                     displayEmpty
                     inputProps={{ "aria-label": "Without label" }}
-                    sx={{ width: 70, height: 42 }}
+                    
+                    sx={{
+                      width: 100,
+                      height: 40,
+                      borderRadius: "10px",
+                      color: "#003543",
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#003543", // default border color
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#003543", // Border color on hover
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#003543", // border on focus
+                      },
+                      "& .MuiSelect-icon": {
+                        color: "#003543", // arrow icon color
+                      },
+                    }}
                     MenuProps={{
                       disableScrollLock: true,
                       PaperProps: {
@@ -81,7 +120,7 @@ const Navbar: React.FC = () => {
                       value="EN"
                       onClick={() => i18n.changeLanguage("en")}
                     >
-                      EN
+                     EN
                     </MenuItem>
                     <MenuItem
                       value="JA"
@@ -127,8 +166,11 @@ const Navbar: React.FC = () => {
                   </Menu>
                 </Box>
               ) : (
-                <ConnectWrapper>
-                  <ConnectBtn onClick={() => dispatch(clickToggle("popUp"))}>
+                <ConnectWrapper onClick={() => dispatch(clickToggle("popUp"))}>
+                  <ConnectIconWrapper>
+                    <ConnectIcon />
+                  </ConnectIconWrapper>
+                  <ConnectBtn>
                     <ConnectText>{t("wallet")}</ConnectText>
                   </ConnectBtn>
                 </ConnectWrapper>
