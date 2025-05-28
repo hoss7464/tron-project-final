@@ -35,24 +35,7 @@ const Navbar: React.FC = () => {
   const avatarRef = useRef<HTMLButtonElement | null>(null);
   const { address, disconnectWallet } = useTronWallet();
 
-  const languages =[
-    {
-      code : "en",
-      name : "EN",
-      country_code : "gb"
-    },
-    {
-      code : "ja",
-      name : "ジャ",
-      country_code : "ja"
-    },
-    {
-      code : "ru",
-      name : " РУ",
-      country_code : "ru"
-    },
-  ]
-
+  
   const avatarOpen = useSelector(
     (state: RootState) => state.toggle.toggles["avatarToggle"]
   );
@@ -120,19 +103,22 @@ const Navbar: React.FC = () => {
                       value="EN"
                       onClick={() => i18n.changeLanguage("en")}
                     >
+                      <span className="flag-icon flag-icon-gb mx-2" ></span>
                      EN
                     </MenuItem>
                     <MenuItem
                       value="JA"
                       onClick={() => i18n.changeLanguage("ja")}
                     >
-                      JA
+                      <span className="flag-icon flag-icon-jp mx-2" ></span>
+                      じゃ
                     </MenuItem>
                     <MenuItem
                       value="RU"
                       onClick={() => i18n.changeLanguage("ru")}
                     >
-                      RU
+                      <span className="flag-icon flag-icon-ru mx-2" ></span>
+                      РУ
                     </MenuItem>
                   </Select>
                 </FormControl>
