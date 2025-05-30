@@ -74,8 +74,8 @@ const Navbar: React.FC = () => {
                     displayEmpty
                     inputProps={{ "aria-label": "Without label" }}
                     sx={{
-                      height: 40,
-                      borderRadius: "55px",
+                      height: 36,
+                      borderRadius: "10px",
                       color: "#003543",
                       "& .MuiOutlinedInput-notchedOutline": {
                         borderColor: "#003543", // default border color
@@ -143,7 +143,7 @@ const Navbar: React.FC = () => {
                         <ConnectIcon />
                       </ConnectIconWrapper>
                       <ConnectBtn>
-                        <ConnectText style={{fontSize : "14px", fontWeight : "500"}} >{shortenAddress(address, 5)}</ConnectText>
+                        <ConnectText >{shortenAddress(address, 5)}</ConnectText>
                       </ConnectBtn>
                     </ConnectWrapper>
                   </span>

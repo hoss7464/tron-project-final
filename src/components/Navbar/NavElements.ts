@@ -2,7 +2,6 @@ import styled from "styled-components";
 import { colors, ThemeColor } from "../../core-UI/Theme";
 import { MdOutlineAccountBalanceWallet } from "react-icons/md";
 
-
 export const NavContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -29,21 +28,21 @@ export const NavContainer = styled.div`
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
     padding: 4px;
     width: 80%;
-    border-radius: 55px;
+    border-radius: 14px;
     border: solid 2px ${ThemeColor.border1};
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     padding: 4px;
     width: 60%;
-    border-radius: 55px;
+    border-radius: 14px;
     border: solid 2px ${ThemeColor.border1};
   }
 
   @media only screen and (min-width: 1921px) {
     padding: 4px;
     width: 60%;
-    border-radius: 55px;
+    border-radius: 14px;
     border: solid 2px ${ThemeColor.border1};
   }
 `;
@@ -68,8 +67,8 @@ export const NavbarLogoWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background-color: ${colors.primary1};
 `;
@@ -98,23 +97,23 @@ export const ConnectWrapper = styled.div`
   justify-content: center;
   align-items: center;
   background-color: ${ThemeColor.secondary1};
-  border-radius: 55px;
+  border-radius: 10px;
   cursor: pointer;
-  padding: 8px 16px;
+  padding: 8px 12px;
 `;
 
 export const ConnectIconWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 0.5rem;
-`
+  margin-right: 0.3rem;
+`;
 
 export const ConnectIcon = styled(MdOutlineAccountBalanceWallet)`
-width: 24px;
-height: 24px;
-color: #ffffff;
-`
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+`;
 
 export const ConnectBtn = styled.div`
   cursor: pointer;
@@ -122,6 +121,24 @@ export const ConnectBtn = styled.div`
 
 export const ConnectText = styled.p`
   color: ${colors.text2};
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: 500;
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    font-size: 12px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    font-size: 14px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    font-size: 14px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    font-size: 14px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    font-size: 16px;
+  }
 `;

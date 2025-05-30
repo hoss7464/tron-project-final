@@ -1,5 +1,5 @@
 import React from "react";
-import "./Hero.css"
+import "./Hero.css";
 import {
   HeroResourceContainer,
   HeroResourceWrapper,
@@ -21,10 +21,10 @@ import {
 } from "./HeroElements";
 import { Grid } from "@mui/material";
 import readyResourceIcon from "../../../assets/svg/ReadyResourceIcon.svg";
-import energyIcon from "../../../assets/svg/EnergyIcon.svg"
-import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg"
-import recoveryIcon from "../../../assets/svg/RecoveryIcon.svg"
-import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg"
+import energyIcon from "../../../assets/svg/EnergyIcon.svg";
+import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
+import recoveryIcon from "../../../assets/svg/RecoveryIcon.svg";
+import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg";
 
 const ResourceComponent: React.FC = () => {
   return (
@@ -32,8 +32,8 @@ const ResourceComponent: React.FC = () => {
       <HeroResourceContainer>
         <HeroResourceWrapper>
           <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }} >
-              <HeroGridCard className="border" >
+            <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
+              <HeroGridCard className="border">
                 <HeroGridCardIconHeaderWrapper>
                   <HeroGridCardIconWrapper>
                     <HeroGridCardIcon
@@ -54,9 +54,16 @@ const ResourceComponent: React.FC = () => {
 
                 <HeroGridCardNumberIconTextWrapper>
                   <HeroGridCardNumberIconWrapper>
-                    <HeroGridCardNumberIconWrapper2 style={{border: "solid 1px #003543"}} >
-                      <HeroGridCardNumberIconWrapper3 style={{backgroundColor: "#003543"}} >
-                        <HeroGridCardNumberIcon alt="energy icon" src={energyIcon} />
+                    <HeroGridCardNumberIconWrapper2
+                      style={{ border: "solid 1px #003543" }}
+                    >
+                      <HeroGridCardNumberIconWrapper3
+                        style={{ backgroundColor: "#003543" }}
+                      >
+                        <HeroGridCardNumberIcon
+                          alt="energy icon"
+                          src={energyIcon}
+                        />
                       </HeroGridCardNumberIconWrapper3>
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
@@ -67,9 +74,16 @@ const ResourceComponent: React.FC = () => {
 
                 <HeroGridCardNumberIconTextWrapper>
                   <HeroGridCardNumberIconWrapper>
-                    <HeroGridCardNumberIconWrapper2 style={{border: "solid 1px #430E00"}} >
-                      <HeroGridCardNumberIconWrapper3 style={{backgroundColor: "#430E00"}} >
-                        <HeroGridCardNumberIcon alt="bandwidth icon" src={bandwidthIcon} />
+                    <HeroGridCardNumberIconWrapper2
+                      style={{ border: "solid 1px #430E00" }}
+                    >
+                      <HeroGridCardNumberIconWrapper3
+                        style={{ backgroundColor: "#430E00" }}
+                      >
+                        <HeroGridCardNumberIcon
+                          alt="bandwidth icon"
+                          src={bandwidthIcon}
+                        />
                       </HeroGridCardNumberIconWrapper3>
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
@@ -80,16 +94,11 @@ const ResourceComponent: React.FC = () => {
               </HeroGridCard>
             </Grid>
 
-
-            
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
               <HeroGridCard className="border">
                 <HeroGridCardIconHeaderWrapper>
                   <HeroGridCardIconWrapper>
-                    <HeroGridCardIcon
-                      alt="recovery icon"
-                      src={recoveryIcon}
-                    />
+                    <HeroGridCardIcon alt="recovery icon" src={recoveryIcon} />
                   </HeroGridCardIconWrapper>
                   <HeroGridCardHeaderWrapper>
                     <HeroGridCardHeader>24h Recovery</HeroGridCardHeader>
@@ -104,9 +113,16 @@ const ResourceComponent: React.FC = () => {
 
                 <HeroGridCardNumberIconTextWrapper>
                   <HeroGridCardNumberIconWrapper>
-                    <HeroGridCardNumberIconWrapper2 style={{border: "solid 1px #003543"}} >
-                      <HeroGridCardNumberIconWrapper3 style={{backgroundColor: "#003543"}} >
-                        <HeroGridCardNumberIcon alt="energy icon" src={energyIcon} />
+                    <HeroGridCardNumberIconWrapper2
+                      style={{ border: "solid 1px #003543" }}
+                    >
+                      <HeroGridCardNumberIconWrapper3
+                        style={{ backgroundColor: "#003543" }}
+                      >
+                        <HeroGridCardNumberIcon
+                          alt="energy icon"
+                          src={energyIcon}
+                        />
                       </HeroGridCardNumberIconWrapper3>
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
@@ -117,9 +133,16 @@ const ResourceComponent: React.FC = () => {
 
                 <HeroGridCardNumberIconTextWrapper>
                   <HeroGridCardNumberIconWrapper>
-                    <HeroGridCardNumberIconWrapper2 style={{border: "solid 1px #430E00"}} >
-                      <HeroGridCardNumberIconWrapper3 style={{backgroundColor: "#430E00"}} >
-                        <HeroGridCardNumberIcon alt="bandwidth icon" src={bandwidthIcon} />
+                    <HeroGridCardNumberIconWrapper2
+                      style={{ border: "solid 1px #430E00" }}
+                    >
+                      <HeroGridCardNumberIconWrapper3
+                        style={{ backgroundColor: "#430E00" }}
+                      >
+                        <HeroGridCardNumberIcon
+                          alt="bandwidth icon"
+                          src={bandwidthIcon}
+                        />
                       </HeroGridCardNumberIconWrapper3>
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
@@ -151,9 +174,16 @@ const ResourceComponent: React.FC = () => {
 
                 <HeroGridCardNumberIconTextWrapper>
                   <HeroGridCardNumberIconWrapper>
-                    <HeroGridCardNumberIconWrapper2 style={{border: "solid 1px #003543"}} >
-                      <HeroGridCardNumberIconWrapper3 style={{backgroundColor: "#003543"}} >
-                        <HeroGridCardNumberIcon alt="energy icon" src={energyIcon} />
+                    <HeroGridCardNumberIconWrapper2
+                      style={{ border: "solid 1px #003543" }}
+                    >
+                      <HeroGridCardNumberIconWrapper3
+                        style={{ backgroundColor: "#003543" }}
+                      >
+                        <HeroGridCardNumberIcon
+                          alt="energy icon"
+                          src={energyIcon}
+                        />
                       </HeroGridCardNumberIconWrapper3>
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
@@ -164,9 +194,16 @@ const ResourceComponent: React.FC = () => {
 
                 <HeroGridCardNumberIconTextWrapper>
                   <HeroGridCardNumberIconWrapper>
-                    <HeroGridCardNumberIconWrapper2 style={{border: "solid 1px #430E00"}} >
-                      <HeroGridCardNumberIconWrapper3 style={{backgroundColor: "#430E00"}} >
-                        <HeroGridCardNumberIcon alt="bandwidth icon" src={bandwidthIcon} />
+                    <HeroGridCardNumberIconWrapper2
+                      style={{ border: "solid 1px #430E00" }}
+                    >
+                      <HeroGridCardNumberIconWrapper3
+                        style={{ backgroundColor: "#430E00" }}
+                      >
+                        <HeroGridCardNumberIcon
+                          alt="bandwidth icon"
+                          src={bandwidthIcon}
+                        />
                       </HeroGridCardNumberIconWrapper3>
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
