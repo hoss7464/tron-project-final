@@ -1,29 +1,27 @@
 import React from "react";
 import "./mainPage.css";
-import { LightMainContainerWrapper } from "../../core-UI/mainContainer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
 import {
   MainPageContainer,
   MainPageWrapper,
+  MainPageWrapper2,
   MainLeftSection,
   MainRightSection,
 } from "./mainPageElements";
-import ResourceComponent from "./ResourceComponent";
 import LegacyComponent from "./LegacyComponent";
-import MobileResourceComponent from "./MobileResourceComponent";
 import OrdersComponent from "./OrdersComponent";
 import MyOrdersComponent from "./MyOrdersComponent";
 import OrderFormComponent from "./OrderFormComponent";
 import PopUp from "../../components/Popup/PopUp";
 import SelectWalletComponent from "../../components/SelectWalletComponent/SelectWalletComponent";
-import { useTronWallet } from "../../contexts/TronWalletContext";
+
+import Hero from "./HeroSection/Hero";
 
 const MainPage: React.FC = () => {
   const popUpVisible = useSelector(
     (state: RootState) => state.toggle.toggles.popUp
   );
-  const { address } = useTronWallet();
 
   return (
     <>
@@ -33,19 +31,19 @@ const MainPage: React.FC = () => {
             <SelectWalletComponent />
           </PopUp>
         )}
-
+        <Hero />
+        <MainPageWrapper2>
         <MainPageWrapper>
           <MainLeftSection>
             <LegacyComponent />
             <OrderFormComponent />
           </MainLeftSection>
           <MainRightSection>
-            <MobileResourceComponent />
-            <ResourceComponent />
             <OrdersComponent />
             <MyOrdersComponent />
           </MainRightSection>
         </MainPageWrapper>
+        </MainPageWrapper2>
       </MainPageContainer>
     </>
   );

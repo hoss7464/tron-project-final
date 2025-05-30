@@ -15,30 +15,56 @@ export const MainPageContainer = styled.div`
   background-color: ${colors.bg2};
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
-    padding: 0 24px 0 24px;
     border-radius: 0;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
-    padding: 0 24px 0 24px;
     border-radius: 0;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    padding: 0 32px 0 32px;
     border-radius: 16px;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    padding: 0 32px 0 32px;
     border-radius: 16px;
   }
 
   @media only screen and (min-width: 1921px) and (max-width: 2700px) {
-    padding: 0 56px 0 56px;
     border-radius: 32px;
   }
 `;
+
+export const MainPageWrapper2 = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+width: 100%;
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    padding: 0 24px 0 24px;
+
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    padding: 0 24px 0 24px;
+
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    padding: 0 32px 0 32px;
+
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    padding: 0 32px 0 32px;
+
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    padding: 0 56px 0 56px;
+  }
+`
 
 export const MainPageWrapper = styled.div`
   display: flex;
@@ -46,12 +72,8 @@ export const MainPageWrapper = styled.div`
   align-items: flex-start;
   width: 100%;
   margin-bottom: 1rem;
-  @media only screen and (min-width: 280px) and (max-width: 1920px) {
-    margin-top: 6rem;
-  }
-  @media only screen and (min-width: 1921px) {
-    margin-top: 9rem;
-  }
+
+
 `;
 
 export const MainLeftSection = styled.div`
@@ -494,44 +516,6 @@ export const FormError = styled.p`
   font-size: 12px;
   font-weight: 400;
   color: red;
-`;
-
-//-------------------------------------------------------------------------
-//Resource section styles
-export const ResourceWrapper = styled.div`
-  width: 100%;
-  border-radius: 32px;
-`;
-
-export const ResourceWrapper2 = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  border: solid 2px ${colors.bg1};
-`;
-
-export const ResourceIconTextWrapper = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-`;
-
-export const ResourceTextWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-export const ResourceText = styled.p`
-  font-weight: 400;
-  @media only screen and (min-width: 280px) and (max-width: 992px) {
-    font-size: 14px;
-  }
-  @media only screen and (min-width: 993px) {
-    font-size: 16px;
-  }
 `;
 //-------------------------------------------------------------------------
 //Orders section styles

@@ -27,23 +27,23 @@ export const NavContainer = styled.div`
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    padding: 8px;
+    padding: 4px;
     width: 80%;
-    border-radius: 1rem;
+    border-radius: 55px;
     border: solid 2px ${ThemeColor.border1};
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    padding: 8px;
-    width: 75%;
-    border-radius: 1rem;
+    padding: 4px;
+    width: 60%;
+    border-radius: 55px;
     border: solid 2px ${ThemeColor.border1};
   }
 
   @media only screen and (min-width: 1921px) {
-    padding: 8px;
-    width: 75%;
-    border-radius: 1rem;
+    padding: 4px;
+    width: 60%;
+    border-radius: 55px;
     border: solid 2px ${ThemeColor.border1};
   }
 `;
@@ -98,9 +98,9 @@ export const ConnectWrapper = styled.div`
   justify-content: center;
   align-items: center;
   background-color: ${ThemeColor.secondary1};
-  border-radius: 10px;
+  border-radius: 55px;
   cursor: pointer;
-  padding: 8px 10px;
+  padding: 8px 16px;
 `;
 
 export const ConnectIconWrapper = styled.div`

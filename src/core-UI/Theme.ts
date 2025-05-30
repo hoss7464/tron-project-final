@@ -29,5 +29,7 @@ export const ThemeColor = {
     bg3 : "#406872",
     border1 : "#D9E1E3",
     primary1 : "#003543",
-    secondary1 : "#430E00"
+    secondary1 : "#430E00",
+    text1 : "#000000",
+    text2 : "#ffffff",
 }

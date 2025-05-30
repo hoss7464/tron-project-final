@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import { ThemeColor } from "../../core-UI/Theme";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -22,7 +21,7 @@ import {
   ConnectIconWrapper,
   ConnectIcon,
 } from "./NavElements";
-import { Avatar, Menu, Box, IconButton } from "@mui/material";
+import {Menu, Box } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
@@ -35,7 +34,6 @@ const Navbar: React.FC = () => {
   const avatarRef = useRef<HTMLButtonElement | null>(null);
   const { address, disconnectWallet } = useTronWallet();
 
-  
   const avatarOpen = useSelector(
     (state: RootState) => state.toggle.toggles["avatarToggle"]
   );
@@ -55,6 +53,10 @@ const Navbar: React.FC = () => {
     dispatch(hoverDisableToggle("avatarToggle"));
   };
 
+  const shortenAddress = (address: string, length = 5) => {
+    return address.length > length ? `${address.slice(0, length)}...` : address;
+  }
+
   return (
     <>
       <NavContainer>
@@ -65,17 +67,15 @@ const Navbar: React.FC = () => {
           <NavbarRightSection>
             <TranslateConnectWrapper>
               <TranslateWrapper>
-                <FormControl sx={{ mr: 2 }}>
+                <FormControl sx={{ mr: 1 }}>
                   <Select
                     value={age}
                     onChange={handleChange}
                     displayEmpty
                     inputProps={{ "aria-label": "Without label" }}
-                    
                     sx={{
-                      width: 100,
                       height: 40,
-                      borderRadius: "10px",
+                      borderRadius: "55px",
                       color: "#003543",
                       "& .MuiOutlinedInput-notchedOutline": {
                         borderColor: "#003543", // default border color
@@ -103,21 +103,30 @@ const Navbar: React.FC = () => {
                       value="EN"
                       onClick={() => i18n.changeLanguage("en")}
                     >
-                      <span className="flag-icon flag-icon-gb mx-2" ></span>
-                     EN
+                      <span
+                        className="flag-icon flag-icon-gb mx-2"
+                        style={{ marginRight: "0.5rem" }}
+                      ></span>
+                      EN
                     </MenuItem>
                     <MenuItem
                       value="JA"
                       onClick={() => i18n.changeLanguage("ja")}
                     >
-                      <span className="flag-icon flag-icon-jp mx-2" ></span>
+                      <span
+                        className="flag-icon flag-icon-jp mx-2"
+                        style={{ marginRight: "0.5rem" }}
+                      ></span>
                       じゃ
                     </MenuItem>
                     <MenuItem
                       value="RU"
                       onClick={() => i18n.changeLanguage("ru")}
                     >
-                      <span className="flag-icon flag-icon-ru mx-2" ></span>
+                      <span
+                        className="flag-icon flag-icon-ru mx-2"
+                        style={{ marginRight: "0.5rem" }}
+                      ></span>
                       РУ
                     </MenuItem>
                   </Select>
@@ -128,13 +137,16 @@ const Navbar: React.FC = () => {
                   onMouseEnter={handleAvatarEnter}
                   onMouseLeave={handleAvatarLeave}
                 >
-                  <IconButton
-                    size="large"
-                    ref={avatarRef}
-                    sx={{ cursor: "pointer" }}
-                  >
-                    <Avatar alt="User" src="/static/images/avatar/1.jpg" />
-                  </IconButton>
+                  <span ref={avatarRef} >
+                    <ConnectWrapper >
+                      <ConnectIconWrapper>
+                        <ConnectIcon />
+                      </ConnectIconWrapper>
+                      <ConnectBtn>
+                        <ConnectText style={{fontSize : "14px", fontWeight : "500"}} >{shortenAddress(address, 5)}</ConnectText>
+                      </ConnectBtn>
+                    </ConnectWrapper>
+                  </span>
                   <Menu
                     anchorEl={avatarRef.current}
                     open={avatarOpen}
