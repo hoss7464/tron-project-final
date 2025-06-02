@@ -6,7 +6,7 @@ interface TronWalletContextProps {
   address: string | null;
   balance: string | null;
   allBandwidth: number | null;
-  totalBandwidth: number | null;
+  availableBandwidth: number | null;
   allEnergy: number | null;
   availableEnergy: number | null;
   connectWallet: () => Promise<void>;
@@ -35,7 +35,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [allBandwidth, setAllBandwidth] = useState<number | null>(null);
-  const [totalBandwidth, setTotalBandwidth] = useState<number | null>(null);
+  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(null);
   const [allEnergy, setAllEnergy] = useState<number | null>(null);
   const [availableEnergy, setAvailableEnergy] = useState<number | null>(null);
 
@@ -80,16 +80,17 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const energyLimit = resource.EnergyLimit ?? 0;
       const energyUsed = resource.EnergyUsed ?? 0;
 
-      const all_bw = freeNetLimit + netLimit - netUsed;
+      const all_bw = (freeNetLimit + netLimit) - netUsed;
       const totalBw = freeNetLimit + netLimit;
 
       const all_energy = energyLimit;
       const available_energy = energyLimit - energyUsed;
 
       setAllBandwidth(all_bw);
-      setTotalBandwidth(totalBw);
+      setAvailableBandwidth(totalBw);
       setAllEnergy(all_energy);
       setAvailableEnergy(available_energy);
+      
     } catch (err) {
       console.error("Wallet connection or signing error:", err);
       disconnectWallet();
@@ -100,7 +101,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     setAddress(null);
     setBalance(null);
     setAllBandwidth(null);
-    setTotalBandwidth(null);
+    setAvailableBandwidth(null);
     setAllEnergy(null);
     setAvailableEnergy(null);
   };
@@ -137,6 +138,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           setBalance(balanceTRX.toString());
 
           const resource = await tronWeb.trx.getAccountResources(savedAddr);
+
           //bandwidth and energy calculation :
           const freeNetLimit = resource.freeNetLimit ?? 0;
           const netLimit = resource.NetLimit ?? 0;
@@ -145,14 +147,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           const energyLimit = resource.EnergyLimit ?? 0;
           const energyUsed = resource.EnergyUsed ?? 0;
 
-          const all_bw = freeNetLimit + netLimit - netUsed;
+          const all_bw = (freeNetLimit + netLimit) - netUsed;
           const totalBw = freeNetLimit + netLimit;
 
           const all_energy = energyLimit;
           const available_energy = energyLimit - energyUsed;
 
           setAllBandwidth(all_bw);
-          setTotalBandwidth(totalBw);
+          setAvailableBandwidth(totalBw);
           setAllEnergy(all_energy);
           setAvailableEnergy(available_energy);
         } catch (e) {
@@ -172,10 +174,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         address,
         balance,
         allBandwidth,
-        totalBandwidth,
+        availableBandwidth,
         availableEnergy,
         allEnergy,
-
         connectWallet,
         disconnectWallet,
         signMessage,

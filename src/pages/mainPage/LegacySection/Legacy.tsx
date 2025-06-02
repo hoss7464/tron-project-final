@@ -57,12 +57,20 @@ const Legacy: React.FC = () => {
     address,
     balance,
     allBandwidth,
-    totalBandwidth,
+    availableBandwidth,
     availableEnergy,
     allEnergy,
   } = useTronWallet();
-  const percentage = 85;
 
+  const bandwidthPercentage =
+    allBandwidth && availableBandwidth
+      ? Math.round((allBandwidth / availableBandwidth) * 100)
+      : 0;
+
+  const energyPercantage =
+    allEnergy && availableEnergy
+      ? Math.round((allEnergy / availableEnergy) * 100)
+      : 0;
   //Funtion for copy button :
   const handleCopy = () => {
     if (address) {
@@ -180,11 +188,21 @@ const Legacy: React.FC = () => {
                       </LegacyCardIconWrapper1>
                       <LegacyBandwidthEnergyPropertyWrapper>
                         <LegacyBandwidthEnergyProperty>
-                          {" "}
-                          <span style={{ color: "#003543" }}>
-                            {availableEnergy} /{" "}
-                          </span>{" "}
-                          <span style={{ color: "#B0C0C5" }}>{allEnergy}</span>
+                          {address ? (
+                            <>
+                              <span style={{ color: "#003543" }}>
+                                {availableEnergy} /{" "}
+                              </span>
+                              <span style={{ color: "#B0C0C5" }}>
+                                {allEnergy}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span style={{ color: "#003543" }}>_ _ / </span>
+                              <span style={{ color: "#B0C0C5" }}>_ _</span>
+                            </>
+                          )}
                         </LegacyBandwidthEnergyProperty>
                       </LegacyBandwidthEnergyPropertyWrapper>
                     </LegacyCardIconNameWrapper>
@@ -205,8 +223,8 @@ const Legacy: React.FC = () => {
                       </LegacyPropertyWrapper>
                       <LegacyCircleWrapper className="circular-text-style">
                         <CircularProgressbar
-                          value={percentage}
-                          text={`${percentage}%`}
+                          value={energyPercantage}
+                          text={`${energyPercantage}%`}
                           styles={buildStyles({
                             pathColor: "#003543",
                             trailColor: "#B0C0C5",
@@ -235,14 +253,21 @@ const Legacy: React.FC = () => {
                       </LegacyCardIconWrapper1>
                       <LegacyBandwidthEnergyPropertyWrapper>
                         <LegacyBandwidthEnergyProperty>
-                          <span style={{ color: "#430E00" }}>
-                            {" "}
-                            {allBandwidth} /
-                          </span>{" "}
-                          <span style={{ color: "#C5B4B0" }}>
-                            {" "}
-                            {totalBandwidth}
-                          </span>
+                          {address ? (
+                            <>
+                              <span style={{ color: "#430E00" }}>
+                                {allBandwidth} /
+                              </span>{" "}
+                              <span style={{ color: "#C5B4B0" }}>
+                                {availableBandwidth}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span style={{ color: "#430E00" }}>_ _ /</span>{" "}
+                              <span style={{ color: "#C5B4B0" }}>_ _</span>
+                            </>
+                          )}
                         </LegacyBandwidthEnergyProperty>
                       </LegacyBandwidthEnergyPropertyWrapper>
                     </LegacyCardIconNameWrapper>
@@ -263,8 +288,8 @@ const Legacy: React.FC = () => {
                       </LegacyPropertyWrapper>
                       <LegacyCircleWrapper className="circular-text-style">
                         <CircularProgressbar
-                          value={percentage}
-                          text={`${percentage}%`}
+                          value={bandwidthPercentage}
+                          text={`${bandwidthPercentage}%`}
                           styles={buildStyles({
                             pathColor: "#430E00",
                             trailColor: "#C5B4B0",
