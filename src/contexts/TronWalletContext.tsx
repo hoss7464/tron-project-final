@@ -35,7 +35,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [allBandwidth, setAllBandwidth] = useState<number | null>(null);
-  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(null);
+  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(
+    null
+  );
   const [allEnergy, setAllEnergy] = useState<number | null>(null);
   const [availableEnergy, setAvailableEnergy] = useState<number | null>(null);
 
@@ -76,11 +78,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const freeNetLimit = resource.freeNetLimit ?? 0;
       const netLimit = resource.NetLimit ?? 0;
       const netUsed = resource.NetUsed ?? 0;
+      const freeNetUsed = resource.freeNetUsed ?? 0;
 
       const energyLimit = resource.EnergyLimit ?? 0;
       const energyUsed = resource.EnergyUsed ?? 0;
 
-      const all_bw = (freeNetLimit + netLimit) - netUsed;
+      const all_bw = freeNetLimit + netLimit - netUsed - freeNetUsed;
       const totalBw = freeNetLimit + netLimit;
 
       const all_energy = energyLimit;
@@ -90,7 +93,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableBandwidth(totalBw);
       setAllEnergy(all_energy);
       setAvailableEnergy(available_energy);
-      
     } catch (err) {
       console.error("Wallet connection or signing error:", err);
       disconnectWallet();
@@ -143,11 +145,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           const freeNetLimit = resource.freeNetLimit ?? 0;
           const netLimit = resource.NetLimit ?? 0;
           const netUsed = resource.NetUsed ?? 0;
+          const freeNetUsed = resource.freeNetUsed ?? 0;
 
           const energyLimit = resource.EnergyLimit ?? 0;
           const energyUsed = resource.EnergyUsed ?? 0;
 
-          const all_bw = (freeNetLimit + netLimit) - netUsed;
+          const all_bw = freeNetLimit + netLimit - netUsed - freeNetUsed;
           const totalBw = freeNetLimit + netLimit;
 
           const all_energy = energyLimit;
