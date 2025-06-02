@@ -48,7 +48,7 @@ const ResourceComponent: React.FC = () => {
 
                 <HeroGridCardSubHeaderWrapper>
                   <HeroGridCardSubHeader>
-                    Your energy and bandwidth, Ready when you are.
+                    Your flexible energy and bandwidth,ready when you are.
                   </HeroGridCardSubHeader>
                 </HeroGridCardSubHeaderWrapper>
 
@@ -107,7 +107,7 @@ const ResourceComponent: React.FC = () => {
 
                 <HeroGridCardSubHeaderWrapper>
                   <HeroGridCardSubHeader>
-                    Your energy and bandwidth are fully restored every 24 hours.
+                    Your energy and bandwidth are restored every 24 hours.
                   </HeroGridCardSubHeader>
                 </HeroGridCardSubHeaderWrapper>
 

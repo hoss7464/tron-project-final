@@ -9,14 +9,13 @@ import {
   MainLeftSection,
   MainRightSection,
 } from "./mainPageElements";
-import LegacyComponent from "./LegacyComponent";
 import OrdersComponent from "./OrdersComponent";
 import MyOrdersComponent from "./MyOrdersComponent";
 import OrderFormComponent from "./OrderFormComponent";
 import PopUp from "../../components/Popup/PopUp";
 import SelectWalletComponent from "../../components/SelectWalletComponent/SelectWalletComponent";
-
 import Hero from "./HeroSection/Hero";
+import Legacy from "./LegacySection/Legacy";
 
 const MainPage: React.FC = () => {
   const popUpVisible = useSelector(
@@ -32,10 +31,10 @@ const MainPage: React.FC = () => {
           </PopUp>
         )}
         <Hero />
+        <Legacy />
         <MainPageWrapper2>
         <MainPageWrapper>
           <MainLeftSection>
-            <LegacyComponent />
             <OrderFormComponent />
           </MainLeftSection>
           <MainRightSection>

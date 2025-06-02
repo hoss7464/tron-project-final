@@ -53,9 +53,10 @@ const Navbar: React.FC = () => {
     dispatch(hoverDisableToggle("avatarToggle"));
   };
 
-  const shortenAddress = (address: string, length = 5) => {
-    return address.length > length ? `${address.slice(0, length)}...` : address;
-  }
+  const shortenAddress = (address: string) => {
+  if (address.length <= 6) return address;
+  return `${address.slice(0, 4)}...${address.slice(-3)}`;
+};
 
   return (
     <>
@@ -143,7 +144,7 @@ const Navbar: React.FC = () => {
                         <ConnectIcon />
                       </ConnectIconWrapper>
                       <ConnectBtn>
-                        <ConnectText >{shortenAddress(address, 5)}</ConnectText>
+                        <ConnectText >{shortenAddress(address)}</ConnectText>
                       </ConnectBtn>
                     </ConnectWrapper>
                   </span>

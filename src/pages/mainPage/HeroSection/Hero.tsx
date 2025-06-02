@@ -25,9 +25,10 @@ const Hero: React.FC = () => {
   const dispatch = useDispatch();
   const { address, disconnectWallet } = useTronWallet();
 
-  const shortenAddress = (address: string, length = 7) => {
-    return address.length > length ? `${address.slice(0, length)}...` : address;
-  };
+  const shortenAddress = (address: string) => {
+  if (address.length <= 6) return address;
+  return `${address.slice(0, 4)}...${address.slice(-3)}`;
+};
 
   return (
     <>
@@ -50,7 +51,7 @@ const Hero: React.FC = () => {
           <HeroButtonWrapper>
             {address ? (
               <HeroButtonWrapper2 onClick={() => disconnectWallet()}>
-                <HeroButtonText>{shortenAddress(address, 7)}</HeroButtonText>
+                <HeroButtonText>{shortenAddress(address)}</HeroButtonText>
               </HeroButtonWrapper2>
             ) : (
               <HeroButtonWrapper2

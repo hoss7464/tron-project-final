@@ -10,6 +10,7 @@ import { store } from "./redux/store/store";
 import { TronWalletProvider } from "./contexts/TronWalletContext";
 import "../node_modules/flag-icon-css/css/flag-icons.min.css"
 
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );

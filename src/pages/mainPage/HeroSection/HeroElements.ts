@@ -10,12 +10,7 @@ export const HeroContainer = styled.div`
   position: relative;
   margin-bottom: 1rem;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    border-radius: 0;
-    min-height: 700px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     border-radius: 0;
     min-height: 700px;
   }
@@ -44,22 +39,12 @@ export const HeroMainbgPhotoWrapper = styled.div`
   height: 70%;
   z-index: 1;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     border-top-right-radius: 0;
     border-top-left-radius: 0;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    border-top-right-radius: 16px;
-    border-top-left-radius: 16px;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 769px) and (max-width: 1920px) {
     border-top-right-radius: 16px;
     border-top-left-radius: 16px;
   }
@@ -82,21 +67,10 @@ export const HeroTextButtonHeaderWrapper = styled.div`
     margin-top: 5rem;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 577px) {
     margin-top: 5rem;
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    margin-top: 5rem;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    margin-top: 5rem;
-  }
-
-  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
-    margin-top: 5rem;
-  }
 `;
 
 export const HeroHeaderWrapper = styled.div`
@@ -106,6 +80,7 @@ export const HeroHeaderWrapper = styled.div`
   width: 100%;
   margin-bottom: 0.5rem;
 `;
+
 export const HeroHeader = styled.p`
   font-weight: 800;
   color: ${ThemeColor.text1};
@@ -130,6 +105,7 @@ export const HeroHeader = styled.p`
     font-size: 40px;
   }
 `;
+
 export const HeroTextWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -141,11 +117,7 @@ export const HeroTextWrapper = styled.div`
     max-width: 290px;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    max-width: 500px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 577px) and (max-width: 1080px) {
     max-width: 500px;
   }
 
@@ -157,6 +129,7 @@ export const HeroTextWrapper = styled.div`
     max-width: 1100px;
   }
 `;
+
 export const HeroText = styled.p`
   font-weight: 300;
   font-style: italic;
@@ -166,11 +139,7 @@ export const HeroText = styled.p`
     font-size: 14px;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    font-size: 18px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 577px) and (max-width: 1080px) {
     font-size: 18px;
   }
 
@@ -182,6 +151,7 @@ export const HeroText = styled.p`
     font-size: 34px;
   }
 `;
+
 export const HeroButtonWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -197,6 +167,7 @@ export const HeroButtonWrapper2 = styled.div`
   border-radius: 10px;
   cursor: pointer;
 `;
+
 export const HeroButtonText = styled.p`
   color: ${ThemeColor.text2};
   font-weight: 500;
@@ -205,15 +176,7 @@ export const HeroButtonText = styled.p`
     font-size: 12px;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    font-size: 14px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    font-size: 14px;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 577px) and (max-width: 1920px) {
     font-size: 14px;
   }
 
@@ -294,12 +257,7 @@ export const HeroResourceContainer = styled.div`
   width: 100%;
   z-index: 3;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    padding: 0 24px 0 24px;
-    margin-top: 2rem;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     padding: 0 24px 0 24px;
     margin-top: 2rem;
   }
@@ -343,22 +301,27 @@ export const HeroGridCard = styled.div`
 
   @media only screen and (min-width: 901px) and (max-width: 1080px) {
     margin-left: 1rem;
+    height: 165px;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1220px) {
     margin-left: 2.5rem;
+    height: 175px;
   }
 
-    @media only screen and (min-width: 1221px) and (max-width: 1440px) {
+  @media only screen and (min-width: 1221px) and (max-width: 1440px) {
     margin-left: 2.8rem;
+    height: 180px;
   }
 
-    @media only screen and (min-width: 1441px) and (max-width: 1920px) {
+  @media only screen and (min-width: 1441px) and (max-width: 1920px) {
     margin-left: 2.8rem;
+    height: 180px;
   }
 
   @media only screen and (min-width: 1921px) and (max-width: 2700px) {
     margin-left: 10rem;
+    height: 195px;
   }
 `;
 
@@ -368,12 +331,14 @@ export const HeroGridCardIconHeaderWrapper = styled.div`
   align-items: center;
   margin-bottom: 0.5rem;
 `;
+
 export const HeroGridCardIconWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   margin-right: 0.7rem;
 `;
+
 export const HeroGridCardIcon = styled.img`
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     width: 30px;
@@ -400,11 +365,13 @@ export const HeroGridCardIcon = styled.img`
     height: 42px;
   }
 `;
+
 export const HeroGridCardHeaderWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
 `;
+
 export const HeroGridCardHeader = styled.p`
   font-weight: 800;
   color: ${ThemeColor.primary1};
@@ -430,45 +397,50 @@ export const HeroGridCardHeader = styled.p`
     font-size: 30px;
   }
 `;
+
 export const HeroGridCardSubHeaderWrapper = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   margin-bottom: 0.5rem;
+
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     max-width: 100%;
+    height: 40px;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
     max-width: 100%;
+    height: 40px;
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px) and (max-width: 900px) {
     max-width: 90%;
+    height: 45px;
+  }
+
+  @media only screen and (min-width: 901px) and (max-width: 1080px) {
+    max-width: 90%;
+    height: 40px;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     max-width: 90%;
+    height: 50px;
   }
 
   @media only screen and (min-width: 1921px) and (max-width: 2700px) {
     max-width: 80%;
+    height: 50px;
   }
 `;
+
 export const HeroGridCardSubHeader = styled.p`
   font-weight: 500;
   color: ${ThemeColor.primary1};
   text-align: left;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    font-size: 14px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    font-size: 14px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 280px) and (max-width: 1080px) {
     font-size: 14px;
   }
 
@@ -480,18 +452,21 @@ export const HeroGridCardSubHeader = styled.p`
     font-size: 20px;
   }
 `;
+
 export const HeroGridCardNumberIconTextWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 0.5rem;
 `;
+
 export const HeroGridCardNumberIconWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   margin-right: 0.5rem;
 `;
+
 export const HeroGridCardNumberIconWrapper2 = styled.div`
   display: flex;
   justify-content: center;
@@ -499,6 +474,7 @@ export const HeroGridCardNumberIconWrapper2 = styled.div`
   border-radius: 10px;
   padding: 4px;
 `;
+
 export const HeroGridCardNumberIconWrapper3 = styled.div`
   display: flex;
   justify-content: center;
@@ -506,29 +482,24 @@ export const HeroGridCardNumberIconWrapper3 = styled.div`
   border-radius: 8px;
   padding: 6px;
 `;
+
 export const HeroGridCardNumberIcon = styled.img`
   width: 14px;
   height: 14px;
 `;
+
 export const HeroGridCardNumberTextWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
 `;
+
 export const HeroGridCardNumberText = styled.p`
   font-weight: 300;
   color: ${ThemeColor.primary1};
   text-align: left;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    font-size: 14px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    font-size: 14px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 280px) and (max-width: 1080px) {
     font-size: 14px;
   }
 
