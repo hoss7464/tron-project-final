@@ -56,14 +56,10 @@ const Legacy: React.FC = () => {
   const {
     address,
     balance,
-    energy,
-    bandwidth,
-    frozenTRX,
-    totalTRX,
-    delegableEnergy,
-    delegatedEnergy,
-    delegableBandwidth,
-    delegatedBandwidth,
+    allBandwidth,
+    totalBandwidth,
+    availableEnergy,
+    allEnergy,
   } = useTronWallet();
   const percentage = 85;
 
@@ -185,8 +181,10 @@ const Legacy: React.FC = () => {
                       <LegacyBandwidthEnergyPropertyWrapper>
                         <LegacyBandwidthEnergyProperty>
                           {" "}
-                          <span style={{ color: "#003543" }}>0 /</span>{" "}
-                          <span style={{ color: "#B0C0C5" }}>0</span>
+                          <span style={{ color: "#003543" }}>
+                            {availableEnergy} /{" "}
+                          </span>{" "}
+                          <span style={{ color: "#B0C0C5" }}>{allEnergy}</span>
                         </LegacyBandwidthEnergyProperty>
                       </LegacyBandwidthEnergyPropertyWrapper>
                     </LegacyCardIconNameWrapper>
@@ -198,7 +196,7 @@ const Legacy: React.FC = () => {
                         <LegacyPropertyNumberWrapper>
                           {address ? (
                             <LegacyPropertyNumber>
-                              {energy}
+                              {availableEnergy}
                             </LegacyPropertyNumber>
                           ) : (
                             <LegacyPropertyNumber>_ _</LegacyPropertyNumber>
@@ -237,8 +235,14 @@ const Legacy: React.FC = () => {
                       </LegacyCardIconWrapper1>
                       <LegacyBandwidthEnergyPropertyWrapper>
                         <LegacyBandwidthEnergyProperty>
-                          <span style={{ color: "#430E00" }}>0 /</span>{" "}
-                          <span style={{ color: "#C5B4B0" }}>0</span>
+                          <span style={{ color: "#430E00" }}>
+                            {" "}
+                            {allBandwidth} /
+                          </span>{" "}
+                          <span style={{ color: "#C5B4B0" }}>
+                            {" "}
+                            {totalBandwidth}
+                          </span>
                         </LegacyBandwidthEnergyProperty>
                       </LegacyBandwidthEnergyPropertyWrapper>
                     </LegacyCardIconNameWrapper>
@@ -250,7 +254,7 @@ const Legacy: React.FC = () => {
                         <LegacyPropertyNumberWrapper>
                           {address ? (
                             <LegacyPropertyNumber>
-                              {bandwidth}
+                              {allBandwidth}
                             </LegacyPropertyNumber>
                           ) : (
                             <LegacyPropertyNumber>_ _</LegacyPropertyNumber>

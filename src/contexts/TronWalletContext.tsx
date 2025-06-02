@@ -5,14 +5,10 @@ import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
 interface TronWalletContextProps {
   address: string | null;
   balance: string | null;
-  energy: number | null;
-  bandwidth: number | null;
-  delegatedEnergy: number | null;
-  delegableEnergy: number | null;
-  delegatedBandwidth: number | null;
-  delegableBandwidth: number | null;
-  frozenTRX: number | null;
-  totalTRX: number | null;
+  allBandwidth: number | null;
+  totalBandwidth: number | null;
+  allEnergy: number | null;
+  availableEnergy: number | null;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   signMessage: (message: string) => Promise<string | null>;
@@ -38,14 +34,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
-  const [energy, setEnergy] = useState<number | null>(null);
-  const [bandwidth, setBandwidth] = useState<number | null>(null);
-  const [delegatedEnergy, setDelegatedEnergy] = useState<number | null>(null);
-  const [delegableEnergy, setDelegableEnergy] = useState<number | null>(null);
-  const [delegatedBandwidth, setDelegatedBandwidth] = useState<number | null>(null);
-  const [delegableBandwidth, setDelegableBandwidth] = useState<number | null>(null);
-  const [frozenTRX, setFrozenTRX] = useState<number | null>(null);
-  const [totalTRX, setTotalTRX] = useState<number | null>(null);
+  const [allBandwidth, setAllBandwidth] = useState<number | null>(null);
+  const [totalBandwidth, setTotalBandwidth] = useState<number | null>(null);
+  const [allEnergy, setAllEnergy] = useState<number | null>(null);
+  const [availableEnergy, setAvailableEnergy] = useState<number | null>(null);
 
   const adapter = new TronLinkAdapter();
 
@@ -75,42 +67,29 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem("tronWalletAddress", addr);
       setAddress(addr);
 
-      // Get account and resources
       const balanceInSun = await tronWeb.trx.getBalance(addr);
       const balanceTRX = tronWeb.fromSun(balanceInSun);
       setBalance(balanceTRX.toString());
 
-      const account = await tronWeb.trx.getAccount(addr);
       const resource = await tronWeb.trx.getAccountResources(addr);
+      //bandwidth and energy calculation :
+      const freeNetLimit = resource.freeNetLimit ?? 0;
+      const netLimit = resource.NetLimit ?? 0;
+      const netUsed = resource.NetUsed ?? 0;
 
-      setEnergy(resource.EnergyLimit ?? 0);
-      setBandwidth(resource.freeNetLimit ?? 0);
-      setDelegatedEnergy(resource.delegatedFrozenBalanceForEnergy ?? 0);
-      setDelegatedBandwidth(resource.delegatedFrozenBalanceForBandwidth ?? 0);
+      const energyLimit = resource.EnergyLimit ?? 0;
+      const energyUsed = resource.EnergyUsed ?? 0;
 
-      let energy = 0;
-      let bandwidth = 0;
+      const all_bw = freeNetLimit + netLimit - netUsed;
+      const totalBw = freeNetLimit + netLimit;
 
-      if (account.frozen) {
-        for (const item of account.frozen) {
-          if (item.resource === "ENERGY") energy += item.frozen_balance;
-          else if (item.resource === "BANDWIDTH") bandwidth += item.frozen_balance;
-        }
-      }
+      const all_energy = energyLimit;
+      const available_energy = energyLimit - energyUsed;
 
-      if (account.frozenV2) {
-        for (const item of account.frozenV2) {
-          if (item.type === "ENERGY") energy += item.amount;
-          else if (item.type === "BANDWIDTH") bandwidth += item.amount;
-        }
-      }
-
-      setDelegableEnergy(energy);
-      setDelegableBandwidth(bandwidth);
-
-      const totalFrozen = energy + bandwidth;
-      setFrozenTRX(totalFrozen);
-      setTotalTRX(parseFloat(balanceTRX) + tronWeb.fromSun(totalFrozen));
+      setAllBandwidth(all_bw);
+      setTotalBandwidth(totalBw);
+      setAllEnergy(all_energy);
+      setAvailableEnergy(available_energy);
     } catch (err) {
       console.error("Wallet connection or signing error:", err);
       disconnectWallet();
@@ -120,14 +99,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const disconnectWallet = () => {
     setAddress(null);
     setBalance(null);
-    setEnergy(null);
-    setBandwidth(null);
-    setDelegatedEnergy(null);
-    setDelegableEnergy(null);
-    setDelegatedBandwidth(null);
-    setDelegableBandwidth(null);
-    setFrozenTRX(null);
-    setTotalTRX(null);
+    setAllBandwidth(null);
+    setTotalBandwidth(null);
+    setAllEnergy(null);
+    setAvailableEnergy(null);
   };
 
   const signMessage = async (message: string): Promise<string | null> => {
@@ -161,37 +136,25 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           const balanceTRX = tronWeb.fromSun(balanceInSun);
           setBalance(balanceTRX.toString());
 
-          const account = await tronWeb.trx.getAccount(savedAddr);
           const resource = await tronWeb.trx.getAccountResources(savedAddr);
+          //bandwidth and energy calculation :
+          const freeNetLimit = resource.freeNetLimit ?? 0;
+          const netLimit = resource.NetLimit ?? 0;
+          const netUsed = resource.NetUsed ?? 0;
 
-          setEnergy(resource.EnergyLimit ?? 0);
-          setBandwidth(resource.freeNetLimit ?? 0);
-          setDelegatedEnergy(resource.delegatedFrozenBalanceForEnergy ?? 0);
-          setDelegatedBandwidth(resource.delegatedFrozenBalanceForBandwidth ?? 0);
+          const energyLimit = resource.EnergyLimit ?? 0;
+          const energyUsed = resource.EnergyUsed ?? 0;
 
-          let energy = 0;
-          let bandwidth = 0;
+          const all_bw = freeNetLimit + netLimit - netUsed;
+          const totalBw = freeNetLimit + netLimit;
 
-          if (account.frozen) {
-            for (const item of account.frozen) {
-              if (item.resource === "ENERGY") energy += item.frozen_balance;
-              else if (item.resource === "BANDWIDTH") bandwidth += item.frozen_balance;
-            }
-          }
+          const all_energy = energyLimit;
+          const available_energy = energyLimit - energyUsed;
 
-          if (account.frozenV2) {
-            for (const item of account.frozenV2) {
-              if (item.type === "ENERGY") energy += item.amount;
-              else if (item.type === "BANDWIDTH") bandwidth += item.amount;
-            }
-          }
-
-          setDelegableEnergy(energy);
-          setDelegableBandwidth(bandwidth);
-
-          const totalFrozen = energy + bandwidth;
-          setFrozenTRX(totalFrozen);
-          setTotalTRX(parseFloat(balanceTRX) + tronWeb.fromSun(totalFrozen));
+          setAllBandwidth(all_bw);
+          setTotalBandwidth(totalBw);
+          setAllEnergy(all_energy);
+          setAvailableEnergy(available_energy);
         } catch (e) {
           console.error("Auto-connect failed:", e);
           disconnectWallet();
@@ -208,14 +171,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         address,
         balance,
-        energy,
-        bandwidth,
-        delegatedEnergy,
-        delegableEnergy,
-        delegatedBandwidth,
-        delegableBandwidth,
-        frozenTRX,
-        totalTRX,
+        allBandwidth,
+        totalBandwidth,
+        availableEnergy,
+        allEnergy,
+
         connectWallet,
         disconnectWallet,
         signMessage,
