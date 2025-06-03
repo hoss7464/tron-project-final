@@ -63,13 +63,13 @@ const Legacy: React.FC = () => {
   } = useTronWallet();
 
   const bandwidthPercentage =
-    allBandwidth && availableBandwidth
-      ? Math.round((allBandwidth / availableBandwidth) * 100)
-      : 0;
+  allBandwidth &&  availableBandwidth
+    ? Math.round(( allBandwidth / availableBandwidth ) * 100)
+    : 0;
 
   const energyPercantage =
-    allEnergy && availableEnergy
-      ? Math.round((allEnergy / availableEnergy) * 100)
+     availableEnergy && allEnergy
+      ? Math.round((availableEnergy /  allEnergy) * 100)
       : 0;
   //Funtion for copy button :
   const handleCopy = () => {
