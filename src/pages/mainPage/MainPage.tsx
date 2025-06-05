@@ -33,15 +33,15 @@ const MainPage: React.FC = () => {
         <Hero />
         <Legacy />
         <MainPageWrapper2>
-        <MainPageWrapper>
-          <MainLeftSection>
-            <OrderFormComponent />
-          </MainLeftSection>
-          <MainRightSection>
-            <OrdersComponent />
-            <MyOrdersComponent />
-          </MainRightSection>
-        </MainPageWrapper>
+          <MainPageWrapper>
+            <MainLeftSection>
+              <OrderFormComponent />
+            </MainLeftSection>
+            <MainRightSection>
+              <OrdersComponent />
+              <MyOrdersComponent />
+            </MainRightSection>
+          </MainPageWrapper>
         </MainPageWrapper2>
       </MainPageContainer>
     </>

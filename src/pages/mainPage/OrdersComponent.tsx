@@ -10,10 +10,10 @@ import {
   OrderNavWrapper,
   OedersPaginationWrapper,
   OrdersNavHeaderWrapper,
-  AccountHeader,
   OrderNavTextWrapper1,
   OrderNavTextWrapper,
   OrderCardIconWrapper,
+  OrderCardIconWrapper2,
   OrderCardIcon,
   OrderNavText,
   OrdersCarouselWrapper,
@@ -31,11 +31,12 @@ import {
   OrdersSellBtnWrapper,
   OrdersSell,
 } from "./mainPageElements";
+import { LegacyCardName } from "./LegacySection/LegacyElements";
 import LinearProgress from "@mui/material/LinearProgress";
 import useGetData from "../../hooks/useGetData";
 import Pagination from "@mui/material/Pagination";
-import singleEnergy2 from "../../assets/svg/SingleEnergy2.svg";
-import singleBandwidth2 from "../../assets/svg/SingleBandwidth2.svg";
+import energyIcon from "../../assets/svg/EnergyIcon.svg";
+import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import { sortByDateTime2 } from "../../utils/sortByDateAndTime2";
 
 type Post = {
@@ -92,7 +93,9 @@ export const OrdersComponent: React.FC = () => {
       <OrdersWrapper className="order-bg">
         <OrderMainWrapper>
           <OrdersNavHeaderWrapper>
-            <AccountHeader>{t("orders")}</AccountHeader>
+            <LegacyCardName style={{ color: "#003543" }}>
+              {t("orders")}
+            </LegacyCardName>
             <MyFilterComponent
               listKey="orders"
               options={["All", "energy", "bandwidth"]}
@@ -140,16 +143,27 @@ export const OrdersComponent: React.FC = () => {
 
                       <OrdersCardTextWrap>
                         <OrdersCardTextWrapper2>
-                          <OrderCardIconWrapper>
-                            <OrderCardIcon
-                              alt="energy"
-                              src={
-                                myData.orderProduct === "energy"
-                                  ? singleEnergy2
-                                  : singleBandwidth2
-                              }
-                            />
-                          </OrderCardIconWrapper>
+                          {myData.orderProduct === "energy" ? (
+                            
+                              <OrderCardIconWrapper2
+                                style={{ backgroundColor: "#003543" }}
+                              >
+                                <OrderCardIcon alt="energy" src={energyIcon} />
+                              </OrderCardIconWrapper2>
+                            
+                          ) : (
+                            
+                              <OrderCardIconWrapper2
+                                style={{ backgroundColor: "#430E00" }}
+                              >
+                                <OrderCardIcon
+                                  alt="bandwidth"
+                                  src={bandwidthIcon}
+                                />
+                              </OrderCardIconWrapper2>
+                            
+                          )}
+
                           <OrdersCardText1>
                             {myData.orderResource}
                           </OrdersCardText1>
@@ -196,9 +210,9 @@ export const OrdersComponent: React.FC = () => {
                             sx={{
                               height: 5,
                               borderRadius: 5,
-                              backgroundColor: "#8DB186",
+                              backgroundColor: "#C5B4B0",
                               "& .MuiLinearProgress-bar": {
-                                backgroundColor: "#1E650F",
+                                backgroundColor: "#430E00",
                               },
                             }}
                           />
@@ -223,10 +237,10 @@ export const OrdersComponent: React.FC = () => {
             color="primary"
             sx={{
               "& .MuiPaginationItem-root.Mui-selected": {
-                backgroundColor: "#1E650F",
+                backgroundColor: "#430E00",
                 color: "white",
                 "&:hover": {
-                  backgroundColor: "#1E650F",
+                  backgroundColor: "#430E00",
                 },
               },
             }}

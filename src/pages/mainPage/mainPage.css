@@ -1,5 +1,26 @@
 .order-bg {
-    background-image: url("../../assets/png/bg.png");
+    background-image: url("../../assets/png/Orders-bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.form-bg1 {
+    background-image: url("../../assets/png//form-bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.form-bg2 {
+    background-image: url("../../assets/png/form-bg2.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.my-orders-bg2 {
+    background-image: url("../../assets/png/myOrders-bg.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

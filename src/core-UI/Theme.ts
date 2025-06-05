@@ -26,10 +26,13 @@ export const colors = {
 
 export const ThemeColor = {
     bg1 : "#003543",
+    bg2 : "#ffffff",
     bg3 : "#406872",
     border1 : "#D9E1E3",
     primary1 : "#003543",
     secondary1 : "#430E00",
+    secondary2 : "#C5B4B0",
     text1 : "#000000",
     text2 : "#ffffff",
+    text3 : "#B0C0C5"
 }

@@ -13,12 +13,12 @@ import {
 } from "@mui/material";
 import {
   FormWrapper,
+  FormWrapper2,
   Form,
   FormHeaderSwitchWrapper,
   FormHeaderIconWrapper,
   FormHeaderWrapper,
   FormIconWrapper,
-  AccountIcon,
   AccountHeader,
   FormSwitchWrapper,
   FormAddInputLabelWrapper,
@@ -43,14 +43,22 @@ import {
   OrderSubmitBtn,
   FormErrorWrapper,
   FormError,
+  FormSettingWrapper,
+  FormSettingIconWrapper1,
+  FormSettingIconWrapper2,
+  FormSettingIcon,
 } from "./mainPageElements";
+import {
+  HeroGridCardNumberIconWrapper2,
+  HeroGridCardNumberIconWrapper3,
+  HeroGridCardNumberIcon,
+} from "./HeroSection/HeroElements";
+import { HeroGridCardHeader } from "./HeroSection/HeroElements";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { styled } from "@mui/material/styles";
-import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
-import singleEnergy from "../../assets/svg/SingleEnergy.svg";
-import singleBandwidth from "../../assets/svg/SingleBandwidth.svg";
+import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import { useDispatch } from "react-redux";
 import { clickToggle } from "../../redux/actions/toggleSlice";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
@@ -75,18 +83,18 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   textTransform: "none",
   fontWeight: "bold",
   fontSize: "12px",
-  border: "2px solid #1E650F",
+  border: "2px solid #430E00",
   borderRadius: 8,
   padding: "6px 8px",
   "&.Mui-selected": {
-    backgroundColor: "#1E650F",
+    backgroundColor: "#430E00",
     color: "#ffffff",
     "&:hover": {
-      backgroundColor: "#1E650F",
+      backgroundColor: "#430E00",
     },
   },
   "&:not(.Mui-selected)": {
-    color: "#1E650F",
+    color: "#430E00",
   },
 }));
 //-------------------------------------------------------------------------------------
@@ -102,14 +110,14 @@ const DropdownIconWithText: React.FC = () => {
         fontWeight: "500",
       }}
     >
-      <span style={{ fontSize: "14px", color: "#000" }}>SUN</span>
+      <span style={{ fontSize: "14px", color: "#003543" }}>SUN</span>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="18"
         height="18"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#333"
+        stroke="#003543"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -546,452 +554,517 @@ const OrderFormComponent: React.FC = () => {
   return (
     <>
       <FormWrapper>
-        <Form onSubmit={handleSubmit} className="order-bg">
-          {/** Form header and switch btn component */}
-          <FormHeaderSwitchWrapper>
-            <FormHeaderIconWrapper>
-              <FormIconWrapper>
-                <AccountIcon
-                  alt={switchBtn === "energy" ? "energy" : "bandwidth"}
-                  src={switchBtn === "energy" ? energyIcon : bandwidthIcon}
-                />
-              </FormIconWrapper>
-              <FormHeaderWrapper>
-                {switchBtn === "energy" ? (
-                  <AccountHeader style={{ color: "#1E650F" }}>
+        <FormWrapper2 className="form-bg1">
+          <Form onSubmit={handleSubmit} className="form-bg2">
+            {/** Form header and switch btn component */}
+            <FormHeaderSwitchWrapper>
+              <FormHeaderIconWrapper>
+                <FormIconWrapper>
+                  {switchBtn === "energy" ? (
+                    <HeroGridCardNumberIconWrapper2
+                      style={{ border: "solid 1px #003543" }}
+                    >
+                      <HeroGridCardNumberIconWrapper3
+                        style={{ backgroundColor: "#003543" }}
+                      >
+                        <HeroGridCardNumberIcon
+                          alt="energy icon"
+                          src={energyIcon}
+                          style={{ width: "18px", height: "18px" }}
+                        />
+                      </HeroGridCardNumberIconWrapper3>
+                    </HeroGridCardNumberIconWrapper2>
+                  ) : (
+                    <HeroGridCardNumberIconWrapper2
+                      style={{ border: "solid 1px #430E00" }}
+                    >
+                      <HeroGridCardNumberIconWrapper3
+                        style={{ backgroundColor: "#430E00" }}
+                      >
+                        <HeroGridCardNumberIcon
+                          alt="bandwidth icon"
+                          src={bandwidthIcon}
+                          style={{ width: "18px", height: "18px" }}
+                        />
+                      </HeroGridCardNumberIconWrapper3>
+                    </HeroGridCardNumberIconWrapper2>
+                  )}
+                </FormIconWrapper>
+                <FormHeaderWrapper>
+                  {switchBtn === "energy" ? (
+                    <HeroGridCardHeader style={{ color: "#003543" }}>
+                      {t("energy")}
+                    </HeroGridCardHeader>
+                  ) : (
+                    <HeroGridCardHeader style={{ color: "#003543" }}>
+                      {t("bandwidth")}
+                    </HeroGridCardHeader>
+                  )}
+                </FormHeaderWrapper>
+              </FormHeaderIconWrapper>
+              <FormSwitchWrapper>
+                <ToggleButtonGroup
+                  value={switchBtn}
+                  exclusive
+                  onChange={handleChange}
+                >
+                  <CustomToggleButton value="energy">
                     {t("energy")}
-                  </AccountHeader>
-                ) : (
-                  <AccountHeader style={{ color: "#1E650F" }}>
+                  </CustomToggleButton>
+                  <CustomToggleButton value="bandwidth">
                     {t("bandwidth")}
-                  </AccountHeader>
-                )}
-              </FormHeaderWrapper>
-            </FormHeaderIconWrapper>
-            <FormSwitchWrapper>
-              <ToggleButtonGroup
-                value={switchBtn}
-                exclusive
-                onChange={handleChange}
-              >
-                <CustomToggleButton value="energy">
-                  {t("energy")}
-                </CustomToggleButton>
-                <CustomToggleButton value="bandwidth">
-                  {t("bandwidth")}
-                </CustomToggleButton>
-              </ToggleButtonGroup>
-            </FormSwitchWrapper>
-          </FormHeaderSwitchWrapper>
-          {/** Form wallet address input component */}
-          <FormAddInputLabelWrapper>
-            <FormAddLabelWrapper>
-              <FormAddLabel>Wallet Address</FormAddLabel>
-            </FormAddLabelWrapper>
-            <FormAddInputWrapper>
-              <FormAddInputIconWrapper>
-                <FormAddIconWrapper>
-                  <FormAddIcon />
-                </FormAddIconWrapper>
-                <FormAddInputWrapper2>
-                  <FormAddInput
-                    readOnly
-                    value={address ?? ""}
-                    onChange={(e) => setWalletAdd(e.target.value)}
-                  />
-                </FormAddInputWrapper2>
-              </FormAddInputIconWrapper>
-            </FormAddInputWrapper>
-          </FormAddInputLabelWrapper>
-          {/** Form amount input component */}
-          <FormAddInputLabelWrapper>
-            <FormAddLabelWrapper>
-              <FormAddLabel>Amount</FormAddLabel>
-            </FormAddLabelWrapper>
-            <FormAddInputWrapper>
-              <FormAddInputIconWrapper>
-                <FormAddIconWrapper>
-                  <FormIcon2
-                    alt={switchBtn === "energy" ? "energy" : "bandwidth"}
-                    src={
-                      switchBtn === "energy" ? singleEnergy : singleBandwidth
-                    }
-                  />
-                </FormAddIconWrapper>
-                <FormAddInputWrapper2>
-                  <FormAddInput
-                    style={{ fontSize: "16px" }}
-                    value={amount}
-                    onChange={amountHandleChange}
-                    placeholder={`Amount of ${
-                      switchBtn === "energy"
-                        ? "energy (64,350 - 100,000,000)"
-                        : "bandwidth (1000 - ...)"
-                    }`}
-                  />
-                </FormAddInputWrapper2>
-              </FormAddInputIconWrapper>
-            </FormAddInputWrapper>
-
-            {switchBtn === "energy" ? (
-              <InputMiniBtnWrapper>
-                {/** Form input mini btns component */}
-                <InputMiniBtnWrapper2>
-                  <InputMiniBtn
-                    type="button"
-                    onClick={() => amountHandleChange("65,000")}
-                    value="65,000"
-                  >
-                    USDT Tsf
-                  </InputMiniBtn>
-                </InputMiniBtnWrapper2>
-                <InputMiniBtnWrapper2>
-                  <InputMiniBtn
-                    type="button"
-                    onClick={() => amountHandleChange("100,000")}
-                    value="100,000"
-                  >
-                    100k
-                  </InputMiniBtn>
-                </InputMiniBtnWrapper2>
-                <InputMiniBtnWrapper2>
-                  <InputMiniBtn
-                    type="button"
-                    onClick={() => amountHandleChange("1,000,000")}
-                    value="1,000,000"
-                  >
-                    1m
-                  </InputMiniBtn>
-                </InputMiniBtnWrapper2>
-                <InputMiniBtnWrapper2>
-                  <InputMiniBtn
-                    type="button"
-                    onClick={() => amountHandleChange("2,000,000")}
-                    value="2,000,000"
-                  >
-                    2m
-                  </InputMiniBtn>
-                </InputMiniBtnWrapper2>
-                <InputMiniBtnWrapper2>
-                  <InputMiniBtn
-                    type="button"
-                    onClick={() => amountHandleChange("10,000,000")}
-                    value="10,000,000"
-                  >
-                    10m
-                  </InputMiniBtn>
-                </InputMiniBtnWrapper2>
-              </InputMiniBtnWrapper>
-            ) : (
-              <InputMiniBtnWrapper>
-                <InputMiniBtnWrapper2>
-                  <InputMiniBtn
-                    type="button"
-                    onClick={() => amountHandleChange("1,000")}
-                    value="1,000"
-                  >
-                    1k
-                  </InputMiniBtn>
-                </InputMiniBtnWrapper2>
-                <InputMiniBtnWrapper2>
-                  <InputMiniBtn
-                    type="button"
-                    onClick={() => amountHandleChange("2,000")}
-                    value="2,000"
-                  >
-                    2k
-                  </InputMiniBtn>
-                </InputMiniBtnWrapper2>
-                <InputMiniBtnWrapper2>
-                  <InputMiniBtn
-                    type="button"
-                    onClick={() => amountHandleChange("5,000")}
-                    value="5,000"
-                  >
-                    5k
-                  </InputMiniBtn>
-                </InputMiniBtnWrapper2>
-                <InputMiniBtnWrapper2>
-                  <InputMiniBtn
-                    type="button"
-                    onClick={() => amountHandleChange("10,000")}
-                    value="10,000"
-                  >
-                    10k
-                  </InputMiniBtn>
-                </InputMiniBtnWrapper2>
-              </InputMiniBtnWrapper>
-            )}
-            {amountError && (
-              <FormErrorWrapper>
-                <FormError>{amountError}</FormError>
-              </FormErrorWrapper>
-            )}
-          </FormAddInputLabelWrapper>
-          {/** Form duration dropdown component */}
-          <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
-            <FormAddLabelWrapper>
-              <FormAddLabel>Duration</FormAddLabel>
-            </FormAddLabelWrapper>
-            <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
-              <ClickAwayListener onClickAway={() => setOpen(false)}>
-                <Box>
-                  <TextField
-                    placeholder="Duration"
-                    value={durationValue}
-                    onChange={(e) => setDurationValue(e.target.value)}
-                    onFocus={() => setOpen(true)}
-                    inputRef={anchorRef}
-                    onBlur={() =>
-                      setDurationError(validateDuration(durationValue))
-                    }
-                    fullWidth
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: "40px",
-                        border: "1px solid #1E650F",
-                        borderRadius: "55px",
-
-                        "&.Mui-focused fieldset": {
-                          borderColor: "transparent",
-                        },
-                        "& fieldset": {
-                          border: "none",
-                        },
-                      },
-                      "& input::placeholder": {
-                        fontSize: "14px",
-                      },
+                  </CustomToggleButton>
+                </ToggleButtonGroup>
+              </FormSwitchWrapper>
+            </FormHeaderSwitchWrapper>
+            {/** Form wallet address input component */}
+            <FormAddInputLabelWrapper>
+              <FormAddLabelWrapper>
+                <FormAddLabel>Wallet Address</FormAddLabel>
+              </FormAddLabelWrapper>
+              <FormAddInputWrapper>
+                <FormAddInputIconWrapper>
+                  <HeroGridCardNumberIconWrapper3
+                    style={{
+                      backgroundColor: "#003543",
+                      marginRight: "0.5rem",
                     }}
-                  />
-                  <Popper
-                    open={open}
-                    anchorEl={anchorRef.current}
-                    placement="bottom-start"
-                    style={{ zIndex: 1300 }}
                   >
-                    <Box
+                    <FormAddIcon />
+                  </HeroGridCardNumberIconWrapper3>
+
+                  <FormAddInputWrapper2>
+                    <FormAddInput
+                      readOnly
+                      value={address ?? ""}
+                      onChange={(e) => setWalletAdd(e.target.value)}
+                    />
+                  </FormAddInputWrapper2>
+                </FormAddInputIconWrapper>
+              </FormAddInputWrapper>
+            </FormAddInputLabelWrapper>
+            {/** Form amount input component */}
+            <FormAddInputLabelWrapper>
+              <FormAddLabelWrapper>
+                <FormAddLabel>Amount</FormAddLabel>
+              </FormAddLabelWrapper>
+              <FormAddInputWrapper>
+                <FormAddInputIconWrapper>
+                  {switchBtn === "energy" ? (
+                    <HeroGridCardNumberIconWrapper3
+                      style={{ backgroundColor: "#003543" }}
+                    >
+                      <HeroGridCardNumberIcon
+                        alt="energy icon"
+                        src={energyIcon}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                    </HeroGridCardNumberIconWrapper3>
+                  ) : (
+                    <HeroGridCardNumberIconWrapper3
+                      style={{ backgroundColor: "#430E00" }}
+                    >
+                      <HeroGridCardNumberIcon
+                        alt="bandwidth icon"
+                        src={bandwidthIcon}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                    </HeroGridCardNumberIconWrapper3>
+                  )}
+                  <FormAddInputWrapper2>
+                    <FormAddInput
+                      style={{ fontSize: "16px", marginLeft: "0.5rem" }}
+                      value={amount}
+                      onChange={amountHandleChange}
+                      placeholder={`Amount of ${
+                        switchBtn === "energy"
+                          ? "energy (64,350 - 100,000,000)"
+                          : "bandwidth (1000 - ...)"
+                      }`}
+                    />
+                  </FormAddInputWrapper2>
+                </FormAddInputIconWrapper>
+              </FormAddInputWrapper>
+
+              {switchBtn === "energy" ? (
+                <InputMiniBtnWrapper>
+                  {/** Form input mini btns component */}
+                  <InputMiniBtnWrapper2>
+                    <InputMiniBtn
+                      type="button"
+                      onClick={() => amountHandleChange("65,000")}
+                      value="65,000"
+                    >
+                      USDT Tsf
+                    </InputMiniBtn>
+                  </InputMiniBtnWrapper2>
+                  <InputMiniBtnWrapper2>
+                    <InputMiniBtn
+                      type="button"
+                      onClick={() => amountHandleChange("100,000")}
+                      value="100,000"
+                    >
+                      100k
+                    </InputMiniBtn>
+                  </InputMiniBtnWrapper2>
+                  <InputMiniBtnWrapper2>
+                    <InputMiniBtn
+                      type="button"
+                      onClick={() => amountHandleChange("1,000,000")}
+                      value="1,000,000"
+                    >
+                      1m
+                    </InputMiniBtn>
+                  </InputMiniBtnWrapper2>
+                  <InputMiniBtnWrapper2>
+                    <InputMiniBtn
+                      type="button"
+                      onClick={() => amountHandleChange("2,000,000")}
+                      value="2,000,000"
+                    >
+                      2m
+                    </InputMiniBtn>
+                  </InputMiniBtnWrapper2>
+                  <InputMiniBtnWrapper2>
+                    <InputMiniBtn
+                      type="button"
+                      onClick={() => amountHandleChange("10,000,000")}
+                      value="10,000,000"
+                    >
+                      10m
+                    </InputMiniBtn>
+                  </InputMiniBtnWrapper2>
+                </InputMiniBtnWrapper>
+              ) : (
+                <InputMiniBtnWrapper>
+                  <InputMiniBtnWrapper2>
+                    <InputMiniBtn
+                      type="button"
+                      onClick={() => amountHandleChange("1,000")}
+                      value="1,000"
+                    >
+                      1k
+                    </InputMiniBtn>
+                  </InputMiniBtnWrapper2>
+                  <InputMiniBtnWrapper2>
+                    <InputMiniBtn
+                      type="button"
+                      onClick={() => amountHandleChange("2,000")}
+                      value="2,000"
+                    >
+                      2k
+                    </InputMiniBtn>
+                  </InputMiniBtnWrapper2>
+                  <InputMiniBtnWrapper2>
+                    <InputMiniBtn
+                      type="button"
+                      onClick={() => amountHandleChange("5,000")}
+                      value="5,000"
+                    >
+                      5k
+                    </InputMiniBtn>
+                  </InputMiniBtnWrapper2>
+                  <InputMiniBtnWrapper2>
+                    <InputMiniBtn
+                      type="button"
+                      onClick={() => amountHandleChange("10,000")}
+                      value="10,000"
+                    >
+                      10k
+                    </InputMiniBtn>
+                  </InputMiniBtnWrapper2>
+                </InputMiniBtnWrapper>
+              )}
+              {amountError && (
+                <FormErrorWrapper>
+                  <FormError>{amountError}</FormError>
+                </FormErrorWrapper>
+              )}
+            </FormAddInputLabelWrapper>
+            {/** Form duration dropdown component */}
+            <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
+              <FormAddLabelWrapper>
+                <FormAddLabel>Duration</FormAddLabel>
+              </FormAddLabelWrapper>
+              <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
+                <ClickAwayListener onClickAway={() => setOpen(false)}>
+                  <Box>
+                    <TextField
+                      placeholder="Duration"
+                      value={durationValue}
+                      onChange={(e) => setDurationValue(e.target.value)}
+                      onFocus={() => setOpen(true)}
+                      inputRef={anchorRef}
+                      onBlur={() =>
+                        setDurationError(validateDuration(durationValue))
+                      }
+                      fullWidth
                       sx={{
-                        bgcolor: "background.paper",
-                        border: "1px solid #ccc",
-                        p: 2,
-                        mt: 0.5,
-                        width: 300,
-                        boxShadow: 4,
-                        borderRadius: 2,
-                      }}
-                    >
-                      <Typography fontWeight="bold">Minutes</Typography>
-                      <Grid container spacing={1} mb={2}>
-                        {minutes.map((min) => (
-                          <Grid key={min}>
-                            <Box
-                              sx={boxStyle}
-                              onClick={(e) => {
-                                e.stopPropagation(); // prevent triggering events on other components
-                                handleOptionClick(`${min} minutes`);
-                              }}
-                            >
-                              {min}
-                            </Box>
-                          </Grid>
-                        ))}
-                      </Grid>
-                      <Typography fontWeight="bold">Hours</Typography>
-                      <Grid container spacing={1} mb={2}>
-                        {hours.map((hr) => (
-                          <Grid key={hr}>
-                            <Box
-                              sx={boxStyle}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOptionClick(`${hr} hours`);
-                              }}
-                            >
-                              {hr}
-                            </Box>
-                          </Grid>
-                        ))}
-                      </Grid>
-                      <Typography fontWeight="bold">Days</Typography>
-                      <Grid container spacing={1}>
-                        {days.map((day) => (
-                          <Grid size={2} key={day}>
-                            <Box
-                              sx={boxStyle}
-                              onMouseDown={(e) => {
-                                e.preventDefault(); // Prevent focus shift
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOptionClick(`${day} days`);
-                              }}
-                            >
-                              {day}
-                            </Box>
-                          </Grid>
-                        ))}
-                      </Grid>
-                    </Box>
-                  </Popper>
-                </Box>
-              </ClickAwayListener>
-            </FormControl>
-            {durationError && (
-              <FormErrorWrapper>
-                <FormError>{durationError}</FormError>
-              </FormErrorWrapper>
-            )}
-          </FormAddInputLabelWrapper>
-          {/** Form price component */}
-          <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
-            <FormAddLabelWrapper>
-              <FormAddLabel>Price</FormAddLabel>
-            </FormAddLabelWrapper>
-            <FormControl fullWidth>
-              <Autocomplete
-                freeSolo
-                disableClearable
-                openOnFocus
-                options={priceOptions}
-                inputValue={inputValue}
-                onInputChange={(_, newInputValue) =>
-                  setInputValue(newInputValue)
-                }
-                getOptionLabel={(option) => {
-                  if (typeof option === "string") return option;
-                  return `${option.col1} - ${option.col2}`;
-                }}
-                filterOptions={filterPriceOptions}
-                renderOption={(props, option) => {
-                  // Destructure the 'key' out of 'props' before spreading the rest
-                  const { key, ...restProps } = props;
-                  return (
-                    <li
-                      key={key}
-                      {...restProps} // Spread the remaining props
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        ...getOptionStyle(option.col1),
-                        pointerEvents: "none", // disable interaction
-                      }}
-                    >
-                      <span>{option.col1}</span>
-                      <span style={{ marginLeft: "auto" }}>{option.col2}</span>
-                    </li>
-                  );
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Price"
-                    variant="outlined"
-                    onBlur={() => {
-                      const errorMsg = validatePrice(inputValue);
-                      setPriceError(errorMsg);
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: "40px",
-                        border: "1px solid #1E650F",
-                        borderRadius: "55px",
+                        "& .MuiOutlinedInput-root": {
+                          height: "40px",
+                          border: "2px solid #D9E1E3",
+                          backgroundColor: "#ffffff",
+                          color: "#003543",
+                          borderRadius: "10px",
 
-                        "&.Mui-focused fieldset": {
-                          borderColor: "transparent",
+                          "&.Mui-focused fieldset": {
+                            borderColor: "transparent",
+                          },
+                          "& fieldset": {
+                            border: "none",
+                          },
                         },
-                        "& fieldset": {
-                          border: "none",
+                        "& input::placeholder": {
+                          fontSize: "14px",
                         },
-                      },
-                      "& input::placeholder": {
-                        fontSize: "14px",
-                      },
-                    }}
-                    InputProps={{
-                      ...params.InputProps,
-                      type: "text",
-                      endAdornment: (
-                        <div>
-                          <DropdownIconWithText />
-                        </div>
-                      ),
-                    }}
-                  />
-                )}
-              />
-            </FormControl>
-            {priceError && (
-              <FormErrorWrapper>
-                <FormError>{priceError}</FormError>
-              </FormErrorWrapper>
-            )}
-          </FormAddInputLabelWrapper>
-          <Divider orientation="horizontal" flexItem sx={{ my: 2 }} />
-          <OrderInfoWrapper>
-            <OrderInfoHeaderWrapper style={{ marginBottom: "0.5rem" }}>
-              <AccountHeader
-                style={{
-                  color: "#989898",
-                  fontSize: "16px",
-                  fontWeight: "800",
-                }}
-              >
-                Order Info
-              </AccountHeader>
-            </OrderInfoHeaderWrapper>
-            <OrderInfoTextWrapper>
-              <OrderInfoTextWrapper2>
-                <OrderInfoText style={{ color: "#989898" }}>
-                  Amount
-                </OrderInfoText>
-              </OrderInfoTextWrapper2>
-              <OrderInfoTextWrapper2>
-                <OrderInfoText style={{ color: "#989898" }}>
-                  {amount}
-                </OrderInfoText>
-              </OrderInfoTextWrapper2>
-            </OrderInfoTextWrapper>
+                      }}
+                    />
+                    <Popper
+                      open={open}
+                      anchorEl={anchorRef.current}
+                      placement="bottom-start"
+                      style={{ zIndex: 1300 }}
+                    >
+                      <Box
+                        sx={{
+                          bgcolor: "background.paper",
+                          border: "1px solid #ccc",
 
-            <OrderInfoTextWrapper>
-              <OrderInfoTextWrapper2>
-                <OrderInfoText style={{ color: "#989898" }}>
-                  Duration
-                </OrderInfoText>
-              </OrderInfoTextWrapper2>
-              <OrderInfoTextWrapper2>
-                <OrderInfoText style={{ color: "#989898" }}>
-                  {durationValue}
-                </OrderInfoText>
-              </OrderInfoTextWrapper2>
-            </OrderInfoTextWrapper>
+                          p: 2,
+                          mt: 0.5,
+                          width: 300,
+                          boxShadow: 4,
+                          borderRadius: 2,
+                        }}
+                      >
+                        <Typography fontWeight="bold">Minutes</Typography>
+                        <Grid container spacing={1} mb={2}>
+                          {minutes.map((min) => (
+                            <Grid key={min}>
+                              <Box
+                                sx={boxStyle}
+                                onClick={(e) => {
+                                  e.stopPropagation(); // prevent triggering events on other components
+                                  handleOptionClick(`${min} minutes`);
+                                }}
+                              >
+                                {min}
+                              </Box>
+                            </Grid>
+                          ))}
+                        </Grid>
+                        <Typography fontWeight="bold">Hours</Typography>
+                        <Grid container spacing={1} mb={2}>
+                          {hours.map((hr) => (
+                            <Grid key={hr}>
+                              <Box
+                                sx={boxStyle}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOptionClick(`${hr} hours`);
+                                }}
+                              >
+                                {hr}
+                              </Box>
+                            </Grid>
+                          ))}
+                        </Grid>
+                        <Typography fontWeight="bold">Days</Typography>
+                        <Grid container spacing={1}>
+                          {days.map((day) => (
+                            <Grid size={2} key={day}>
+                              <Box
+                                sx={boxStyle}
+                                onMouseDown={(e) => {
+                                  e.preventDefault(); // Prevent focus shift
+                                }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOptionClick(`${day} days`);
+                                }}
+                              >
+                                {day}
+                              </Box>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </Box>
+                    </Popper>
+                  </Box>
+                </ClickAwayListener>
+              </FormControl>
+              {durationError && (
+                <FormErrorWrapper>
+                  <FormError>{durationError}</FormError>
+                </FormErrorWrapper>
+              )}
+            </FormAddInputLabelWrapper>
+            {/** Form price component */}
+            <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
+              <FormAddLabelWrapper>
+                <FormAddLabel>Price</FormAddLabel>
+              </FormAddLabelWrapper>
+              <FormControl fullWidth>
+                <Autocomplete
+                  freeSolo
+                  disableClearable
+                  openOnFocus
+                  options={priceOptions}
+                  inputValue={inputValue}
+                  onInputChange={(_, newInputValue) =>
+                    setInputValue(newInputValue)
+                  }
+                  getOptionLabel={(option) => {
+                    if (typeof option === "string") return option;
+                    return `${option.col1} - ${option.col2}`;
+                  }}
+                  filterOptions={filterPriceOptions}
+                  renderOption={(props, option) => {
+                    // Destructure the 'key' out of 'props' before spreading the rest
+                    const { key, ...restProps } = props;
+                    return (
+                      <li
+                        key={key}
+                        {...restProps} // Spread the remaining props
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          ...getOptionStyle(option.col1),
+                          pointerEvents: "none", // disable interaction
+                        }}
+                      >
+                        <span>{option.col1}</span>
+                        <span style={{ marginLeft: "auto" }}>
+                          {option.col2}
+                        </span>
+                      </li>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      placeholder="Price"
+                      variant="outlined"
+                      onBlur={() => {
+                        const errorMsg = validatePrice(inputValue);
+                        setPriceError(errorMsg);
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          height: "40px",
+                          border: "2px solid #D9E1E3",
+                          backgroundColor: "#ffffff",
+                          color: "#003543",
+                          borderRadius: "10px",
 
-            <OrderInfoTextWrapper>
-              <OrderInfoTextWrapper2>
-                <OrderInfoText style={{ color: "#989898" }}>
-                  Payout
-                </OrderInfoText>
-              </OrderInfoTextWrapper2>
-
-              <OrderInfoTextWrapper2>
-                <OrderInfoText
+                          "&.Mui-focused fieldset": {
+                            borderColor: "transparent",
+                          },
+                          "& fieldset": {
+                            border: "none",
+                          },
+                        },
+                        "& input::placeholder": {
+                          fontSize: "14px",
+                        },
+                      }}
+                      InputProps={{
+                        ...params.InputProps,
+                        type: "text",
+                        endAdornment: (
+                          <div>
+                            <DropdownIconWithText />
+                          </div>
+                        ),
+                      }}
+                    />
+                  )}
+                />
+              </FormControl>
+              {priceError && (
+                <FormErrorWrapper>
+                  <FormError>{priceError}</FormError>
+                </FormErrorWrapper>
+              )}
+            </FormAddInputLabelWrapper>
+            {/** Setting button */}
+            <FormSettingWrapper>
+              <FormSettingIconWrapper1>
+                <FormSettingIconWrapper2>
+                  <FormSettingIcon />
+                </FormSettingIconWrapper2>
+              </FormSettingIconWrapper1>
+            </FormSettingWrapper>
+            <Divider
+              orientation="horizontal"
+              flexItem
+              sx={{ my: 2, backgroundColor: "#D9E1E3" }}
+            />
+            <OrderInfoWrapper>
+              <OrderInfoHeaderWrapper style={{ marginBottom: "0.5rem" }}>
+                <AccountHeader
                   style={{
-                    color: "#1E650F",
-                    fontSize: "20px",
+                    color: "#003543",
+                    fontSize: "16px",
                     fontWeight: "800",
                   }}
                 >
-                  {myPrice?.totalPrice ?? 0} TRX
-                </OrderInfoText>
-              </OrderInfoTextWrapper2>
-            </OrderInfoTextWrapper>
-          </OrderInfoWrapper>
+                  Order Info
+                </AccountHeader>
+              </OrderInfoHeaderWrapper>
+              <OrderInfoTextWrapper>
+                <OrderInfoTextWrapper2>
+                  <OrderInfoText style={{ color: "#003543" }}>
+                    Amount
+                  </OrderInfoText>
+                </OrderInfoTextWrapper2>
+                <OrderInfoTextWrapper2>
+                  <OrderInfoText style={{ color: "#003543" }}>
+                    {amount}
+                  </OrderInfoText>
+                </OrderInfoTextWrapper2>
+              </OrderInfoTextWrapper>
 
-          <OrderSubmitBtnWrapper>
-            <OrderSubmitBtn type="submit">Create Order</OrderSubmitBtn>
-          </OrderSubmitBtnWrapper>
-        </Form>
+              <OrderInfoTextWrapper>
+                <OrderInfoTextWrapper2>
+                  <OrderInfoText style={{ color: "#003543" }}>
+                    Duration
+                  </OrderInfoText>
+                </OrderInfoTextWrapper2>
+                <OrderInfoTextWrapper2>
+                  <OrderInfoText style={{ color: "#003543" }}>
+                    {durationValue}
+                  </OrderInfoText>
+                </OrderInfoTextWrapper2>
+              </OrderInfoTextWrapper>
+
+              <OrderInfoTextWrapper>
+                <OrderInfoTextWrapper2>
+                  <OrderInfoText style={{ color: "#003543" }}>
+                    Payout
+                  </OrderInfoText>
+                </OrderInfoTextWrapper2>
+
+                <OrderInfoTextWrapper2>
+                  <OrderInfoText
+                    style={{
+                      color: "#430E00",
+                      fontSize: "20px",
+                      fontWeight: "800",
+                    }}
+                  >
+                    {myPrice?.totalPrice ?? 0} TRX
+                  </OrderInfoText>
+                </OrderInfoTextWrapper2>
+              </OrderInfoTextWrapper>
+            </OrderInfoWrapper>
+
+            <OrderSubmitBtnWrapper>
+              <OrderSubmitBtn type="submit">Create Order</OrderSubmitBtn>
+            </OrderSubmitBtnWrapper>
+          </Form>
+        </FormWrapper2>
       </FormWrapper>
     </>
   );

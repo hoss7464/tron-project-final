@@ -17,6 +17,7 @@ export const MainContainerWrapper = styled.div`
     padding: 0.5rem;
   }
 
+
 `;
 
 export const LightMainContainerWrapper = styled.div`
@@ -49,17 +50,27 @@ export const PrimeMainContainer = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
+  background-color: ${ThemeColor.bg2};
 
-  @media only screen and (min-width: 280px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
     border-radius: 0;
   }
 
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    border-radius: 0;
+  }
 
-  @media only screen and (min-width: 769px) and (max-width: 1920px) {
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
     border-radius: 16px;
   }
 
-  @media only screen and (min-width: 1921px) {
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
     border-radius: 32px;
   }
+
+  
 `;

@@ -24,6 +24,7 @@ import {
   OrdersCardText2,
   MyOrdersTextWrapper,
 } from "./mainPageElements";
+import { LegacyCardName } from "./LegacySection/LegacyElements";
 import singleEnergy2 from "../../assets/svg/SingleEnergy2.svg";
 import singleBandwidth2 from "../../assets/svg/SingleBandwidth2.svg";
 import { sortByDateTime } from "../../utils/sortByDateAndTime";
@@ -65,10 +66,10 @@ const MyOrdersComponent: React.FC = () => {
 
   return (
     <>
-      <MyOrdersWrapper className="order-bg">
+      <MyOrdersWrapper className="my-orders-bg2">
         <OrderMainWrapper>
           <OrdersNavHeaderWrapper>
-            <AccountHeader>My Orders</AccountHeader>
+            <LegacyCardName>My Orders</LegacyCardName>
             <MyFilterComponent
               listKey="myOrders"
               options={["All", "energy", "bandwidth"]}

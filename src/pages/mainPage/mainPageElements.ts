@@ -1,7 +1,8 @@
 import styled from "styled-components";
-import { colors } from "../../core-UI/Theme";
+import { colors, ThemeColor } from "../../core-UI/Theme";
 import { IoCopy } from "react-icons/io5";
 import { MdOutlineAccountBalanceWallet } from "react-icons/md";
+import { IoMdSettings } from "react-icons/io";
 
 //--------------------------------------------------------------------------
 //Main page styles :
@@ -12,68 +13,68 @@ export const MainPageContainer = styled.div`
   flex-direction: column;
   width: 100%;
   min-height: 720px;
-  background-color: ${colors.bg2};
+  background-color: ${ThemeColor.bg2};
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    border-radius: 0;
+    @media only screen and (min-width: 280px) and (max-width: 576px) {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
-    border-radius: 0;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    border-radius: 16px;
+    border-top-right-radius: 16px;
+    border-top-left-radius: 16px;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    border-radius: 16px;
+    border-top-right-radius: 16px;
+    border-top-left-radius: 16px;
   }
 
   @media only screen and (min-width: 1921px) and (max-width: 2700px) {
-    border-radius: 32px;
+    border-top-right-radius: 32px;
+    border-top-left-radius: 32px;
   }
 `;
 
 export const MainPageWrapper2 = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     padding: 0 24px 0 24px;
-
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
     padding: 0 24px 0 24px;
-
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
     padding: 0 32px 0 32px;
-
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     padding: 0 32px 0 32px;
-
   }
 
   @media only screen and (min-width: 1921px) and (max-width: 2700px) {
     padding: 0 56px 0 56px;
   }
-`
+`;
 
 export const MainPageWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-  margin-bottom: 1rem;
-
-
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 `;
 
 export const MainLeftSection = styled.div`
@@ -92,7 +93,7 @@ export const MainLeftSection = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    width: 27%;
+    width: 32.8%;
   }
 `;
 
@@ -112,31 +113,12 @@ export const MainRightSection = styled.div`
     padding-left: 1rem;
   }
   @media only screen and (min-width: 1201px) {
-    width: 73%;
+    width: 68.2%;
     padding-left: 1rem;
   }
 `;
 //-------------------------------------------------------------------------
 //Legacy section styles :
-export const LegacyContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-  margin-bottom: 1.2rem;
-`;
-export const AccountWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  width: 100%;
-  border-radius: 32px;
-  padding: 0.5rem;
-  border: solid 2px ${colors.bg1};
-`;
-
 export const MobileAccountWrapper = styled.div`
   width: 100%;
   border: solid 2px ${colors.bg1};
@@ -293,15 +275,60 @@ export const FormWrapper = styled.div`
   width: 100%;
 `;
 
+export const FormWrapper2 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border: solid 2px ${ThemeColor.border1};
+  padding: 0.5rem;
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    border-radius: 20px;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    border-radius: 24px;
+  }
+`;
+
 export const Form = styled.form`
   display: flex;
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
   width: 100%;
-  border-radius: 32px;
-  border: solid 2px ${colors.bg1};
   padding: 16px;
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    border-radius: 14px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    border-radius: 14px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    border-radius: 14px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    border-radius: 18px;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    border-radius: 22px;
+  }
 `;
 
 export const FormHeaderSwitchWrapper = styled.div`
@@ -348,7 +375,7 @@ export const FormAddLabelWrapper = styled.div`
   margin-bottom: 0.5rem;
 `;
 export const FormAddLabel = styled.label`
-  color: ${colors.text1};
+  color: ${ThemeColor.primary1};
   font-weight: 700;
   font-size: 14px;
 `;
@@ -357,8 +384,9 @@ export const FormAddInputWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  border-radius: 24px;
-  border: solid 1px ${colors.primary1};
+  border-radius: 10px;
+  border: solid 2px ${ThemeColor.border1};
+  background-color: ${ThemeColor.bg2};
   padding-top: 0.3rem;
   padding-left: 0.3rem;
   padding-bottom: 0.3rem;
@@ -404,7 +432,8 @@ export const FormAddInput = styled.input`
   border: none;
   outline: none;
   background-color: transparent;
-  font-size: 14px;
+
+  color: ${ThemeColor.primary1};
   &:active {
     border: none;
     outline: none;
@@ -415,7 +444,15 @@ export const FormAddInput = styled.input`
     outline: none;
   }
   &::placeholder {
-    font-size: 14px;
+    font-size: 13px;
+    color: ${ThemeColor.border1};
+  }
+  @media only screen and (min-width: 280px) and (max-width: 1080px) {
+    font-size: 12px;
+  }
+
+  @media only screen and (min-width: 1081px) {
+    font-size: 13px;
   }
 `;
 
@@ -442,15 +479,16 @@ export const InputMiniBtn = styled.button`
   padding: 2px 4px;
   font-size: 12px;
   font-weight: 400;
-  color: ${colors.text7};
-  border: solid 0.5px ${colors.text7};
+  color: ${ThemeColor.primary1};
+  border: solid 0.5px ${ThemeColor.border1};
+  background-color: ${ThemeColor.bg2};
   cursor: pointer;
   border-radius: 6px;
 
   &:hover {
-    background-color: ${colors.primary1};
-    color: ${colors.text2};
-    border: solid 0.3px ${colors.primary1};
+    background-color: ${ThemeColor.secondary1};
+    color: ${ThemeColor.bg2};
+    border: solid 0.3px ${ThemeColor.secondary1};
   }
 `;
 
@@ -497,12 +535,12 @@ export const OrderSubmitBtn = styled.button`
   border: none;
   font-size: 18px;
   font-weight: 700;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   width: 100%;
-  border-radius: 55px;
-  background-color: ${colors.primary1};
-  color: ${colors.bg2};
+  border-radius: 10px;
+  background-color: ${ThemeColor.secondary1};
+  color: ${ThemeColor.text2};
   cursor: pointer;
 `;
 
@@ -517,6 +555,37 @@ export const FormError = styled.p`
   font-weight: 400;
   color: red;
 `;
+
+export const FormSettingWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  margin-top: 1rem;
+`;
+export const FormSettingIconWrapper1 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px;
+  border: solid 1px ${ThemeColor.secondary1};
+  border-radius: 10px;
+  cursor: pointer;
+`;
+export const FormSettingIconWrapper2 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px;
+  background-color: ${ThemeColor.secondary1};
+  border-radius: 8px;
+`;
+export const FormSettingIcon = styled(IoMdSettings)`
+  color: ${ThemeColor.bg2};
+  width: 24px;
+  height: 24px;
+`;
+
 //-------------------------------------------------------------------------
 //Orders section styles
 export const OrdersWrapper = styled.div`
@@ -524,12 +593,28 @@ export const OrdersWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  border-radius: 32px;
   width: 100%;
-
-  margin-top: 1.2rem;
   padding: 0.5rem;
-  border: solid 2px ${colors.bg1};
+  border: solid 2px ${ThemeColor.border1};
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    border-radius: 20px;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    border-radius: 24px;
+  }
 `;
 
 export const OrderMainWrapper = styled.div`
@@ -539,7 +624,6 @@ export const OrderMainWrapper = styled.div`
   flex-direction: column;
   width: 100%;
   padding: 0.5rem;
-  border-radius: 24px;
 `;
 
 export const OrdersCarouselWrapper = styled.div`
@@ -555,12 +639,12 @@ export const OrdersCarouselWrapper = styled.div`
 export const OrdersScroll = styled.div`
   overflow-x: auto;
   width: 100%;
-  height: 496px;
+  height: 550px;
 `;
 
 export const OrdersCard = styled.div`
   width: 100%;
-  min-width: 700px;
+  min-width: 750px;
   color: white;
   border-radius: 10px;
   flex-shrink: 0;
@@ -571,10 +655,21 @@ export const OrdersDetail = styled.div`
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  border-radius: 16px;
-  border: solid 1px ${colors.border1};
+  border-radius: 8px;
   margin-bottom: 0.5rem;
-  padding: 0.5rem 0.5rem;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+`;
+
+export const OrdersNavHeaderWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background-color: ${ThemeColor.bg2};
+  padding: 0.5rem;
+  border-radius: 8px;
 `;
 
 export const OrderNavWrapper = styled.div`
@@ -585,18 +680,10 @@ export const OrderNavWrapper = styled.div`
   width: 100%;
   min-width: 700px;
   padding: 0.5rem;
-  border-radius: 24px;
-  background-color: ${colors.bg1};
+  background-color: ${ThemeColor.bg2};
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
-  border: solid 1px ${colors.primary1};
-`;
-
-export const OrdersNavHeaderWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
+  border-radius: 8px;
 `;
 
 export const OrderNavTextWrapper1 = styled.div`
@@ -618,16 +705,27 @@ export const OrderCardIconWrapper = styled.div`
   justify-content: center;
   align-items: center;
   margin-right: 0.2rem;
+  padding: 4px;
+  border-radius: 8px;
+`;
+export const OrderCardIconWrapper2 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  border-radius: 6px;
+  margin-right: 0.2rem;
+  margin-bottom: 0.2rem;
 `;
 export const OrderCardIcon = styled.img`
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
 `;
 
 export const OrderNavText = styled.p`
   font-size: 14px;
   font-weight: 700;
-  color: ${colors.text3};
+  color: ${ThemeColor.text3};
 `;
 
 export const OrdersCardTextWrap = styled.div`
@@ -647,12 +745,12 @@ export const OrdersCardTextWrapper2 = styled.div`
 export const OrdersCardText1 = styled.p`
   font-size: 14px;
   font-weight: 500;
-  color: ${colors.text1};
+  color: ${ThemeColor.primary1};
 `;
 export const OrdersCardText2 = styled.p`
   font-size: 14px;
   font-weight: 500;
-  color: ${colors.text7};
+  color: ${ThemeColor.secondary1};
 `;
 
 export const OrderCardLinearWrapper = styled.div`
@@ -678,19 +776,19 @@ export const OrderCardLineraPercentWrapper = styled.div`
 export const OrderCardLineraPercent = styled.p`
   font-size: 14px;
   font-weight: 500;
-  color: ${colors.primary1};
+  color: ${ThemeColor.primary1};
 `;
 
 export const OrdersSellBtnWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 6px 16px;
-  background-color: ${colors.primary1};
-  border-radius: 8px;
+  padding: 10px 16px;
+  background-color: ${ThemeColor.secondary1};
+  border-radius: 6px;
   cursor: pointer;
   position: absolute;
-  right: 0.5rem;
+  right: 0.7rem;
 `;
 
 export const OrdersSell = styled.p`
@@ -714,11 +812,29 @@ export const MyOrdersWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  border-radius: 32px;
   width: 100%;
   margin-top: 1.2rem;
   padding: 0.5rem;
-  border: solid 2px ${colors.bg1};
+  border: solid 2px ${ThemeColor.border1};
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    border-radius: 20px;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    border-radius: 24px;
+  }
 `;
 
 export const MyOrdersNavWrapper = styled.div`
@@ -729,11 +845,10 @@ export const MyOrdersNavWrapper = styled.div`
   width: 100%;
   min-width: 700px;
   padding: 0.5rem;
-  border-radius: 24px;
-  background-color: ${colors.bg1};
+  border-radius: 8px;
+  background-color: ${ThemeColor.bg2};
   margin-bottom: 0.5rem;
   margin-top: 0.5rem;
-  border: solid 1px ${colors.primary1};
 `;
 
 export const MyOrdersScroll = styled.div`
@@ -757,7 +872,6 @@ export const MyOrdersCarouselWrapper = styled.div`
   width: 100%;
   overflow-x: auto;
   position: relative;
-  background-color: khaki;
 `;
 
 export const MyOrdersTextWrapper = styled.div`
@@ -773,10 +887,11 @@ export const MyOrderDetails = styled.div`
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  border-radius: 16px;
-  border: solid 1px ${colors.border1};
+  border-radius: 8px;
   margin-bottom: 0.5rem;
-  padding: 0.5rem 0.5rem;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
 `;
 
 export const MyOrderCardTextWrap = styled.div`

@@ -36,7 +36,24 @@ const MyFilterComponent: React.FC<Props> = ({
         value={selected}
         onChange={handleChange}
         inputProps={{ "aria-label": "Without label" }}
-        sx={{ height: 32 }}
+        sx={{
+          height: 32,
+          color: "#ffffff",
+          backgroundColor: "#430E00",
+          borderRadius : "6px",
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#430E00", // default border color
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#430E00", // Border color on hover
+          },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#430E00", // border on focus
+          },
+          "& .MuiSelect-icon": {
+            color: "#ffffff", // arrow icon color
+          },
+        }}
         MenuProps={{
           disableScrollLock: true,
           PaperProps: {
