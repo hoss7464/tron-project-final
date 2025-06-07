@@ -54,7 +54,14 @@ import {
   HeroGridCardNumberIcon,
 } from "./HeroSection/HeroElements";
 import { HeroGridCardHeader } from "./HeroSection/HeroElements";
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import {
+  ToggleButton,
+  ToggleButtonGroup,
+  Checkbox,
+  FormControlLabel,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { styled } from "@mui/material/styles";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
@@ -139,6 +146,7 @@ const OrderFormComponent: React.FC = () => {
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
   const [walletAdd, setWalletAdd] = useState("");
+  const [walletAddError, setWalletAddError] = useState<string | null>("");
   //Amount input states:
   const [amount, setAmount] = useState("");
   const [amountError, setAmountError] = useState("");
@@ -151,6 +159,9 @@ const OrderFormComponent: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [priceOptions, setPriceOptions] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
+  //Setting dropdown states :
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [multiAddress, setMultiAddress] = useState<boolean>(false);
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -161,9 +172,28 @@ const OrderFormComponent: React.FC = () => {
       setSwitchBtn(switchBtn);
     }
   };
+  //--------------------------------------------------------------------------------------
+  //Functions for wallet address :
+  //Wallet address validation :
+  const validationWalletAdd = (address: string) => {
+    const walletAddRegX = /^T[a-zA-Z0-9]{33}$/;
+    return walletAddRegX.test(address);
+  };
+  //Wallet address function :
+  const handleWalletAdd = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
 
+    if (!validationWalletAdd(newValue)) {
+      setWalletAddError("wrong address");
+    } else {
+      setWalletAddError(null);
+    }
+
+    setWalletAdd(newValue);
+  };
   //--------------------------------------------------------------------------------------
   //Amount input functions :
+
   //Function for amount validation :
   const validateAmount = (
     rawValue: string,
@@ -266,7 +296,6 @@ const OrderFormComponent: React.FC = () => {
     const match = value.match(/^(\d+)/); // Matches digits at the start
     return match ? Number(match[1]) : null;
   };
-
   //--------------------------------------------------------------------------------------
   //Price input functions :
   //To set min max dynamic options :
@@ -407,6 +436,27 @@ const OrderFormComponent: React.FC = () => {
     }
   }, [durationValue]);
   //--------------------------------------------------------------------------------------
+  //Functions for setting button :
+  //checkbox click toggle function :
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+  //Function to close the checkbox when clicking anywhere :
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const menuOpen = Boolean(anchorEl);
+  //Function for checkbox value :
+  const handleMultiAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = event.target.checked;
+    setMultiAddress(checked);
+
+    if (!checked) {
+      setWalletAddError(null);
+    }
+  };
+  //--------------------------------------------------------------------------------------
   //To calculate payout amount :
   const calculateTotalPrice = () => {
     const numericAmount = getNumericAmount(amount);
@@ -459,7 +509,11 @@ const OrderFormComponent: React.FC = () => {
       dispatch(clickToggle("popUp"));
       return;
     }
-
+    //Wallet address input validation :
+    const walletAddValidationError = validationWalletAdd(walletAdd)
+      ? null
+      : "wrong address";
+    setWalletAddError(walletAddValidationError);
     //Amount input validation :
     const amountValidationError = validateAmount(amount, switchBtn);
     setAmountError(amountValidationError);
@@ -471,6 +525,7 @@ const OrderFormComponent: React.FC = () => {
     setPriceError(priceValidationError);
 
     if (
+      walletAddValidationError ||
       amountValidationError ||
       durationValidationError ||
       priceValidationError
@@ -481,7 +536,7 @@ const OrderFormComponent: React.FC = () => {
     //Switch button value :
     let formBtn = switchBtn;
     //Wallet address :
-    let walletAddress = address ?? "";
+    let walletAddress = multiAddress ? walletAdd : address ?? "";
     //numeric value of amount input
     const numericAmount = getNumericAmount(amount);
     //duration input value :
@@ -539,17 +594,25 @@ const OrderFormComponent: React.FC = () => {
 
       await response.json();
       dispatch(toggleRefresh());
-
       setAmount("");
       setDurationValue("");
       setInputValue("");
       setAmountError("");
       setDurationError("");
       setPriceError("");
+      setWalletAdd("");
+      setMultiAddress(false);
     } catch (error) {
       console.error("Failed to submit data:", error);
     }
   };
+
+  useEffect(() => {
+    // show wallet address when reloading the page
+    if (multiAddress && !walletAdd) {
+      setWalletAdd(address ?? "");
+    }
+  }, [address]);
 
   return (
     <>
@@ -635,13 +698,20 @@ const OrderFormComponent: React.FC = () => {
 
                   <FormAddInputWrapper2>
                     <FormAddInput
-                      readOnly
-                      value={address ?? ""}
-                      onChange={(e) => setWalletAdd(e.target.value)}
+                      readOnly={!multiAddress}
+                      value={multiAddress ? walletAdd : address ?? ""}
+                      onChange={handleWalletAdd}
                     />
                   </FormAddInputWrapper2>
                 </FormAddInputIconWrapper>
               </FormAddInputWrapper>
+              {walletAddError ? (
+                <FormErrorWrapper>
+                  <FormError>{walletAddError}</FormError>
+                </FormErrorWrapper>
+              ) : (
+                ""
+              )}
             </FormAddInputLabelWrapper>
             {/** Form amount input component */}
             <FormAddInputLabelWrapper>
@@ -990,11 +1060,64 @@ const OrderFormComponent: React.FC = () => {
             </FormAddInputLabelWrapper>
             {/** Setting button */}
             <FormSettingWrapper>
-              <FormSettingIconWrapper1>
+              <FormSettingIconWrapper1 onClick={handleClick}>
                 <FormSettingIconWrapper2>
                   <FormSettingIcon />
                 </FormSettingIconWrapper2>
               </FormSettingIconWrapper1>
+              <Menu
+                anchorEl={anchorEl}
+                open={menuOpen}
+                onClose={handleClose}
+                disableScrollLock
+                MenuListProps={{
+                  style: {
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                  },
+                }}
+                sx={{
+                  "& .MuiMenuItem-root:hover": {
+                    backgroundColor: "transparent !important",
+                  },
+                }}
+              >
+                <MenuItem
+                  disableRipple
+                  sx={{
+                    minHeight: "auto",
+                    transition: "none",
+                    "&:hover": {
+                      backgroundColor: "transparent !important",
+                    },
+                    "&.Mui-focusVisible, &:focus, &:active": {
+                      backgroundColor: "transparent !important",
+                      outline: "none",
+                      boxShadow: "none",
+                      border: "none",
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={multiAddress}
+                        onChange={handleMultiAddress}
+                        sx={{
+                          color: "#430E00", // border color when unchecked
+                          "&.Mui-checked": {
+                            color: "#430E00", // color when checked
+                          },
+                          "& .MuiSvgIcon-root": {
+                            fontSize: 26,
+                          },
+                        }}
+                      />
+                    }
+                    label="Multi-Address"
+                  />
+                </MenuItem>
+              </Menu>
             </FormSettingWrapper>
             <Divider
               orientation="horizontal"

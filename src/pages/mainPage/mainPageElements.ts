@@ -902,5 +902,4 @@ export const MyOrderCardTextWrap = styled.div`
   width: 25%;
   height: 100%;
 `;
-//-------------------------------------------------------------------------
-//Footer section styles
+

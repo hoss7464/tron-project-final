@@ -12,7 +12,6 @@ import {
   OrdersNavHeaderWrapper,
   OrderNavTextWrapper1,
   OrderNavTextWrapper,
-  OrderCardIconWrapper,
   OrderCardIconWrapper2,
   OrderCardIcon,
   OrderNavText,
@@ -144,24 +143,20 @@ export const OrdersComponent: React.FC = () => {
                       <OrdersCardTextWrap>
                         <OrdersCardTextWrapper2>
                           {myData.orderProduct === "energy" ? (
-                            
-                              <OrderCardIconWrapper2
-                                style={{ backgroundColor: "#003543" }}
-                              >
-                                <OrderCardIcon alt="energy" src={energyIcon} />
-                              </OrderCardIconWrapper2>
-                            
+                            <OrderCardIconWrapper2
+                              style={{ backgroundColor: "#003543" }}
+                            >
+                              <OrderCardIcon alt="energy" src={energyIcon} />
+                            </OrderCardIconWrapper2>
                           ) : (
-                            
-                              <OrderCardIconWrapper2
-                                style={{ backgroundColor: "#430E00" }}
-                              >
-                                <OrderCardIcon
-                                  alt="bandwidth"
-                                  src={bandwidthIcon}
-                                />
-                              </OrderCardIconWrapper2>
-                            
+                            <OrderCardIconWrapper2
+                              style={{ backgroundColor: "#430E00" }}
+                            >
+                              <OrderCardIcon
+                                alt="bandwidth"
+                                src={bandwidthIcon}
+                              />
+                            </OrderCardIconWrapper2>
                           )}
 
                           <OrdersCardText1>

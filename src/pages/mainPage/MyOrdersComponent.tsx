@@ -24,11 +24,12 @@ import {
   OrdersCardText2,
   MyOrdersTextWrapper,
 } from "./mainPageElements";
+import { OrderCardIconWrapper2 } from "./mainPageElements";
 import { LegacyCardName } from "./LegacySection/LegacyElements";
-import singleEnergy2 from "../../assets/svg/SingleEnergy2.svg";
-import singleBandwidth2 from "../../assets/svg/SingleBandwidth2.svg";
 import { sortByDateTime } from "../../utils/sortByDateAndTime";
 import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
+import energyIcon from "../../assets/svg/EnergyIcon.svg";
+import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 
 type Post = {
   id: number;
@@ -112,16 +113,22 @@ const MyOrdersComponent: React.FC = () => {
 
                       <MyOrderCardTextWrap>
                         <OrdersCardTextWrapper2>
-                          <OrderCardIconWrapper>
-                            <OrderCardIcon
-                              alt="energy"
-                              src={
-                                myData.formHeader === "energy"
-                                  ? singleEnergy2
-                                  : singleBandwidth2
-                              }
-                            />
-                          </OrderCardIconWrapper>
+                          {myData.formHeader === "energy" ? (
+                            <OrderCardIconWrapper2
+                              style={{ backgroundColor: "#003543" }}
+                            >
+                              <OrderCardIcon alt="energy" src={energyIcon} />
+                            </OrderCardIconWrapper2>
+                          ) : (
+                            <OrderCardIconWrapper2
+                              style={{ backgroundColor: "#430E00" }}
+                            >
+                              <OrderCardIcon
+                                alt="bandwidth"
+                                src={bandwidthIcon}
+                              />
+                            </OrderCardIconWrapper2>
+                          )}
                           <OrdersCardText1>{myData.formAmount}</OrdersCardText1>
                         </OrdersCardTextWrapper2>
                         <OrdersCardTextWrapper2>
