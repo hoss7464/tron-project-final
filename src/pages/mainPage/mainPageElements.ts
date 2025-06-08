@@ -74,7 +74,6 @@ export const MainPageWrapper = styled.div`
   align-items: flex-start;
   width: 100%;
   padding-top: 1rem;
-  padding-bottom: 1rem;
 `;
 
 export const MainLeftSection = styled.div`

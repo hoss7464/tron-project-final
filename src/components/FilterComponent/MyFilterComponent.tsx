@@ -4,7 +4,6 @@ import { RootState } from "../../redux/store/store";
 import { setFilter } from "../../redux/actions/filterSlice";
 import {
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
   SelectChangeEvent,
