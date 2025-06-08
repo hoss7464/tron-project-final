@@ -182,7 +182,7 @@ const OrderFormComponent: React.FC = () => {
     const newValue = event.target.value;
     setWalletAdd(newValue);
 
-    // Optional: Validate and set error
+    
     if (newValue && !validationWalletAdd(newValue)) {
       setWalletAddError("wrong format.");
     } else {

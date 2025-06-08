@@ -73,18 +73,6 @@
       "message": "Log into your wallet: TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j - Time: 2025-06-03T14:47:06.553Z",
       "signature": "0x1228fbdc68dcdf96e9312871031c1dbb47d30392d8c567ec72a5c6d2d92004790f2f2d06713aac1238d1fc2ccd7b87ab21cae3a5c0af68a98a6affa1f3f899ac1b",
       "id": 2
-    },
-    {
-      "address": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "message": "Log into your wallet : TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j - Time: 2025-06-07T14:22:40.305Z",
-      "signature": "0xaaba2a4ba2efd03c69feced0569113bdab72ed593836f7c6cf1b5291f9a5e0794dc30bfe356c55cefa49ed4edb21d8587dfdb820b6446e56f07b62df31f694c81c",
-      "id": 3
-    },
-    {
-      "address": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "message": "Log into your wallet : TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j - Time: 2025-06-07T15:13:33.164Z",
-      "signature": "0xd8b25d742692f27496e7ad9e41171e89ee65597ec634ec718577566429b08e444cb1cc0ecaea2cc9b9cdc3931b436b95de48e1a7aa74faeaa8facb9048699a421c",
-      "id": 4
     }
   ],
   "post": [
