@@ -143,7 +143,7 @@ const OrderFormComponent: React.FC = () => {
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
-  const [walletAdd, setWalletAdd] = useState("");
+  const [walletAdd, setWalletAdd] = useState<string>("");
   const [walletAddError, setWalletAddError] = useState<string | null>("");
   //Amount input states:
   const [amount, setAmount] = useState("");
@@ -180,14 +180,14 @@ const OrderFormComponent: React.FC = () => {
   //Wallet address function :
   const handleWalletAdd = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
+    setWalletAdd(newValue);
 
-    if (!validationWalletAdd(newValue)) {
-      setWalletAddError("wrong address");
+    // Optional: Validate and set error
+    if (newValue && !validationWalletAdd(newValue)) {
+      setWalletAddError("wrong format.");
     } else {
       setWalletAddError(null);
     }
-
-    setWalletAdd(newValue);
   };
   //--------------------------------------------------------------------------------------
   //Amount input functions :
@@ -508,10 +508,13 @@ const OrderFormComponent: React.FC = () => {
       return;
     }
     //Wallet address input validation :
-    const walletAddValidationError = validationWalletAdd(walletAdd)
-      ? null
-      : "wrong address";
-    setWalletAddError(walletAddValidationError);
+    const walletAddressIsValid = validationWalletAdd(walletAdd);
+    if (!walletAddressIsValid) {
+      setWalletAddError("enter valid address.");
+      return; // prevent form submission if invalid
+    } else {
+      setWalletAddError(null);
+    }
     //Amount input validation :
     const amountValidationError = validateAmount(amount, switchBtn);
     setAmountError(amountValidationError);
@@ -523,7 +526,7 @@ const OrderFormComponent: React.FC = () => {
     setPriceError(priceValidationError);
 
     if (
-      walletAddValidationError ||
+      !walletAddressIsValid ||
       amountValidationError ||
       durationValidationError ||
       priceValidationError
@@ -534,7 +537,7 @@ const OrderFormComponent: React.FC = () => {
     //Switch button value :
     let formBtn = switchBtn;
     //Wallet address :
-    let walletAddress = multiAddress ? walletAdd : address ?? "";
+    let walletAddress = walletAdd || (address ?? "");
     //numeric value of amount input
     const numericAmount = getNumericAmount(amount);
     //duration input value :
@@ -599,16 +602,14 @@ const OrderFormComponent: React.FC = () => {
       setDurationError("");
       setPriceError("");
       setWalletAdd("");
-      setMultiAddress(false);
     } catch (error) {
       console.error("Failed to submit data:", error);
     }
   };
 
   useEffect(() => {
-    // show wallet address when reloading the page
-    if (multiAddress && !walletAdd) {
-      setWalletAdd(address ?? "");
+    if (!walletAdd && address) {
+      setWalletAdd(address);
     }
   }, [address]);
 
@@ -696,8 +697,7 @@ const OrderFormComponent: React.FC = () => {
 
                   <FormAddInputWrapper2>
                     <FormAddInput
-                      readOnly={!multiAddress}
-                      value={multiAddress ? walletAdd : address ?? ""}
+                      value={walletAdd}
                       onChange={handleWalletAdd}
                     />
                   </FormAddInputWrapper2>
