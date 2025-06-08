@@ -308,25 +308,30 @@ export const Form = styled.form`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  padding: 16px;
+  
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     border-radius: 14px;
+    padding: 8px;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
     border-radius: 14px;
+    padding: 16px;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
     border-radius: 14px;
+    padding: 16px;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     border-radius: 18px;
+    padding: 16px;
   }
 
   @media only screen and (min-width: 1921px) {
     border-radius: 22px;
+    padding: 16px;
   }
 `;
 
@@ -336,6 +341,7 @@ export const FormHeaderSwitchWrapper = styled.div`
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;
+ 
 `;
 export const FormHeaderIconWrapper = styled.div`
   display: flex;

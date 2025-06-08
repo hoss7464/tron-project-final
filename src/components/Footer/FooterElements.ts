@@ -10,25 +10,13 @@ export const FooterContainer = styled.div`
   align-items: center;
   width: 100%;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
     padding: 0 24px 24px 24px;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-    padding: 0 24px 24px 24px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    border-bottom-right-radius: 16px;
-    border-bottom-left-radius: 16px;
-    padding: 0 32px 32px 32px;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 769px) and (max-width: 1920px) {
     border-bottom-right-radius: 16px;
     border-bottom-left-radius: 16px;
     padding: 0 32px 32px 32px;
@@ -49,15 +37,7 @@ export const FooterWrapper = styled.div`
   width: 100%;
  
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    border-radius: 16px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    border-radius: 16px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 280px) and (max-width: 1080px) {
     border-radius: 16px;
   }
 
@@ -78,17 +58,7 @@ export const CooperationWrapper = styled.div`
   height: 80px;
   background-color: ${ThemeColor.primary3};
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    border-top-right-radius: 16px;
-    border-top-left-radius: 16px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    border-top-right-radius: 16px;
-    border-top-left-radius: 16px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 280px) and (max-width: 1080px) {
     border-top-right-radius: 16px;
     border-top-left-radius: 16px;
   }
@@ -132,14 +102,7 @@ export const FooterContentWrapper = styled.div`
     margin-bottom: 2rem;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 3rem;
-  }
-
-  @media only screen and (min-width: 1921px) {
+  @media only screen and (min-width: 1081px) {
     flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
@@ -152,52 +115,28 @@ export const FooterContentLeftSection = styled.div`
   justify-content: flex-start;
   flex-direction: column;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     width: 100%;
     align-items: center;
     margin-bottom: 2rem;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    width: 100%;
-    align-items: center;
-    margin-bottom: 2rem;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px) {
     align-items: flex-start;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    align-items: flex-start;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    align-items: flex-start;
-  }
 `;
+
 export const FooterIconHeaderWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     margin-bottom: 1.5rem;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    margin-bottom: 1.5rem;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    margin-bottom: 0.5rem;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    margin-bottom: 0.5rem;
-  }
-
-  @media only screen and (min-width: 1921px) {
+  @media only screen and (min-width: 769px) {
     margin-bottom: 0.5rem;
   }
 `;
@@ -206,25 +145,14 @@ export const FooterIconWrapper = styled.div`
   justify-content: center;
   align-items: center;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     margin-right: 0.2rem;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    margin-right: 0.2rem;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px) {
     margin-right: 0.5rem;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    margin-right: 0.5rem;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    margin-right: 0.5rem;
-  }
 `;
 export const FooterIcon = styled.div`
   width: 50px;
@@ -241,12 +169,7 @@ export const FooterHeader = styled.p`
   color: ${ThemeColor.primary1};
   font-weight: 900;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    font-size: 16px;
-    text-align: center;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     font-size: 16px;
     text-align: center;
   }
@@ -286,36 +209,22 @@ export const FooterSubheaderWrapper = styled.div`
     margin-bottom: 2rem;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 1081px) {
     max-width: 650px;
     margin-bottom: 2rem;
   }
 
-  @media only screen and (min-width: 1921px) {
-    max-width: 650px;
-    margin-bottom: 2rem;
-  }
 `;
 export const FooterSubheader = styled.p`
   color: ${ThemeColor.primary1};
   font-weight: 400;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     font-size: 16px;
     text-align: center;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    font-size: 16px;
-    text-align: center;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    font-size: 16px;
-    text-align: left;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 769px) and (max-width: 1920px) {
     font-size: 16px;
     text-align: left;
   }
@@ -325,6 +234,7 @@ export const FooterSubheader = styled.p`
     text-align: left;
   }
 `;
+
 export const FooterSocialMediaWrapper1 = styled.div`
   display: flex;
   justify-content: center;
@@ -356,12 +266,7 @@ export const FooterSocialMediaWrapper4 = styled.div`
 export const FooterTelegramIcon = styled(FaTelegram)`
   color: ${ThemeColor.bg2};
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    width: 14px;
-    height: 14px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     width: 14px;
     height: 14px;
   }
@@ -371,25 +276,16 @@ export const FooterTelegramIcon = styled(FaTelegram)`
     height: 16px;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 1081px) {
     width: 19px;
     height: 19px;
   }
 
-  @media only screen and (min-width: 1921px) {
-    width: 19px;
-    height: 19px;
-  }
 `;
 
 export const FooterWhatsAppIcon = styled(IoLogoWhatsapp)`
   color: ${ThemeColor.bg2};
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    width: 14px;
-    height: 14px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     width: 14px;
     height: 14px;
   }
@@ -399,25 +295,16 @@ export const FooterWhatsAppIcon = styled(IoLogoWhatsapp)`
     height: 16px;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 1081px) {
     width: 19px;
     height: 19px;
   }
 
-  @media only screen and (min-width: 1921px) {
-    width: 19px;
-    height: 19px;
-  }
 `;
 
 export const FooterLinkedInIcon = styled(FaLinkedin)`
   color: ${ThemeColor.bg2};
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    width: 14px;
-    height: 14px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     width: 14px;
     height: 14px;
   }
@@ -427,15 +314,11 @@ export const FooterLinkedInIcon = styled(FaLinkedin)`
     height: 16px;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 1081px) {
     width: 19px;
     height: 19px;
   }
 
-  @media only screen and (min-width: 1921px) {
-    width: 19px;
-    height: 19px;
-  }
 `;
 export const FooterContentRightSection = styled.div`
   display: flex;
@@ -454,23 +337,12 @@ export const FooterContentRightSection = styled.div`
     align-items: center;
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px) {
     flex-direction: row;
     justify-content: flex-start;
     align-items: flex-start;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
 `;
 export const FooterFeatureWrapper = styled.div`
   display: flex;
@@ -489,13 +361,7 @@ export const FooterFeatureWrapper = styled.div`
     min-width: 200px;
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    align-items: flex-start;
-    justify-content: flex-start;
-    min-width: 150px;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 769px) and (max-width: 1920px) {
     align-items: flex-start;
     justify-content: flex-start;
     min-width: 150px;
@@ -513,39 +379,21 @@ export const FooterFeatureHeaderWrapper = styled.div`
   width: 100%;
   margin-bottom: 0.5rem;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     margin-right: 0;
     justify-content: center;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    margin-right: 0;
-    justify-content: center;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px) {
     margin-right: 1rem;
     justify-content: flex-start;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    margin-right: 1rem;
-    justify-content: flex-start;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    margin-right: 1rem;
-    justify-content: flex-start;
-  }
 `;
 export const FooterFeatureHeader = styled.p`
   color: ${ThemeColor.primary1};
   font-weight: 800;
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    font-size: 14px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     font-size: 14px;
   }
 
@@ -574,42 +422,23 @@ export const FooterFeatureTextWrapper2 = styled.div`
   margin-bottom: 0.3rem;
   width: 100%;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     justify-content: center;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    justify-content: center;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px) {
     justify-content: flex-start;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    justify-content: flex-start;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    justify-content: flex-start;
-  }
 `;
 export const FooterFeatureText = styled.p`
   color: ${ThemeColor.primary1};
   font-weight: 500;
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     font-size: 13px;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    font-size: 13px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    font-size: 14px;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 769px) and (max-width: 1920px) {
     font-size: 14px;
   }
 
@@ -640,19 +469,11 @@ align-items: center;
 export const PrivacyTermsText = styled.div`
 color: ${ThemeColor.primary1};
 font-weight: 700;
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     font-size: 13px;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    font-size: 13px;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    font-size: 14px;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+  @media only screen and (min-width: 769px) and (max-width: 1920px) {
     font-size: 14px;
   }
 
