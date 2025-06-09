@@ -159,7 +159,10 @@ const OrderFormComponent: React.FC = () => {
   const [priceError, setPriceError] = useState("");
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [multiAddress, setMultiAddress] = useState<boolean>(false);
+  //Setting button (Allow partial fill) states :
+  const [partialFill, setPartialFill] = useState<boolean>(false);
+  //Setting button (Bulk order) states :
+  const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -171,6 +174,19 @@ const OrderFormComponent: React.FC = () => {
     }
   };
   //--------------------------------------------------------------------------------------
+  //Functions for setting button (Allow partial fill) :
+  const handlePartialFill = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let partialValue = event.target.checked;
+    setPartialFill(partialValue);
+  };
+
+  //Functions for stting button (Bulk order) :
+  const handleBulkOrder = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const bulkValue = event.target.checked;
+    setBulkOrder(bulkValue);
+  };
+
+  //--------------------------------------------------------------------------------------
   //Functions for wallet address :
   //Wallet address validation :
   const validationWalletAdd = (address: string) => {
@@ -181,17 +197,52 @@ const OrderFormComponent: React.FC = () => {
   const handleWalletAdd = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
     setWalletAdd(newValue);
+    //when bulk order is true
+    if (bulkOrder) {
+      //separate addresses from each other by - and ignore spaces
+      const allAdresses = newValue.split("-").map((addr) => addr.trim());
+      //all addresses must be validated into correct format
+      const allValid = allAdresses.every((addr) => validationWalletAdd(addr));
 
-    
-    if (newValue && !validationWalletAdd(newValue)) {
-      setWalletAddError("wrong format.");
+      if (!allValid) {
+        setWalletAddError("all addresses must be in write format.");
+      } else {
+        setWalletAddError(null);
+      }
+    } else {
+      if (newValue && !validationWalletAdd(newValue)) {
+        setWalletAddError("wrong format.");
+      } else {
+        setWalletAddError(null);
+      }
+    }
+  };
+  //Function for conditional wallet add validation with bulkOrder :
+  const isWalletAddValid = (): boolean => {
+    if (!bulkOrder) {
+      const walletAddressIsValid = validationWalletAdd(walletAdd);
+      if (!walletAddressIsValid) {
+        setWalletAddError("wrong format.");
+        return false;
+      } else {
+        setWalletAddError(null);
+        return true;
+      }
+    }
+
+    // bulkOrder === true
+    const addresses = walletAdd.split("-").map((addr) => addr.trim());
+    const allValid = addresses.every((addr) => validationWalletAdd(addr));
+    if (!allValid) {
+      setWalletAddError("wallet addresses must be valid and separated by '-'");
+      return false;
     } else {
       setWalletAddError(null);
+      return true;
     }
   };
   //--------------------------------------------------------------------------------------
   //Amount input functions :
-
   //Function for amount validation :
   const validateAmount = (
     rawValue: string,
@@ -445,16 +496,8 @@ const OrderFormComponent: React.FC = () => {
   };
 
   const menuOpen = Boolean(anchorEl);
-  //Function for checkbox value :
-  const handleMultiAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = event.target.checked;
-    setMultiAddress(checked);
-
-    if (!checked) {
-      setWalletAddError(null);
-    }
-  };
   //--------------------------------------------------------------------------------------
+
   //To calculate payout amount :
   const calculateTotalPrice = () => {
     const numericAmount = getNumericAmount(amount);
@@ -508,13 +551,8 @@ const OrderFormComponent: React.FC = () => {
       return;
     }
     //Wallet address input validation :
-    const walletAddressIsValid = validationWalletAdd(walletAdd);
-    if (!walletAddressIsValid) {
-      setWalletAddError("enter valid address.");
-      return; // prevent form submission if invalid
-    } else {
-      setWalletAddError(null);
-    }
+    const isValid = isWalletAddValid();
+    if (!isValid) return;
     //Amount input validation :
     const amountValidationError = validateAmount(amount, switchBtn);
     setAmountError(amountValidationError);
@@ -526,7 +564,6 @@ const OrderFormComponent: React.FC = () => {
     setPriceError(priceValidationError);
 
     if (
-      !walletAddressIsValid ||
       amountValidationError ||
       durationValidationError ||
       priceValidationError
@@ -555,6 +592,10 @@ const OrderFormComponent: React.FC = () => {
     const now = new Date();
     const formattedDate = now.toISOString().split("T")[0];
     const formattedTime = now.toTimeString().split(" ")[0].slice(0, 5);
+    //Setting button (allow partial fill) :
+    let partialFillValue = partialFill;
+    //Setting button (Bulk order) :
+    let bulkOrderValue = bulkOrder;
 
     if (
       formBtn === null ||
@@ -577,6 +618,10 @@ const OrderFormComponent: React.FC = () => {
       formTime: formattedTime,
       formTotalPrice: totalPrice,
       formDurationUnit: unit,
+      setting: {
+        partial_fill: partialFillValue,
+        bulk_order: bulkOrderValue,
+      },
     };
 
     //Fetch data towards server :
@@ -601,7 +646,9 @@ const OrderFormComponent: React.FC = () => {
       setAmountError("");
       setDurationError("");
       setPriceError("");
-      setWalletAdd("");
+      setWalletAdd(address)
+      setPartialFill(false);
+      setBulkOrder(false);
     } catch (error) {
       console.error("Failed to submit data:", error);
     }
@@ -1099,8 +1146,8 @@ const OrderFormComponent: React.FC = () => {
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={multiAddress}
-                        onChange={handleMultiAddress}
+                        checked={partialFill}
+                        onChange={handlePartialFill}
                         sx={{
                           color: "#430E00", // border color when unchecked
                           "&.Mui-checked": {
@@ -1112,7 +1159,43 @@ const OrderFormComponent: React.FC = () => {
                         }}
                       />
                     }
-                    label="Multi-Address"
+                    label="Allow partial fill"
+                  />
+                </MenuItem>
+
+                <MenuItem
+                  disableRipple
+                  sx={{
+                    minHeight: "auto",
+                    transition: "none",
+                    "&:hover": {
+                      backgroundColor: "transparent !important",
+                    },
+                    "&.Mui-focusVisible, &:focus, &:active": {
+                      backgroundColor: "transparent !important",
+                      outline: "none",
+                      boxShadow: "none",
+                      border: "none",
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={bulkOrder}
+                        onChange={handleBulkOrder}
+                        sx={{
+                          color: "#430E00", // border color when unchecked
+                          "&.Mui-checked": {
+                            color: "#430E00", // color when checked
+                          },
+                          "& .MuiSvgIcon-root": {
+                            fontSize: 26,
+                          },
+                        }}
+                      />
+                    }
+                    label="Bulk order"
                   />
                 </MenuItem>
               </Menu>
