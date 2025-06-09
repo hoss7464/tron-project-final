@@ -1,116 +1,68 @@
 {
   "formData": [
     {
-      "formHeader": "energy",
-      "formAddress": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "formAmount": 65000,
-      "formDuration": 15,
-      "formPrice": 67,
-      "formDate": "2025-06-09",
-      "formTime": "10:48",
-      "formTotalPrice": 4.355,
-      "formDurationUnit": "minutes",
-      "setting": {
-        "partial_fill": false,
+      "resourceType": "energy",
+      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "resourceAmount": 65000,
+      "durationSec": 900,
+      "price": 65,
+      "date": "2025-06-09",
+      "time": "13:16",
+      "totalPrice": 4.355,
+      "options": {
+        "allow_partial": false,
         "bulk_order": false
       },
       "id": 1
     },
     {
-      "formHeader": "bandwidth",
-      "formAddress": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "formAmount": 2000,
-      "formDuration": 1,
-      "formPrice": 850,
-      "formDate": "2025-06-09",
-      "formTime": "10:49",
-      "formTotalPrice": 0.14,
-      "formDurationUnit": "hours",
-      "setting": {
-        "partial_fill": true,
+      "resourceType": "bandwidth",
+      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "receiver": "TK4fYNkWhzgHDUxMo5jhudi1eRzpk2ZaB4",
+      "resourceAmount": 2000,
+      "durationSec": 86400,
+      "price": 2300,
+      "date": "2025-06-09",
+      "time": "13:17",
+      "totalPrice": 4,
+      "options": {
+        "allow_partial": false,
         "bulk_order": false
       },
       "id": 2
     },
     {
-      "formHeader": "energy",
-      "formAddress": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "formAmount": 100000,
-      "formDuration": 3,
-      "formPrice": 1500,
-      "formDate": "2025-06-09",
-      "formTime": "10:49",
-      "formTotalPrice": 8,
-      "formDurationUnit": "hours",
-      "setting": {
-        "partial_fill": true,
-        "bulk_order": true
+      "resourceType": "energy",
+      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "resourceAmount": 65000,
+      "durationSec": 86400,
+      "price": 2500,
+      "date": "2025-06-09",
+      "time": "13:29",
+      "totalPrice": 130,
+      "options": {
+        "allow_partial": false,
+        "bulk_order": false
       },
       "id": 3
     },
     {
-      "formHeader": "bandwidth",
-      "formAddress": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "formAmount": 10000,
-      "formDuration": 1,
-      "formPrice": 2300,
-      "formDate": "2025-06-09",
-      "formTime": "10:50",
-      "formTotalPrice": 20,
-      "formDurationUnit": "days",
-      "setting": {
-        "partial_fill": false,
+      "resourceType": "bandwidth",
+      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j-TK4fYNkWhzgHDUxMo5jhudi1eRzpk2ZaB4",
+      "resourceAmount": 2000,
+      "durationSec": 172800,
+      "price": 3200,
+      "date": "2025-06-09",
+      "time": "13:30",
+      "totalPrice": 12,
+      "options": {
+        "allow_partial": false,
         "bulk_order": true
       },
       "id": 4
-    },
-    {
-      "formHeader": "energy",
-      "formAddress": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "formAmount": 65000,
-      "formDuration": 15,
-      "formPrice": 65,
-      "formDate": "2025-06-09",
-      "formTime": "11:25",
-      "formTotalPrice": 4.355,
-      "formDurationUnit": "minutes",
-      "setting": {
-        "partial_fill": false,
-        "bulk_order": false
-      },
-      "id": 5
-    },
-    {
-      "formHeader": "bandwidth",
-      "formAddress": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j-TK4fYNkWhzgHDUxMo5jhudi1eRzpk2ZaB4",
-      "formAmount": 2000,
-      "formDuration": 1,
-      "formPrice": 2300,
-      "formDate": "2025-06-09",
-      "formTime": "11:27",
-      "formTotalPrice": 4,
-      "formDurationUnit": "days",
-      "setting": {
-        "partial_fill": false,
-        "bulk_order": true
-      },
-      "id": 6
-    },
-    {
-      "formHeader": "energy",
-      "formAddress": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j-TK4fYNkWhzgHDUxMo5jhudi1eRzpk2ZaB4",
-      "formAmount": 65000,
-      "formDuration": 1,
-      "formPrice": 2300,
-      "formDate": "2025-06-09",
-      "formTime": "11:34",
-      "formTotalPrice": 130,
-      "formDurationUnit": "days",
-      "setting": {
-        "partial_fill": false,
-        "bulk_order": true
-      },
-      "id": 7
     }
   ],
   "walletSignature": [

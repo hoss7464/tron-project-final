@@ -1,6 +1,6 @@
 type ItemWithDateTime = {
-  formDate: string;  
-  formTime: string;  
+  date: string;  
+  time: string;  
 };
 
 export function sortByDateTime<T extends ItemWithDateTime>(data: T[]): T[] {
@@ -12,8 +12,8 @@ export function sortByDateTime<T extends ItemWithDateTime>(data: T[]): T[] {
       return new Date(year, month - 1, day, hours, minutes).getTime();
     };
 
-    const dateTimeA = parseDateTime(a.formDate, a.formTime);
-    const dateTimeB = parseDateTime(b.formDate, b.formTime);
+    const dateTimeA = parseDateTime(a.date, a.time);
+    const dateTimeB = parseDateTime(b.date, b.time);
 
     return dateTimeB - dateTimeA; // Latest first
   });

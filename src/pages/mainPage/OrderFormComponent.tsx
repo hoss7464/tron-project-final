@@ -340,6 +340,30 @@ const OrderFormComponent: React.FC = () => {
     setDurationError(errorMessage);
   };
 
+  const getDurationInSeconds = (value: string): number | null => {
+    const trimmed = value.trim().toLowerCase();
+    const match = trimmed.match(/^(\d+)\s*(minutes?|hours?|days?)$/);
+
+    if (!match) return null;
+
+    const number = parseInt(match[1], 10);
+    const unit = match[2];
+
+    switch (unit) {
+      case "minute":
+      case "minutes":
+        return number * 60;
+      case "hour":
+      case "hours":
+        return number * 3600;
+      case "day":
+      case "days":
+        return number * 86400;
+      default:
+        return null;
+    }
+  };
+
   //Function for getting the digit part out of duration options :
   const getNumericDuration = (value: string): number | null => {
     const match = value.match(/^(\d+)/); // Matches digits at the start
@@ -578,7 +602,7 @@ const OrderFormComponent: React.FC = () => {
     //numeric value of amount input
     const numericAmount = getNumericAmount(amount);
     //duration input value :
-    const durationNumericValue = getNumericDuration(durationValue);
+    const durationNumericValue = getDurationInSeconds(durationValue);
     //Price input value :
     let stringSelectedPrice = inputValue;
     let numericSelectedPrice = getNumericSelectedPrice(stringSelectedPrice);
@@ -609,17 +633,17 @@ const OrderFormComponent: React.FC = () => {
 
     // Data object to send
     const postData = {
-      formHeader: formBtn,
-      formAddress: walletAddress,
-      formAmount: numericAmount,
-      formDuration: durationNumericValue,
-      formPrice: numericSelectedPrice,
-      formDate: formattedDate,
-      formTime: formattedTime,
-      formTotalPrice: totalPrice,
-      formDurationUnit: unit,
-      setting: {
-        partial_fill: partialFillValue,
+      resourceType: formBtn,
+      requester: address,
+      receiver: walletAddress,
+      resourceAmount: numericAmount,
+      durationSec: durationNumericValue,
+      price: numericSelectedPrice,
+      date: formattedDate,
+      time: formattedTime,
+      totalPrice: totalPrice,
+      options: {
+        allow_partial: partialFillValue,
         bulk_order: bulkOrderValue,
       },
     };
@@ -646,7 +670,7 @@ const OrderFormComponent: React.FC = () => {
       setAmountError("");
       setDurationError("");
       setPriceError("");
-      setWalletAdd(address)
+      setWalletAdd(address);
       setPartialFill(false);
       setBulkOrder(false);
     } catch (error) {

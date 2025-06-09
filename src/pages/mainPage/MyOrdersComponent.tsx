@@ -31,14 +31,13 @@ import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 
 type Post = {
   id: number;
-  formDate: string;
-  formTime: string;
-  formTotalPrice: number;
-  formAmount: number;
-  formHeader: string;
-  formDuration: number;
-  formPrice: number;
-  formDurationUnit: string;
+  date: string;
+  time: string;
+  totalPrice: number;
+  resourceAmount: number;
+  resourceType: string;
+  durationSec: number;
+  price: number;
 };
 
 const MyOrdersComponent: React.FC = () => {
@@ -59,7 +58,7 @@ const MyOrdersComponent: React.FC = () => {
   const filteredData =
     selectedFilter === "All"
       ? sortedData
-      : sortedData.filter((item) => item.formHeader === selectedFilter);
+      : sortedData.filter((item) => item.resourceType === selectedFilter);
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
@@ -102,16 +101,16 @@ const MyOrdersComponent: React.FC = () => {
                     <MyOrderDetails key={myData.id}>
                       <MyOrderCardTextWrap>
                         <OrdersCardTextWrapper2>
-                          <OrdersCardText1>{myData.formDate}</OrdersCardText1>
+                          <OrdersCardText1>{myData.date}</OrdersCardText1>
                         </OrdersCardTextWrapper2>
                         <OrdersCardTextWrapper2>
-                          <OrdersCardText2>{myData.formTime}</OrdersCardText2>
+                          <OrdersCardText2>{myData.time}</OrdersCardText2>
                         </OrdersCardTextWrapper2>
                       </MyOrderCardTextWrap>
 
                       <MyOrderCardTextWrap>
                         <OrdersCardTextWrapper2>
-                          {myData.formHeader === "energy" ? (
+                          {myData.resourceType === "energy" ? (
                             <OrderCardIconWrapper2
                               style={{ backgroundColor: "#003543" }}
                             >
@@ -127,25 +126,25 @@ const MyOrdersComponent: React.FC = () => {
                               />
                             </OrderCardIconWrapper2>
                           )}
-                          <OrdersCardText1>{myData.formAmount}</OrdersCardText1>
+                          <OrdersCardText1>{myData.resourceAmount}</OrdersCardText1>
                         </OrdersCardTextWrapper2>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText2>
-                            {myData.formDuration}/ {myData.formDurationUnit}
+                            {myData.durationSec}
                           </OrdersCardText2>
                         </OrdersCardTextWrapper2>
                       </MyOrderCardTextWrap>
 
                       <MyOrderCardTextWrap>
                         <OrdersCardTextWrapper2>
-                          <OrdersCardText1>{myData.formPrice}</OrdersCardText1>
+                          <OrdersCardText1>{myData.price}</OrdersCardText1>
                         </OrdersCardTextWrapper2>
                       </MyOrderCardTextWrap>
 
                       <MyOrderCardTextWrap>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>
-                            {myData.formTotalPrice} TRX
+                            {myData.totalPrice} TRX
                           </OrdersCardText1>
                         </OrdersCardTextWrapper2>
                       </MyOrderCardTextWrap>
