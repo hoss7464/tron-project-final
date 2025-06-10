@@ -49,18 +49,18 @@
       "id": 3
     },
     {
-      "resourceType": "bandwidth",
+      "resourceType": "energy",
       "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j-TK4fYNkWhzgHDUxMo5jhudi1eRzpk2ZaB4",
-      "resourceAmount": 2000,
+      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "resourceAmount": 65000,
       "durationSec": 172800,
-      "price": 3200,
-      "date": "2025-06-09",
-      "time": "13:30",
-      "totalPrice": 12,
+      "price": 65,
+      "date": "2025-06-10",
+      "time": "19:18",
+      "totalPrice": 6.5,
       "options": {
         "allow_partial": false,
-        "bulk_order": true
+        "bulk_order": false
       },
       "id": 4
     },
@@ -69,32 +69,16 @@
       "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
       "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
       "resourceAmount": 65000,
-      "durationSec": 900,
-      "price": 65,
-      "date": "2025-06-09",
-      "time": "14:21",
-      "totalPrice": "4.355",
+      "durationSec": 172800,
+      "price": 55,
+      "date": "2025-06-10",
+      "time": "19:28",
+      "totalPrice": 6.5,
       "options": {
         "allow_partial": false,
         "bulk_order": false
       },
       "id": 5
-    },
-    {
-      "resourceType": "energy",
-      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "resourceAmount": 65000,
-      "durationSec": 900,
-      "price": 50,
-      "date": "2025-06-09",
-      "time": "22:08",
-      "totalPrice": 4.355,
-      "options": {
-        "allow_partial": false,
-        "bulk_order": false
-      },
-      "id": 6
     }
   ],
   "walletSignature": [

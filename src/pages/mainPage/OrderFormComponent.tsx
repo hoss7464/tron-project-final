@@ -156,7 +156,7 @@ const OrderFormComponent: React.FC = () => {
   const [durationError, setDurationError] = useState("");
   //Price dropdown states :
   const [inputValue, setInputValue] = useState<string>("");
-  const [priceOptions, setPriceOptions] = useState<any[]>([]);
+  const [priceOptions, setPriceOptions] = useState<{ col1: string; col2: string }[]>([]);
   const [priceError, setPriceError] = useState("");
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -244,11 +244,23 @@ const OrderFormComponent: React.FC = () => {
   };
   //--------------------------------------------------------------------------------------
   //Amount input functions :
+  //Function to get minium amount :
+  const getMinimumAmount = async () => {
+    const minAmountServerData = await fetch("http://91.244.70.95/Setting/UI", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    })
+
+    const responsMinAmount = await minAmountServerData.json()
+    console.log(responsMinAmount)
+    return responsMinAmount.data
+    
+  }
   //Function for amount validation :
   const validateAmount = (
     rawValue: string,
     switchBtn: string | null
-  ): string => {
+  ) => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     if (rawValue.trim() === "") {
@@ -256,6 +268,8 @@ const OrderFormComponent: React.FC = () => {
     } else if (isNaN(numericValue)) {
       return "required";
     }
+
+    
 
     if (switchBtn === "energy") {
       if (numericValue < 64350) {
@@ -290,6 +304,8 @@ const OrderFormComponent: React.FC = () => {
     if (!isNaN(numericValue)) {
       setAmount(numericValue.toString()); // just display it as a string
     }
+
+    getMinimumAmount()
 
     // Validate input
     const errorMessage = validateAmount(rawValue, switchBtn);
@@ -355,39 +371,42 @@ const OrderFormComponent: React.FC = () => {
         return null;
     }
   };
-  //funtion to post duration data towards the server : 
+  //funtion to post duration data towards the server :
   const postDurationData = async (durationInSec: number) => {
-   if (durationInSec === null) {
-    console.error("Duration in seconds is not set.");
-    return;
-  }
-  
-  const payload = {
-    durationSec: durationInSec,
-    resourceType: switchBtn === "energy" ? "energy" : "bandwidth", 
-  };
-
-  try {
-    const response = await fetch(`http://91.244.70.95/Setting/resource-available`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.status}`);
+    if (durationInSec === null) {
+      console.error("Duration in seconds is not set.");
+      return;
     }
 
-    const data = await response.json();
-    console.log("Successfully posted:", data);
-  } catch (error) {
-    console.error("Error posting data:", error);
-  }
-  }
+    const payload = {
+      durationSec: durationInSec,
+      resourceType: switchBtn === "energy" ? "energy" : "bandwidth",
+    };
 
-    //Function for getting the digit part out of duration options :
+    try {
+      const response = await fetch(
+        `http://91.244.70.95/Setting/resource-available`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      return responseData.data;
+    } catch (error) {
+      console.error("Error posting data:", error);
+    }
+  };
+  
+  //Function for getting the digit part out of duration options :
   const getNumericDuration = (value: string): number | null => {
     const match = value.match(/^(\d+)/); // Matches digits at the start
     return match ? Number(match[1]) : null;
@@ -409,10 +428,9 @@ const OrderFormComponent: React.FC = () => {
     console.log("Selected duration in seconds:", durationInSeconds);
 
     if (durationInSeconds !== null) {
-    postDurationData(durationInSeconds);
-  }
+      postDurationData(durationInSeconds);
+    }
   };
-
 
   //--------------------------------------------------------------------------------------
   //Price input functions :
@@ -520,39 +538,25 @@ const OrderFormComponent: React.FC = () => {
   };
   //--------------------------------------------------------------------------------------
   //To fetch dynamic options data for price dropdown based on duration dropdown :
-  const fetchOptionsForDuration = async (duration: string) => {
-    let endPoint = "";
-    if (switchBtn === "energy") {
-      endPoint = `http://91.244.70.95/Setting/resource-available?duration=${encodeURIComponent(
-        duration
-      )}`;
-    } else {
-      endPoint = `http://localhost:3001/bandwidthPrices?duration=${encodeURIComponent(
-        duration
-      )}`;
-    }
+  const fetchOptionsForDuration = async (durationInSec: number) => {
+    const data = await postDurationData(durationInSec);
 
-    try {
-      const res = await fetch(endPoint);
-      const data = await res.json();
+     if (data) {
+      // data is like [{price: 50, available: 120000}, ...]
+      const mappedOptions = data.map((item : any) => ({
+        col1: item.price.toString(),       // convert number to string for col1
+        col2: item.available.toString(),   // convert number to string for col2
+      }));
 
-      if (data.length > 0) {
-        // options array inside matched duration
-        setPriceOptions(data[0].options);
-      } else {
-        // No options found
-        setPriceOptions([]);
-      }
-    } catch (err) {
-      console.error("Failed to fetch price options:", err);
+      setPriceOptions(mappedOptions);
     }
   };
   //To render dynamic options in price dropdown :
   useEffect(() => {
-    if (durationValue) {
-      fetchOptionsForDuration(durationValue);
+    if (durationInSec !== null) {
+      fetchOptionsForDuration(durationInSec);
     }
-  }, [durationValue]);
+  }, [durationValue, switchBtn]);
   //--------------------------------------------------------------------------------------
   //Functions for setting button :
   //checkbox click toggle function :
@@ -656,7 +660,7 @@ const OrderFormComponent: React.FC = () => {
     if (!myPrice) {
       return;
     }
-    const { totalPrice, unit } = myPrice;
+    const { totalPrice } = myPrice;
     //Time and date for submitted form :
     const now = new Date();
     const formattedDate = now.toISOString().split("T")[0];
