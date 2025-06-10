@@ -61,7 +61,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
-import { styled } from "@mui/material/styles";
+import { duration, styled } from "@mui/material/styles";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import { useDispatch } from "react-redux";
@@ -150,6 +150,7 @@ const OrderFormComponent: React.FC = () => {
   const [amountError, setAmountError] = useState("");
   //Duration dropdown states :
   const [durationValue, setDurationValue] = useState("");
+  const [durationInSec, setDurationInSec] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLInputElement | null>(null); //to get a refrence to the actual dom node
   const [durationError, setDurationError] = useState("");
@@ -200,7 +201,7 @@ const OrderFormComponent: React.FC = () => {
     //when bulk order is true
     if (bulkOrder) {
       //separate addresses from each other by - and ignore spaces
-      const allAdresses = newValue.split("-").map((addr) => addr.trim());
+      const allAdresses = newValue.split(",").map((addr) => addr.trim());
       //all addresses must be validated into correct format
       const allValid = allAdresses.every((addr) => validationWalletAdd(addr));
 
@@ -231,10 +232,10 @@ const OrderFormComponent: React.FC = () => {
     }
 
     // bulkOrder === true
-    const addresses = walletAdd.split("-").map((addr) => addr.trim());
+    const addresses = walletAdd.split(",").map((addr) => addr.trim());
     const allValid = addresses.every((addr) => validationWalletAdd(addr));
     if (!allValid) {
-      setWalletAddError("wallet addresses must be valid and separated by '-'");
+      setWalletAddError("wallet addresses must be valid and separated by ','");
       return false;
     } else {
       setWalletAddError(null);
@@ -330,16 +331,7 @@ const OrderFormComponent: React.FC = () => {
     }
     return "";
   };
-  //handleOption function on click :
-  const handleOptionClick = (value: string) => {
-    setDurationValue(value);
-    setOpen(false);
-    anchorRef.current?.blur();
-
-    const errorMessage = validateDuration(value);
-    setDurationError(errorMessage);
-  };
-
+  //Function to convert duration in seconds :
   const getDurationInSeconds = (value: string): number | null => {
     const trimmed = value.trim().toLowerCase();
     const match = trimmed.match(/^(\d+)\s*(minutes?|hours?|days?)$/);
@@ -363,12 +355,65 @@ const OrderFormComponent: React.FC = () => {
         return null;
     }
   };
+  //funtion to post duration data towards the server : 
+  const postDurationData = async (durationInSec: number) => {
+   if (durationInSec === null) {
+    console.error("Duration in seconds is not set.");
+    return;
+  }
+  
+  const payload = {
+    durationSec: durationInSec,
+    resourceType: switchBtn === "energy" ? "energy" : "bandwidth", 
+  };
 
-  //Function for getting the digit part out of duration options :
+  try {
+    const response = await fetch(`http://91.244.70.95/Setting/resource-available`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Successfully posted:", data);
+  } catch (error) {
+    console.error("Error posting data:", error);
+  }
+  }
+
+    //Function for getting the digit part out of duration options :
   const getNumericDuration = (value: string): number | null => {
     const match = value.match(/^(\d+)/); // Matches digits at the start
     return match ? Number(match[1]) : null;
   };
+
+  //handleOption function on click :
+  const handleOptionClick = (value: string) => {
+    const durationInSeconds = getDurationInSeconds(value);
+
+    setDurationValue(value);
+    setDurationInSec(durationInSeconds);
+
+    setOpen(false);
+    anchorRef.current?.blur();
+
+    const errorMessage = validateDuration(value);
+    setDurationError(errorMessage);
+
+    console.log("Selected duration in seconds:", durationInSeconds);
+
+    if (durationInSeconds !== null) {
+    postDurationData(durationInSeconds);
+  }
+  };
+
+
   //--------------------------------------------------------------------------------------
   //Price input functions :
   //To set min max dynamic options :
@@ -478,7 +523,7 @@ const OrderFormComponent: React.FC = () => {
   const fetchOptionsForDuration = async (duration: string) => {
     let endPoint = "";
     if (switchBtn === "energy") {
-      endPoint = `http://localhost:3001/energyPrices?duration=${encodeURIComponent(
+      endPoint = `http://91.244.70.95/Setting/resource-available?duration=${encodeURIComponent(
         duration
       )}`;
     } else {
@@ -560,7 +605,7 @@ const OrderFormComponent: React.FC = () => {
       return null; // Not a recognized duration
     }
     console.log("Duration unit:", unit);
-    return { totalPrice, unit };
+    return { totalPrice: Number(totalPrice.toFixed(3)), unit };
   };
 
   let myPrice = calculateTotalPrice();
@@ -1229,6 +1274,7 @@ const OrderFormComponent: React.FC = () => {
               flexItem
               sx={{ my: 2, backgroundColor: "#D9E1E3" }}
             />
+            {/** Order info */}
             <OrderInfoWrapper>
               <OrderInfoHeaderWrapper style={{ marginBottom: "0.5rem" }}>
                 <AccountHeader

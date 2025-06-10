@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Hero.css";
 import {
   HeroResourceContainer,
@@ -27,6 +27,51 @@ import recoveryIcon from "../../../assets/svg/RecoveryIcon.svg";
 import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg";
 
 const ResourceComponent: React.FC = () => {
+  //states :
+  
+  //ready resources states :
+  const [energyReady, setEnergyReady] =useState(null)
+  const [bandwidthReady, setBandwidthReady] =useState(null)
+  //24 hours recovery states :
+  const [energy24, setEnergy24] = useState(null)
+  const [bandwidth24, setBandwidth24] = useState(null)
+  //apy states : 
+  const [energyApySeller, setEnergyApySeller] = useState()
+  const [bandwidthApySeller, setBandwidthApySeller] = useState()
+
+  //To get data from server :
+  const resourceData = async () => {
+     const getResources =  await fetch("http://91.244.70.95/Setting/UI", {
+      method : "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+
+    const convertToJson = await getResources.json()
+    //To extract ready resource :
+    const energyReadyResource = convertToJson.data.readyResource.energy
+    const bandwidthReadyResource = convertToJson.data.readyResource.bandwidth
+    //To extract 24 hours recovery :
+    const energyDailyRecovery = convertToJson.data.dailyRecovery.energy
+    const bandwidthDailyRecovery = convertToJson.data.dailyRecovery.bandwidth
+    //To extract apy for sellers :
+    const energyApy = convertToJson.data.apy.energy
+    const bandwidthApy = convertToJson.data.apy.bandwidth
+
+    //set states :
+    setEnergyReady(energyReadyResource)
+    setBandwidthReady(bandwidthReadyResource)
+    setEnergy24(energyDailyRecovery)
+    setBandwidth24(bandwidthDailyRecovery)
+    setEnergyApySeller(energyApy)
+    setBandwidthApySeller(bandwidthApy)
+    
+  }
+  
+  useEffect(() => {
+   resourceData()
+
+  }, [])
+  
   return (
     <>
       <HeroResourceContainer>
@@ -68,7 +113,7 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>123,456,789</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>{energyReady}</HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
 
@@ -88,7 +133,7 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>123,456</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>{bandwidthReady}</HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
               </HeroGridCard>
@@ -127,7 +172,7 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>123,456,789</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>{energy24}</HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
 
@@ -147,7 +192,7 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>123,456</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>{bandwidth24}</HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
               </HeroGridCard>
@@ -188,7 +233,7 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>12.58 %</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>{energyApySeller} %</HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
 
@@ -208,7 +253,7 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>74.32 %</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>{bandwidthApySeller} %</HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
               </HeroGridCard>

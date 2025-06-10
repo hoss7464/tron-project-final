@@ -57,6 +57,7 @@ const Navbar: React.FC = () => {
   if (address.length <= 6) return address;
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 };
+ console.log(address)
 
   return (
     <>

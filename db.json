@@ -63,6 +63,38 @@
         "bulk_order": true
       },
       "id": 4
+    },
+    {
+      "resourceType": "energy",
+      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "resourceAmount": 65000,
+      "durationSec": 900,
+      "price": 65,
+      "date": "2025-06-09",
+      "time": "14:21",
+      "totalPrice": "4.355",
+      "options": {
+        "allow_partial": false,
+        "bulk_order": false
+      },
+      "id": 5
+    },
+    {
+      "resourceType": "energy",
+      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
+      "resourceAmount": 65000,
+      "durationSec": 900,
+      "price": 50,
+      "date": "2025-06-09",
+      "time": "22:08",
+      "totalPrice": 4.355,
+      "options": {
+        "allow_partial": false,
+        "bulk_order": false
+      },
+      "id": 6
     }
   ],
   "walletSignature": [
@@ -74,8 +106,8 @@
     },
     {
       "address": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "message": "Log into your wallet: TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j - Time: 2025-06-03T14:47:06.553Z",
-      "signature": "0x1228fbdc68dcdf96e9312871031c1dbb47d30392d8c567ec72a5c6d2d92004790f2f2d06713aac1238d1fc2ccd7b87ab21cae3a5c0af68a98a6affa1f3f899ac1b",
+      "message": "Login => nonce : 1749501242424",
+      "signature": "0xe420dc8b175a4c504b4461131d1fa4ebaa69a0e9d766a4feed7070e8b2035c0e28cd408723a35b9e233faa3d9428c7b40400bb76d68318bf976ef13acfafbcbc1c",
       "id": 2
     }
   ],
