@@ -160,16 +160,21 @@ const OrderFormComponent: React.FC = () => {
   const [durationError, setDurationError] = useState("");
   //Price dropdown states :
   const [inputValue, setInputValue] = useState<string>("");
-  const [priceOptions, setPriceOptions] = useState<{ col1: string; col2: string }[]>([]);
+  const [priceOptions, setPriceOptions] = useState<
+    { col1: string; col2: string }[]
+  >([]);
   const [minAmountPrice, setMinAmountPrice] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
+  const [longTermData, setLongTermData] = useState<{ energy: number; bandwidth: number } | null>(null);
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   //Setting button (Allow partial fill) states :
   const [partialFill, setPartialFill] = useState<boolean>(false);
   //Setting button (Bulk order) states :
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
+
+
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -181,9 +186,12 @@ const OrderFormComponent: React.FC = () => {
     }
     setAmount("");
     setDurationValue("");
-    setDurationInSec(null)
+    setDurationInSec(null);
     setInputValue("");
-    setDynamicPlaceholder("Price")
+    setPriceOptions([]);
+    setDynamicPlaceholder("Price");
+    setPriceError("")
+    setDurationError("")
   };
   //--------------------------------------------------------------------------------------
   //Functions for setting button (Allow partial fill) :
@@ -273,6 +281,19 @@ const OrderFormComponent: React.FC = () => {
       if (response?.data?.ratesByDuration) {
         setMinAmountPrice(response.data.ratesByDuration);
       }
+      if (response?.data?.longTermData) {
+        setLongTermData(response.data.longTermData);
+        // Set duration to 30 days in seconds (2592000)
+        setDurationInSec(2592000);
+        setDurationValue("30 days");
+        // Set default inputValue based on switchBtn
+        const defaultValue =
+          switchBtn === "energy"
+            ? response.data.longTermData.energy
+            : response.data.longTermData.bandwidth;
+        setInputValue(String(defaultValue));
+      }
+
     };
     getMinimumAmountDuration();
   }, []);
@@ -462,83 +483,67 @@ const OrderFormComponent: React.FC = () => {
   const maxOption = Math.max(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
   );
+  //Utils function to get dynamic min value for price :
+  const getMatchedRate = (durationInSec: number | null) => {
+  if (durationInSec === null) return null;
+
+  return minAmountPrice.find((item) => {
+    const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } = item;
+
+    return (
+      durationInSec === exactDurationSeconds ||
+      (durationInSec >= minDurationSeconds && durationInSec <= maxDurationSeconds)
+    );
+  });
+};
+
+
   //Price input validation :
   const validatePrice = (value: string): string => {
-    const numValue = parseInt(value, 10);
+  const numValue = parseInt(value, 10);
+  if (value.trim() === "") {
+    return "Required";
+  }
 
-    if (value.trim() === "") {
-      return "Required";
-    }
+  if (isNaN(numValue)) {
+    return "Invalid number";
+  }
 
-    if (isNaN(numValue)) {
-      return "Invalid number";
-    }
+  //skip the validation if minAmountPrice and durationInSec are not loaded yet
+  if (!minAmountPrice || minAmountPrice.length === 0 || durationInSec === null) {
+    return "";
+  }
 
-    // Loop through the price options
-    for (const item of minAmountPrice) {
-      const exactDuration = item.exactDurationSeconds;
-      const minDuration = item.minDurationSeconds;
-      const maxDuration = item.maxDurationSeconds;
-      const rateEnergy = item.rate.energy;
-      const rateBandwidth = item.rate.bandwidth;
+  // Match the item based on exact or range duration
+  const matchedItem = minAmountPrice.find((item) => {
+    const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } = item;
 
-      // Energy Mode
-      if (switchBtn === "energy") {
-        if (exactDuration === 900 && numValue === rateEnergy) {
-          return ""; // Valid
-        } else if (exactDuration === 3600 && numValue === rateEnergy) {
-          return "";
-        } else if (exactDuration === 10800 && numValue === rateEnergy) {
-          return "";
-        } else if (exactDuration === 86400 && numValue === rateEnergy) {
-          return "";
-        } else if (exactDuration === 172800 && numValue === rateEnergy) {
-          return "";
-        } else if (
-          minDuration === 259200 &&
-          maxDuration === 1296000 &&
-          numValue === rateEnergy
-        ) {
-          return "";
-        } else if (
-          minDuration === 1296000 &&
-          maxDuration === 2592000 &&
-          numValue === rateEnergy
-        ) {
-          return "";
-        }
-      }
+    return (
+      durationInSec === exactDurationSeconds ||
+      (durationInSec !== null &&
+        minDurationSeconds !== undefined &&
+        maxDurationSeconds !== undefined &&
+        durationInSec >= minDurationSeconds &&
+        durationInSec <= maxDurationSeconds)
+    );
+  });
+  
+   if (!matchedItem) {
+    return "Invalid price";
+  } 
 
-      // Bandwidth Mode
-      if (switchBtn === "bandwidth") {
-        if (exactDuration === 900 && numValue === rateBandwidth) {
-          return "";
-        } else if (exactDuration === 3600 && numValue === rateBandwidth) {
-          return "";
-        } else if (exactDuration === 10800 && numValue === rateBandwidth) {
-          return "";
-        } else if (exactDuration === 86400 && numValue === rateBandwidth) {
-          return "";
-        } else if (exactDuration === 172800 && numValue === rateBandwidth) {
-          return "";
-        } else if (
-          minDuration === 259200 &&
-          maxDuration === 1296000 &&
-          numValue === rateBandwidth
-        ) {
-          return "";
-        } else if (
-          minDuration === 1296000 &&
-          maxDuration === 2592000 &&
-          numValue === rateBandwidth
-        ) {
-          return "";
-        }
-      }
-    }
 
-    return "Invalid price for selected option";
-  };
+  const rate_energy = matchedItem.rate.energy;
+  const rate_bandwidth = matchedItem.rate.bandwidth;
+
+  if (switchBtn === "energy") {
+    return numValue < rate_energy ? "less than min amount" : "";
+  } else if (switchBtn === "bandwidth") {
+    return numValue < rate_bandwidth ? "less than min amount" : "";
+  }
+
+  return "";
+};
 
   //To change the color of the options :
   const getOptionStyle = (option: string) => {
@@ -637,26 +642,28 @@ const OrderFormComponent: React.FC = () => {
       setPriceOptions(mappedOptions);
     }
   };
+  //To render long term data by default : 
+  useEffect(() => {
+  if (longTermData) {
+    const defaultValue =
+      switchBtn === "energy" ? longTermData.energy : longTermData.bandwidth;
+    setInputValue(String(defaultValue));
+    setDurationValue("30 days");
+  }
+}, [switchBtn]);
   //To render dynamic options in price dropdown :
   useEffect(() => {
   if (durationInSec !== null) {
     fetchOptionsForDuration(durationInSec);
 
-    // Find matching rate based on duration
-    const matchedItem = minAmountPrice.find(item => {
-      const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } = item;
-
-      return (
-        durationInSec === exactDurationSeconds ||
-        (durationInSec >= minDurationSeconds && durationInSec <= maxDurationSeconds)
-      );
-    });
+    const matchedItem = getMatchedRate(durationInSec);
 
     if (matchedItem) {
-      const energyPlaceholder = matchedItem.rate.energy;
-      const bandwidthPlaceholder = matchedItem.rate.bandwidth;
+      const rate =
+        switchBtn === "energy"
+          ? matchedItem.rate.energy
+          : matchedItem.rate.bandwidth;
 
-      const rate = switchBtn === "energy" ? energyPlaceholder : bandwidthPlaceholder;
       setDynamicPlaceholder(`Min price: ${rate}`);
     }
   }
@@ -665,7 +672,9 @@ const OrderFormComponent: React.FC = () => {
     const errorMessage = validatePrice(inputValue);
     setPriceError(errorMessage);
   }
-}, [durationInSec, switchBtn]);
+}, [durationInSec, switchBtn, inputValue, minAmountPrice]);
+
+
   //--------------------------------------------------------------------------------------
   //Functions for setting button :
   //checkbox click toggle function :

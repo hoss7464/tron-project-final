@@ -53,11 +53,11 @@
       "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
       "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
       "resourceAmount": 65000,
-      "durationSec": 172800,
-      "price": 65,
-      "date": "2025-06-10",
-      "time": "19:18",
-      "totalPrice": 6.5,
+      "durationSec": 900,
+      "price": 70,
+      "date": "2025-06-11",
+      "time": "19:05",
+      "totalPrice": 4.355,
       "options": {
         "allow_partial": false,
         "bulk_order": false
