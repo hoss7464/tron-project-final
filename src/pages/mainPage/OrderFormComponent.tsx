@@ -147,6 +147,10 @@ const OrderFormComponent: React.FC = () => {
   const [walletAddError, setWalletAddError] = useState<string | null>("");
   //Amount input states:
   const [amount, setAmount] = useState("");
+  const [minAmount, setMinAmount] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
   const [amountError, setAmountError] = useState("");
   //Duration dropdown states :
   const [durationValue, setDurationValue] = useState("");
@@ -157,7 +161,9 @@ const OrderFormComponent: React.FC = () => {
   //Price dropdown states :
   const [inputValue, setInputValue] = useState<string>("");
   const [priceOptions, setPriceOptions] = useState<{ col1: string; col2: string }[]>([]);
+  const [minAmountPrice, setMinAmountPrice] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
+  const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   //Setting button (Allow partial fill) states :
@@ -173,6 +179,11 @@ const OrderFormComponent: React.FC = () => {
     if (switchBtn !== null) {
       setSwitchBtn(switchBtn);
     }
+    setAmount("");
+    setDurationValue("");
+    setDurationInSec(null)
+    setInputValue("");
+    setDynamicPlaceholder("Price")
   };
   //--------------------------------------------------------------------------------------
   //Functions for setting button (Allow partial fill) :
@@ -244,22 +255,33 @@ const OrderFormComponent: React.FC = () => {
   };
   //--------------------------------------------------------------------------------------
   //Amount input functions :
-  //Function to get minium amount :
-  const getMinimumAmount = async () => {
-    const minAmountServerData = await fetch("http://91.244.70.95/Setting/UI", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
-    })
+  useEffect(() => {
+    //Function to get minium amount and minimum price :
+    const getMinimumAmountDuration = async () => {
+      const minAmountServerData = await fetch(
+        "http://91.244.70.95/Setting/UI",
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
-    const responsMinAmount = await minAmountServerData.json()
-    console.log(responsMinAmount)
-    return responsMinAmount.data
-    
-  }
+      const response = await minAmountServerData.json();
+      if (response?.data?.minAmount) {
+        setMinAmount(response.data.minAmount);
+      }
+      if (response?.data?.ratesByDuration) {
+        setMinAmountPrice(response.data.ratesByDuration);
+      }
+    };
+    getMinimumAmountDuration();
+  }, []);
+
   //Function for amount validation :
   const validateAmount = (
     rawValue: string,
-    switchBtn: string | null
+    switchBtn: string | null,
+    minAmount: { energy: number; bandwidth: number }
   ) => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
@@ -269,18 +291,17 @@ const OrderFormComponent: React.FC = () => {
       return "required";
     }
 
-    
-
     if (switchBtn === "energy") {
-      if (numericValue < 64350) {
+      if (numericValue < minAmount.energy) {
         return "Minimum amount limitation";
       } else if (numericValue > 100000000) {
         return "Maximum amount limitation";
       }
     } else if (switchBtn === "bandwidth") {
-      if (numericValue < 1000) {
+      if (numericValue < minAmount.bandwidth) {
         return "Minimum amount limitation";
       }
+    } else {
     }
 
     return "";
@@ -305,10 +326,8 @@ const OrderFormComponent: React.FC = () => {
       setAmount(numericValue.toString()); // just display it as a string
     }
 
-    getMinimumAmount()
-
     // Validate input
-    const errorMessage = validateAmount(rawValue, switchBtn);
+    const errorMessage = validateAmount(rawValue, switchBtn, minAmount);
     setAmountError(errorMessage);
   };
 
@@ -405,7 +424,7 @@ const OrderFormComponent: React.FC = () => {
       console.error("Error posting data:", error);
     }
   };
-  
+
   //Function for getting the digit part out of duration options :
   const getNumericDuration = (value: string): number | null => {
     const match = value.match(/^(\d+)/); // Matches digits at the start
@@ -434,6 +453,8 @@ const OrderFormComponent: React.FC = () => {
 
   //--------------------------------------------------------------------------------------
   //Price input functions :
+  //Function to get minimum price dynamically :
+
   //To set min max dynamic options :
   const minOption = Math.min(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
@@ -446,15 +467,79 @@ const OrderFormComponent: React.FC = () => {
     const numValue = parseInt(value, 10);
 
     if (value.trim() === "") {
-      return "required";
+      return "Required";
     }
 
-    if (isNaN(numValue) || numValue < minOption) {
-      return `more than ${minOption}`;
+    if (isNaN(numValue)) {
+      return "Invalid number";
     }
 
-    return ""; // Accept anything equal or above minOption
+    // Loop through the price options
+    for (const item of minAmountPrice) {
+      const exactDuration = item.exactDurationSeconds;
+      const minDuration = item.minDurationSeconds;
+      const maxDuration = item.maxDurationSeconds;
+      const rateEnergy = item.rate.energy;
+      const rateBandwidth = item.rate.bandwidth;
+
+      // Energy Mode
+      if (switchBtn === "energy") {
+        if (exactDuration === 900 && numValue === rateEnergy) {
+          return ""; // Valid
+        } else if (exactDuration === 3600 && numValue === rateEnergy) {
+          return "";
+        } else if (exactDuration === 10800 && numValue === rateEnergy) {
+          return "";
+        } else if (exactDuration === 86400 && numValue === rateEnergy) {
+          return "";
+        } else if (exactDuration === 172800 && numValue === rateEnergy) {
+          return "";
+        } else if (
+          minDuration === 259200 &&
+          maxDuration === 1296000 &&
+          numValue === rateEnergy
+        ) {
+          return "";
+        } else if (
+          minDuration === 1296000 &&
+          maxDuration === 2592000 &&
+          numValue === rateEnergy
+        ) {
+          return "";
+        }
+      }
+
+      // Bandwidth Mode
+      if (switchBtn === "bandwidth") {
+        if (exactDuration === 900 && numValue === rateBandwidth) {
+          return "";
+        } else if (exactDuration === 3600 && numValue === rateBandwidth) {
+          return "";
+        } else if (exactDuration === 10800 && numValue === rateBandwidth) {
+          return "";
+        } else if (exactDuration === 86400 && numValue === rateBandwidth) {
+          return "";
+        } else if (exactDuration === 172800 && numValue === rateBandwidth) {
+          return "";
+        } else if (
+          minDuration === 259200 &&
+          maxDuration === 1296000 &&
+          numValue === rateBandwidth
+        ) {
+          return "";
+        } else if (
+          minDuration === 1296000 &&
+          maxDuration === 2592000 &&
+          numValue === rateBandwidth
+        ) {
+          return "";
+        }
+      }
+    }
+
+    return "Invalid price for selected option";
   };
+
   //To change the color of the options :
   const getOptionStyle = (option: string) => {
     const inputNum = parseInt(inputValue, 10);
@@ -536,16 +621,17 @@ const OrderFormComponent: React.FC = () => {
 
     return Number(selectedPrice); // Return the numeric value
   };
+
   //--------------------------------------------------------------------------------------
   //To fetch dynamic options data for price dropdown based on duration dropdown :
   const fetchOptionsForDuration = async (durationInSec: number) => {
     const data = await postDurationData(durationInSec);
 
-     if (data) {
+    if (data) {
       // data is like [{price: 50, available: 120000}, ...]
-      const mappedOptions = data.map((item : any) => ({
-        col1: item.price.toString(),       // convert number to string for col1
-        col2: item.available.toString(),   // convert number to string for col2
+      const mappedOptions = data.map((item: any) => ({
+        col1: item.price.toString(), // convert number to string for col1
+        col2: item.available.toString(), // convert number to string for col2
       }));
 
       setPriceOptions(mappedOptions);
@@ -553,10 +639,33 @@ const OrderFormComponent: React.FC = () => {
   };
   //To render dynamic options in price dropdown :
   useEffect(() => {
-    if (durationInSec !== null) {
-      fetchOptionsForDuration(durationInSec);
+  if (durationInSec !== null) {
+    fetchOptionsForDuration(durationInSec);
+
+    // Find matching rate based on duration
+    const matchedItem = minAmountPrice.find(item => {
+      const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } = item;
+
+      return (
+        durationInSec === exactDurationSeconds ||
+        (durationInSec >= minDurationSeconds && durationInSec <= maxDurationSeconds)
+      );
+    });
+
+    if (matchedItem) {
+      const energyPlaceholder = matchedItem.rate.energy;
+      const bandwidthPlaceholder = matchedItem.rate.bandwidth;
+
+      const rate = switchBtn === "energy" ? energyPlaceholder : bandwidthPlaceholder;
+      setDynamicPlaceholder(`Min price: ${rate}`);
     }
-  }, [durationValue, switchBtn]);
+  }
+
+  if (inputValue.trim() !== "") {
+    const errorMessage = validatePrice(inputValue);
+    setPriceError(errorMessage);
+  }
+}, [durationInSec, switchBtn]);
   //--------------------------------------------------------------------------------------
   //Functions for setting button :
   //checkbox click toggle function :
@@ -627,7 +736,7 @@ const OrderFormComponent: React.FC = () => {
     const isValid = isWalletAddValid();
     if (!isValid) return;
     //Amount input validation :
-    const amountValidationError = validateAmount(amount, switchBtn);
+    const amountValidationError = validateAmount(amount, switchBtn, minAmount);
     setAmountError(amountValidationError);
     //Duration input validation :
     const durationValidationError = validateDuration(durationValue);
@@ -866,8 +975,8 @@ const OrderFormComponent: React.FC = () => {
                       onChange={amountHandleChange}
                       placeholder={`Amount of ${
                         switchBtn === "energy"
-                          ? "energy (64,350 - 100,000,000)"
-                          : "bandwidth (1000 - ...)"
+                          ? `energy (${minAmount.energy} - 100,000,000)`
+                          : `bandwidth (${minAmount.bandwidth} - ...)`
                       }`}
                     />
                   </FormAddInputWrapper2>
@@ -1132,7 +1241,7 @@ const OrderFormComponent: React.FC = () => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      placeholder="Price"
+                      placeholder={dynamicPlaceholder}
                       variant="outlined"
                       onBlur={() => {
                         const errorMsg = validatePrice(inputValue);

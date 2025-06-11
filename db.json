@@ -63,22 +63,6 @@
         "bulk_order": false
       },
       "id": 4
-    },
-    {
-      "resourceType": "energy",
-      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "resourceAmount": 65000,
-      "durationSec": 172800,
-      "price": 55,
-      "date": "2025-06-10",
-      "time": "19:28",
-      "totalPrice": 6.5,
-      "options": {
-        "allow_partial": false,
-        "bulk_order": false
-      },
-      "id": 5
     }
   ],
   "walletSignature": [
