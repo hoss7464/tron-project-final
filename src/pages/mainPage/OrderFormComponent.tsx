@@ -68,6 +68,16 @@ import { useDispatch } from "react-redux";
 import { clickToggle } from "../../redux/actions/toggleSlice";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
+
+//-------------------------------------------------------------------------------------
+// Define the type for the data structure
+interface SettingUI {
+  data: {
+    minAmount?: any;
+    ratesByDuration?: any;
+    longTermData?: any;
+  };
+}
 //-------------------------------------------------------------------------------------
 //Duration input components :
 const boxStyle = {
@@ -145,12 +155,11 @@ const OrderFormComponent: React.FC = () => {
   //Wallet address states :
   const [walletAdd, setWalletAdd] = useState<string>("");
   const [walletAddError, setWalletAddError] = useState<string | null>("");
+  //Store whole fetch data in one state : 
+  const [wholeData, setWholeData] = useState<SettingUI | null>(null)
   //Amount input states:
   const [amount, setAmount] = useState("");
-  const [minAmount, setMinAmount] = useState<{
-    energy: number;
-    bandwidth: number;
-  }>({ energy: 0, bandwidth: 0 });
+  const [minAmount, setMinAmount] = useState<{energy: number;bandwidth: number;}>({ energy: 0, bandwidth: 0 });
   const [amountError, setAmountError] = useState("");
   //Duration dropdown states :
   const [durationValue, setDurationValue] = useState("");
@@ -160,20 +169,18 @@ const OrderFormComponent: React.FC = () => {
   const [durationError, setDurationError] = useState("");
   //Price dropdown states :
   const [inputValue, setInputValue] = useState<string>("");
-  const [priceOptions, setPriceOptions] = useState<
-    { col1: string; col2: string }[]
-  >([]);
+  const [priceOptions, setPriceOptions] = useState<{ col1: string; col2: string }[]>([]);
   const [minAmountPrice, setMinAmountPrice] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
-  const [longTermData, setLongTermData] = useState<{ energy: number; bandwidth: number } | null>(null);
+  const [longTermData, setLongTermData] = useState<{energy: number;bandwidth: number;} | null>(null);
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   //Setting button (Allow partial fill) states :
   const [partialFill, setPartialFill] = useState<boolean>(false);
   //Setting button (Bulk order) states :
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
-
+  //Total price states :
 
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
@@ -190,8 +197,8 @@ const OrderFormComponent: React.FC = () => {
     setInputValue("");
     setPriceOptions([]);
     setDynamicPlaceholder("Price");
-    setPriceError("")
-    setDurationError("")
+    setPriceError("");
+    setDurationError("");
   };
   //--------------------------------------------------------------------------------------
   //Functions for setting button (Allow partial fill) :
@@ -262,41 +269,44 @@ const OrderFormComponent: React.FC = () => {
     }
   };
   //--------------------------------------------------------------------------------------
-  //Amount input functions :
-  useEffect(() => {
-    //Function to get minium amount and minimum price :
-    const getMinimumAmountDuration = async () => {
-      const minAmountServerData = await fetch(
-        "http://91.244.70.95/Setting/UI",
-        {
+   //Function to store the whole data for order form in it from server once :
+   useEffect(() => {
+       const getMinimumAmountDuration = async () => {
+          try {
+        const res = await fetch("http://91.244.70.95/Setting/UI", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
-        }
-      );
+        });
+        const json = await res.json();
+        // store full response in one state
+        setWholeData(json); 
+      } catch (error) {
+        console.error("Failed to fetch setting UI:", error);
+      }
+       }
+       getMinimumAmountDuration()
+   }, [])
+  //--------------------------------------------------------------------------------------
+  //Amount input functions :
+  //Function to get states from stored data :
+  useEffect(() => {
+    //Function to get minium amount and minimum price :
+      if (!wholeData || !wholeData.data)  return 
+      
+      if (wholeData?.data?.minAmount) {
+        setMinAmount(wholeData.data.minAmount);
+      }
+      if (wholeData?.data?.ratesByDuration) {
+        setMinAmountPrice(wholeData.data.ratesByDuration);
+      }
+      if (wholeData?.data?.longTermData) {
+        console.log(wholeData.data.longTermData);
 
-      const response = await minAmountServerData.json();
-      if (response?.data?.minAmount) {
-        setMinAmount(response.data.minAmount);
+        setLongTermData(wholeData.data.longTermData);
       }
-      if (response?.data?.ratesByDuration) {
-        setMinAmountPrice(response.data.ratesByDuration);
-      }
-      if (response?.data?.longTermData) {
-        setLongTermData(response.data.longTermData);
-        // Set duration to 30 days in seconds (2592000)
-        setDurationInSec(2592000);
-        setDurationValue("30 days");
-        // Set default inputValue based on switchBtn
-        const defaultValue =
-          switchBtn === "energy"
-            ? response.data.longTermData.energy
-            : response.data.longTermData.bandwidth;
-        setInputValue(String(defaultValue));
-      }
+    
 
-    };
-    getMinimumAmountDuration();
-  }, []);
+  }, [wholeData]);
 
   //Function for amount validation :
   const validateAmount = (
@@ -356,17 +366,14 @@ const OrderFormComponent: React.FC = () => {
   const getNumericAmount = (amount: string): number => {
     return Number(amount.replace(/,/g, ""));
   };
-
   //--------------------------------------------------------------------------------------
   //Duration input functions :
-
   //To create an array of 30 days
   const days = Array.from({ length: 30 }, (_, i) => i + 1);
   //To create an array of 1 & 3 hours
   const hours = [1, 3];
   //To create an array for 15 min
   const minutes = [15];
-
   //Duration inout validation :
   const validateDuration = (value: string): string => {
     const trimmed = value.trim();
@@ -446,11 +453,6 @@ const OrderFormComponent: React.FC = () => {
     }
   };
 
-  //Function for getting the digit part out of duration options :
-  const getNumericDuration = (value: string): number | null => {
-    const match = value.match(/^(\d+)/); // Matches digits at the start
-    return match ? Number(match[1]) : null;
-  };
 
   //handleOption function on click :
   const handleOptionClick = (value: string) => {
@@ -471,11 +473,9 @@ const OrderFormComponent: React.FC = () => {
       postDurationData(durationInSeconds);
     }
   };
-
   //--------------------------------------------------------------------------------------
   //Price input functions :
   //Function to get minimum price dynamically :
-
   //To set min max dynamic options :
   const minOption = Math.min(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
@@ -485,66 +485,69 @@ const OrderFormComponent: React.FC = () => {
   );
   //Utils function to get dynamic min value for price :
   const getMatchedRate = (durationInSec: number | null) => {
-  if (durationInSec === null) return null;
+    if (durationInSec === null) return null;
 
-  return minAmountPrice.find((item) => {
-    const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } = item;
-
-    return (
-      durationInSec === exactDurationSeconds ||
-      (durationInSec >= minDurationSeconds && durationInSec <= maxDurationSeconds)
-    );
-  });
-};
-
+    return minAmountPrice.find((item) => {
+      const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } =
+        item;
+        
+      return (
+        durationInSec === exactDurationSeconds ||
+        (durationInSec >= minDurationSeconds &&
+          durationInSec <= maxDurationSeconds)
+      );
+    });
+  };
 
   //Price input validation :
   const validatePrice = (value: string): string => {
-  const numValue = parseInt(value, 10);
-  if (value.trim() === "") {
-    return "Required";
-  }
+    const numValue = parseInt(value, 10);
+    if (value.trim() === "") {
+      return "Required";
+    }
 
-  if (isNaN(numValue)) {
-    return "Invalid number";
-  }
+    if (isNaN(numValue)) {
+      return "Invalid number";
+    }
 
-  //skip the validation if minAmountPrice and durationInSec are not loaded yet
-  if (!minAmountPrice || minAmountPrice.length === 0 || durationInSec === null) {
+    //skip the validation if minAmountPrice and durationInSec are not loaded yet
+    if (
+      !minAmountPrice ||
+      minAmountPrice.length === 0 ||
+      durationInSec === null
+    ) {
+      return "";
+    }
+
+    // Match the item based on exact or range duration
+    const matchedItem = minAmountPrice.find((item) => {
+      const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } =
+        item;
+
+      return (
+        durationInSec === exactDurationSeconds ||
+        (durationInSec !== null &&
+          minDurationSeconds !== undefined &&
+          maxDurationSeconds !== undefined &&
+          durationInSec >= minDurationSeconds &&
+          durationInSec <= maxDurationSeconds)
+      );
+    });
+
+    if (!matchedItem) {
+      return "Invalid price";
+    }
+
+    const rate_energy = matchedItem.rate.energy;
+    const rate_bandwidth = matchedItem.rate.bandwidth;
+    if (switchBtn === "energy") {
+      return numValue < rate_energy ? "less than min amount" : "";
+    } else if (switchBtn === "bandwidth") {
+      return numValue < rate_bandwidth ? "less than min amount" : "";
+    }
+
     return "";
-  }
-
-  // Match the item based on exact or range duration
-  const matchedItem = minAmountPrice.find((item) => {
-    const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } = item;
-
-    return (
-      durationInSec === exactDurationSeconds ||
-      (durationInSec !== null &&
-        minDurationSeconds !== undefined &&
-        maxDurationSeconds !== undefined &&
-        durationInSec >= minDurationSeconds &&
-        durationInSec <= maxDurationSeconds)
-    );
-  });
-  
-   if (!matchedItem) {
-    return "Invalid price";
-  } 
-
-
-  const rate_energy = matchedItem.rate.energy;
-  const rate_bandwidth = matchedItem.rate.bandwidth;
-
-  if (switchBtn === "energy") {
-    return numValue < rate_energy ? "less than min amount" : "";
-  } else if (switchBtn === "bandwidth") {
-    return numValue < rate_bandwidth ? "less than min amount" : "";
-  }
-
-  return "";
-};
-
+  };
   //To change the color of the options :
   const getOptionStyle = (option: string) => {
     const inputNum = parseInt(inputValue, 10);
@@ -591,7 +594,6 @@ const OrderFormComponent: React.FC = () => {
       }
     }
   };
-
   //Function to filter the dropdown to shows nothing if the entered value was more than max-price :
   const filterPriceOptions = (
     options: typeof priceOptions,
@@ -626,7 +628,6 @@ const OrderFormComponent: React.FC = () => {
 
     return Number(selectedPrice); // Return the numeric value
   };
-
   //--------------------------------------------------------------------------------------
   //To fetch dynamic options data for price dropdown based on duration dropdown :
   const fetchOptionsForDuration = async (durationInSec: number) => {
@@ -642,39 +643,30 @@ const OrderFormComponent: React.FC = () => {
       setPriceOptions(mappedOptions);
     }
   };
-  //To render long term data by default : 
-  useEffect(() => {
-  if (longTermData) {
-    const defaultValue =
-      switchBtn === "energy" ? longTermData.energy : longTermData.bandwidth;
-    setInputValue(String(defaultValue));
-    setDurationValue("30 days");
-  }
-}, [switchBtn]);
+  //To render long term data by default :
+
   //To render dynamic options in price dropdown :
   useEffect(() => {
-  if (durationInSec !== null) {
-    fetchOptionsForDuration(durationInSec);
+    if (durationInSec !== null) {
+      fetchOptionsForDuration(durationInSec);
 
-    const matchedItem = getMatchedRate(durationInSec);
+      const matchedItem = getMatchedRate(durationInSec);
 
-    if (matchedItem) {
-      const rate =
-        switchBtn === "energy"
-          ? matchedItem.rate.energy
-          : matchedItem.rate.bandwidth;
+      if (matchedItem) {
+        const rate =
+          switchBtn === "energy"
+            ? matchedItem.rate.energy
+            : matchedItem.rate.bandwidth;
 
-      setDynamicPlaceholder(`Min price: ${rate}`);
+        setDynamicPlaceholder(`Min price: ${rate}`);
+      }
     }
-  }
 
-  if (inputValue.trim() !== "") {
-    const errorMessage = validatePrice(inputValue);
-    setPriceError(errorMessage);
-  }
-}, [durationInSec, switchBtn, inputValue, minAmountPrice]);
-
-
+    if (inputValue.trim() !== "") {
+      const errorMessage = validatePrice(inputValue);
+      setPriceError(errorMessage);
+    }
+  }, [durationInSec, switchBtn, inputValue, minAmountPrice]);
   //--------------------------------------------------------------------------------------
   //Functions for setting button :
   //checkbox click toggle function :
@@ -688,46 +680,55 @@ const OrderFormComponent: React.FC = () => {
 
   const menuOpen = Boolean(anchorEl);
   //--------------------------------------------------------------------------------------
+  //Function to render long term data on duration and price by default :
+  useEffect(() => {
+    if (!longTermData) return;
+    const defaultValue =
+      switchBtn === "energy" ? longTermData.energy : longTermData.bandwidth;
+    setInputValue(String(defaultValue));
+    setDurationValue("30 days");
+  }, [switchBtn, longTermData]);
 
   //To calculate payout amount :
   const calculateTotalPrice = () => {
     const numericAmount = getNumericAmount(amount);
+    const numericDuration = getDurationInSeconds(durationValue);
+    if (numericDuration === null) {
+      return null; 
+    }
     const pricePerUnit = getNumericSelectedPrice(inputValue);
-    const durationNumeric = getNumericDuration(durationValue);
+    //To get minimum value of each selected duration based on server data :
+    const minOption = switchBtn === "energy" ? getMatchedRate(numericDuration).rate.energy : getMatchedRate(numericDuration).rate.bandwidth
+    
+    console.log(minOption)
     const SUN = 1000000;
 
-    if (pricePerUnit === null || durationNumeric === null) {
-      return null; // can't calculate without valid inputs
+    if (pricePerUnit === null || numericAmount === null) {
+      return null; // don't calculate without valid inputs
     }
 
+    // Convert duration to seconds
+    let totalSeconds = numericDuration;
     let totalPrice = 0;
 
-    // Extract duration unit (e.g., "minutes", "hours", "days")
-    const parts = durationValue.trim().split(" ");
-    const unit = parts[1]; // This will be "minutes", "hours", or "days"
-
-    if (durationValue === "15 minutes") {
-      totalPrice = (numericAmount / SUN) * 67 * 1;
-    } else if (durationValue === "1 hours") {
-      totalPrice = (numericAmount / SUN) * 70 * 1;
-    } else if (durationValue === "3 hours") {
-      totalPrice = (numericAmount / SUN) * 80 * 1;
-    } else if (durationValue.endsWith("days")) {
-      // Handle "1 days" to "30 days"
-      const daysMatch = durationValue.match(/^(\d+)\s+days$/);
-      if (daysMatch) {
-        const numberOfDays = parseInt(daysMatch[1], 10);
-        if (!isNaN(numberOfDays)) {
-          totalPrice = (numericAmount / SUN) * minOption * numberOfDays;
-        }
-      } else {
-        return null; // Invalid format
-      }
+    if (totalSeconds === 900) {
+      // 15 minutes
+      totalPrice = (numericAmount / SUN) * 67;
+    } else if (totalSeconds === 3600) {
+      // 1 hour
+      totalPrice = (numericAmount / SUN) * 70;
+    } else if (totalSeconds === 10800) {
+      // 3 hours
+      totalPrice = (numericAmount / SUN) * 80;
+    } else if (totalSeconds % 86400 === 0) {
+      // whole days
+      const numberOfDays = totalSeconds / 86400;
+      totalPrice = (numericAmount / SUN) * minOption * numberOfDays;
     } else {
-      return null; // Not a recognized duration
+      return null; // Invalid time
     }
-    console.log("Duration unit:", unit);
-    return { totalPrice: Number(totalPrice.toFixed(3)), unit };
+
+    return { totalPrice: Number(totalPrice.toFixed(3)) };
   };
 
   let myPrice = calculateTotalPrice();
@@ -749,6 +750,7 @@ const OrderFormComponent: React.FC = () => {
     setAmountError(amountValidationError);
     //Duration input validation :
     const durationValidationError = validateDuration(durationValue);
+
     setDurationError(durationValidationError);
     //Price input validation :
     const priceValidationError = validatePrice(inputValue);
