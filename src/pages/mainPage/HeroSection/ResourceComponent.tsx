@@ -25,19 +25,23 @@ import energyIcon from "../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
 import recoveryIcon from "../../../assets/svg/RecoveryIcon.svg";
 import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg";
+//----------------------------------------------------------------------------------------
 
 const ResourceComponent: React.FC = () => {
   //states :
-  
+
   //ready resources states :
-  const [energyReady, setEnergyReady] =useState(null)
-  const [bandwidthReady, setBandwidthReady] =useState(null)
+  const [energyReady, setEnergyReady] =useState<string | null>(null)
+  const [bandwidthReady, setBandwidthReady] =useState<string | null>(null)
   //24 hours recovery states :
-  const [energy24, setEnergy24] = useState(null)
-  const [bandwidth24, setBandwidth24] = useState(null)
+  const [energy24, setEnergy24] = useState<string | null>(null)
+  const [bandwidth24, setBandwidth24] = useState<string | null>(null)
   //apy states : 
-  const [energyApySeller, setEnergyApySeller] = useState()
-  const [bandwidthApySeller, setBandwidthApySeller] = useState()
+  const [energyApySeller, setEnergyApySeller] = useState<string | null>(null)
+  const [bandwidthApySeller, setBandwidthApySeller] = useState<string | null>(null)
+
+  //Helper formatter : 
+  const formatNumber = (num: number | string) => Number(num).toLocaleString();
 
   //To get data from server :
   const resourceData = async () => {
@@ -58,12 +62,12 @@ const ResourceComponent: React.FC = () => {
     const bandwidthApy = convertToJson.data.apy.bandwidth
 
     //set states :
-    setEnergyReady(energyReadyResource)
-    setBandwidthReady(bandwidthReadyResource)
-    setEnergy24(energyDailyRecovery)
-    setBandwidth24(bandwidthDailyRecovery)
-    setEnergyApySeller(energyApy)
-    setBandwidthApySeller(bandwidthApy)
+    setEnergyReady(formatNumber(energyReadyResource));
+  setBandwidthReady(formatNumber(bandwidthReadyResource));
+  setEnergy24(formatNumber(energyDailyRecovery));
+  setBandwidth24(formatNumber(bandwidthDailyRecovery));
+  setEnergyApySeller(formatNumber(energyApy));
+  setBandwidthApySeller(formatNumber(bandwidthApy));
     
   }
   

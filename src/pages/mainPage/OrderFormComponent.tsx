@@ -68,7 +68,6 @@ import { useDispatch } from "react-redux";
 import { clickToggle } from "../../redux/actions/toggleSlice";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
-
 //-------------------------------------------------------------------------------------
 // Define the type for the data structure
 interface SettingUI {
@@ -91,7 +90,6 @@ const boxStyle = {
     backgroundColor: "#ddd",
   },
 };
-
 //-------------------------------------------------------------------------------------
 //Switch button material ui styles :
 const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
@@ -143,20 +141,18 @@ const DropdownIconWithText: React.FC = () => {
   );
 };
 //-------------------------------------------------------------------------------------
-
 const OrderFormComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { address } = useTronWallet();
-
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
   const [walletAdd, setWalletAdd] = useState<string>("");
   const [walletAddError, setWalletAddError] = useState<string | null>("");
-  //Store whole fetch data in one state : 
-  const [wholeData, setWholeData] = useState<SettingUI | null>(null)
+  //Store whole fetch data in one state :
+  const [wholeData, setWholeData] = useState<SettingUI | null>(null);
   //Amount input states:
   const [amount, setAmount] = useState("");
   const [minAmount, setMinAmount] = useState<{energy: number;bandwidth: number;}>({ energy: 0, bandwidth: 0 });
@@ -181,7 +177,6 @@ const OrderFormComponent: React.FC = () => {
   //Setting button (Bulk order) states :
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   //Total price states :
-
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -206,13 +201,11 @@ const OrderFormComponent: React.FC = () => {
     let partialValue = event.target.checked;
     setPartialFill(partialValue);
   };
-
   //Functions for stting button (Bulk order) :
   const handleBulkOrder = (event: React.ChangeEvent<HTMLInputElement>) => {
     const bulkValue = event.target.checked;
     setBulkOrder(bulkValue);
   };
-
   //--------------------------------------------------------------------------------------
   //Functions for wallet address :
   //Wallet address validation :
@@ -261,7 +254,7 @@ const OrderFormComponent: React.FC = () => {
     const addresses = walletAdd.split(",").map((addr) => addr.trim());
     const allValid = addresses.every((addr) => validationWalletAdd(addr));
     if (!allValid) {
-      setWalletAddError("wallet addresses must be valid and separated by ','");
+      setWalletAddError("addresses must be valid and separated by ','");
       return false;
     } else {
       setWalletAddError(null);
@@ -269,45 +262,40 @@ const OrderFormComponent: React.FC = () => {
     }
   };
   //--------------------------------------------------------------------------------------
-   //Function to store the whole data for order form in it from server once :
-   useEffect(() => {
-       const getMinimumAmountDuration = async () => {
-          try {
+  //Function to store the whole data for order form in it from server once :
+  useEffect(() => {
+    const getMinimumAmountDuration = async () => {
+      try {
         const res = await fetch("http://91.244.70.95/Setting/UI", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
         const json = await res.json();
         // store full response in one state
-        setWholeData(json); 
+        setWholeData(json);
       } catch (error) {
         console.error("Failed to fetch setting UI:", error);
       }
-       }
-       getMinimumAmountDuration()
-   }, [])
+    };
+    getMinimumAmountDuration();
+  }, []);
   //--------------------------------------------------------------------------------------
   //Amount input functions :
   //Function to get states from stored data :
   useEffect(() => {
     //Function to get minium amount and minimum price :
-      if (!wholeData || !wholeData.data)  return 
-      
-      if (wholeData?.data?.minAmount) {
-        setMinAmount(wholeData.data.minAmount);
-      }
-      if (wholeData?.data?.ratesByDuration) {
-        setMinAmountPrice(wholeData.data.ratesByDuration);
-      }
-      if (wholeData?.data?.longTermData) {
-        console.log(wholeData.data.longTermData);
+    if (!wholeData || !wholeData.data) return;
 
-        setLongTermData(wholeData.data.longTermData);
-      }
-    
-
+    if (wholeData?.data?.minAmount) {
+      setMinAmount(wholeData.data.minAmount);
+    }
+    if (wholeData?.data?.ratesByDuration) {
+      setMinAmountPrice(wholeData.data.ratesByDuration);
+    }
+    if (wholeData?.data?.longTermData) {
+      setLongTermData(wholeData.data.longTermData);
+    }
   }, [wholeData]);
-
   //Function for amount validation :
   const validateAmount = (
     rawValue: string,
@@ -324,20 +312,19 @@ const OrderFormComponent: React.FC = () => {
 
     if (switchBtn === "energy") {
       if (numericValue < minAmount.energy) {
-        return "Minimum amount limitation";
+        return "Minimum limitation";
       } else if (numericValue > 100000000) {
-        return "Maximum amount limitation";
+        return "Maximum limitation";
       }
     } else if (switchBtn === "bandwidth") {
       if (numericValue < minAmount.bandwidth) {
-        return "Minimum amount limitation";
+        return "Minimum limitation";
       }
     } else {
     }
 
     return "";
   };
-
   const amountHandleChange = (
     value: string | React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -361,7 +348,6 @@ const OrderFormComponent: React.FC = () => {
     const errorMessage = validateAmount(rawValue, switchBtn, minAmount);
     setAmountError(errorMessage);
   };
-
   //Function for getting numeric value out of amount input :
   const getNumericAmount = (amount: string): number => {
     return Number(amount.replace(/,/g, ""));
@@ -386,7 +372,10 @@ const OrderFormComponent: React.FC = () => {
       "15 minutes",
       "1 hours",
       "3 hours",
-      ...Array.from({ length: 30 }, (_, i) => `${i + 1} days`),
+      ...Array.from(
+        { length: 30 },
+        (_, i) => `${i + 1} ${i + 1 === 1 ? "day" : "days"}`
+      ),
     ];
 
     if (!validDurations.includes(trimmed)) {
@@ -421,7 +410,6 @@ const OrderFormComponent: React.FC = () => {
   //funtion to post duration data towards the server :
   const postDurationData = async (durationInSec: number) => {
     if (durationInSec === null) {
-      console.error("Duration in seconds is not set.");
       return;
     }
 
@@ -449,11 +437,9 @@ const OrderFormComponent: React.FC = () => {
       const responseData = await response.json();
       return responseData.data;
     } catch (error) {
-      console.error("Error posting data:", error);
+      console.error("Error data:", error);
     }
   };
-
-
   //handleOption function on click :
   const handleOptionClick = (value: string) => {
     const durationInSeconds = getDurationInSeconds(value);
@@ -466,8 +452,6 @@ const OrderFormComponent: React.FC = () => {
 
     const errorMessage = validateDuration(value);
     setDurationError(errorMessage);
-
-    console.log("Selected duration in seconds:", durationInSeconds);
 
     if (durationInSeconds !== null) {
       postDurationData(durationInSeconds);
@@ -490,7 +474,7 @@ const OrderFormComponent: React.FC = () => {
     return minAmountPrice.find((item) => {
       const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } =
         item;
-        
+
       return (
         durationInSec === exactDurationSeconds ||
         (durationInSec >= minDurationSeconds &&
@@ -498,7 +482,6 @@ const OrderFormComponent: React.FC = () => {
       );
     });
   };
-
   //Price input validation :
   const validatePrice = (value: string): string => {
     const numValue = parseInt(value, 10);
@@ -540,6 +523,7 @@ const OrderFormComponent: React.FC = () => {
 
     const rate_energy = matchedItem.rate.energy;
     const rate_bandwidth = matchedItem.rate.bandwidth;
+
     if (switchBtn === "energy") {
       return numValue < rate_energy ? "less than min amount" : "";
     } else if (switchBtn === "bandwidth") {
@@ -548,6 +532,7 @@ const OrderFormComponent: React.FC = () => {
 
     return "";
   };
+
   //To change the color of the options :
   const getOptionStyle = (option: string) => {
     const inputNum = parseInt(inputValue, 10);
@@ -643,8 +628,6 @@ const OrderFormComponent: React.FC = () => {
       setPriceOptions(mappedOptions);
     }
   };
-  //To render long term data by default :
-
   //To render dynamic options in price dropdown :
   useEffect(() => {
     if (durationInSec !== null) {
@@ -657,8 +640,8 @@ const OrderFormComponent: React.FC = () => {
           switchBtn === "energy"
             ? matchedItem.rate.energy
             : matchedItem.rate.bandwidth;
-
         setDynamicPlaceholder(`Min price: ${rate}`);
+        setInputValue(String(rate));
       }
     }
 
@@ -667,6 +650,7 @@ const OrderFormComponent: React.FC = () => {
       setPriceError(errorMessage);
     }
   }, [durationInSec, switchBtn, inputValue, minAmountPrice]);
+
   //--------------------------------------------------------------------------------------
   //Functions for setting button :
   //checkbox click toggle function :
@@ -677,7 +661,6 @@ const OrderFormComponent: React.FC = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-
   const menuOpen = Boolean(anchorEl);
   //--------------------------------------------------------------------------------------
   //Function to render long term data on duration and price by default :
@@ -688,19 +671,20 @@ const OrderFormComponent: React.FC = () => {
     setInputValue(String(defaultValue));
     setDurationValue("30 days");
   }, [switchBtn, longTermData]);
-
   //To calculate payout amount :
   const calculateTotalPrice = () => {
     const numericAmount = getNumericAmount(amount);
     const numericDuration = getDurationInSeconds(durationValue);
     if (numericDuration === null) {
-      return null; 
+      return null;
     }
     const pricePerUnit = getNumericSelectedPrice(inputValue);
     //To get minimum value of each selected duration based on server data :
-    const minOption = switchBtn === "energy" ? getMatchedRate(numericDuration).rate.energy : getMatchedRate(numericDuration).rate.bandwidth
-    
-    console.log(minOption)
+    const minOption =
+      switchBtn === "energy"
+        ? getMatchedRate(numericDuration).rate.energy
+        : getMatchedRate(numericDuration).rate.bandwidth;
+
     const SUN = 1000000;
 
     if (pricePerUnit === null || numericAmount === null) {
@@ -730,7 +714,6 @@ const OrderFormComponent: React.FC = () => {
 
     return { totalPrice: Number(totalPrice.toFixed(3)) };
   };
-
   let myPrice = calculateTotalPrice();
   //--------------------------------------------------------------------------------------
   //Submit form function :
@@ -738,7 +721,7 @@ const OrderFormComponent: React.FC = () => {
     e.preventDefault();
 
     if (!address) {
-      alert("Please connect your Tron wallet before submitting.");
+      alert("Connect your wallet.");
       dispatch(clickToggle("popUp"));
       return;
     }
@@ -846,7 +829,6 @@ const OrderFormComponent: React.FC = () => {
       console.error("Failed to submit data:", error);
     }
   };
-
   useEffect(() => {
     if (!walletAdd && address) {
       setWalletAdd(address);
@@ -1188,7 +1170,9 @@ const OrderFormComponent: React.FC = () => {
                                 }}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleOptionClick(`${day} days`);
+                                  handleOptionClick(
+                                    `${day} ${day === 1 ? "day" : "days"}`
+                                  );
                                 }}
                               >
                                 {day}
@@ -1457,7 +1441,6 @@ const OrderFormComponent: React.FC = () => {
                 </OrderInfoTextWrapper2>
               </OrderInfoTextWrapper>
             </OrderInfoWrapper>
-
             <OrderSubmitBtnWrapper>
               <OrderSubmitBtn type="submit">Create Order</OrderSubmitBtn>
             </OrderSubmitBtnWrapper>

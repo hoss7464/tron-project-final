@@ -23,7 +23,7 @@ import ResourceComponent from "./ResourceComponent";
 
 const Hero: React.FC = () => {
   const dispatch = useDispatch();
-  const { address, disconnectWallet } = useTronWallet();
+  const { address } = useTronWallet();
 
   const shortenAddress = (address: string) => {
   if (address.length <= 6) return address;
@@ -50,7 +50,7 @@ const Hero: React.FC = () => {
           </HeroTextWrapper>
           <HeroButtonWrapper>
             {address ? (
-              <HeroButtonWrapper2 onClick={() => disconnectWallet()}>
+              <HeroButtonWrapper2>
                 <HeroButtonText>{shortenAddress(address)}</HeroButtonText>
               </HeroButtonWrapper2>
             ) : (
