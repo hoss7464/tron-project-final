@@ -57,7 +57,7 @@ export const OrdersComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 6;
+  const rowsPerPage = 7;
   const { data, error, getData } = useGetData<Post>();
   //Selectors :
   const selectedFilter = useSelector(

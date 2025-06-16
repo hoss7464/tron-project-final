@@ -98,7 +98,7 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   fontSize: "12px",
   border: "2px solid #430E00",
   borderRadius: 8,
-  padding: "6px 8px",
+  padding: "4px 6px",
   "&.Mui-selected": {
     backgroundColor: "#430E00",
     color: "#ffffff",
@@ -158,18 +158,17 @@ const OrderFormComponent: React.FC = () => {
   const [minAmount, setMinAmount] = useState<{energy: number;bandwidth: number;}>({ energy: 0, bandwidth: 0 });
   const [amountError, setAmountError] = useState("");
   //Duration dropdown states :
-  const [durationValue, setDurationValue] = useState("");
-  const [durationInSec, setDurationInSec] = useState<number | null>(null);
+  const [durationValue, setDurationValue] = useState("30 days");
+  const [durationInSec, setDurationInSec] = useState<number | null>(2592000);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLInputElement | null>(null); //to get a refrence to the actual dom node
   const [durationError, setDurationError] = useState("");
   //Price dropdown states :
-  const [inputValue, setInputValue] = useState<string>("");
+  const [inputValue, setInputValue] = useState<string>("35");
   const [priceOptions, setPriceOptions] = useState<{ col1: string; col2: string }[]>([]);
   const [minAmountPrice, setMinAmountPrice] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
-  const [longTermData, setLongTermData] = useState<{energy: number;bandwidth: number;} | null>(null);
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   //Setting button (Allow partial fill) states :
@@ -181,11 +180,13 @@ const OrderFormComponent: React.FC = () => {
   //Switch button handleChange function :
   const handleChange = (
     event: React.MouseEvent<HTMLElement>,
-    switchBtn: string | null
+    newSwitchBtn: string | null
   ) => {
-    if (switchBtn !== null) {
-      setSwitchBtn(switchBtn);
+    // If the same switchBtn is clicked again, do nothing
+    if (newSwitchBtn === switchBtn || newSwitchBtn === null) {
+      return;
     }
+    setSwitchBtn(newSwitchBtn);
     setAmount("");
     setDurationValue("");
     setDurationInSec(null);
@@ -194,6 +195,7 @@ const OrderFormComponent: React.FC = () => {
     setDynamicPlaceholder("Price");
     setPriceError("");
     setDurationError("");
+    setAmountError("")
   };
   //--------------------------------------------------------------------------------------
   //Functions for setting button (Allow partial fill) :
@@ -261,6 +263,12 @@ const OrderFormComponent: React.FC = () => {
       return true;
     }
   };
+
+  useEffect(() => {
+    if (walletAdd.trim() !== "") {
+      isWalletAddValid();
+    }
+  }, [bulkOrder]);
   //--------------------------------------------------------------------------------------
   //Function to store the whole data for order form in it from server once :
   useEffect(() => {
@@ -279,8 +287,7 @@ const OrderFormComponent: React.FC = () => {
     };
     getMinimumAmountDuration();
   }, []);
-  //--------------------------------------------------------------------------------------
-  //Amount input functions :
+
   //Function to get states from stored data :
   useEffect(() => {
     //Function to get minium amount and minimum price :
@@ -292,10 +299,9 @@ const OrderFormComponent: React.FC = () => {
     if (wholeData?.data?.ratesByDuration) {
       setMinAmountPrice(wholeData.data.ratesByDuration);
     }
-    if (wholeData?.data?.longTermData) {
-      setLongTermData(wholeData.data.longTermData);
-    }
   }, [wholeData]);
+  //--------------------------------------------------------------------------------------
+  //Amount input functions :
   //Function for amount validation :
   const validateAmount = (
     rawValue: string,
@@ -353,6 +359,7 @@ const OrderFormComponent: React.FC = () => {
     return Number(amount.replace(/,/g, ""));
   };
   //--------------------------------------------------------------------------------------
+
   //Duration input functions :
   //To create an array of 30 days
   const days = Array.from({ length: 30 }, (_, i) => i + 1);
@@ -370,7 +377,7 @@ const OrderFormComponent: React.FC = () => {
     //valid time between options :
     const validDurations = [
       "15 minutes",
-      "1 hours",
+      "1 hour",
       "3 hours",
       ...Array.from(
         { length: 30 },
@@ -459,7 +466,6 @@ const OrderFormComponent: React.FC = () => {
   };
   //--------------------------------------------------------------------------------------
   //Price input functions :
-  //Function to get minimum price dynamically :
   //To set min max dynamic options :
   const minOption = Math.min(
     ...priceOptions.map((option) => parseInt(option.col1, 10))
@@ -630,26 +636,35 @@ const OrderFormComponent: React.FC = () => {
   };
   //To render dynamic options in price dropdown :
   useEffect(() => {
+    const defaultDuration = "30 days";
+    const durationInSeconds = getDurationInSeconds(defaultDuration);
+    setDurationValue(defaultDuration);
+    setDurationInSec(durationInSeconds);
+  }, [switchBtn]);
+
+  useEffect(() => {
     if (durationInSec !== null) {
       fetchOptionsForDuration(durationInSec);
 
       const matchedItem = getMatchedRate(durationInSec);
-
       if (matchedItem) {
         const rate =
           switchBtn === "energy"
             ? matchedItem.rate.energy
             : matchedItem.rate.bandwidth;
+
         setDynamicPlaceholder(`Min price: ${rate}`);
-        setInputValue(String(rate));
+        setInputValue(rate.toString());
       }
     }
+  }, [durationInSec]);
 
+  useEffect(() => {
     if (inputValue.trim() !== "") {
       const errorMessage = validatePrice(inputValue);
       setPriceError(errorMessage);
     }
-  }, [durationInSec, switchBtn, inputValue, minAmountPrice]);
+  }, [inputValue]);
 
   //--------------------------------------------------------------------------------------
   //Functions for setting button :
@@ -663,14 +678,7 @@ const OrderFormComponent: React.FC = () => {
   };
   const menuOpen = Boolean(anchorEl);
   //--------------------------------------------------------------------------------------
-  //Function to render long term data on duration and price by default :
-  useEffect(() => {
-    if (!longTermData) return;
-    const defaultValue =
-      switchBtn === "energy" ? longTermData.energy : longTermData.bandwidth;
-    setInputValue(String(defaultValue));
-    setDurationValue("30 days");
-  }, [switchBtn, longTermData]);
+
   //To calculate payout amount :
   const calculateTotalPrice = () => {
     const numericAmount = getNumericAmount(amount);
@@ -679,13 +687,16 @@ const OrderFormComponent: React.FC = () => {
       return null;
     }
     const pricePerUnit = getNumericSelectedPrice(inputValue);
+    const SUN = 1000000;
     //To get minimum value of each selected duration based on server data :
+    const matchedRate = getMatchedRate(numericDuration);
+    if (!matchedRate || !matchedRate.rate) {
+      return null; // or throw an error, or set a fallback
+    }
     const minOption =
       switchBtn === "energy"
-        ? getMatchedRate(numericDuration).rate.energy
-        : getMatchedRate(numericDuration).rate.bandwidth;
-
-    const SUN = 1000000;
+        ? matchedRate.rate.energy
+        : matchedRate.rate.bandwidth;
 
     if (pricePerUnit === null || numericAmount === null) {
       return null; // don't calculate without valid inputs
@@ -905,6 +916,13 @@ const OrderFormComponent: React.FC = () => {
             <FormAddInputLabelWrapper>
               <FormAddLabelWrapper>
                 <FormAddLabel>Wallet Address</FormAddLabel>
+                {walletAddError ? (
+                <FormErrorWrapper>
+                  <FormError>{walletAddError}</FormError>
+                </FormErrorWrapper>
+              ) : (
+                ""
+              )}
               </FormAddLabelWrapper>
               <FormAddInputWrapper>
                 <FormAddInputIconWrapper>
@@ -925,18 +943,16 @@ const OrderFormComponent: React.FC = () => {
                   </FormAddInputWrapper2>
                 </FormAddInputIconWrapper>
               </FormAddInputWrapper>
-              {walletAddError ? (
-                <FormErrorWrapper>
-                  <FormError>{walletAddError}</FormError>
-                </FormErrorWrapper>
-              ) : (
-                ""
-              )}
             </FormAddInputLabelWrapper>
             {/** Form amount input component */}
             <FormAddInputLabelWrapper>
               <FormAddLabelWrapper>
                 <FormAddLabel>Amount</FormAddLabel>
+                {amountError && (
+                <FormErrorWrapper>
+                  <FormError>{amountError}</FormError>
+                </FormErrorWrapper>
+              )}
               </FormAddLabelWrapper>
               <FormAddInputWrapper>
                 <FormAddInputIconWrapper>
@@ -982,8 +998,8 @@ const OrderFormComponent: React.FC = () => {
                   <InputMiniBtnWrapper2>
                     <InputMiniBtn
                       type="button"
-                      onClick={() => amountHandleChange("65,000")}
-                      value="65,000"
+                      onClick={() => amountHandleChange("64,350")}
+                      value="64,350"
                     >
                       USDT Tsf
                     </InputMiniBtn>
@@ -1065,16 +1081,17 @@ const OrderFormComponent: React.FC = () => {
                   </InputMiniBtnWrapper2>
                 </InputMiniBtnWrapper>
               )}
-              {amountError && (
-                <FormErrorWrapper>
-                  <FormError>{amountError}</FormError>
-                </FormErrorWrapper>
-              )}
+              
             </FormAddInputLabelWrapper>
             {/** Form duration dropdown component */}
             <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
               <FormAddLabelWrapper>
                 <FormAddLabel>Duration</FormAddLabel>
+                {durationError && (
+                <FormErrorWrapper>
+                  <FormError>{durationError}</FormError>
+                </FormErrorWrapper>
+              )}
               </FormAddLabelWrapper>
               <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
                 <ClickAwayListener onClickAway={() => setOpen(false)}>
@@ -1151,7 +1168,9 @@ const OrderFormComponent: React.FC = () => {
                                 sx={boxStyle}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleOptionClick(`${hr} hours`);
+                                  handleOptionClick(
+                                    `${hr} ${hr === 1 ? "hour" : "hours"}`
+                                  );
                                 }}
                               >
                                 {hr}
@@ -1185,16 +1204,17 @@ const OrderFormComponent: React.FC = () => {
                   </Box>
                 </ClickAwayListener>
               </FormControl>
-              {durationError && (
-                <FormErrorWrapper>
-                  <FormError>{durationError}</FormError>
-                </FormErrorWrapper>
-              )}
+              
             </FormAddInputLabelWrapper>
             {/** Form price component */}
             <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
-              <FormAddLabelWrapper>
+              <FormAddLabelWrapper >
                 <FormAddLabel>Price</FormAddLabel>
+                {priceError && (
+                <FormErrorWrapper>
+                  <FormError>{priceError}</FormError>
+                </FormErrorWrapper>
+              )}
               </FormAddLabelWrapper>
               <FormControl fullWidth>
                 <Autocomplete
@@ -1274,11 +1294,7 @@ const OrderFormComponent: React.FC = () => {
                   )}
                 />
               </FormControl>
-              {priceError && (
-                <FormErrorWrapper>
-                  <FormError>{priceError}</FormError>
-                </FormErrorWrapper>
-              )}
+              
             </FormAddInputLabelWrapper>
             {/** Setting button */}
             <FormSettingWrapper>

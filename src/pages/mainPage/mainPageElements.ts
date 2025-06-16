@@ -662,7 +662,7 @@ export const OrdersDetail = styled.div`
   width: 100%;
   border-radius: 8px;
   margin-bottom: 0.5rem;
-  padding: 10px 14px;
+  padding: 6px 14px;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(6px);
 `;
@@ -717,7 +717,7 @@ export const OrderCardIconWrapper2 = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 5px;
+  padding: 4px;
   border-radius: 6px;
   margin-right: 0.2rem;
   margin-bottom: 0.2rem;
@@ -788,7 +788,7 @@ export const OrdersSellBtnWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px 16px;
+  padding: 7px 12px;
   background-color: ${ThemeColor.secondary1};
   border-radius: 6px;
   cursor: pointer;
@@ -894,7 +894,7 @@ export const MyOrderDetails = styled.div`
   width: 100%;
   border-radius: 8px;
   margin-bottom: 0.5rem;
-  padding: 10px 14px;
+  padding: 6px 14px;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(6px);
 `;
