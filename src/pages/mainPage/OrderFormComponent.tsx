@@ -155,17 +155,22 @@ const OrderFormComponent: React.FC = () => {
   const [wholeData, setWholeData] = useState<SettingUI | null>(null);
   //Amount input states:
   const [amount, setAmount] = useState("");
-  const [minAmount, setMinAmount] = useState<{energy: number;bandwidth: number;}>({ energy: 0, bandwidth: 0 });
+  const [minAmount, setMinAmount] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
   const [amountError, setAmountError] = useState("");
   //Duration dropdown states :
-  const [durationValue, setDurationValue] = useState("30 days");
+  const [durationValue, setDurationValue] = useState("");
   const [durationInSec, setDurationInSec] = useState<number | null>(2592000);
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLInputElement | null>(null); //to get a refrence to the actual dom node
   const [durationError, setDurationError] = useState("");
   //Price dropdown states :
-  const [inputValue, setInputValue] = useState<string>("35");
-  const [priceOptions, setPriceOptions] = useState<{ col1: string; col2: string }[]>([]);
+  const [inputValue, setInputValue] = useState<string>("");
+  const [priceOptions, setPriceOptions] = useState<
+    { col1: string; col2: string }[]
+  >([]);
   const [minAmountPrice, setMinAmountPrice] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
@@ -195,7 +200,7 @@ const OrderFormComponent: React.FC = () => {
     setDynamicPlaceholder("Price");
     setPriceError("");
     setDurationError("");
-    setAmountError("")
+    setAmountError("");
   };
   //--------------------------------------------------------------------------------------
   //Functions for setting button (Allow partial fill) :
@@ -298,6 +303,7 @@ const OrderFormComponent: React.FC = () => {
     }
     if (wholeData?.data?.ratesByDuration) {
       setMinAmountPrice(wholeData.data.ratesByDuration);
+     
     }
   }, [wholeData]);
   //--------------------------------------------------------------------------------------
@@ -619,6 +625,7 @@ const OrderFormComponent: React.FC = () => {
 
     return Number(selectedPrice); // Return the numeric value
   };
+  
   //--------------------------------------------------------------------------------------
   //To fetch dynamic options data for price dropdown based on duration dropdown :
   const fetchOptionsForDuration = async (durationInSec: number) => {
@@ -640,7 +647,7 @@ const OrderFormComponent: React.FC = () => {
     const durationInSeconds = getDurationInSeconds(defaultDuration);
     setDurationValue(defaultDuration);
     setDurationInSec(durationInSeconds);
-  }, [switchBtn]);
+  }, [switchBtn, minAmountPrice]);
 
   useEffect(() => {
     if (durationInSec !== null) {
@@ -657,7 +664,7 @@ const OrderFormComponent: React.FC = () => {
         setInputValue(rate.toString());
       }
     }
-  }, [durationInSec]);
+  }, [durationInSec, minAmountPrice]);
 
   useEffect(() => {
     if (inputValue.trim() !== "") {
@@ -917,12 +924,12 @@ const OrderFormComponent: React.FC = () => {
               <FormAddLabelWrapper>
                 <FormAddLabel>Wallet Address</FormAddLabel>
                 {walletAddError ? (
-                <FormErrorWrapper>
-                  <FormError>{walletAddError}</FormError>
-                </FormErrorWrapper>
-              ) : (
-                ""
-              )}
+                  <FormErrorWrapper>
+                    <FormError>{walletAddError}</FormError>
+                  </FormErrorWrapper>
+                ) : (
+                  ""
+                )}
               </FormAddLabelWrapper>
               <FormAddInputWrapper>
                 <FormAddInputIconWrapper>
@@ -949,10 +956,10 @@ const OrderFormComponent: React.FC = () => {
               <FormAddLabelWrapper>
                 <FormAddLabel>Amount</FormAddLabel>
                 {amountError && (
-                <FormErrorWrapper>
-                  <FormError>{amountError}</FormError>
-                </FormErrorWrapper>
-              )}
+                  <FormErrorWrapper>
+                    <FormError>{amountError}</FormError>
+                  </FormErrorWrapper>
+                )}
               </FormAddLabelWrapper>
               <FormAddInputWrapper>
                 <FormAddInputIconWrapper>
@@ -1081,17 +1088,16 @@ const OrderFormComponent: React.FC = () => {
                   </InputMiniBtnWrapper2>
                 </InputMiniBtnWrapper>
               )}
-              
             </FormAddInputLabelWrapper>
             {/** Form duration dropdown component */}
             <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
               <FormAddLabelWrapper>
                 <FormAddLabel>Duration</FormAddLabel>
                 {durationError && (
-                <FormErrorWrapper>
-                  <FormError>{durationError}</FormError>
-                </FormErrorWrapper>
-              )}
+                  <FormErrorWrapper>
+                    <FormError>{durationError}</FormError>
+                  </FormErrorWrapper>
+                )}
               </FormAddLabelWrapper>
               <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
                 <ClickAwayListener onClickAway={() => setOpen(false)}>
@@ -1204,17 +1210,16 @@ const OrderFormComponent: React.FC = () => {
                   </Box>
                 </ClickAwayListener>
               </FormControl>
-              
             </FormAddInputLabelWrapper>
             {/** Form price component */}
             <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
-              <FormAddLabelWrapper >
+              <FormAddLabelWrapper>
                 <FormAddLabel>Price</FormAddLabel>
                 {priceError && (
-                <FormErrorWrapper>
-                  <FormError>{priceError}</FormError>
-                </FormErrorWrapper>
-              )}
+                  <FormErrorWrapper>
+                    <FormError>{priceError}</FormError>
+                  </FormErrorWrapper>
+                )}
               </FormAddLabelWrapper>
               <FormControl fullWidth>
                 <Autocomplete
@@ -1294,7 +1299,6 @@ const OrderFormComponent: React.FC = () => {
                   )}
                 />
               </FormControl>
-              
             </FormAddInputLabelWrapper>
             {/** Setting button */}
             <FormSettingWrapper>
