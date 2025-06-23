@@ -100,12 +100,12 @@
       "resourceType": "bandwidth",
       "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
       "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "resourceAmount": 10000,
-      "durationSec": 1209600,
-      "price": 1500,
-      "date": "2025-06-16",
-      "time": "11:43",
-      "totalPrice": 91,
+      "resourceAmount": 2000,
+      "durationSec": 2592000,
+      "price": 600,
+      "date": "2025-06-23",
+      "time": "15:25",
+      "totalPrice": 36,
       "options": {
         "allow_partial": false,
         "bulk_order": false
@@ -117,48 +117,16 @@
       "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
       "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
       "resourceAmount": 64350,
-      "durationSec": 3600,
-      "price": 90,
-      "date": "2025-06-16",
-      "time": "11:52",
-      "totalPrice": 4.505,
+      "durationSec": 86400,
+      "price": 140,
+      "date": "2025-06-23",
+      "time": "15:40",
+      "totalPrice": 9.009,
       "options": {
         "allow_partial": false,
         "bulk_order": false
       },
       "id": 8
-    },
-    {
-      "resourceType": "energy",
-      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j,TK4fYNkWhzgHDUxMo5jhudi1eRzpk2ZaB4",
-      "resourceAmount": 64350,
-      "durationSec": 2592000,
-      "price": 35,
-      "date": "2025-06-16",
-      "time": "12:24",
-      "totalPrice": 67.567,
-      "options": {
-        "allow_partial": false,
-        "bulk_order": true
-      },
-      "id": 9
-    },
-    {
-      "resourceType": "energy",
-      "requester": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j",
-      "receiver": "TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j,TK4fYNkWhzgHDUxMo5jhudi1eRzpk2ZaB4",
-      "resourceAmount": 64350,
-      "durationSec": 2592000,
-      "price": 35,
-      "date": "2025-06-16",
-      "time": "12:39",
-      "totalPrice": 67.567,
-      "options": {
-        "allow_partial": false,
-        "bulk_order": true
-      },
-      "id": 10
     }
   ],
   "walletSignature": [

@@ -58,9 +58,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const window_tronweb = (window as any).tronWeb;
       //To get data from api.trongrid.io
       const tronWeb = new TronWeb({ fullHost: "https://api.trongrid.io" });
-
+      //base url :
+      const baseURL = process.env.REACT_APP_BASE_URL;
       //Message in signature form based nonce :
-      const generate_msg = await fetch("http://91.244.70.95/Auth/get-message", {
+      const generate_msg = await fetch(`${baseURL}/Auth/get-message`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -76,22 +77,24 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!signature) throw new Error("User rejected signing message");
       //To send address , message , signature hash towards the server :
       const postServerData = await fetch(
-        "http://91.244.70.95/Auth/verify-request",
+        `${baseURL}/Auth/verify-request`,
         {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ address: addr, message, signature }),
         }
       );
+
       //To convert postServerData into json
       const server_data_json = await postServerData.json();
-      //To get refresh token :
-      const refresh_Token = server_data_json.data.refresh_token;
+      if (server_data_json.success === false)
+        throw new Error("Something went wrong");
+
       //To get access token :
       const access_Token = server_data_json.data.access_token;
       //To save refressh_token, access_token, wallet address into a json
       const localStorageSavedData = {
-        refresh_Token: refresh_Token,
         access_Token: access_Token,
         wallet_address: addr,
       };
@@ -131,32 +134,24 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //-------------------------------------------------------------------------------------
   //Function to delete data from localStorage :
   const localStorageDeleteData = async () => {
+    const baseURL = process.env.REACT_APP_BASE_URL;
     try {
-      //To get data from localStorage :
       const stored = localStorage.getItem("tronWalletAddress");
-      if (stored) {
-        const { refresh_Token, access_Token, wallet_address } =
-          JSON.parse(stored);
-
-        //To send disconnect request towards the server :
-        const deleteData = await fetch("http://91.244.70.95/Auth/disconnect", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            refresh_token: refresh_Token,
-            access_token: access_Token,
-            address: wallet_address,
-          }),
-        });
-        const disconnectResponse = await deleteData.json();
-        if (!disconnectResponse.success) {
-          alert(`Disconnect failed on server side: ${disconnectResponse}`);
-        }
-      }
-      //To clear localStorage :
+      
+      // همیشه اول localStorage پاک می‌کنیم
       localStorage.removeItem("tronWalletAddress");
+  
+      if (stored) {
+        // درخواست به سرور (بدون env)
+        await fetch(`${baseURL}/Auth/disconnect`, {
+          method: "POST",
+          credentials: "include"
+        }).catch(() => {});
+      }
+  
     } catch (err) {
-      console.log(`Error during disconnect: ${err}`);
+      // چون env نداری، فقط کلا suppress میکنیم
+      console.warn("Error during logout process:", err);
     }
   };
   //-------------------------------------------------------------------------------------

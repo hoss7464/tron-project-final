@@ -68,6 +68,7 @@ import { useDispatch } from "react-redux";
 import { clickToggle } from "../../redux/actions/toggleSlice";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
+import { time } from "console";
 //-------------------------------------------------------------------------------------
 // Define the type for the data structure
 interface SettingUI {
@@ -671,7 +672,7 @@ const OrderFormComponent: React.FC = () => {
       const errorMessage = validatePrice(inputValue);
       setPriceError(errorMessage);
     }
-  }, [inputValue]);
+  }, [inputValue, validatePrice]);
 
   //--------------------------------------------------------------------------------------
   //Functions for setting button :
@@ -809,18 +810,17 @@ const OrderFormComponent: React.FC = () => {
       resourceAmount: numericAmount,
       durationSec: durationNumericValue,
       price: numericSelectedPrice,
-      date: formattedDate,
-      time: formattedTime,
       totalPrice: totalPrice,
       options: {
         allow_partial: partialFillValue,
         bulk_order: bulkOrderValue,
       },
     };
-
+    //base url :
+    const baseURL = process.env.REACT_APP_BASE_URL
     //Fetch data towards server :
     try {
-      const response = await fetch("http://localhost:3001/formData", {
+      const response = await fetch(`${baseURL}/order/createorder`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -851,7 +851,7 @@ const OrderFormComponent: React.FC = () => {
     if (!walletAdd && address) {
       setWalletAdd(address);
     }
-  }, [address]);
+  }, [address, walletAdd]);
 
   return (
     <>

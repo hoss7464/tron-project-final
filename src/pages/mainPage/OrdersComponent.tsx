@@ -82,8 +82,9 @@ export const OrdersComponent: React.FC = () => {
       selectedFilter === "All" ? "" : `orderProduct=${selectedFilter}`;
 
     //Fetch all filtered data first
-    getData(`http://localhost:3001/post?${filterParam}`);
-  }, [selectedFilter]);
+    const localUrl = process.env.REACT_APP_LOCAL_URL
+    getData(`${localUrl}/post?${filterParam}`);
+  }, [selectedFilter, getData]);
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 

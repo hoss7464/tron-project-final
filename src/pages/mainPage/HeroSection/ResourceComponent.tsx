@@ -31,51 +31,53 @@ const ResourceComponent: React.FC = () => {
   //states :
 
   //ready resources states :
-  const [energyReady, setEnergyReady] =useState<string | null>(null)
-  const [bandwidthReady, setBandwidthReady] =useState<string | null>(null)
+  const [energyReady, setEnergyReady] = useState<string | null>(null);
+  const [bandwidthReady, setBandwidthReady] = useState<string | null>(null);
   //24 hours recovery states :
-  const [energy24, setEnergy24] = useState<string | null>(null)
-  const [bandwidth24, setBandwidth24] = useState<string | null>(null)
-  //apy states : 
-  const [energyApySeller, setEnergyApySeller] = useState<string | null>(null)
-  const [bandwidthApySeller, setBandwidthApySeller] = useState<string | null>(null)
+  const [energy24, setEnergy24] = useState<string | null>(null);
+  const [bandwidth24, setBandwidth24] = useState<string | null>(null);
+  //apy states :
+  const [energyApySeller, setEnergyApySeller] = useState<string | null>(null);
+  const [bandwidthApySeller, setBandwidthApySeller] = useState<string | null>(
+    null
+  );
 
-  //Helper formatter : 
+  //Helper formatter :
   const formatNumber = (num: number | string) => Number(num).toLocaleString();
 
   //To get data from server :
   const resourceData = async () => {
-     const getResources =  await fetch("http://91.244.70.95/Setting/UI", {
-      method : "GET",
+    
+    const baseURL = process.env.REACT_APP_BASE_URL;
+    const getResources = await fetch(`${baseURL}/Setting/UI`, {
+      method: "GET",
       headers: { "Content-Type": "application/json" },
-    })
+    });
 
-    const convertToJson = await getResources.json()
+    const convertToJson = await getResources.json();
     //To extract ready resource :
-    const energyReadyResource = convertToJson.data.readyResource.energy
-    const bandwidthReadyResource = convertToJson.data.readyResource.bandwidth
+    const energyReadyResource = convertToJson.data.readyResource.energy;
+    const bandwidthReadyResource = convertToJson.data.readyResource.bandwidth;
     //To extract 24 hours recovery :
-    const energyDailyRecovery = convertToJson.data.dailyRecovery.energy
-    const bandwidthDailyRecovery = convertToJson.data.dailyRecovery.bandwidth
+    const energyDailyRecovery = convertToJson.data.dailyRecovery.energy;
+    const bandwidthDailyRecovery = convertToJson.data.dailyRecovery.bandwidth;
     //To extract apy for sellers :
-    const energyApy = convertToJson.data.apy.energy
-    const bandwidthApy = convertToJson.data.apy.bandwidth
+    const energyApy = convertToJson.data.apy.energy;
+    const bandwidthApy = convertToJson.data.apy.bandwidth;
 
     //set states :
     setEnergyReady(formatNumber(energyReadyResource));
-  setBandwidthReady(formatNumber(bandwidthReadyResource));
-  setEnergy24(formatNumber(energyDailyRecovery));
-  setBandwidth24(formatNumber(bandwidthDailyRecovery));
-  setEnergyApySeller(formatNumber(energyApy));
-  setBandwidthApySeller(formatNumber(bandwidthApy));
-    
-  }
-  
-  useEffect(() => {
-   resourceData()
+    setBandwidthReady(formatNumber(bandwidthReadyResource));
+    setEnergy24(formatNumber(energyDailyRecovery));
+    setBandwidth24(formatNumber(bandwidthDailyRecovery));
+    setEnergyApySeller(formatNumber(energyApy));
+    setBandwidthApySeller(formatNumber(bandwidthApy));
+  };
 
-  }, [])
-  
+  useEffect(() => {
+    resourceData();
+  }, []);
+
   return (
     <>
       <HeroResourceContainer>
@@ -117,7 +119,9 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>{energyReady}</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>
+                      {energyReady}
+                    </HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
 
@@ -137,7 +141,9 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>{bandwidthReady}</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>
+                      {bandwidthReady}
+                    </HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
               </HeroGridCard>
@@ -196,7 +202,9 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>{bandwidth24}</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>
+                      {bandwidth24}
+                    </HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
               </HeroGridCard>
@@ -237,7 +245,9 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>{energyApySeller} %</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>
+                      {energyApySeller} %
+                    </HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
 
@@ -257,7 +267,9 @@ const ResourceComponent: React.FC = () => {
                     </HeroGridCardNumberIconWrapper2>
                   </HeroGridCardNumberIconWrapper>
                   <HeroGridCardNumberTextWrapper>
-                    <HeroGridCardNumberText>{bandwidthApySeller} %</HeroGridCardNumberText>
+                    <HeroGridCardNumberText>
+                      {bandwidthApySeller} %
+                    </HeroGridCardNumberText>
                   </HeroGridCardNumberTextWrapper>
                 </HeroGridCardNumberIconTextWrapper>
               </HeroGridCard>

@@ -52,7 +52,7 @@ const MyOrdersComponent: React.FC = () => {
 
   useEffect(() => {
     getData("http://localhost:3001/formData");
-  }, [refreshTrigger]);
+  }, [refreshTrigger, getData]);
 
   const sortedData = sortByDateTime(data || []);
   const filteredData =

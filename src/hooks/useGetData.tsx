@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useState, useCallback } from "react";
 
 type UseGetDataReturn<T> = {
   data: T[];
@@ -15,7 +14,7 @@ function useGetData<T = any>(): UseGetDataReturn<T> {
   const [error, setError] = useState("");
   const [totalCount, setTotalCount] = useState(0);
 
-  const getData = async (url: string): Promise<void> => {
+  const getData = useCallback(async (url: string): Promise<void> => {
     setIsLoading(true);
     setError("");
 
@@ -32,18 +31,16 @@ function useGetData<T = any>(): UseGetDataReturn<T> {
       }
 
       const total = response.headers.get("X-Total-Count");
-      console.log(total)
       const fetchedData: T[] = await response.json();
       setData(fetchedData);
       setTotalCount(total ? parseInt(total, 10) : 0);
-      
     } catch (err: any) {
       setError(err.message || "Something went wrong!");
       throw err;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []); //to memoize get data , stable for useEffect 
 
   return { data, isLoading, error, getData, totalCount };
 }

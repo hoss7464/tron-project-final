@@ -1,14 +1,11 @@
-import { useState } from "react";
-
+import { useState, useCallback } from "react";
 
 const useGetData = <T = unknown>() => {
-
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-
-  const getData = async (url: string): Promise<T> => {
+  const getData = useCallback(async (url: string): Promise<T> => {
     setIsLoading(true);
     setError("");
 
@@ -32,7 +29,7 @@ const useGetData = <T = unknown>() => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []); 
 
   return { data, isLoading, error, getData };
 };
