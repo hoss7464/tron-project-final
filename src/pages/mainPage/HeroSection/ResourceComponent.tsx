@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Hero.css";
+import axios from "axios";
 import {
   HeroResourceContainer,
   HeroResourceWrapper,
@@ -26,10 +27,25 @@ import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
 import recoveryIcon from "../../../assets/svg/RecoveryIcon.svg";
 import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg";
 //----------------------------------------------------------------------------------------
+type ResourceResponse = {
+  data: {
+    readyResource: {
+      energy: number | string;
+      bandwidth: number | string;
+    };
+    dailyRecovery: {
+      energy: number | string;
+      bandwidth: number | string;
+    };
+    apy: {
+      energy: number | string;
+      bandwidth: number | string;
+    };
+  };
+};
 
 const ResourceComponent: React.FC = () => {
   //states :
-
   //ready resources states :
   const [energyReady, setEnergyReady] = useState<string | null>(null);
   const [bandwidthReady, setBandwidthReady] = useState<string | null>(null);
@@ -38,32 +54,29 @@ const ResourceComponent: React.FC = () => {
   const [bandwidth24, setBandwidth24] = useState<string | null>(null);
   //apy states :
   const [energyApySeller, setEnergyApySeller] = useState<string | null>(null);
-  const [bandwidthApySeller, setBandwidthApySeller] = useState<string | null>(
-    null
-  );
+  const [bandwidthApySeller, setBandwidthApySeller] = useState<string | null>(null);
 
   //Helper formatter :
   const formatNumber = (num: number | string) => Number(num).toLocaleString();
 
   //To get data from server :
   const resourceData = async () => {
-    
     const baseURL = process.env.REACT_APP_BASE_URL;
-    const getResources = await fetch(`${baseURL}/Setting/UI`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+    try{
+      const response = await axios.get<ResourceResponse>(`${baseURL}/Setting/UI`, {
+        headers: { "Content-Type": "application/json" },
+      })
+      const myData = response.data 
 
-    const convertToJson = await getResources.json();
     //To extract ready resource :
-    const energyReadyResource = convertToJson.data.readyResource.energy;
-    const bandwidthReadyResource = convertToJson.data.readyResource.bandwidth;
+    const energyReadyResource = myData.data.readyResource.energy;
+    const bandwidthReadyResource = myData.data.readyResource.bandwidth;
     //To extract 24 hours recovery :
-    const energyDailyRecovery = convertToJson.data.dailyRecovery.energy;
-    const bandwidthDailyRecovery = convertToJson.data.dailyRecovery.bandwidth;
+    const energyDailyRecovery = myData.data.dailyRecovery.energy;
+    const bandwidthDailyRecovery = myData.data.dailyRecovery.bandwidth;
     //To extract apy for sellers :
-    const energyApy = convertToJson.data.apy.energy;
-    const bandwidthApy = convertToJson.data.apy.bandwidth;
+    const energyApy = myData.data.apy.energy;
+    const bandwidthApy = myData.data.apy.bandwidth;
 
     //set states :
     setEnergyReady(formatNumber(energyReadyResource));
@@ -72,6 +85,9 @@ const ResourceComponent: React.FC = () => {
     setBandwidth24(formatNumber(bandwidthDailyRecovery));
     setEnergyApySeller(formatNumber(energyApy));
     setBandwidthApySeller(formatNumber(bandwidthApy));
+    }catch(error){
+      console.log("error fetching data : ", error)
+    }
   };
 
   useEffect(() => {

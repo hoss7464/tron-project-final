@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import axios from "axios";
 
 const useGetData = <T = unknown>() => {
   const [data, setData] = useState<T | null>(null);
@@ -10,25 +11,18 @@ const useGetData = <T = unknown>() => {
     setError("");
 
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error("Failed to fetch data!");
-      }
+    const response = await axios.get<T>(url);
 
-      const fetchedData: T = await response.json();
-      setData(fetchedData);
-      return fetchedData;
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-        throw err;
-      } else {
-        setError("Something went wrong!");
-        throw new Error("Unknown error occurred");
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    // No need to check response.ok — axios throws on error
+    const fetchedData = response.data; // Already parsed JSON
+    setData(fetchedData);
+    return fetchedData;
+  } catch (err: any) {
+    setError(err.message || "Something went wrong!");
+    throw err;
+  } finally {
+    setIsLoading(false);
+  }
   }, []); 
 
   return { data, isLoading, error, getData };

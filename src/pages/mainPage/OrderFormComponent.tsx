@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
 import { useTranslation } from "react-i18next";
 import "./mainPage.css";
 import {
@@ -61,14 +62,13 @@ import {
   MenuItem,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
-import { duration, styled } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import { useDispatch } from "react-redux";
 import { clickToggle } from "../../redux/actions/toggleSlice";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
-import { time } from "console";
 //-------------------------------------------------------------------------------------
 // Define the type for the data structure
 interface SettingUI {
@@ -738,7 +738,7 @@ const OrderFormComponent: React.FC = () => {
   //Submit form function :
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    
     if (!address) {
       alert("Connect your wallet.");
       dispatch(clickToggle("popUp"));
@@ -810,6 +810,8 @@ const OrderFormComponent: React.FC = () => {
       resourceAmount: numericAmount,
       durationSec: durationNumericValue,
       price: numericSelectedPrice,
+      date: formattedDate,
+      time : formattedTime,
       totalPrice: totalPrice,
       options: {
         allow_partial: partialFillValue,
@@ -817,35 +819,35 @@ const OrderFormComponent: React.FC = () => {
       },
     };
     //base url :
-    const baseURL = process.env.REACT_APP_BASE_URL
+    const baseURL = process.env.REACT_APP_LOCAL_URL
     //Fetch data towards server :
     try {
-      const response = await fetch(`${baseURL}/order/createorder`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postData),
-      });
+    const response = await axios.post(`${baseURL}/formData`, postData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      await response.json();
-      dispatch(toggleRefresh());
-      setAmount("");
-      setDurationValue("");
-      setInputValue("");
-      setAmountError("");
-      setDurationError("");
-      setPriceError("");
-      setWalletAdd(address);
-      setPartialFill(false);
-      setBulkOrder(false);
-    } catch (error) {
-      console.error("Failed to submit data:", error);
+    // If you want to check status explicitly (optional):
+    if (response.status < 200 || response.status >= 300) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
+    // Response data is in response.data if you want to use it
+
+    dispatch(toggleRefresh());
+    setAmount("");
+    setDurationValue("");
+    setInputValue("");
+    setAmountError("");
+    setDurationError("");
+    setPriceError("");
+    setWalletAdd(address);
+    setPartialFill(false);
+    setBulkOrder(false);
+  } catch (error) {
+    console.error("Failed to submit data:", error);
+  }
   };
   useEffect(() => {
     if (!walletAdd && address) {

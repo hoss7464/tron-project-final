@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import axios from "axios";
 
 type UseGetDataReturn<T> = {
   data: T[];
@@ -19,23 +20,20 @@ function useGetData<T = any>(): UseGetDataReturn<T> {
     setError("");
 
     try {
-      const response = await fetch(url, {
+      const response = await axios.get<T[]>(url, {
         headers: {
           Accept: "application/json",
           "Cache-Control": "no-cache",
         },
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch data!");
-      }
-
-      const total = response.headers.get("X-Total-Count");
-      const fetchedData: T[] = await response.json();
-      setData(fetchedData);
+      const total = response.headers["x-total-count"];
+      setData(response.data);
       setTotalCount(total ? parseInt(total, 10) : 0);
     } catch (err: any) {
-      setError(err.message || "Something went wrong!");
+      const message =
+        err.response?.data?.message || err.message || "Something went wrong!";
+      setError(message);
       throw err;
     } finally {
       setIsLoading(false);

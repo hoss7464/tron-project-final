@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
+import axios from "axios";
 
 // Context interface
 interface TronWalletContextProps {
@@ -36,9 +37,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [allBandwidth, setAllBandwidth] = useState<number | null>(null);
-  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(
-    null
-  );
+  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(null);
   const [allEnergy, setAllEnergy] = useState<number | null>(null);
   const [availableEnergy, setAvailableEnergy] = useState<number | null>(null);
   //-------------------------------------------------------------------------------------
@@ -61,12 +60,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //base url :
       const baseURL = process.env.REACT_APP_BASE_URL;
       //Message in signature form based nonce :
-      const generate_msg = await fetch(`${baseURL}/Auth/get-message`, {
-        method: "GET",
+      const generate_msg = await axios.get<{ success: boolean; data: { nonce: string } }>(`${baseURL}/Auth/get-message`, {
         headers: { "Content-Type": "application/json" },
       });
       //To convert he message into json :
-      const responseBody = await generate_msg.json();
+      const responseBody = generate_msg.data;
       if (responseBody.success === false)
         throw new Error("Something went wrong");
       const message = responseBody.data.nonce;
@@ -76,18 +74,21 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const signature = await adapter.signMessage(message);
       if (!signature) throw new Error("User rejected signing message");
       //To send address , message , signature hash towards the server :
-      const postServerData = await fetch(
-        `${baseURL}/Auth/verify-request`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address: addr, message, signature }),
-        }
-      );
+      const postServerData = await axios.post<{ success: boolean; data: { access_token: string } }>(
+      `${baseURL}/Auth/verify-request`,
+      {
+        address: addr,
+        message,
+        signature,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      }
+    );
 
       //To convert postServerData into json
-      const server_data_json = await postServerData.json();
+      const server_data_json = postServerData.data;
       if (server_data_json.success === false)
         throw new Error("Something went wrong");
 
@@ -108,7 +109,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //To get balance from tronWeb :
       const balanceInSun = await tronWeb.trx.getBalance(addr);
       const balanceTRX = tronWeb.fromSun(balanceInSun);
-      setBalance(balanceTRX.toString());
+      //To set balance with 2 digites after decimal point
+      setBalance(Number(balanceTRX).toFixed(2));
 
       //bandwidth and energy calculation :
       const resource = await tronWeb.trx.getAccountResources(addr);
@@ -143,10 +145,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   
       if (stored) {
         // درخواست به سرور (بدون env)
-        await fetch(`${baseURL}/Auth/disconnect`, {
-          method: "POST",
-          credentials: "include"
-        }).catch(() => {});
+        await axios.post(`${baseURL}/Auth/disconnect`, {}, {withCredentials: true}).catch(() => {});
       }
   
     } catch (err) {
@@ -201,7 +200,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           //To get balance from TronLink :
           const balanceInSun = await tronWeb.trx.getBalance(walletAddr);
           const balanceTRX = tronWeb.fromSun(balanceInSun);
-          setBalance(balanceTRX.toString());
+          //To set balance with 2 digites after decimal point
+          setBalance(Number(balanceTRX).toFixed(2));
 
           //bandwidth and energy calculation :
           const resource = await tronWeb.trx.getAccountResources(walletAddr);
