@@ -3,20 +3,30 @@ import { ThemeColor } from "../../../core-UI/Theme";
 import { IoCopy } from "react-icons/io5";
 
 export const LegacyContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 100%;
 
-  @media only screen and (min-width: 280px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 600px) {
+    display: none;
+  }
+
+  @media only screen and (min-width: 601px) and (max-width: 768px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 0 24px 0 24px;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1920px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 0 32px 0 32px;
   }
 
   @media only screen and (min-width: 1921px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 0 56px 0 56px;
   }
 `;
@@ -69,12 +79,11 @@ export const LegacyCardWrapper2 = styled.div`
   border: solid 2px ${ThemeColor.border1};
   padding: 4px;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 600px) {
     border-radius: 16px;
-    height: 250px;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 601px) and (max-width: 768px) {
     border-radius: 16px;
     height: 270px;
   }

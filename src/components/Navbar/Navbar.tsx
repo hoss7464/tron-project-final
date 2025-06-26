@@ -170,7 +170,7 @@ const Navbar: React.FC = () => {
                     <ConnectIcon />
                   </ConnectIconWrapper>
                   <ConnectBtn>
-                    <ConnectText>{t("wallet")}</ConnectText>
+                    <ConnectText>{t("Wallet")}</ConnectText>
                   </ConnectBtn>
                 </ConnectWrapper>
               )}

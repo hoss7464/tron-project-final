@@ -1,6 +1,6 @@
-{
+const translation = {
   "JA" : "ジャ",
-  "wallet": "ウォレット",
+  "Wallet": "ウォレット",
   "language": "JA",
   "account": "アカウント",
   "balance_trx": "残高（TRX）",
@@ -27,4 +27,6 @@
   "days": "日々",
   "month": "月",
   "months": "ヶ月"
-}
+} as const
+
+export default translation

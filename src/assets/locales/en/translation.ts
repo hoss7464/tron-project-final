@@ -1,5 +1,5 @@
-{
-  "wallet": "Wallet",
+ const translation = {
+  "Wallet": "Wallet",
   "language": "EN",
   "account": "Account",
   "balance_trx": "Balance (TRX)",
@@ -26,4 +26,6 @@
   "days": "Days",
   "month": "Month",
   "months": "Months"
-}
+} as const
+
+export default translation

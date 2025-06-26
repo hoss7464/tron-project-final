@@ -1,5 +1,5 @@
-{
-    "wallet": "Кошелек",
+ const translation = {
+    "Wallet": "Кошелек",
     "language": "RU",
       "account": "Аккаунт",
       "balance_trx": "Баланс (TRX)",
@@ -26,4 +26,6 @@
       "days": "Дни",
       "month": "Месяц",
       "months": "Месяцы"
-}
+} as const
+
+export default translation

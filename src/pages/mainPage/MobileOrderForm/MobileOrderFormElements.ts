@@ -33,11 +33,11 @@ export const MobileOrderFormWrapper = styled.div`
   justify-content: center;
   align-items: center;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 600px) {
     width: 100%;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 601px) and (max-width: 768px) {
     width: 450px;
   }
 

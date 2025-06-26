@@ -17,6 +17,7 @@ import SelectWalletComponent from "../../components/SelectWalletComponent/Select
 import Hero from "./HeroSection/Hero";
 import Legacy from "./LegacySection/Legacy";
 import MobileOrderForm from "./MobileOrderForm/MobileOrderForm";
+import MobileLegacy from "./MobileLegacy/mobileLegacy";
 
 const MainPage: React.FC = () => {
   const popUpVisible = useSelector(
@@ -34,6 +35,7 @@ const MainPage: React.FC = () => {
         <Hero />
         <MobileOrderForm />
         <Legacy />
+        
         <MainPageWrapper2>
           <MainPageWrapper>
             <MainLeftSection>
@@ -42,6 +44,7 @@ const MainPage: React.FC = () => {
             <MainRightSection>
               <OrdersComponent />
               <MyOrdersComponent />
+              <MobileLegacy />
             </MainRightSection>
           </MainPageWrapper>
         </MainPageWrapper2>
