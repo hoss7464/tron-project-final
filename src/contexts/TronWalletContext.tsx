@@ -13,7 +13,16 @@ interface TronWalletContextProps {
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   signMessage: (message: string) => Promise<string | null>;
+  transferTrx: ( toAddress: string, amount: number) => Promise<TrxTransferResult>;
+  isTransferring: boolean;
+  transferError: string | null;
 }
+//Type for TRX transfer : 
+type TrxTransferResult = {
+  success: boolean;
+  txId?: string;
+  error?: string;
+};
 
 // Create context
 const TronWalletContext = createContext<TronWalletContextProps | undefined>(
@@ -40,6 +49,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(null);
   const [allEnergy, setAllEnergy] = useState<number | null>(null);
   const [availableEnergy, setAvailableEnergy] = useState<number | null>(null);
+  //States for Transfering TRX :
+  const [isTransferring, setIsTransferring] = useState(false);
+  const [transferError, setTransferError] = useState<string | null>(null);
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapter = new TronLinkAdapter();
@@ -60,7 +72,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //base url :
       const baseURL = process.env.REACT_APP_BASE_URL;
       //Message in signature form based nonce :
-      const generate_msg = await axios.get<{ success: boolean; data: { nonce: string } }>(`${baseURL}/Auth/get-message`, {
+      const generate_msg = await axios.get<{
+        success: boolean;
+        data: { nonce: string };
+      }>(`${baseURL}/Auth/get-message`, {
         headers: { "Content-Type": "application/json" },
       });
       //To convert he message into json :
@@ -74,18 +89,21 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const signature = await adapter.signMessage(message);
       if (!signature) throw new Error("User rejected signing message");
       //To send address , message , signature hash towards the server :
-      const postServerData = await axios.post<{ success: boolean; data: { access_token: string } }>(
-      `${baseURL}/Auth/verify-request`,
-      {
-        address: addr,
-        message,
-        signature,
-      },
-      {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true,
-      }
-    );
+      const postServerData = await axios.post<{
+        success: boolean;
+        data: { access_token: string };
+      }>(
+        `${baseURL}/Auth/verify-request`,
+        {
+          address: addr,
+          message,
+          signature,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
 
       //To convert postServerData into json
       const server_data_json = postServerData.data;
@@ -139,15 +157,16 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     const baseURL = process.env.REACT_APP_BASE_URL;
     try {
       const stored = localStorage.getItem("tronWalletAddress");
-      
+
       // همیشه اول localStorage پاک می‌کنیم
       localStorage.removeItem("tronWalletAddress");
-  
+
       if (stored) {
         // درخواست به سرور (بدون env)
-        await axios.post(`${baseURL}/Auth/disconnect`, {}, {withCredentials: true}).catch(() => {});
+        await axios
+          .post(`${baseURL}/Auth/disconnect`, {}, { withCredentials: true })
+          .catch(() => {});
       }
-  
     } catch (err) {
       // چون env نداری، فقط کلا suppress میکنیم
       console.warn("Error during logout process:", err);
@@ -228,6 +247,61 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     autoConnect();
   }, []);
   //-------------------------------------------------------------------------------------
+  //To transfer TRX :
+  const transferTrx = async (toAddress: string,amount: number): Promise<TrxTransferResult> => {
+    setIsTransferring(true);
+    setTransferError(null);
+
+    //If the wallet didn't connect return an error :
+    try {
+      if (!address) {
+        throw new Error("Wallet not connected");
+      }
+      //To get data from any network
+      const window_tronweb = (window as any).tronWeb;
+      if (!window_tronweb) {
+        throw new Error("TronWeb not found");
+      }
+
+      // Validate inputs
+      if (!window_tronweb.isAddress(toAddress)) {
+        throw new Error("Invalid recipient address");
+      }
+      //If the amount <= 0 return an error :
+      if (amount <= 0) {
+        throw new Error("Amount must be greater than 0");
+      }
+
+      // Convert amount to sun
+      const amountInSun = window_tronweb.toSun(amount.toString());
+
+      // Create transaction
+      const transaction = await window_tronweb.transactionBuilder.sendTrx(
+        toAddress,
+        amountInSun,
+        address // from address
+      );
+
+      // Sign transaction
+      const signedTx = await window_tronweb.trx.sign(transaction);
+
+      // Broadcast transaction
+      const txResult = await window_tronweb.trx.sendRawTransaction(signedTx);
+
+      // Update balance after successful transfer
+      const newBalance = await window_tronweb.trx.getBalance(address);
+      setBalance(Number(window_tronweb.fromSun(newBalance)).toFixed(2));
+
+      return {success: true,txId: txResult.transaction.txID};
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Transfer failed";
+      setTransferError(errorMessage);
+      return {success: false,error: errorMessage,};
+    } finally {
+      setIsTransferring(false);
+    }
+  };
+  //-------------------------------------------------------------------------------------
   return (
     <TronWalletContext.Provider
       value={{
@@ -240,6 +314,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         connectWallet,
         disconnectWallet,
         signMessage,
+        transferTrx,
+        isTransferring,
+        transferError,
       }}
     >
       {children}

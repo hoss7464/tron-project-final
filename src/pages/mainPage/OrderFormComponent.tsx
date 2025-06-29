@@ -146,7 +146,7 @@ const OrderFormComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { address } = useTronWallet();
+  const { address,transferTrx,isTransferring,transferError} = useTronWallet();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
@@ -276,17 +276,16 @@ const OrderFormComponent: React.FC = () => {
     }
   }, [bulkOrder]);
   //--------------------------------------------------------------------------------------
-  //Function to store the whole data for order form in it from server once :
+  //Function to store the whole data for order form in it from server :
   useEffect(() => {
     const getMinimumAmountDuration = async () => {
+      const baseURL = process.env.REACT_APP_BASE_URL
       try {
-        const res = await fetch("http://91.244.70.95/Setting/UI", {
-          method: "GET",
+        const res = await axios.get<SettingUI>(`${baseURL}/Setting/UI`, {
           headers: { "Content-Type": "application/json" },
         });
-        const json = await res.json();
         // store full response in one state
-        setWholeData(json);
+        setWholeData(res.data);
       } catch (error) {
         console.error("Failed to fetch setting UI:", error);
       }
@@ -432,24 +431,18 @@ const OrderFormComponent: React.FC = () => {
       resourceType: switchBtn === "energy" ? "energy" : "bandwidth",
     };
 
+    const baseURL = process.env.REACT_APP_BASE_URL
+
     try {
-      const response = await fetch(
-        `http://91.244.70.95/Setting/resource-available`,
+      const response = await axios.post(`${baseURL}/Setting/resource-available`,payload,
         {
-          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(payload),
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      return responseData.data;
+      return (response.data as { data: any }).data;
     } catch (error) {
       console.error("Error data:", error);
     }
@@ -827,14 +820,21 @@ const OrderFormComponent: React.FC = () => {
         "Content-Type": "application/json",
       },
     });
-
+    // Response data is in response.data if you want to use it
     // If you want to check status explicitly (optional):
     if (response.status < 200 || response.status >= 300) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
+    
+     /* 
+     // Now handle the TRX transfer
+      const transferResult = await transferTrx(walletAddress, totalPrice);
 
-    // Response data is in response.data if you want to use it
-
+      if (!transferResult.success) {
+        throw new Error(transferResult.error || "TRX transfer failed");
+      }
+    */
+   
     dispatch(toggleRefresh());
     setAmount("");
     setDurationValue("");
@@ -845,6 +845,8 @@ const OrderFormComponent: React.FC = () => {
     setWalletAdd(address);
     setPartialFill(false);
     setBulkOrder(false);
+
+   
   } catch (error) {
     console.error("Failed to submit data:", error);
   }
