@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store/store";
 import { TronWalletProvider } from "./contexts/TronWalletContext";
 import "../node_modules/flag-icon-css/css/flag-icons.min.css"
+import Notification from "./components/Notifictions/Notification";
 
 
 const root = ReactDOM.createRoot(
@@ -19,6 +20,7 @@ root.render(
     <Provider store={store}>
       <I18nextProvider i18n={i18n}>
         <TronWalletProvider>
+          <Notification />
           <App />
         </TronWalletProvider>
       </I18nextProvider>

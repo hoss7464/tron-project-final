@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { RootState } from "../../redux/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { showNotification } from "../../redux/actions/notifSlice";
 import "./mainPage.css";
 import {
   FormControl,
@@ -65,7 +68,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { styled } from "@mui/material/styles";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
-import { useDispatch } from "react-redux";
+
 import { clickToggle } from "../../redux/actions/toggleSlice";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
@@ -146,7 +149,9 @@ const OrderFormComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { address,transferTrx,isTransferring,transferError} = useTronWallet();
+  const { address, balance, availableBandwidth } = useTronWallet();
+  //Selectors :
+
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
@@ -279,7 +284,7 @@ const OrderFormComponent: React.FC = () => {
   //Function to store the whole data for order form in it from server :
   useEffect(() => {
     const getMinimumAmountDuration = async () => {
-      const baseURL = process.env.REACT_APP_BASE_URL
+      const baseURL = process.env.REACT_APP_BASE_URL;
       try {
         const res = await axios.get<SettingUI>(`${baseURL}/Setting/UI`, {
           headers: { "Content-Type": "application/json" },
@@ -303,7 +308,6 @@ const OrderFormComponent: React.FC = () => {
     }
     if (wholeData?.data?.ratesByDuration) {
       setMinAmountPrice(wholeData.data.ratesByDuration);
-     
     }
   }, [wholeData]);
   //--------------------------------------------------------------------------------------
@@ -431,10 +435,12 @@ const OrderFormComponent: React.FC = () => {
       resourceType: switchBtn === "energy" ? "energy" : "bandwidth",
     };
 
-    const baseURL = process.env.REACT_APP_BASE_URL
+    const baseURL = process.env.REACT_APP_BASE_URL;
 
     try {
-      const response = await axios.post(`${baseURL}/Setting/resource-available`,payload,
+      const response = await axios.post(
+        `${baseURL}/Setting/resource-available`,
+        payload,
         {
           headers: {
             "Content-Type": "application/json",
@@ -619,7 +625,7 @@ const OrderFormComponent: React.FC = () => {
 
     return Number(selectedPrice); // Return the numeric value
   };
-  
+
   //--------------------------------------------------------------------------------------
   //To fetch dynamic options data for price dropdown based on duration dropdown :
   const fetchOptionsForDuration = async (durationInSec: number) => {
@@ -731,10 +737,15 @@ const OrderFormComponent: React.FC = () => {
   //Submit form function :
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!address) {
-      alert("Connect your wallet.");
-      dispatch(clickToggle("popUp"));
+      dispatch(
+        showNotification({
+          name: "error1",
+          message: "Connect your wallet.",
+          severity: "error",
+        })
+      );
       return;
     }
     //Wallet address input validation :
@@ -804,52 +815,103 @@ const OrderFormComponent: React.FC = () => {
       durationSec: durationNumericValue,
       price: numericSelectedPrice,
       date: formattedDate,
-      time : formattedTime,
+      time: formattedTime,
       totalPrice: totalPrice,
       options: {
         allow_partial: partialFillValue,
         bulk_order: bulkOrderValue,
       },
     };
+
     //base url :
-    const baseURL = process.env.REACT_APP_LOCAL_URL
+    const baseURL = process.env.REACT_APP_LOCAL_URL;
     //Fetch data towards server :
     try {
-    const response = await axios.post(`${baseURL}/formData`, postData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    // Response data is in response.data if you want to use it
-    // If you want to check status explicitly (optional):
-    if (response.status < 200 || response.status >= 300) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    
-     /* 
-     // Now handle the TRX transfer
-      const transferResult = await transferTrx(walletAddress, totalPrice);
+      if (balance) {
+        const balanceNum = parseFloat(balance);
 
-      if (!transferResult.success) {
-        throw new Error(transferResult.error || "TRX transfer failed");
+        if (balanceNum >= totalPrice + 0.4) {
+          //proceed with posting
+          const response = await axios.post(`${baseURL}/formData`, postData, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          // Response data is in response.data if you want to use it
+          // If you want to check status explicitly (optional):
+
+          if (response.status < 200 || response.status >= 300) {
+            dispatch(
+              showNotification({
+                name: "error2",
+                message: "HTTP error.",
+                severity: "error",
+              })
+            );
+          }
+        } else if (balanceNum === totalPrice) {
+          if (!availableBandwidth || availableBandwidth <= 500) {
+            dispatch(
+              showNotification({
+                name: "post-error",
+                message: "Available bandwidth must be more than 500.",
+                severity: "error",
+              })
+            );
+            return;
+          }
+        } else {
+          //proceed with posting
+          const response = await axios.post(`${baseURL}/formData`, postData, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          // Response data is in response.data if you want to use it
+          // If you want to check status explicitly (optional):
+
+          if (response.status < 200 || response.status >= 300) {
+            dispatch(
+              showNotification({
+                name: "error2",
+                message: "HTTP error.",
+                severity: "error",
+              })
+            );
+          }
+        }
+      } else {
+        dispatch(
+          showNotification({
+            name: "error5",
+            message: `Insufficient balance. Need ${
+              totalPrice + 0.4
+            } TRX (or exactly ${totalPrice} TRX with >500 bandwidth)`,
+            severity: "error",
+          })
+        );
+        return;
       }
-    */
-   
-    dispatch(toggleRefresh());
-    setAmount("");
-    setDurationValue("");
-    setInputValue("");
-    setAmountError("");
-    setDurationError("");
-    setPriceError("");
-    setWalletAdd(address);
-    setPartialFill(false);
-    setBulkOrder(false);
-
-   
-  } catch (error) {
-    console.error("Failed to submit data:", error);
-  }
+      
+      dispatch(toggleRefresh());
+      setAmount("");
+      setDurationValue("");
+      setInputValue("");
+      setAmountError("");
+      setDurationError("");
+      setPriceError("");
+      setWalletAdd(address);
+      setPartialFill(false);
+      setBulkOrder(false);
+    } catch (error) {
+      dispatch(
+        showNotification({
+          name: "error3",
+          message: "Internal Server Error.",
+          severity: "error",
+        })
+      );
+    }
   };
   useEffect(() => {
     if (!walletAdd && address) {

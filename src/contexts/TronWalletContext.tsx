@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { showNotification } from "../redux/actions/notifSlice";
 
 // Context interface
 interface TronWalletContextProps {
@@ -13,11 +15,14 @@ interface TronWalletContextProps {
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   signMessage: (message: string) => Promise<string | null>;
-  transferTrx: ( toAddress: string, amount: number) => Promise<TrxTransferResult>;
+  transferTrx: (
+    toAddress: string,
+    amount: number
+  ) => Promise<TrxTransferResult>;
   isTransferring: boolean;
   transferError: string | null;
 }
-//Type for TRX transfer : 
+//Type for TRX transfer :
 type TrxTransferResult = {
   success: boolean;
   txId?: string;
@@ -42,6 +47,7 @@ export const useTronWallet = () => {
 export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const dispatch = useDispatch();
   //States :
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
@@ -62,7 +68,16 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       await adapter.connect();
       //wallet address :
       const addr = adapter.address;
-      if (!addr) throw new Error("No wallet address found");
+      if (!addr) {
+        dispatch(
+          showNotification({
+            name: "tron-error1",
+            message: "No wallet address found. Please connect your wallet.",
+            severity: "error",
+          })
+        );
+        return;
+      }
       //To import TronWeb localy :
       const { TronWeb } = await import("tronweb");
       //To get data from any network
@@ -80,14 +95,32 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       //To convert he message into json :
       const responseBody = generate_msg.data;
-      if (responseBody.success === false)
-        throw new Error("Something went wrong");
+      if (responseBody.success === false) {
+        dispatch(
+          showNotification({
+            name: "tron-error2",
+            message: "Tron Error : Something went wrong.",
+            severity: "error",
+          })
+        );
+        return;
+      }
+
       const message = responseBody.data.nonce;
       //To convert message into hex :
       window_tronweb.toHex(message);
       //To sign the message :
       const signature = await adapter.signMessage(message);
-      if (!signature) throw new Error("User rejected signing message");
+      if (!signature) {
+        dispatch(
+          showNotification({
+            name: "tron-error3",
+            message: "Tron Error : User rejected signing message.",
+            severity: "error",
+          })
+        );
+        return;
+      }
       //To send address , message , signature hash towards the server :
       const postServerData = await axios.post<{
         success: boolean;
@@ -107,8 +140,16 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       //To convert postServerData into json
       const server_data_json = postServerData.data;
-      if (server_data_json.success === false)
-        throw new Error("Something went wrong");
+      if (server_data_json.success === false) {
+        dispatch(
+          showNotification({
+            name: "tron-error4",
+            message: "Tron Error : error fetching data from server.",
+            severity: "error",
+          })
+        );
+        return;
+      }
 
       //To get access token :
       const access_Token = server_data_json.data.access_token;
@@ -147,8 +188,30 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAllEnergy(all_energy);
       setAvailableEnergy(available_energy);
     } catch (err) {
-      console.error("Wallet connection or signing error:", err);
-      disconnectWallet();
+      // Check if the error matches any of your 5 specific cases
+      const isMyError =
+        err instanceof Error &&
+        (err.message.includes("No wallet address found") ||
+          err.message.includes("Tron Error : Something went wrong") ||
+          err.message.includes("User rejected signing message") ||
+          err.message.includes("error fetching data from server") ||
+          err.message.includes("Wallet connection failed"));
+
+      // Always show error5 for any unhandled error
+      dispatch(
+        showNotification({
+          name: "tron-error5",
+          message:
+            "Wallet connection failed: " +
+            (err instanceof Error ? err.message : "Unknown error"),
+          severity: "error",
+        })
+      );
+
+      // Only disconnect if it's NOT one of your 5 errors
+      if (!isMyError) {
+        disconnectWallet();
+      }
     }
   };
   //-------------------------------------------------------------------------------------
@@ -169,7 +232,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch (err) {
       // چون env نداری، فقط کلا suppress میکنیم
-      console.warn("Error during logout process:", err);
+      dispatch(
+        showNotification({
+          name: "tron-error6",
+          message: `Error during logout process : ${err}`,
+          severity: "error",
+        })
+      );
     }
   };
   //-------------------------------------------------------------------------------------
@@ -194,7 +263,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const signature = await tronWeb.trx.signMessage(hexMessage);
       return signature;
     } catch (error) {
-      console.error("Error signing message:", error);
       return null;
     }
   };
@@ -248,7 +316,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
   //-------------------------------------------------------------------------------------
   //To transfer TRX :
-  const transferTrx = async (toAddress: string,amount: number): Promise<TrxTransferResult> => {
+  const transferTrx = async (
+    toAddress: string,
+    amount: number
+  ): Promise<TrxTransferResult> => {
     setIsTransferring(true);
     setTransferError(null);
 
@@ -292,11 +363,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const newBalance = await window_tronweb.trx.getBalance(address);
       setBalance(Number(window_tronweb.fromSun(newBalance)).toFixed(2));
 
-      return {success: true,txId: txResult.transaction.txID};
+      return { success: true, txId: txResult.transaction.txID };
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Transfer failed";
+      const errorMessage =
+        err instanceof Error ? err.message : "Transfer failed";
       setTransferError(errorMessage);
-      return {success: false,error: errorMessage,};
+      return { success: false, error: errorMessage };
     } finally {
       setIsTransferring(false);
     }

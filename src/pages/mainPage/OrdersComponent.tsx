@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { showNotification } from "../../redux/actions/notifSlice";
 import { RootState } from "../../redux/store/store";
 import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
 import {
@@ -54,6 +55,7 @@ type Post = {
 };
 
 export const OrdersComponent: React.FC = () => {
+  const dispatch = useDispatch()
   //States :
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
@@ -86,7 +88,14 @@ export const OrdersComponent: React.FC = () => {
     getData(`${localUrl}/post?${filterParam}`);
   }, [selectedFilter, getData]);
 
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (error) {
+      dispatch(showNotification({
+      name: "error5", 
+      message: "Error Fetching Data.", 
+      severity: "error" 
+    }));
+    return null
+    }
 
   return (
     <>

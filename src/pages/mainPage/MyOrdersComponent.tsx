@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
 import useGetData from "../../hooks/MyOrdersSection/useGetData";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { showNotification } from "../../redux/actions/notifSlice";
 import { RootState } from "../../redux/store/store";
 import {
   MyOrdersWrapper,
@@ -41,6 +42,7 @@ type Post = {
 };
 
 const MyOrdersComponent: React.FC = () => {
+  const dispatch = useDispatch()
   const { t } = useTranslation();
   const { data, error, getData } = useGetData<Post[]>();
   const refreshTrigger = useSelector(
@@ -60,7 +62,14 @@ const MyOrdersComponent: React.FC = () => {
       ? sortedData
       : sortedData.filter((item) => item.resourceType === selectedFilter);
 
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (error) {
+    dispatch(showNotification({
+    name: "error4", 
+    message: "Error Fetching Data.", 
+    severity: "error" 
+  }));
+  return null
+  }
 
   return (
     <>

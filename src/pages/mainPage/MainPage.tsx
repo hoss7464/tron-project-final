@@ -18,6 +18,8 @@ import Hero from "./HeroSection/Hero";
 import Legacy from "./LegacySection/Legacy";
 import MobileOrderForm from "./MobileOrderForm/MobileOrderForm";
 import MobileLegacy from "./MobileLegacy/mobileLegacy";
+import Notification from "../../components/Notifictions/Notification";
+
 
 const MainPage: React.FC = () => {
   const popUpVisible = useSelector(
