@@ -9,7 +9,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import MainPage from "./pages/mainPage/MainPage";
 import Footer from "./components/Footer/Footer";
-import styled from "styled-components";
 import Notification from "./components/Notifictions/Notification";
 
 

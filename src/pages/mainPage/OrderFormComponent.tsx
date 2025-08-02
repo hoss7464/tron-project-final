@@ -72,6 +72,8 @@ import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import { clickToggle } from "../../redux/actions/toggleSlice";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
+import PopUp from "../../components/Popup/PopUp";
+import PopUp2 from "../../components/Popup/PopUp2";
 //-------------------------------------------------------------------------------------
 // Define the type for the data structure
 interface SettingUI {
@@ -80,6 +82,23 @@ interface SettingUI {
     ratesByDuration?: any;
     longTermData?: any;
   };
+}
+
+//Define type for API response for posting form data :
+interface OrderData {
+  payTo: string;
+  requester: string;
+  receiver: string;
+  totalPrice: number;
+  status: string;
+  _id: string;
+  createdAt: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: OrderData;
 }
 //-------------------------------------------------------------------------------------
 //Duration input components :
@@ -149,9 +168,13 @@ const OrderFormComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { address, balance, availableBandwidth } = useTronWallet();
   //Selectors :
 
+  const { address, balance, availableBandwidth } = useTronWallet();
+  //Selectors :
+  const orderPopUpVisible = useSelector(
+    (state: RootState) => state.toggle.toggles.popUp
+  );
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
@@ -186,7 +209,10 @@ const OrderFormComponent: React.FC = () => {
   const [partialFill, setPartialFill] = useState<boolean>(false);
   //Setting button (Bulk order) states :
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
-  //Total price states :
+  //create order popup component states :
+  const [createOrderResponseData, setCreateOrderResponseData] =
+    useState<OrderData | null>(null);
+  const [popupOpen, setPopupOpen] = useState(false);
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -814,8 +840,6 @@ const OrderFormComponent: React.FC = () => {
       resourceAmount: numericAmount,
       durationSec: durationNumericValue,
       price: numericSelectedPrice,
-      date: formattedDate,
-      time: formattedTime,
       totalPrice: totalPrice,
       options: {
         allow_partial: partialFillValue,
@@ -824,75 +848,42 @@ const OrderFormComponent: React.FC = () => {
     };
 
     //base url :
-    const baseURL = process.env.REACT_APP_LOCAL_URL;
+    const baseURL = process.env.REACT_APP_BASE_URL;
+
     //Fetch data towards server :
     try {
-      if (balance) {
-        const balanceNum = parseFloat(balance);
-
-        if (balanceNum >= totalPrice + 0.4) {
-          //proceed with posting
-          const response = await axios.post(`${baseURL}/formData`, postData, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          // Response data is in response.data if you want to use it
-          // If you want to check status explicitly (optional):
-
-          if (response.status < 200 || response.status >= 300) {
-            dispatch(
-              showNotification({
-                name: "error2",
-                message: "HTTP error.",
-                severity: "error",
-              })
-            );
-          }
-        } else if (balanceNum === totalPrice) {
-          if (!availableBandwidth || availableBandwidth <= 500) {
-            dispatch(
-              showNotification({
-                name: "post-error",
-                message: "Available bandwidth must be more than 500.",
-                severity: "error",
-              })
-            );
-            return;
-          }
-        } else {
-          //proceed with posting
-          const response = await axios.post(`${baseURL}/formData`, postData, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          // Response data is in response.data if you want to use it
-          // If you want to check status explicitly (optional):
-
-          if (response.status < 200 || response.status >= 300) {
-            dispatch(
-              showNotification({
-                name: "error2",
-                message: "HTTP error.",
-                severity: "error",
-              })
-            );
-          }
+      const response = await axios.post<ApiResponse>(
+        `${baseURL}/order/CreateOrder`,
+        postData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
+      );
+
+      if (response.status === 200) {
+        dispatch(
+          showNotification({
+            name: "success2",
+            message: "Data has been sent successfully.",
+            severity: "success",
+          })
+        );
       } else {
         dispatch(
           showNotification({
-            name: "error5",
-            message: `Insufficient balance. Need ${
-              totalPrice + 0.4
-            } TRX (or exactly ${totalPrice} TRX with >500 bandwidth)`,
+            name: "error2",
+            message: "Error sending data.",
             severity: "error",
           })
         );
-        return;
       }
-      
+
+      //to pass response data into our state so that we use it in popup component :
+      setCreateOrderResponseData(response.data.data);
+      setPopupOpen(true);
+
       dispatch(toggleRefresh());
       setAmount("");
       setDurationValue("");
@@ -1533,6 +1524,11 @@ const OrderFormComponent: React.FC = () => {
           </Form>
         </FormWrapper2>
       </FormWrapper>
+      <PopUp2
+        open={popupOpen}
+        onClose={() => setPopupOpen(false)}
+        orderData={createOrderResponseData}
+      />
     </>
   );
 };

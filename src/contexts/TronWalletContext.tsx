@@ -52,7 +52,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [allBandwidth, setAllBandwidth] = useState<number | null>(null);
-  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(null);
+  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(
+    null
+  );
   const [allEnergy, setAllEnergy] = useState<number | null>(null);
   const [availableEnergy, setAvailableEnergy] = useState<number | null>(null);
   //States for Transfering TRX :
@@ -82,8 +84,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const { TronWeb } = await import("tronweb");
       //To get data from any network
       const window_tronweb = (window as any).tronWeb;
+
       //To get data from api.trongrid.io
-      const tronWeb = new TronWeb({ fullHost: "https://api.trongrid.io" });
+      const tronWeb = new TronWeb({ fullHost: "https://nile.trongrid.io" });
       //base url :
       const baseURL = process.env.REACT_APP_BASE_URL;
       //Message in signature form based nonce :
@@ -281,7 +284,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           //To import TronWeb localy :
           const { TronWeb } = await import("tronweb");
           //To get data from api.trongrid.io
-          const tronWeb = new TronWeb({ fullHost: "https://api.trongrid.io" });
+          const tronWeb = new TronWeb({ fullHost: "https://nile.trongrid.io" });
           //Wallwet address state :
           setAddress(walletAddr);
           //To get balance from TronLink :
@@ -323,50 +326,129 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsTransferring(true);
     setTransferError(null);
 
-    //If the wallet didn't connect return an error :
     try {
-      if (!address) {
-        throw new Error("Wallet not connected");
+      //validate connection :
+      if (!address || !adapter.connected) {
+        dispatch(
+          showNotification({
+            name: "tron-error6",
+            message: "No wallet address found. Please connect your wallet.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "Wallet not connected" };
       }
-      //To get data from any network
-      const window_tronweb = (window as any).tronWeb;
-      if (!window_tronweb) {
-        throw new Error("TronWeb not found");
+
+      // Access TronWeb from window with proper type checking
+      const tronWeb = (window as any).tronWeb;
+
+      if (!tronWeb?.ready) {
+        dispatch(
+          showNotification({
+            name: "tron-error7",
+            message: "TronWeb is not available.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "TronWeb is not available." };
       }
 
       // Validate inputs
-      if (!window_tronweb.isAddress(toAddress)) {
-        throw new Error("Invalid recipient address");
-      }
-      //If the amount <= 0 return an error :
-      if (amount <= 0) {
-        throw new Error("Amount must be greater than 0");
+      if (!tronWeb.isAddress(toAddress)) {
+        dispatch(
+          showNotification({
+            name: "tron-error8",
+            message: "Invalid recipient address.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "Invalid recipient address." };
       }
 
-      // Convert amount to sun
-      const amountInSun = window_tronweb.toSun(amount.toString());
+      if (amount <= 0 || isNaN(amount)) {
+        dispatch(
+          showNotification({
+            name: "tron-error9",
+            message: "Amount must be a positive number.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "Amount must be a positive number." };
+      }
 
-      // Create transaction
-      const transaction = await window_tronweb.transactionBuilder.sendTrx(
+      // Check balance
+      const currentBalance = await tronWeb.trx.getBalance(address);
+      if (Number(tronWeb.fromSun(currentBalance)) < amount) {
+        dispatch(
+          showNotification({
+            name: "tron-error10",
+            message: "Insufficient balance.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "Insufficient balance." };
+      }
+
+      // Convert amount to sun (fixed type issue)
+      const amountInSun = tronWeb.toSun(amount); // No need for toString()
+
+      // Create transaction (fixed parameter type issue)
+      const transaction = await tronWeb.transactionBuilder.sendTrx(
         toAddress,
-        amountInSun,
-        address // from address
+        tronWeb.toBigNumber(amountInSun),
+        address
       );
 
-      // Sign transaction
-      const signedTx = await window_tronweb.trx.sign(transaction);
+      // Sign transaction using adapter
+      const signedTx = await adapter.signTransaction(transaction);
 
-      // Broadcast transaction
-      const txResult = await window_tronweb.trx.sendRawTransaction(signedTx);
+      // Broadcast transaction using TronWeb directly
+      const txResult = await tronWeb.trx.sendRawTransaction(signedTx);
+
+      // Verify transaction
+      if (!txResult?.transaction?.txID && !txResult?.txid) {
+        dispatch(
+          showNotification({
+            name: "tron-error11",
+            message: "Transaction failed: no transaction ID received.",
+            severity: "error",
+          })
+        );
+        return {
+          success: false,
+          error: "Transaction failed: no transaction ID received.",
+        };
+      }
 
       // Update balance after successful transfer
-      const newBalance = await window_tronweb.trx.getBalance(address);
-      setBalance(Number(window_tronweb.fromSun(newBalance)).toFixed(2));
+      const newBalance = await tronWeb.trx.getBalance(address);
+      setBalance(Number(tronWeb.fromSun(newBalance)).toFixed(2));
 
-      return { success: true, txId: txResult.transaction.txID };
+      //successful notification:
+      dispatch(
+        showNotification({
+          name: "tron-success",
+          message: "Transfer Successful",
+          severity: "success",
+        })
+      );
+
+      return {
+        success: true,
+        txId: txResult.transaction?.txID || txResult.txid,
+      };
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Transfer failed";
+
+      dispatch(
+        showNotification({
+          name: "tron-error12",
+          message: errorMessage,
+          severity: "error",
+        })
+      );
+
       setTransferError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {

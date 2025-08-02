@@ -58,6 +58,8 @@ const Navbar: React.FC = () => {
   return `${address.slice(0, 4)}...${address.slice(-4)}`;
 };
 
+
+
   return (
     <>
       <NavContainer>
