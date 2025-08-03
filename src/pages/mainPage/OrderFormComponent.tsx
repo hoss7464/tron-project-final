@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-import { RootState } from "../../redux/store/store";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import "./mainPage.css";
 import {
@@ -68,11 +67,8 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { styled } from "@mui/material/styles";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
-
-import { clickToggle } from "../../redux/actions/toggleSlice";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
-import PopUp from "../../components/Popup/PopUp";
 import PopUp2 from "../../components/Popup/PopUp2";
 //-------------------------------------------------------------------------------------
 // Define the type for the data structure
@@ -168,13 +164,7 @@ const OrderFormComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  //Selectors :
-
-  const { address, balance, availableBandwidth, transferTrx } = useTronWallet();
-  //Selectors :
-  const orderPopUpVisible = useSelector(
-    (state: RootState) => state.toggle.toggles.popUp
-  );
+  const { address, balance, availableBandwidth } = useTronWallet();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
@@ -184,10 +174,7 @@ const OrderFormComponent: React.FC = () => {
   const [wholeData, setWholeData] = useState<SettingUI | null>(null);
   //Amount input states:
   const [amount, setAmount] = useState("");
-  const [minAmount, setMinAmount] = useState<{
-    energy: number;
-    bandwidth: number;
-  }>({ energy: 0, bandwidth: 0 });
+  const [minAmount, setMinAmount] = useState<{energy: number;bandwidth: number;}>({ energy: 0, bandwidth: 0 });
   const [amountError, setAmountError] = useState("");
   //Duration dropdown states :
   const [durationValue, setDurationValue] = useState("");
@@ -197,9 +184,7 @@ const OrderFormComponent: React.FC = () => {
   const [durationError, setDurationError] = useState("");
   //Price dropdown states :
   const [inputValue, setInputValue] = useState<string>("");
-  const [priceOptions, setPriceOptions] = useState<
-    { col1: string; col2: string }[]
-  >([]);
+  const [priceOptions, setPriceOptions] = useState<{ col1: string; col2: string }[]>([]);
   const [minAmountPrice, setMinAmountPrice] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
@@ -210,9 +195,10 @@ const OrderFormComponent: React.FC = () => {
   //Setting button (Bulk order) states :
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   //create order popup component states :
-  const [createOrderResponseData, setCreateOrderResponseData] =
-    useState<OrderData | null>(null);
+  const [createOrderResponseData, setCreateOrderResponseData] = useState<OrderData | null>(null);
   const [popupOpen, setPopupOpen] = useState(false);
+  //to get axios timeout :
+  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT)
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -313,7 +299,7 @@ const OrderFormComponent: React.FC = () => {
       const baseURL = process.env.REACT_APP_BASE_URL;
       try {
         const res = await axios.get<SettingUI>(`${baseURL}/Setting/UI`, {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" },timeout: axiosTimeOut
         });
         // store full response in one state
         setWholeData(res.data);
@@ -470,7 +456,7 @@ const OrderFormComponent: React.FC = () => {
         {
           headers: {
             "Content-Type": "application/json",
-          },
+          },timeout : axiosTimeOut
         }
       );
 
@@ -813,10 +799,7 @@ const OrderFormComponent: React.FC = () => {
       return;
     }
     const { totalPrice } = myPrice;
-    //Time and date for submitted form :
-    const now = new Date();
-    const formattedDate = now.toISOString().split("T")[0];
-    const formattedTime = now.toTimeString().split(" ")[0].slice(0, 5);
+
     //Setting button (allow partial fill) :
     let partialFillValue = partialFill;
     //Setting button (Bulk order) :
@@ -851,38 +834,107 @@ const OrderFormComponent: React.FC = () => {
     const baseURL = process.env.REACT_APP_BASE_URL;
 
     //Fetch data towards server :
-    try {
-      const response = await axios.post<ApiResponse>(
-        `${baseURL}/order/CreateOrder`,
-        postData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
 
-      if (response.status === 200) {
-        dispatch(
-          showNotification({
-            name: "success2",
-            message: "Data has been sent successfully.",
-            severity: "success",
-          })
-        );
+    try {
+      if (balance) {
+        const balanceNum = parseFloat(balance);
+        //balance must be at least 0.4 more than total price :
+        if (balanceNum >= totalPrice + 0.4) {
+          const response = await axios.post<ApiResponse>(
+            `${baseURL}/order/CreateOrder`,
+            postData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              }, timeout : axiosTimeOut
+            }
+          );
+
+          if (response.status === 200) {
+            dispatch(
+              showNotification({
+                name: "success2",
+                message: "Data has been created successfully.",
+                severity: "success",
+              })
+            );
+          } else {
+            dispatch(
+              showNotification({
+                name: "error2",
+                message: "Error sending data.",
+                severity: "error",
+              })
+            );
+            return;
+          }
+          setCreateOrderResponseData(response.data.data);
+          setPopupOpen(true);
+          //if balance = total price ----> bandwidth must be at lease 500 or more :
+        } else if (balanceNum === totalPrice) {
+          if (!availableBandwidth || availableBandwidth <= 500) {
+            dispatch(
+              showNotification({
+                name: "post-error",
+                message: "Available bandwidth must be more than 500.",
+                severity: "error",
+              })
+            );
+            return;
+          } else {
+            const response = await axios.post<ApiResponse>(
+              `${baseURL}/order/CreateOrder`,
+              postData,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                }, timeout : axiosTimeOut
+              }
+            );
+
+            if (response.status === 200) {
+              dispatch(
+                showNotification({
+                  name: "success2",
+                  message: "Data has been created successfully.",
+                  severity: "success",
+                })
+              );
+            } else {
+              dispatch(
+                showNotification({
+                  name: "error2",
+                  message: "Error sending data.",
+                  severity: "error",
+                })
+              );
+              return;
+            }
+            setCreateOrderResponseData(response.data.data);
+            setPopupOpen(true);
+          }
+        } else {
+          dispatch(
+            showNotification({
+              name: "error5",
+              message: `Insufficient balance: Need ${totalPrice + 0.4} TRX at least or exactly ${totalPrice} TRX with >500 bandwidth`,
+              severity: "error",
+            })
+          );
+          return;
+        }
       } else {
         dispatch(
           showNotification({
-            name: "error2",
-            message: "Error sending data.",
+            name: "error5",
+            message: `please check your balance or bandwidth.`,
             severity: "error",
           })
         );
+        return;
       }
 
       //to pass response data into our state so that we use it in popup component :
-      setCreateOrderResponseData(response.data.data);
-      setPopupOpen(true);
 
       dispatch(toggleRefresh());
       setAmount("");

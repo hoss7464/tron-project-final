@@ -14,6 +14,8 @@ function useGetData<T = any>(): UseGetDataReturn<T> {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [totalCount, setTotalCount] = useState(0);
+  //to get axios timeout :
+  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT)
 
   const getData = useCallback(async (url: string): Promise<void> => {
     setIsLoading(true);
@@ -25,6 +27,7 @@ function useGetData<T = any>(): UseGetDataReturn<T> {
           Accept: "application/json",
           "Cache-Control": "no-cache",
         },
+        timeout: axiosTimeOut
       });
 
       const total = response.headers["x-total-count"];

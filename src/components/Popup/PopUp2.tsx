@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { PopUpContainer } from "./PopUpElements";
 import { useTronWallet } from "../../contexts/TronWalletContext";
+import axios from "axios";
 import {
   Dialog,
   DialogTitle,
@@ -11,7 +12,6 @@ import {
   Typography,
   Box,
 } from "@mui/material";
-import Notification from "../Notifictions/Notification";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 
@@ -37,38 +37,55 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const dispatch = useDispatch();
   const { transferTrx, isTransferring, address } = useTronWallet();
   const baseUrl = process.env.REACT_APP_BASE_URL;
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleReject = () => {
+    dispatch(
+      showNotification({
+        name: "tron-warning1",
+        message: "Transaction rejected by user.",
+        severity: "warning",
+      })
+    );
+    onClose();
+  };
+
   const handleSendTrx = async () => {
     if (!orderData) return;
+
+    setIsProcessing(true); // Disable buttons
 
     try {
       const result = await transferTrx(orderData.payTo, orderData.totalPrice);
 
       if (result.success) {
         //verify payment :
-        const resultPayload = {
-          txid: result.txId,
-          orderId: orderData._id,
-        };
+        const resultPayload = { txid: result.txId, orderId: orderData._id };
+        //to get axios timeout :
+        const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
-        const veryfyPayment = axios.post(
+        const veryfyPayment = await axios.post(
           `${baseUrl}/order/verifyPayment`,
           resultPayload,
           {
             headers: {
               "Content-Type": "application/json",
             },
+            timeout: axiosTimeOut,
           }
         );
 
-        console.log(veryfyPayment);
-
-        dispatch(
-          showNotification({
-            name: "success1",
-            message: "Payment verification successful.",
-            severity: "success",
-          })
-        );
+        if (veryfyPayment.status === 200) {
+          dispatch(
+            showNotification({
+              name: "success1",
+              message: "Transaction successful.",
+              severity: "success",
+            })
+          );
+          onClose(); // Close popup automatically on success
+          return;
+        }
       } else {
         dispatch(
           showNotification({
@@ -77,15 +94,19 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             severity: "error",
           })
         );
+
+        return;
       }
     } catch (error) {
       dispatch(
         showNotification({
-          name: "error1",
+          name: "error2",
           message: `Error sending TRX ${error}`,
           severity: "error",
         })
       );
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -93,7 +114,15 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   return (
     <>
       <PopUpContainer>
-        <Dialog open={open} onClose={onClose}>
+        <Dialog
+          open={open}
+          onClose={(event, reason) => {
+            // Only close if the reason is not 'backdropClick'
+            if (reason !== "backdropClick" && !isProcessing) {
+              handleReject();
+            }
+          }}
+        >
           <DialogTitle>Order Created Successfully</DialogTitle>
           <DialogContent>
             <Box mb={2}>
@@ -128,12 +157,17 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={onClose} color="primary" variant="contained">
-              Close
+            <Button
+              disabled={isProcessing || isTransferring}
+              onClick={handleReject}
+              color="primary"
+              variant="contained"
+            >
+              Reject
             </Button>
 
             <Button
-              disabled={isTransferring || !address}
+              disabled={isTransferring || !address || isProcessing}
               onClick={handleSendTrx}
               color="primary"
               variant="contained"

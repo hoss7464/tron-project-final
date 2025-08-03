@@ -47,19 +47,20 @@ export const useTronWallet = () => {
 export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  //dispatch :
   const dispatch = useDispatch();
   //States :
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [allBandwidth, setAllBandwidth] = useState<number | null>(null);
-  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(
-    null
-  );
+  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(null);
   const [allEnergy, setAllEnergy] = useState<number | null>(null);
   const [availableEnergy, setAvailableEnergy] = useState<number | null>(null);
   //States for Transfering TRX :
   const [isTransferring, setIsTransferring] = useState(false);
   const [transferError, setTransferError] = useState<string | null>(null);
+  //to get axios timeout :
+  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT)
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapter = new TronLinkAdapter();
@@ -80,13 +81,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         return;
       }
+      //nile network url :
+      const tronNileUrl = process.env.REACT_APP_TRON_API;
       //To import TronWeb localy :
       const { TronWeb } = await import("tronweb");
       //To get data from any network
       const window_tronweb = (window as any).tronWeb;
 
       //To get data from api.trongrid.io
-      const tronWeb = new TronWeb({ fullHost: "https://nile.trongrid.io" });
+      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
       //base url :
       const baseURL = process.env.REACT_APP_BASE_URL;
       //Message in signature form based nonce :
@@ -94,7 +97,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         success: boolean;
         data: { nonce: string };
       }>(`${baseURL}/Auth/get-message`, {
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },timeout : axiosTimeOut
       });
       //To convert he message into json :
       const responseBody = generate_msg.data;
@@ -138,6 +141,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
+          timeout: axiosTimeOut
         }
       );
 
@@ -190,6 +194,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableBandwidth(totalBw);
       setAllEnergy(all_energy);
       setAvailableEnergy(available_energy);
+
+      //To show success notification after wallet connection :
+      dispatch(
+        showNotification({
+          name: "tron-success5",
+          message: "Wallet connection successful.",
+          severity: "success",
+        })
+      );
     } catch (err) {
       // Check if the error matches any of your 5 specific cases
       const isMyError =
@@ -230,7 +243,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       if (stored) {
         // درخواست به سرور (بدون env)
         await axios
-          .post(`${baseURL}/Auth/disconnect`, {}, { withCredentials: true })
+          .post(`${baseURL}/Auth/disconnect`, {}, { withCredentials: true, timeout : axiosTimeOut })
           .catch(() => {});
       }
     } catch (err) {
@@ -254,6 +267,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     setAllEnergy(null);
     setAvailableEnergy(null);
     localStorageDeleteData();
+
+    dispatch(
+      showNotification({
+        name: "tron-success6",
+        message: "Disconnect successful.",
+        severity: "success",
+      })
+    );
   };
   //-------------------------------------------------------------------------------------
   //Function sign the message :
@@ -279,12 +300,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         try {
           const parsedData = JSON.parse(savedData);
           const walletAddr = parsedData.wallet_address;
+          //nile network url :
+          const tronNileUrl = process.env.REACT_APP_TRON_API;
           //To coonect to adapter :
           await adapter.connect();
           //To import TronWeb localy :
           const { TronWeb } = await import("tronweb");
           //To get data from api.trongrid.io
-          const tronWeb = new TronWeb({ fullHost: "https://nile.trongrid.io" });
+          const tronWeb = new TronWeb({ fullHost: tronNileUrl });
           //Wallwet address state :
           setAddress(walletAddr);
           //To get balance from TronLink :
@@ -328,7 +351,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       //validate connection :
-      const baseUrl = process.env.REACT_APP_TRON_API
+      const baseUrl = process.env.REACT_APP_TRON_API;
       if (!address || !adapter.connected) {
         dispatch(
           showNotification({
@@ -339,14 +362,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         return { success: false, error: "Wallet not connected" };
       }
-      
+
       //To import TronWeb localy :
       const { TronWeb } = await import("tronweb");
-      // Access TronWeb from window with proper type checking
-      //const tronWeb = (window as any).tronWeb;
+      //nile network url :
+      const tronNileUrl = process.env.REACT_APP_TRON_API;
       //To get data from api.trongrid.io
-      const tronWeb = new TronWeb({ fullHost: "https://nile.trongrid.io" });
-      const MainAddress = process.env.REACT_APP_TRON_API
+      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+      const MainAddress = process.env.REACT_APP_TRON_API;
       if (window?.tronWeb?.fullNode.host !== MainAddress) {
         dispatch(
           showNotification({
@@ -406,7 +429,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       // Convert amount to sun (fixed type issue)
-      const amountInSun = tronWeb.toSun(amount); 
+      const amountInSun = tronWeb.toSun(amount);
 
       // Create transaction (fixed parameter type issue)
       const transaction = await tronWeb.transactionBuilder.sendTrx(
@@ -440,20 +463,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const newBalance = await tronWeb.trx.getBalance(address);
       setBalance(Number(tronWeb.fromSun(newBalance)).toFixed(2));
 
-      //successful notification:
-      dispatch(
-        showNotification({
-          name: "tron-success",
-          message: "Transfer Successful",
-          severity: "success",
-        })
-      );
-
       return {
         success: true,
         txId: txResult.transaction?.txID || txResult.txid,
       };
-    
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Transfer failed";

@@ -26,10 +26,14 @@ const Notification: React.FC = () => {
     <>
       <Stack
         sx={{
-          width: "100%",
+          width: {
+            xs: "95%", 
+            sm: "85%", 
+            md: "85%", 
+            lg: "62%", 
+          },
           position: "fixed",
           top: 0,
-          left: 0,
           zIndex: 9999,
           padding: "16px",
           boxSizing: "border-box",

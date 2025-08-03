@@ -62,9 +62,11 @@ const ResourceComponent: React.FC = () => {
   //To get data from server :
   const resourceData = async () => {
     const baseURL = process.env.REACT_APP_BASE_URL;
+    //to get axios timeout :
+    const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT)
     try{
       const response = await axios.get<ResourceResponse>(`${baseURL}/Setting/UI`, {
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },timeout :axiosTimeOut 
       })
       const myData = response.data 
 
