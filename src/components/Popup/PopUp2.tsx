@@ -11,6 +11,9 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import Notification from "../Notifictions/Notification";
+import { useDispatch } from "react-redux";
+import { showNotification } from "../../redux/actions/notifSlice";
 
 interface OrderSuccessPopupProps {
   open: boolean;
@@ -31,38 +34,58 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   onClose,
   orderData,
 }) => {
-    const { transferTrx, isTransferring, address } = useTronWallet();
-    const baseUrl = process.env.REACT_APP_BASE_URL
-    const handleSendTrx = async () => {
+  const dispatch = useDispatch();
+  const { transferTrx, isTransferring, address } = useTronWallet();
+  const baseUrl = process.env.REACT_APP_BASE_URL;
+  const handleSendTrx = async () => {
     if (!orderData) return;
-    
+
     try {
-      const result = await transferTrx(
-        orderData.payTo, 
-        orderData.totalPrice
-      );
-      
+      const result = await transferTrx(orderData.payTo, orderData.totalPrice);
+
       if (result.success) {
-
-         //verify payment : 
-         const resultPayload = {
+        //verify payment :
+        const resultPayload = {
           txid: result.txId,
-          orderId : orderData._id
-         }
+          orderId: orderData._id,
+        };
 
-         const veryfyPayment = axios.post(`${baseUrl}/order/verifyPayment`, resultPayload, {
-          headers : {
-            "Content-Type": "application/json",
+        const veryfyPayment = axios.post(
+          `${baseUrl}/order/verifyPayment`,
+          resultPayload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
-         })
+        );
 
-         console.log(veryfyPayment)
+        console.log(veryfyPayment);
+
+        dispatch(
+          showNotification({
+            name: "success1",
+            message: "Payment verification successful.",
+            severity: "success",
+          })
+        );
       } else {
-        console.error("Transaction failed:", result.error);
-        // Error is already handled in the context, no need to show again
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `Payment verification faild: ${result.error}`,
+            severity: "error",
+          })
+        );
       }
     } catch (error) {
-      console.error("Error sending TRX:", error);
+      dispatch(
+        showNotification({
+          name: "error1",
+          message: `Error sending TRX ${error}`,
+          severity: "error",
+        })
+      );
     }
   };
 
@@ -109,7 +132,12 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
               Close
             </Button>
 
-            <Button disabled={isTransferring || !address} onClick={handleSendTrx} color="primary" variant="contained">
+            <Button
+              disabled={isTransferring || !address}
+              onClick={handleSendTrx}
+              color="primary"
+              variant="contained"
+            >
               {isTransferring ? "Sending..." : "Send TRX"}
             </Button>
           </DialogActions>
