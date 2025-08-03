@@ -328,6 +328,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       //validate connection :
+      const baseUrl = process.env.REACT_APP_TRON_API
       if (!address || !adapter.connected) {
         dispatch(
           showNotification({
@@ -338,11 +339,26 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         return { success: false, error: "Wallet not connected" };
       }
-
+      
+      //To import TronWeb localy :
+      const { TronWeb } = await import("tronweb");
       // Access TronWeb from window with proper type checking
-      const tronWeb = (window as any).tronWeb;
+      //const tronWeb = (window as any).tronWeb;
+      //To get data from api.trongrid.io
+      const tronWeb = new TronWeb({ fullHost: "https://nile.trongrid.io" });
+      const MainAddress = process.env.REACT_APP_TRON_API
+      if (window?.tronWeb?.fullNode.host !== MainAddress) {
+        dispatch(
+          showNotification({
+            name: "tron-error100",
+            message: "Switch to mainnet network.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "Switch to mainnet network." };
+      }
 
-      if (!tronWeb?.ready) {
+      if (!tronWeb) {
         dispatch(
           showNotification({
             name: "tron-error7",
@@ -390,12 +406,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       // Convert amount to sun (fixed type issue)
-      const amountInSun = tronWeb.toSun(amount); // No need for toString()
+      const amountInSun = tronWeb.toSun(amount); 
 
       // Create transaction (fixed parameter type issue)
       const transaction = await tronWeb.transactionBuilder.sendTrx(
         toAddress,
-        tronWeb.toBigNumber(amountInSun),
+        Number(amountInSun),
         address
       );
 
@@ -437,6 +453,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         success: true,
         txId: txResult.transaction?.txID || txResult.txid,
       };
+    
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Transfer failed";

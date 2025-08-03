@@ -32,6 +32,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   orderData,
 }) => {
     const { transferTrx, isTransferring, address } = useTronWallet();
+    const baseUrl = process.env.REACT_APP_BASE_URL
     const handleSendTrx = async () => {
     if (!orderData) return;
     
@@ -42,8 +43,20 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
       );
       
       if (result.success) {
-        console.log("Transaction successful:", result.txId);
-        // You might want to show a success message or update UI
+
+         //verify payment : 
+         const resultPayload = {
+          txid: result.txId,
+          orderId : orderData._id
+         }
+
+         const veryfyPayment = axios.post(`${baseUrl}/order/verifyPayment`, resultPayload, {
+          headers : {
+            "Content-Type": "application/json",
+          }
+         })
+
+         console.log(veryfyPayment)
       } else {
         console.error("Transaction failed:", result.error);
         // Error is already handled in the context, no need to show again

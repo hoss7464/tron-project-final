@@ -170,7 +170,7 @@ const OrderFormComponent: React.FC = () => {
   const dispatch = useDispatch();
   //Selectors :
 
-  const { address, balance, availableBandwidth } = useTronWallet();
+  const { address, balance, availableBandwidth, transferTrx } = useTronWallet();
   //Selectors :
   const orderPopUpVisible = useSelector(
     (state: RootState) => state.toggle.toggles.popUp
