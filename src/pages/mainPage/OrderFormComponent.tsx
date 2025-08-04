@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
+import { useDispatch} from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import "./mainPage.css";
 import {
@@ -196,7 +196,7 @@ const OrderFormComponent: React.FC = () => {
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   //create order popup component states :
   const [createOrderResponseData, setCreateOrderResponseData] = useState<OrderData | null>(null);
-  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupOpen2, setPopupOpen2] = useState(false);
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT)
   //--------------------------------------------------------------------------------------
@@ -846,18 +846,13 @@ const OrderFormComponent: React.FC = () => {
             {
               headers: {
                 "Content-Type": "application/json",
-              }, timeout : axiosTimeOut
+              }, timeout : axiosTimeOut 
             }
-          );
+          ); 
 
-          if (response.status === 200) {
-            dispatch(
-              showNotification({
-                name: "success2",
-                message: "Data has been created successfully.",
-                severity: "success",
-              })
-            );
+          if (response.data.success === true) {
+            setCreateOrderResponseData(response.data.data);
+            setPopupOpen2(true);
           } else {
             dispatch(
               showNotification({
@@ -868,8 +863,7 @@ const OrderFormComponent: React.FC = () => {
             );
             return;
           }
-          setCreateOrderResponseData(response.data.data);
-          setPopupOpen(true);
+          
           //if balance = total price ----> bandwidth must be at lease 500 or more :
         } else if (balanceNum === totalPrice) {
           if (!availableBandwidth || availableBandwidth <= 500) {
@@ -892,14 +886,9 @@ const OrderFormComponent: React.FC = () => {
               }
             );
 
-            if (response.status === 200) {
-              dispatch(
-                showNotification({
-                  name: "success2",
-                  message: "Data has been created successfully.",
-                  severity: "success",
-                })
-              );
+            if (response.data.success === true) {
+            setCreateOrderResponseData(response.data.data);
+            setPopupOpen2(true);
             } else {
               dispatch(
                 showNotification({
@@ -910,8 +899,7 @@ const OrderFormComponent: React.FC = () => {
               );
               return;
             }
-            setCreateOrderResponseData(response.data.data);
-            setPopupOpen(true);
+           
           }
         } else {
           dispatch(
@@ -933,19 +921,7 @@ const OrderFormComponent: React.FC = () => {
         );
         return;
       }
-
-      //to pass response data into our state so that we use it in popup component :
-
-      dispatch(toggleRefresh());
-      setAmount("");
-      setDurationValue("");
-      setInputValue("");
-      setAmountError("");
-      setDurationError("");
-      setPriceError("");
       setWalletAdd(address);
-      setPartialFill(false);
-      setBulkOrder(false);
     } catch (error) {
       dispatch(
         showNotification({
@@ -961,6 +937,8 @@ const OrderFormComponent: React.FC = () => {
       setWalletAdd(address);
     }
   }, [address, walletAdd]);
+  //--------------------------------------------------------------------------------------
+
 
   return (
     <>
@@ -1576,11 +1554,26 @@ const OrderFormComponent: React.FC = () => {
           </Form>
         </FormWrapper2>
       </FormWrapper>
-      <PopUp2
-        open={popupOpen}
-        onClose={() => setPopupOpen(false)}
+     <PopUp2
+        open={popupOpen2}
+        onClose={() => setPopupOpen2(false)}
         orderData={createOrderResponseData}
+        mySwitchBtn={switchBtn}
+        myAmount={amount}
+        myDuration={durationValue}
+        resetForm={() => {
+          dispatch(toggleRefresh());
+          setAmount("");
+          setDurationValue("");
+          setInputValue("");
+          setAmountError("");
+          setDurationError("");
+          setPriceError("");
+          setPartialFill(false);
+          setBulkOrder(false);
+        }}
       />
+      
     </>
   );
 };
