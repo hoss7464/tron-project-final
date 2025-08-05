@@ -26,6 +26,7 @@ import energyIcon from "../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
 import recoveryIcon from "../../../assets/svg/RecoveryIcon.svg";
 import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg";
+
 //----------------------------------------------------------------------------------------
 type ResourceResponse = {
   data: {
@@ -64,10 +65,12 @@ const ResourceComponent: React.FC = () => {
     const baseURL = process.env.REACT_APP_BASE_URL;
     //to get axios timeout :
     const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT)
+
     try{
       const response = await axios.get<ResourceResponse>(`${baseURL}/Setting/UI`, {
         headers: { "Content-Type": "application/json" },timeout :axiosTimeOut 
       })
+
       const myData = response.data 
 
     //To extract ready resource :
@@ -89,11 +92,16 @@ const ResourceComponent: React.FC = () => {
     setBandwidthApySeller(formatNumber(bandwidthApy));
     }catch(error){
       console.log("error fetching data : ", error)
-    }
+    } 
   };
 
   useEffect(() => {
+    //Make the initial request immediately when the component mounts
     resourceData();
+    //Then make subsequent requests every 3 seconds
+    const intervalId = setInterval(resourceData, 3000); 
+    //Clean up the interval when the component unmounts to prevent memory leaks
+    return () => clearInterval(intervalId);
   }, []);
 
   return (

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useLoading } from "../../contexts/LoaderContext";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { useDispatch} from "react-redux";
@@ -162,8 +163,13 @@ const DropdownIconWithText: React.FC = () => {
 //-------------------------------------------------------------------------------------
 const OrderFormComponent: React.FC = () => {
   //States :
+  //loader states :
+  const {incrementLoading, decrementLoading} = useLoading()
+  //translation states : 
   const { t } = useTranslation();
+  //redux dispatch :
   const dispatch = useDispatch();
+  //tron wallet context : 
   const { address, balance, availableBandwidth } = useTronWallet();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
@@ -297,6 +303,10 @@ const OrderFormComponent: React.FC = () => {
   useEffect(() => {
     const getMinimumAmountDuration = async () => {
       const baseURL = process.env.REACT_APP_BASE_URL;
+
+      //we use the loader tracker that loader stays loading until minimum prices will get from server :
+      incrementLoading()
+
       try {
         const res = await axios.get<SettingUI>(`${baseURL}/Setting/UI`, {
           headers: { "Content-Type": "application/json" },timeout: axiosTimeOut
@@ -305,6 +315,9 @@ const OrderFormComponent: React.FC = () => {
         setWholeData(res.data);
       } catch (error) {
         console.error("Failed to fetch setting UI:", error);
+      } finally{
+        //we finish the tracking operation when fetching data ends :
+        decrementLoading()
       }
     };
     getMinimumAmountDuration();

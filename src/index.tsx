@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
+import { LoadingProvider } from "./contexts/LoaderContext";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import i18n from "./i18n";
@@ -12,11 +13,13 @@ import "../node_modules/flag-icon-css/css/flag-icons.min.css"
 
 
 
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
+    <LoadingProvider>
     <Provider store={store}>
       <I18nextProvider i18n={i18n}>
         <TronWalletProvider>
@@ -24,6 +27,7 @@ root.render(
         </TronWalletProvider>
       </I18nextProvider>
     </Provider>
+    </LoadingProvider>
   </React.StrictMode>
 );
 

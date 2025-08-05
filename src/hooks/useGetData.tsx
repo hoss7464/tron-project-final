@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useLoading } from "../contexts/LoaderContext";
 import axios from "axios";
 
 type UseGetDataReturn<T> = {
@@ -10,6 +11,7 @@ type UseGetDataReturn<T> = {
 };
 
 function useGetData<T = any>(): UseGetDataReturn<T> {
+  const {incrementLoading, decrementLoading} = useLoading()
   const [data, setData] = useState<T[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -20,6 +22,8 @@ function useGetData<T = any>(): UseGetDataReturn<T> {
   const getData = useCallback(async (url: string): Promise<void> => {
     setIsLoading(true);
     setError("");
+
+    incrementLoading()
 
     try {
       const response = await axios.get<T[]>(url, {
@@ -40,6 +44,7 @@ function useGetData<T = any>(): UseGetDataReturn<T> {
       throw err;
     } finally {
       setIsLoading(false);
+      decrementLoading()
     }
   }, []); //to memoize get data , stable for useEffect 
 

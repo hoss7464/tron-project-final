@@ -75,13 +75,6 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleReject = () => {
-    dispatch(
-      showNotification({
-        name: "tron-warning1",
-        message: "Transaction rejected by user.",
-        severity: "warning",
-      })
-    );
     onClose();
   };
 
@@ -122,17 +115,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           resetForm(); //reset order form
           return;
         }
-      } else {
-        dispatch(
-          showNotification({
-            name: "error1",
-            message: `Payment faild: ${result.error}`,
-            severity: "error",
-          })
-        );
-
-        return;
-      }
+      } 
     } catch (error) {
       dispatch(
         showNotification({
