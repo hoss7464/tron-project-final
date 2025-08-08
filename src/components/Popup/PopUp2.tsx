@@ -3,12 +3,9 @@ import { useTronWallet } from "../../contexts/TronWalletContext";
 import axios from "axios";
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   Button,
-  Typography,
   Box,
 } from "@mui/material";
 import { useDispatch } from "react-redux";
@@ -115,7 +112,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           resetForm(); //reset order form
           return;
         }
-      } 
+      }
     } catch (error) {
       dispatch(
         showNotification({
@@ -148,7 +145,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           "& .MuiPaper-root": {
             padding: "0.5rem 0.5rem",
             borderRadius: "16px !important",
-            border : "solid 2px #D9E1E3"
+            border: "solid 2px #D9E1E3",
           },
         }}
       >
@@ -298,7 +295,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             display: "flex",
             flexDirection: "column", // Stack vertically
             gap: "0.5rem", // Space between buttons
-            
+
             "& .MuiButton-root": {
               // Target both buttons
               width: "100%", // Full width

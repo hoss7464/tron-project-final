@@ -154,12 +154,12 @@ export const FooterIconWrapper = styled.div`
   }
 
 `;
-export const FooterIcon = styled.div`
-  width: 50px;
-  height: 50px;
-  background-color: ${ThemeColor.secondary1};
-  border-radius: 55px;
-`;
+
+
+export const FooterLogo = styled.img`
+box-sizing: border-box;
+height: 40px;
+`
 export const FooterHeaderWrapper = styled.div`
   display: flex;
   justify-content: flex-start;

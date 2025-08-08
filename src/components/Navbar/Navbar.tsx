@@ -12,6 +12,7 @@ import {
   NavbarActiveArea,
   NavbarLeftSection,
   NavbarLogoWrapper,
+  NavbarLogo,
   NavbarRightSection,
   TranslateConnectWrapper,
   TranslateWrapper,
@@ -26,6 +27,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useTronWallet } from "../../contexts/TronWalletContext";
+import Logo from "../../assets/svg/Logo/Logo.svg"
 
 const Navbar: React.FC = () => {
   const [age, setAge] = React.useState("EN");
@@ -65,7 +67,9 @@ const Navbar: React.FC = () => {
       <NavContainer>
         <NavbarActiveArea>
           <NavbarLeftSection>
-            <NavbarLogoWrapper />
+            <NavbarLogoWrapper>
+              <NavbarLogo alt="Logo" src={Logo} />
+            </NavbarLogoWrapper>
           </NavbarLeftSection>
           <NavbarRightSection>
             <TranslateConnectWrapper>

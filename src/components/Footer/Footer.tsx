@@ -8,7 +8,7 @@ import {
   FooterContentLeftSection,
   FooterIconHeaderWrapper,
   FooterIconWrapper,
-  FooterIcon,
+  FooterLogo,
   FooterHeaderWrapper,
   FooterHeader,
   FooterSubheaderWrapper,
@@ -33,6 +33,7 @@ import {
   PrivacyTermsText,
 } from "./FooterElements";
 import { Divider } from "@mui/material";
+import Logo from "../../assets/svg/Logo/Logo.svg"
 
 const Footer: React.FC = () => {
   return (
@@ -44,7 +45,7 @@ const Footer: React.FC = () => {
             <FooterContentLeftSection>
               <FooterIconHeaderWrapper>
                 <FooterIconWrapper>
-                  <FooterIcon />
+                  <FooterLogo alt="Logo" src={Logo} />
                 </FooterIconWrapper>
                 <FooterHeaderWrapper>
                   <FooterHeader>

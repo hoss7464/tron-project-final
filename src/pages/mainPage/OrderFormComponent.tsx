@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useLoading } from "../../contexts/LoaderContext";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-import { useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import "./mainPage.css";
 import {
@@ -164,12 +164,12 @@ const DropdownIconWithText: React.FC = () => {
 const OrderFormComponent: React.FC = () => {
   //States :
   //loader states :
-  const {incrementLoading, decrementLoading} = useLoading()
-  //translation states : 
+  const { incrementLoading, decrementLoading } = useLoading();
+  //translation states :
   const { t } = useTranslation();
   //redux dispatch :
   const dispatch = useDispatch();
-  //tron wallet context : 
+  //tron wallet context :
   const { address, balance, availableBandwidth } = useTronWallet();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
@@ -180,7 +180,10 @@ const OrderFormComponent: React.FC = () => {
   const [wholeData, setWholeData] = useState<SettingUI | null>(null);
   //Amount input states:
   const [amount, setAmount] = useState("");
-  const [minAmount, setMinAmount] = useState<{energy: number;bandwidth: number;}>({ energy: 0, bandwidth: 0 });
+  const [minAmount, setMinAmount] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
   const [amountError, setAmountError] = useState("");
   //Duration dropdown states :
   const [durationValue, setDurationValue] = useState("");
@@ -190,7 +193,9 @@ const OrderFormComponent: React.FC = () => {
   const [durationError, setDurationError] = useState("");
   //Price dropdown states :
   const [inputValue, setInputValue] = useState<string>("");
-  const [priceOptions, setPriceOptions] = useState<{ col1: string; col2: string }[]>([]);
+  const [priceOptions, setPriceOptions] = useState<
+    { col1: string; col2: string }[]
+  >([]);
   const [minAmountPrice, setMinAmountPrice] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
@@ -201,10 +206,11 @@ const OrderFormComponent: React.FC = () => {
   //Setting button (Bulk order) states :
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   //create order popup component states :
-  const [createOrderResponseData, setCreateOrderResponseData] = useState<OrderData | null>(null);
+  const [createOrderResponseData, setCreateOrderResponseData] =
+    useState<OrderData | null>(null);
   const [popupOpen2, setPopupOpen2] = useState(false);
   //to get axios timeout :
-  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT)
+  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -305,19 +311,20 @@ const OrderFormComponent: React.FC = () => {
       const baseURL = process.env.REACT_APP_BASE_URL;
 
       //we use the loader tracker that loader stays loading until minimum prices will get from server :
-      incrementLoading()
+      incrementLoading();
 
       try {
         const res = await axios.get<SettingUI>(`${baseURL}/Setting/UI`, {
-          headers: { "Content-Type": "application/json" },timeout: axiosTimeOut
+          headers: { "Content-Type": "application/json" },
+          timeout: axiosTimeOut,
         });
         // store full response in one state
         setWholeData(res.data);
       } catch (error) {
         console.error("Failed to fetch setting UI:", error);
-      } finally{
+      } finally {
         //we finish the tracking operation when fetching data ends :
-        decrementLoading()
+        decrementLoading();
       }
     };
     getMinimumAmountDuration();
@@ -469,7 +476,8 @@ const OrderFormComponent: React.FC = () => {
         {
           headers: {
             "Content-Type": "application/json",
-          },timeout : axiosTimeOut
+          },
+          timeout: axiosTimeOut,
         }
       );
 
@@ -859,9 +867,10 @@ const OrderFormComponent: React.FC = () => {
             {
               headers: {
                 "Content-Type": "application/json",
-              }, timeout : axiosTimeOut 
+              },
+              timeout: axiosTimeOut,
             }
-          ); 
+          );
 
           if (response.data.success === true) {
             setCreateOrderResponseData(response.data.data);
@@ -876,7 +885,7 @@ const OrderFormComponent: React.FC = () => {
             );
             return;
           }
-          
+
           //if balance = total price ----> bandwidth must be at lease 500 or more :
         } else if (balanceNum === totalPrice) {
           if (!availableBandwidth || availableBandwidth <= 500) {
@@ -895,13 +904,14 @@ const OrderFormComponent: React.FC = () => {
               {
                 headers: {
                   "Content-Type": "application/json",
-                }, timeout : axiosTimeOut
+                },
+                timeout: axiosTimeOut,
               }
             );
 
             if (response.data.success === true) {
-            setCreateOrderResponseData(response.data.data);
-            setPopupOpen2(true);
+              setCreateOrderResponseData(response.data.data);
+              setPopupOpen2(true);
             } else {
               dispatch(
                 showNotification({
@@ -912,13 +922,14 @@ const OrderFormComponent: React.FC = () => {
               );
               return;
             }
-           
           }
         } else {
           dispatch(
             showNotification({
               name: "error5",
-              message: `Insufficient balance: Need ${totalPrice + 0.4} TRX at least or exactly ${totalPrice} TRX with >500 bandwidth`,
+              message: `Insufficient balance: Need ${
+                totalPrice + 0.4
+              } TRX at least or exactly ${totalPrice} TRX with >500 bandwidth`,
               severity: "error",
             })
           );
@@ -934,6 +945,7 @@ const OrderFormComponent: React.FC = () => {
         );
         return;
       }
+      
       setWalletAdd(address);
     } catch (error) {
       dispatch(
@@ -951,7 +963,6 @@ const OrderFormComponent: React.FC = () => {
     }
   }, [address, walletAdd]);
   //--------------------------------------------------------------------------------------
-
 
   return (
     <>
@@ -1567,7 +1578,7 @@ const OrderFormComponent: React.FC = () => {
           </Form>
         </FormWrapper2>
       </FormWrapper>
-     <PopUp2
+      <PopUp2
         open={popupOpen2}
         onClose={() => setPopupOpen2(false)}
         orderData={createOrderResponseData}
@@ -1586,7 +1597,6 @@ const OrderFormComponent: React.FC = () => {
           setBulkOrder(false);
         }}
       />
-      
     </>
   );
 };
