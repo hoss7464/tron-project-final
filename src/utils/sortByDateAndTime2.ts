@@ -8,7 +8,7 @@ type ItemWithDateTime = {
 
 
 
-export function sortAndFilterOrders<T extends ItemWithDateTime>(
+export function sortAndFilterOrders<T extends ItemWithDateTime & { status: string }>(
   data: T[],
   sortBy: SortOption = 'price'
 ): T[] {
@@ -20,6 +20,11 @@ export function sortAndFilterOrders<T extends ItemWithDateTime>(
 
   // Then sort based on the option
   return filteredData.sort((a, b) => {
+    // Completed items should always go to the bottom
+    if (a.status === 'completed' && b.status !== 'completed') return 1;
+    if (a.status !== 'completed' && b.status === 'completed') return -1;
+    
+    // If both have same status, apply normal sorting
     switch (sortBy) {
       case 'price':
       case 'energy':

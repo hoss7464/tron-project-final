@@ -29,6 +29,7 @@ import { sortByDateTime } from "../../utils/sortByDateAndTime";
 import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
+import axios from "axios";
 
 type Post = {
   id: number;
@@ -52,9 +53,27 @@ const MyOrdersComponent: React.FC = () => {
     (state: RootState) => state.filters["myOrders"] || "All"
   );
 
-  useEffect(() => {
-    getData("http://localhost:3001/formData");
-  }, [refreshTrigger, getData]);
+   useEffect(() => {
+      const baseUrl = process.env.REACT_APP_BASE_URL;
+      
+      const getOrderList = async () => {
+        try {
+          const response = await axios.get(
+            `${baseUrl}/order/myOrder`,
+            {
+              headers: { "Content-Type": "application/json" },
+              timeout: 1000,
+              withCredentials : true 
+            }
+          );
+  
+          console.log(response)
+        } catch (error) {
+          console.error("Failed to fetch setting UI:", error);
+        } 
+      };
+      getOrderList();
+    }, [refreshTrigger]);
 
   const sortedData = sortByDateTime(data || []);
   const filteredData =

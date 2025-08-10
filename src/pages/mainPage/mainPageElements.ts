@@ -16,7 +16,7 @@ export const MainPageContainer = styled.div`
   min-height: 720px;
   background-color: ${ThemeColor.bg2};
 
-    @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
     border-top-right-radius: 0;
     border-top-left-radius: 0;
   }
@@ -309,7 +309,7 @@ export const Form = styled.form`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  
+
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     border-radius: 14px;
     padding: 8px;
@@ -342,7 +342,6 @@ export const FormHeaderSwitchWrapper = styled.div`
   align-items: center;
   width: 100%;
   margin-bottom: 1rem;
- 
 `;
 export const FormHeaderIconWrapper = styled.div`
   display: flex;
@@ -804,15 +803,17 @@ export const OrdersSell = styled.p`
 `;
 
 export const CheckedSignWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 0.7rem;
+`;
 export const CheckedSign = styled(IoCheckbox)`
-color: ${ThemeColor.secondary1};
-width: 32px;
-height: 32px;
-`
+  color: ${ThemeColor.secondary1};
+  width: 32px;
+  height: 32px;
+`;
 
 export const OedersPaginationWrapper = styled.div`
   display: flex;
@@ -919,4 +920,3 @@ export const MyOrderCardTextWrap = styled.div`
   width: 25%;
   height: 100%;
 `;
-

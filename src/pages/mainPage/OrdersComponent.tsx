@@ -66,7 +66,7 @@ interface MarketOrder {
   receiver: string;
   resourceAmount: number;
   resourceType: string;
-  status: string;
+  status: "pending" | "processing" | "completed" | "failed" | "cancelled";
   totalPrice: number;
   type: string;
 }
@@ -77,7 +77,7 @@ export const OrdersComponent: React.FC = () => {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 7;
-  const {incrementLoading, decrementLoading} = useLoading()
+  const { incrementLoading, decrementLoading } = useLoading();
 
   const [wholeOrderData, setWholeOrderData] = useState<ServerResponse | null>(
     null
@@ -99,18 +99,18 @@ export const OrdersComponent: React.FC = () => {
   //------------------------------------------------------------------------------------------------------------
   //Filter and sort data :
 
-// Filter by status first (only processing and completed)
-const statusFilteredData = wholeOrderData?.data
-  ? wholeOrderData.data.filter(
-      (order) => order.status === "processing" || order.status === "completed"
-    )
-  : [];
-  
+  // Filter by status first (only processing and completed)
+  const statusFilteredData = wholeOrderData?.data
+    ? wholeOrderData.data.filter(
+        (order) => order.status === "processing" || order.status === "completed"
+      )
+    : [];
+
   // Then sort the filtered data
-const filteredAndSortedData = sortAndFilterOrders(
-  statusFilteredData,
-  selectedFilter === "All" ? "price" : (selectedFilter as SortOption)
-);
+  const filteredAndSortedData = sortAndFilterOrders(
+    statusFilteredData,
+    selectedFilter === "All" ? "price" : (selectedFilter as SortOption)
+  );
 
   const paginatedData = filteredAndSortedData.slice(
     (currentPage - 1) * rowsPerPage,
@@ -122,7 +122,7 @@ const filteredAndSortedData = sortAndFilterOrders(
   //Function to get data from server :
   useEffect(() => {
     const baseUrl = process.env.REACT_APP_BASE_URL;
-    incrementLoading()
+    incrementLoading();
     const getOrderList = async () => {
       try {
         const response = await axios.get<ServerResponse>(
@@ -148,7 +148,7 @@ const filteredAndSortedData = sortAndFilterOrders(
       } catch (error) {
         console.error("Failed to fetch setting UI:", error);
       } finally {
-        decrementLoading()
+        decrementLoading();
       }
     };
     getOrderList();
@@ -277,13 +277,25 @@ const filteredAndSortedData = sortAndFilterOrders(
                         <OrderCardLinearWrapper2>
                           <OrderCardLineraPercentWrapper>
                             <OrderCardLineraPercent>
-                              {(myData.frozen / myData.freeze) * 100}%
+                              {(() => {
+                                const percent =
+                                  (myData.frozen / myData.freeze) * 100;
+                                const cappedPercent = Math.min(percent, 100);
+
+                                if (cappedPercent >= 100) return "100%";
+                                if (Number.isInteger(cappedPercent))
+                                  return `${cappedPercent}%`;
+                                return `${cappedPercent.toFixed(2)}%`;
+                              })()}
                             </OrderCardLineraPercent>
                           </OrderCardLineraPercentWrapper>
                           <OrderCardLinearWrapper>
                             <LinearProgress
                               variant="determinate"
-                              value={(myData.frozen / myData.freeze) * 100}
+                              value={Math.min(
+                                (myData.frozen / myData.freeze) * 100,
+                                100
+                              )}
                               valueBuffer={myData.freeze}
                               sx={{
                                 height: 5,

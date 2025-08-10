@@ -175,7 +175,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const access_Token = server_data_json.data.access_token;
       //To save refressh_token, access_token, wallet address into a json
       const localStorageSavedData = {
-        access_Token: access_Token,
+        
         wallet_address: addr,
       };
       //To save localStorageSavedData in localStorage :
