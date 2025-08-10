@@ -263,15 +263,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           {},
           { withCredentials: true, timeout: axiosTimeOut }
         );
-        if (response.data.success === true) {
-          dispatch(
-            showNotification({
-              name: "disconnect-notif",
-              message: `disconnect wallet has been successfull.`,
-              severity: "success",
-            })
-          );
-        } else {
+        if (response.data.success === false) {
           dispatch(
             showNotification({
               name: "disconnect-error",

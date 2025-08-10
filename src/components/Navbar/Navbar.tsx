@@ -28,6 +28,7 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import Logo from "../../assets/svg/Logo/Logo.svg"
+import { toggleRefresh } from "../../redux/actions/refreshSlice";
 
 const Navbar: React.FC = () => {
   const [age, setAge] = React.useState("EN");
@@ -53,6 +54,7 @@ const Navbar: React.FC = () => {
   const handleDisconnect = () => {
     disconnectWallet();
     dispatch(hoverDisableToggle("avatarToggle"));
+    dispatch(toggleRefresh())
   };
 
   const shortenAddress = (address: string) => {

@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { useLoading } from "../../contexts/LoaderContext";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/store/store";
 import { showNotification } from "../../redux/actions/notifSlice";
 import "./mainPage.css";
 import {
@@ -169,6 +170,7 @@ const OrderFormComponent: React.FC = () => {
   const { t } = useTranslation();
   //redux dispatch :
   const dispatch = useDispatch();
+    const refreshTrigger = useSelector((state: RootState) => state.refresh.refreshTrigger);
   //tron wallet context :
   const { address, balance, availableBandwidth } = useTronWallet();
   //Switch button states:
@@ -326,7 +328,7 @@ const OrderFormComponent: React.FC = () => {
       }
     };
     getMinimumAmountDuration();
-  }, []);
+  }, [refreshTrigger]);
 
   //Function to get states from stored data :
   useEffect(() => {

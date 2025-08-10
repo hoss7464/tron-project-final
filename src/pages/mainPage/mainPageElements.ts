@@ -810,8 +810,8 @@ align-items: center;
 `
 export const CheckedSign = styled(IoCheckbox)`
 color: ${ThemeColor.secondary1};
-width: 24px;
-height: 24px;
+width: 32px;
+height: 32px;
 `
 
 export const OedersPaginationWrapper = styled.div`

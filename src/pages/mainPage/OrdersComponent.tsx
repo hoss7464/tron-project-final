@@ -97,11 +97,20 @@ export const OrdersComponent: React.FC = () => {
     setCurrentPage(page);
   };
   //------------------------------------------------------------------------------------------------------------
-  //Filter and sort data based on Date/Time & energy/bandwidth
-  const filteredAndSortedData = sortAndFilterOrders(
-    wholeOrderData?.data || [],
-    selectedFilter === "All" ? "price" : (selectedFilter as SortOption)
-  );
+  //Filter and sort data :
+
+// Filter by status first (only processing and completed)
+const statusFilteredData = wholeOrderData?.data
+  ? wholeOrderData.data.filter(
+      (order) => order.status === "processing" || order.status === "completed"
+    )
+  : [];
+  
+  // Then sort the filtered data
+const filteredAndSortedData = sortAndFilterOrders(
+  statusFilteredData,
+  selectedFilter === "All" ? "price" : (selectedFilter as SortOption)
+);
 
   const paginatedData = filteredAndSortedData.slice(
     (currentPage - 1) * rowsPerPage,
@@ -228,7 +237,7 @@ export const OrdersComponent: React.FC = () => {
                             )}
 
                             <OrdersCardText1>
-                              {myData.resourceAmount}
+                              {myData.resourceAmount.toLocaleString()}
                             </OrdersCardText1>
                           </OrdersCardTextWrapper2>
                           <OrdersCardTextWrapper2>
@@ -287,7 +296,7 @@ export const OrdersComponent: React.FC = () => {
                             />
                           </OrderCardLinearWrapper>
                         </OrderCardLinearWrapper2>
-                        {myData.status === "complete" ? (
+                        {myData.status === "completed" ? (
                           <CheckedSignWrapper>
                             <CheckedSign />
                           </CheckedSignWrapper>
