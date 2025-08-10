@@ -9,10 +9,7 @@ import { I18nextProvider } from "react-i18next";
 import { Provider } from "react-redux";
 import { store } from "./redux/store/store";
 import { TronWalletProvider } from "./contexts/TronWalletContext";
-import "../node_modules/flag-icon-css/css/flag-icons.min.css"
-
-
-
+import "../node_modules/flag-icon-css/css/flag-icons.min.css";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -20,13 +17,13 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <LoadingProvider>
-    <Provider store={store}>
-      <I18nextProvider i18n={i18n}>
-        <TronWalletProvider>
-          <App />
-        </TronWalletProvider>
-      </I18nextProvider>
-    </Provider>
+      <Provider store={store}>
+        <I18nextProvider i18n={i18n}>
+          <TronWalletProvider>
+            <App />
+          </TronWalletProvider>
+        </I18nextProvider>
+      </Provider>
     </LoadingProvider>
   </React.StrictMode>
 );

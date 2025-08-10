@@ -1,20 +1,39 @@
+export type SortOption = 'price' | 'energy' | 'bandwidth' | 'latest' | 'oldest';
+
 type ItemWithDateTime = {
-  orderDate: string;  
-  orderTime: string; 
+  createdAt: string;
+  price: number;
+  resourceType: string;
 };
 
-export function sortByDateTime2<T extends ItemWithDateTime>(data: T[]): T[] {
-  return [...data].sort((a, b) => {
-    const parseDateTime = (dateStr: string, timeStr: string): number => {
-      const [day, month] = dateStr.split("/").map(Number);
-      const [hours, minutes] = timeStr.split(":").map(Number);
-      const year = new Date().getFullYear(); 
-      return new Date(year, month - 1, day, hours, minutes).getTime();
-    };
 
-    const dateTimeA = parseDateTime(a.orderDate, a.orderTime);
-    const dateTimeB = parseDateTime(b.orderDate, b.orderTime);
 
-    return dateTimeB - dateTimeA; // Latest first
+export function sortAndFilterOrders<T extends ItemWithDateTime>(
+  data: T[],
+  sortBy: SortOption = 'price'
+): T[] {
+  // First filter if needed
+  let filteredData = [...data];
+  if (sortBy === 'energy' || sortBy === 'bandwidth') {
+    filteredData = data.filter(item => item.resourceType === sortBy);
+  }
+
+  // Then sort based on the option
+  return filteredData.sort((a, b) => {
+    switch (sortBy) {
+      case 'price':
+      case 'energy':
+      case 'bandwidth':
+        // Highest price first
+        return b.price - a.price;
+      case 'latest':
+        // Newest first
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      case 'oldest':
+        // Oldest first
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      default:
+        return 0;
+    }
   });
 }

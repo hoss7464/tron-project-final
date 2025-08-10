@@ -202,7 +202,7 @@ const OrderFormComponent: React.FC = () => {
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   //Setting button (Allow partial fill) states :
-  const [partialFill, setPartialFill] = useState<boolean>(false);
+  const [partialFill, setPartialFill] = useState<boolean>(true);
   //Setting button (Bulk order) states :
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   //create order popup component states :
@@ -309,10 +309,8 @@ const OrderFormComponent: React.FC = () => {
   useEffect(() => {
     const getMinimumAmountDuration = async () => {
       const baseURL = process.env.REACT_APP_BASE_URL;
-
       //we use the loader tracker that loader stays loading until minimum prices will get from server :
       incrementLoading();
-
       try {
         const res = await axios.get<SettingUI>(`${baseURL}/Setting/UI`, {
           headers: { "Content-Type": "application/json" },
@@ -869,6 +867,7 @@ const OrderFormComponent: React.FC = () => {
                 "Content-Type": "application/json",
               },
               timeout: axiosTimeOut,
+              withCredentials: true
             }
           );
 
@@ -906,6 +905,7 @@ const OrderFormComponent: React.FC = () => {
                   "Content-Type": "application/json",
                 },
                 timeout: axiosTimeOut,
+                withCredentials: true
               }
             );
 

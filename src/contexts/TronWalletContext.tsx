@@ -22,6 +22,16 @@ interface TronWalletContextProps {
   isTransferring: boolean;
   transferError: string | null;
 }
+//Disconnect interface :
+interface DisconnectResponse {
+  success: boolean;
+  code?: string;
+  message?: string;
+  details?: Array<{
+    field: string;
+    message: string;
+  }>;
+}
 //Type for TRX transfer :
 type TrxTransferResult = {
   success: boolean;
@@ -53,14 +63,16 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [allBandwidth, setAllBandwidth] = useState<number | null>(null);
-  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(null);
+  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(
+    null
+  );
   const [allEnergy, setAllEnergy] = useState<number | null>(null);
   const [availableEnergy, setAvailableEnergy] = useState<number | null>(null);
   //States for Transfering TRX :
   const [isTransferring, setIsTransferring] = useState(false);
   const [transferError, setTransferError] = useState<string | null>(null);
   //to get axios timeout :
-  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT)
+  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapter = new TronLinkAdapter();
@@ -97,7 +109,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         success: boolean;
         data: { nonce: string };
       }>(`${baseURL}/Auth/get-message`, {
-        headers: { "Content-Type": "application/json" },timeout : axiosTimeOut
+        headers: { "Content-Type": "application/json" },
+        timeout: axiosTimeOut,
       });
       //To convert he message into json :
       const responseBody = generate_msg.data;
@@ -141,7 +154,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
-          timeout: axiosTimeOut
+          timeout: axiosTimeOut,
         }
       );
 
@@ -236,18 +249,40 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     const baseURL = process.env.REACT_APP_BASE_URL;
     try {
       const stored = localStorage.getItem("tronWalletAddress");
-
-      // همیشه اول localStorage پاک می‌کنیم
+      // to remove localStorage :
       localStorage.removeItem("tronWalletAddress");
-
       if (stored) {
-        // درخواست به سرور (بدون env)
-        await axios
-          .post(`${baseURL}/Auth/disconnect`, {}, { withCredentials: true, timeout : axiosTimeOut })
-          .catch(() => {});
+        /*
+        we use {} in out axios because the data format of posting with axios is something like this: 
+          axios.post(url, data?, config?)
+        If you skip the data parameter, the config (like withCredentials) becomes the second argument.
+        This can cause confusion because Axios may misinterpret your intention.
+        */
+        const response = await axios.post<DisconnectResponse>(
+          `${baseURL}/Auth/disconnect`,
+          {},
+          { withCredentials: true, timeout: axiosTimeOut }
+        );
+        if (response.data.success === true) {
+          dispatch(
+            showNotification({
+              name: "disconnect-notif",
+              message: `disconnect wallet has been successfull.`,
+              severity: "success",
+            })
+          );
+        } else {
+          dispatch(
+            showNotification({
+              name: "disconnect-error",
+              message: `${response.data.message}`,
+              severity: "error",
+            })
+          );
+          return;
+        }
       }
     } catch (err) {
-      // چون env نداری، فقط کلا suppress میکنیم
       dispatch(
         showNotification({
           name: "tron-error6",

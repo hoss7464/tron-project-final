@@ -3,6 +3,7 @@ import { colors, ThemeColor } from "../../core-UI/Theme";
 import { IoCopy } from "react-icons/io5";
 import { MdOutlineAccountBalanceWallet } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
+import { IoCheckbox } from "react-icons/io5";
 
 //--------------------------------------------------------------------------
 //Main page styles :
@@ -801,6 +802,17 @@ export const OrdersSell = styled.p`
   font-weight: 600;
   color: ${colors.text9};
 `;
+
+export const CheckedSignWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+`
+export const CheckedSign = styled(IoCheckbox)`
+color: ${ThemeColor.secondary1};
+width: 24px;
+height: 24px;
+`
 
 export const OedersPaginationWrapper = styled.div`
   display: flex;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./mainPage.css";
+import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
@@ -30,72 +31,127 @@ import {
   OrderCardLineraPercent,
   OrdersSellBtnWrapper,
   OrdersSell,
+  CheckedSignWrapper,
+  CheckedSign,
 } from "./mainPageElements";
 import { LegacyCardName } from "./LegacySection/LegacyElements";
 import LinearProgress from "@mui/material/LinearProgress";
-import useGetData from "../../hooks/useGetData";
 import Pagination from "@mui/material/Pagination";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
-import { sortByDateTime2 } from "../../utils/sortByDateAndTime2";
+import {
+  sortAndFilterOrders,
+  SortOption,
+} from "../../utils/sortByDateAndTime2";
+import { formatDateTime } from "../../utils/dateTime";
+import { formatStrictDuration } from "../../utils/fromSec";
+import { durationToNumber } from "../../utils/durationToNum";
+import { useLoading } from "../../contexts/LoaderContext";
 
-type Post = {
-  orderId: number;
-  orderTime: string;
-  orderDate: string;
-  orderResource: string;
-  orderRentTime: string;
-  orderRentTimeNumber: number;
-  orderRentTimeDate: string;
-  orderPrice: string;
-  orderAPY: string;
-  orderPayment: string;
-  orderFulfilled: number;
-  orderProduct: string;
-};
+interface ServerResponse {
+  success: boolean;
+  data: MarketOrder[];
+}
+interface MarketOrder {
+  createdAt: string;
+  durationSec: number;
+  freeze: number;
+  frozen: number;
+  lock: boolean;
+  options: {
+    allow_partial: boolean;
+    bulk_order: boolean;
+  };
+  price: number;
+  receiver: string;
+  resourceAmount: number;
+  resourceType: string;
+  status: string;
+  totalPrice: number;
+  type: string;
+}
 
 export const OrdersComponent: React.FC = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   //States :
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 7;
-  const { data, error, getData } = useGetData<Post>();
+  const {incrementLoading, decrementLoading} = useLoading()
+
+  const [wholeOrderData, setWholeOrderData] = useState<ServerResponse | null>(
+    null
+  );
   //Selectors :
   const selectedFilter = useSelector(
     (state: RootState) => state.filters["orders"] || "All"
   );
-
+  const refreshTrigger = useSelector(
+    (state: RootState) => state.refresh.refreshTrigger
+  );
+  //to get axios timeout :
+  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+  //------------------------------------------------------------------------------------------------------------
   //Function for pagination :
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
   };
+  //------------------------------------------------------------------------------------------------------------
   //Filter and sort data based on Date/Time & energy/bandwidth
-  const sortedData = sortByDateTime2(data || []);
-  const filteredData = sortedData.slice(
+  const filteredAndSortedData = sortAndFilterOrders(
+    wholeOrderData?.data || [],
+    selectedFilter === "All" ? "price" : (selectedFilter as SortOption)
+  );
+
+  const paginatedData = filteredAndSortedData.slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
   //Pagination
-  const totalPages = Math.ceil((data?.length || 0) / rowsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedData.length / rowsPerPage);
+  //------------------------------------------------------------------------------------------------------------
   //Function to get data from server :
   useEffect(() => {
-    const filterParam =
-      selectedFilter === "All" ? "" : `orderProduct=${selectedFilter}`;
+    const baseUrl = process.env.REACT_APP_BASE_URL;
+    incrementLoading()
+    const getOrderList = async () => {
+      try {
+        const response = await axios.get<ServerResponse>(
+          `${baseUrl}/order/list`,
+          {
+            headers: { "Content-Type": "application/json" },
+            timeout: axiosTimeOut,
+          }
+        );
 
-    //Fetch all filtered data first
-    const localUrl = process.env.REACT_APP_LOCAL_URL
-    getData(`${localUrl}/post?${filterParam}`);
-  }, [selectedFilter, getData]);
-
-  if (error) {
-      dispatch(showNotification({
-      name: "error5", 
-      message: "Error Fetching Data.", 
-      severity: "error" 
-    }));
-    return null
-    }
+        if (response.data.success === true) {
+          setWholeOrderData(response.data);
+        } else {
+          dispatch(
+            showNotification({
+              name: "error5",
+              message: "Error Fetching Data.",
+              severity: "error",
+            })
+          );
+          return null;
+        }
+      } catch (error) {
+        console.error("Failed to fetch setting UI:", error);
+      } finally {
+        decrementLoading()
+      }
+    };
+    getOrderList();
+  }, [refreshTrigger]);
+  //------------------------------------------------------------------------------------------------------------
+  //Function to calculate APY :
+  const calcAPY = (myTotal: number, myFreeze: number, myDuration: number) => {
+    const duration = durationToNumber(myDuration);
+    //To calculate APY :
+    const calculatedAPY = ((myTotal / myFreeze) ^ 365) / duration;
+    return parseFloat(calculatedAPY.toFixed(2));
+  };
 
   return (
     <>
@@ -107,7 +163,7 @@ export const OrdersComponent: React.FC = () => {
             </LegacyCardName>
             <MyFilterComponent
               listKey="orders"
-              options={["All", "energy", "bandwidth"]}
+              options={["price", "energy", "bandwidth", "latest", "oldest"]}
               label="Product"
             />
           </OrdersNavHeaderWrapper>
@@ -138,98 +194,112 @@ export const OrdersComponent: React.FC = () => {
                 </OrderNavTextWrapper1>
               </OrderNavWrapper>
               <OrdersCard>
-                {filteredData.map((myData) => (
-                  <>
-                    <OrdersDetail key={myData.orderId}>
-                      <OrdersCardTextWrap>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText1>{myData.orderTime}</OrdersCardText1>
-                        </OrdersCardTextWrapper2>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText2>{myData.orderDate}</OrdersCardText2>
-                        </OrdersCardTextWrapper2>
-                      </OrdersCardTextWrap>
+                {paginatedData.map((myData) => {
+                  const { date, time } = formatDateTime(myData.createdAt);
+                  return (
+                    <>
+                      <OrdersDetail key={myData.receiver}>
+                        <OrdersCardTextWrap>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText1>{time}</OrdersCardText1>
+                          </OrdersCardTextWrapper2>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText2>{date}</OrdersCardText2>
+                          </OrdersCardTextWrapper2>
+                        </OrdersCardTextWrap>
 
-                      <OrdersCardTextWrap>
-                        <OrdersCardTextWrapper2>
-                          {myData.orderProduct === "energy" ? (
-                            <OrderCardIconWrapper2
-                              style={{ backgroundColor: "#003543" }}
-                            >
-                              <OrderCardIcon alt="energy" src={energyIcon} />
-                            </OrderCardIconWrapper2>
-                          ) : (
-                            <OrderCardIconWrapper2
-                              style={{ backgroundColor: "#430E00" }}
-                            >
-                              <OrderCardIcon
-                                alt="bandwidth"
-                                src={bandwidthIcon}
-                              />
-                            </OrderCardIconWrapper2>
-                          )}
+                        <OrdersCardTextWrap>
+                          <OrdersCardTextWrapper2>
+                            {myData.resourceType === "energy" ? (
+                              <OrderCardIconWrapper2
+                                style={{ backgroundColor: "#003543" }}
+                              >
+                                <OrderCardIcon alt="energy" src={energyIcon} />
+                              </OrderCardIconWrapper2>
+                            ) : (
+                              <OrderCardIconWrapper2
+                                style={{ backgroundColor: "#430E00" }}
+                              >
+                                <OrderCardIcon
+                                  alt="bandwidth"
+                                  src={bandwidthIcon}
+                                />
+                              </OrderCardIconWrapper2>
+                            )}
 
-                          <OrdersCardText1>
-                            {myData.orderResource}
-                          </OrdersCardText1>
-                        </OrdersCardTextWrapper2>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText2>
-                            {myData.orderRentTimeNumber}
-                            {t(`${myData.orderRentTimeDate}`)}
-                          </OrdersCardText2>
-                        </OrdersCardTextWrapper2>
-                      </OrdersCardTextWrap>
+                            <OrdersCardText1>
+                              {myData.resourceAmount}
+                            </OrdersCardText1>
+                          </OrdersCardTextWrapper2>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText2>
+                              {formatStrictDuration(myData.durationSec)}
+                            </OrdersCardText2>
+                          </OrdersCardTextWrapper2>
+                        </OrdersCardTextWrap>
 
-                      <OrdersCardTextWrap>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText1>
-                            {myData.orderPrice} SUN
-                          </OrdersCardText1>
-                        </OrdersCardTextWrapper2>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText2>
-                            APY: {myData.orderAPY} %
-                          </OrdersCardText2>
-                        </OrdersCardTextWrapper2>
-                      </OrdersCardTextWrap>
+                        <OrdersCardTextWrap>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText1>
+                              {myData.price} SUN
+                            </OrdersCardText1>
+                          </OrdersCardTextWrapper2>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText2>
+                              APY:{" "}
+                              {calcAPY(
+                                myData.totalPrice,
+                                myData.freeze,
+                                myData.durationSec
+                              )}{" "}
+                              %
+                            </OrdersCardText2>
+                          </OrdersCardTextWrapper2>
+                        </OrdersCardTextWrap>
 
-                      <OrdersCardTextWrap>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText1>
-                            {myData.orderPayment}
-                          </OrdersCardText1>
-                        </OrdersCardTextWrapper2>
-                      </OrdersCardTextWrap>
+                        <OrdersCardTextWrap>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText1>
+                              {myData.totalPrice} TRX
+                            </OrdersCardText1>
+                          </OrdersCardTextWrapper2>
+                        </OrdersCardTextWrap>
 
-                      <OrderCardLinearWrapper2>
-                        <OrderCardLineraPercentWrapper>
-                          <OrderCardLineraPercent>
-                            {myData.orderFulfilled}%
-                          </OrderCardLineraPercent>
-                        </OrderCardLineraPercentWrapper>
-                        <OrderCardLinearWrapper>
-                          <LinearProgress
-                            variant="determinate"
-                            value={myData.orderFulfilled}
-                            sx={{
-                              height: 5,
-                              borderRadius: 5,
-                              backgroundColor: "#C5B4B0",
-                              "& .MuiLinearProgress-bar": {
-                                backgroundColor: "#430E00",
-                              },
-                            }}
-                          />
-                        </OrderCardLinearWrapper>
-                      </OrderCardLinearWrapper2>
-
-                      <OrdersSellBtnWrapper>
-                        <OrdersSell>Sell</OrdersSell>
-                      </OrdersSellBtnWrapper>
-                    </OrdersDetail>
-                  </>
-                ))}
+                        <OrderCardLinearWrapper2>
+                          <OrderCardLineraPercentWrapper>
+                            <OrderCardLineraPercent>
+                              {(myData.frozen / myData.freeze) * 100}%
+                            </OrderCardLineraPercent>
+                          </OrderCardLineraPercentWrapper>
+                          <OrderCardLinearWrapper>
+                            <LinearProgress
+                              variant="determinate"
+                              value={(myData.frozen / myData.freeze) * 100}
+                              valueBuffer={myData.freeze}
+                              sx={{
+                                height: 5,
+                                borderRadius: 5,
+                                backgroundColor: "#C5B4B0",
+                                "& .MuiLinearProgress-bar": {
+                                  backgroundColor: "#430E00",
+                                },
+                              }}
+                            />
+                          </OrderCardLinearWrapper>
+                        </OrderCardLinearWrapper2>
+                        {myData.status === "complete" ? (
+                          <CheckedSignWrapper>
+                            <CheckedSign />
+                          </CheckedSignWrapper>
+                        ) : (
+                          <OrdersSellBtnWrapper>
+                            <OrdersSell>Sell</OrdersSell>
+                          </OrdersSellBtnWrapper>
+                        )}
+                      </OrdersDetail>
+                    </>
+                  );
+                })}
               </OrdersCard>
             </OrdersScroll>
           </OrdersCarouselWrapper>

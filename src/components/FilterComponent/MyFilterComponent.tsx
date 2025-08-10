@@ -22,7 +22,7 @@ const MyFilterComponent: React.FC<Props> = ({
 }) => {
   const dispatch = useDispatch();
   const selected = useSelector(
-    (state: RootState) => state.filters[listKey] || "All"
+    (state: RootState) => state.filters[listKey] || "price"
   );
 
   const handleChange = (event: SelectChangeEvent) => {
