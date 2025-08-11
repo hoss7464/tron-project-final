@@ -3,6 +3,7 @@ import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../redux/actions/notifSlice";
+import { toggleRefresh } from "../redux/actions/refreshSlice";
 
 // Context interface
 interface TronWalletContextProps {
@@ -286,14 +287,19 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   //-------------------------------------------------------------------------------------
   //Function to disconnect wallet :
-  const disconnectWallet = () => {
+  const disconnectWallet = async () => {
+  try {
+    // First try to logout from server
+    await localStorageDeleteData();
+    
+    // Clear local state only after successful server logout
     setAddress(null);
     setBalance(null);
     setAllBandwidth(null);
     setAvailableBandwidth(null);
     setAllEnergy(null);
     setAvailableEnergy(null);
-    localStorageDeleteData();
+    toggleRefresh();
 
     dispatch(
       showNotification({
@@ -302,7 +308,25 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         severity: "success",
       })
     );
-  };
+  } catch (err) {
+    // If server logout fails, we still clear local state but show an error
+    setAddress(null);
+    setBalance(null);
+    setAllBandwidth(null);
+    setAvailableBandwidth(null);
+    setAllEnergy(null);
+    setAvailableEnergy(null);
+    toggleRefresh();
+    
+    dispatch(
+      showNotification({
+        name: "tron-error6",
+        message: "Disconnected locally but server logout failed",
+        severity: "warning",
+      })
+    );
+  }
+};
   //-------------------------------------------------------------------------------------
   //Function sign the message :
   const signMessage = async (message: string): Promise<string | null> => {

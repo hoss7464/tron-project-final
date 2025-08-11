@@ -170,7 +170,9 @@ const OrderFormComponent: React.FC = () => {
   const { t } = useTranslation();
   //redux dispatch :
   const dispatch = useDispatch();
-    const refreshTrigger = useSelector((state: RootState) => state.refresh.refreshTrigger);
+  const refreshTrigger = useSelector(
+    (state: RootState) => state.refresh.refreshTrigger
+  );
   //tron wallet context :
   const { address, balance, availableBandwidth } = useTronWallet();
   //Switch button states:
@@ -178,6 +180,10 @@ const OrderFormComponent: React.FC = () => {
   //Wallet address states :
   const [walletAdd, setWalletAdd] = useState<string>("");
   const [walletAddError, setWalletAddError] = useState<string | null>("");
+  //Setting button (Allow partial fill) states :
+  const [partialFill, setPartialFill] = useState<boolean>(true);
+  //Setting button (Bulk order) states :
+  const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   //Store whole fetch data in one state :
   const [wholeData, setWholeData] = useState<SettingUI | null>(null);
   //Amount input states:
@@ -203,10 +209,7 @@ const OrderFormComponent: React.FC = () => {
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  //Setting button (Allow partial fill) states :
-  const [partialFill, setPartialFill] = useState<boolean>(true);
-  //Setting button (Bulk order) states :
-  const [bulkOrder, setBulkOrder] = useState<boolean>(false);
+
   //create order popup component states :
   const [createOrderResponseData, setCreateOrderResponseData] =
     useState<OrderData | null>(null);
@@ -306,6 +309,14 @@ const OrderFormComponent: React.FC = () => {
       isWalletAddValid();
     }
   }, [bulkOrder]);
+
+  useEffect(() => {
+    if (address) {
+    setWalletAdd(address); // Set when address exists
+  } else {
+    setWalletAdd(""); // Clear when address is null (disconnected)
+  }
+  }, [address]);
   //--------------------------------------------------------------------------------------
   //Function to store the whole data for order form in it from server :
   useEffect(() => {
@@ -869,7 +880,7 @@ const OrderFormComponent: React.FC = () => {
                 "Content-Type": "application/json",
               },
               timeout: axiosTimeOut,
-              withCredentials: true
+              withCredentials: true,
             }
           );
 
@@ -907,7 +918,7 @@ const OrderFormComponent: React.FC = () => {
                   "Content-Type": "application/json",
                 },
                 timeout: axiosTimeOut,
-                withCredentials: true
+                withCredentials: true,
               }
             );
 
@@ -947,7 +958,7 @@ const OrderFormComponent: React.FC = () => {
         );
         return;
       }
-      
+
       setWalletAdd(address);
     } catch (error) {
       dispatch(
@@ -959,11 +970,6 @@ const OrderFormComponent: React.FC = () => {
       );
     }
   };
-  useEffect(() => {
-    if (!walletAdd && address) {
-      setWalletAdd(address);
-    }
-  }, [address, walletAdd]);
   //--------------------------------------------------------------------------------------
 
   return (

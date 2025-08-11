@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
-import useGetData from "../../hooks/MyOrdersSection/useGetData";
+import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { RootState } from "../../redux/store/store";
@@ -25,27 +25,51 @@ import {
 } from "./mainPageElements";
 import { OrderCardIconWrapper2 } from "./mainPageElements";
 import { LegacyCardName } from "./LegacySection/LegacyElements";
-import { sortByDateTime } from "../../utils/sortByDateAndTime";
+import {
+  sortAndFilterOrders2,
+  SortOption,
+} from "../../utils/sortByDateAndTime";
 import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
-import axios from "axios";
+import { useTronWallet } from "../../contexts/TronWalletContext";
+import { formatDateTime } from "../../utils/dateTime";
+import { useLoading } from "../../contexts/LoaderContext";
 
-type Post = {
-  id: number;
-  date: string;
-  time: string;
-  totalPrice: number;
+interface ServerResponse {
+  success: boolean;
+  message : string;
+  data: MarketOrder[];
+}
+interface MarketOrder {
+  createdAt: string;
+  durationSec: number;
+  freeze: number;
+  frozen: number;
+  lock: boolean;
+  options: {
+    allow_partial: boolean;
+    bulk_order: boolean;
+  };
+  price: number;
+  receiver: string;
   resourceAmount: number;
   resourceType: string;
-  durationSec: number;
-  price: number;
-};
+  status: "pending" | "processing" | "completed" | "failed" | "cancelled";
+  totalPrice: number;
+  type: string;
+}
 
 const MyOrdersComponent: React.FC = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { data, error, getData } = useGetData<Post[]>();
+  const { address } = useTronWallet();
+  const { incrementLoading, decrementLoading } = useLoading();
+  //to get axios timeout :
+  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+  const [myOrdersWholeData, setMyOrdersWholeData] =
+    useState<ServerResponse | null>(null);
+
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
   );
@@ -53,42 +77,68 @@ const MyOrdersComponent: React.FC = () => {
     (state: RootState) => state.filters["myOrders"] || "All"
   );
 
-   useEffect(() => {
-      const baseUrl = process.env.REACT_APP_BASE_URL;
-      
-      const getOrderList = async () => {
-        try {
-          const response = await axios.get(
-            `${baseUrl}/order/myOrder`,
-            {
-              headers: { "Content-Type": "application/json" },
-              timeout: 1000,
-              withCredentials : true 
-            }
-          );
-  
-          console.log(response)
-        } catch (error) {
-          console.error("Failed to fetch setting UI:", error);
-        } 
-      };
-      getOrderList();
-    }, [refreshTrigger]);
-
-  const sortedData = sortByDateTime(data || []);
-  const filteredData =
-    selectedFilter === "All"
-      ? sortedData
-      : sortedData.filter((item) => item.resourceType === selectedFilter);
-
-  if (error) {
-    dispatch(showNotification({
-    name: "error4", 
-    message: "Error Fetching Data.", 
-    severity: "error" 
-  }));
-  return null
+  useEffect(() => {
+  // Clear the data when address is null
+  if (!address) {
+    setMyOrdersWholeData(null); 
+    return;
   }
+
+  const baseUrl = process.env.REACT_APP_BASE_URL;
+  
+  const getMyOrdersServerData = async () => {
+    try {
+      incrementLoading()
+      const response = await axios.get<ServerResponse>(
+        `${baseUrl}/order/myOrder`,
+        {
+          headers: { "Content-Type": "application/json" },
+          timeout: axiosTimeOut,
+          withCredentials: true,
+        }
+      );
+      
+      if (response.data.success) {
+        setMyOrdersWholeData(response.data);
+      } else {
+        dispatch(
+          showNotification({
+            name: "error5",
+            message: "Error Fetching Data: " + (response.data.message || "Unknown error"),
+            severity: "error",
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(
+          showNotification({
+            name: "error5",
+            message: "Error Fetching Data: " + error,
+            severity: "error",
+          })
+        );
+    } finally{
+      decrementLoading()
+    }
+  };
+
+  getMyOrdersServerData();
+
+}, [refreshTrigger, address]);
+
+  // Filter by status first (only processing and completed)
+  const statusFilteredData2 = myOrdersWholeData?.data
+    ? myOrdersWholeData.data.filter(
+        (myOrder) =>
+          myOrder.status === "processing" || myOrder.status === "completed"
+      )
+    : [];
+
+  // Then sort the filtered data
+  const filteredAndSortedData = sortAndFilterOrders2(
+    statusFilteredData2,
+    selectedFilter === "All" ? "price" : (selectedFilter as SortOption)
+  );
 
   return (
     <>
@@ -98,7 +148,7 @@ const MyOrdersComponent: React.FC = () => {
             <LegacyCardName>My Orders</LegacyCardName>
             <MyFilterComponent
               listKey="myOrders"
-              options={["All", "energy", "bandwidth"]}
+              options={["price", "energy", "bandwidth", "latest", "oldest"]}
               label="Product"
             />
           </OrdersNavHeaderWrapper>
@@ -124,61 +174,67 @@ const MyOrdersComponent: React.FC = () => {
                 </MyOrdersNavTextWrapper>
               </MyOrdersNavWrapper>
               <OrdersCard>
-                {filteredData.map((myData) => (
-                  <>
-                    <MyOrderDetails key={myData.id}>
-                      <MyOrderCardTextWrap>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText1>{myData.date}</OrdersCardText1>
-                        </OrdersCardTextWrapper2>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText2>{myData.time}</OrdersCardText2>
-                        </OrdersCardTextWrapper2>
-                      </MyOrderCardTextWrap>
+                {filteredAndSortedData.map((myData) => {
+                  const { date, time } = formatDateTime(myData.createdAt);
 
-                      <MyOrderCardTextWrap>
-                        <OrdersCardTextWrapper2>
-                          {myData.resourceType === "energy" ? (
-                            <OrderCardIconWrapper2
-                              style={{ backgroundColor: "#003543" }}
-                            >
-                              <OrderCardIcon alt="energy" src={energyIcon} />
-                            </OrderCardIconWrapper2>
-                          ) : (
-                            <OrderCardIconWrapper2
-                              style={{ backgroundColor: "#430E00" }}
-                            >
-                              <OrderCardIcon
-                                alt="bandwidth"
-                                src={bandwidthIcon}
-                              />
-                            </OrderCardIconWrapper2>
-                          )}
-                          <OrdersCardText1>{myData.resourceAmount}</OrdersCardText1>
-                        </OrdersCardTextWrapper2>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText2>
-                            {myData.durationSec}
-                          </OrdersCardText2>
-                        </OrdersCardTextWrapper2>
-                      </MyOrderCardTextWrap>
+                  return (
+                    <>
+                      <MyOrderDetails key={myData.receiver}>
+                        <MyOrderCardTextWrap>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText1>{date}</OrdersCardText1>
+                          </OrdersCardTextWrapper2>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText2>{time}</OrdersCardText2>
+                          </OrdersCardTextWrapper2>
+                        </MyOrderCardTextWrap>
 
-                      <MyOrderCardTextWrap>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText1>{myData.price}</OrdersCardText1>
-                        </OrdersCardTextWrapper2>
-                      </MyOrderCardTextWrap>
+                        <MyOrderCardTextWrap>
+                          <OrdersCardTextWrapper2>
+                            {myData.resourceType === "energy" ? (
+                              <OrderCardIconWrapper2
+                                style={{ backgroundColor: "#003543" }}
+                              >
+                                <OrderCardIcon alt="energy" src={energyIcon} />
+                              </OrderCardIconWrapper2>
+                            ) : (
+                              <OrderCardIconWrapper2
+                                style={{ backgroundColor: "#430E00" }}
+                              >
+                                <OrderCardIcon
+                                  alt="bandwidth"
+                                  src={bandwidthIcon}
+                                />
+                              </OrderCardIconWrapper2>
+                            )}
+                            <OrdersCardText1>
+                              {myData.resourceAmount}
+                            </OrdersCardText1>
+                          </OrdersCardTextWrapper2>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText2>
+                              {myData.durationSec}
+                            </OrdersCardText2>
+                          </OrdersCardTextWrapper2>
+                        </MyOrderCardTextWrap>
 
-                      <MyOrderCardTextWrap>
-                        <OrdersCardTextWrapper2>
-                          <OrdersCardText1>
-                            {myData.totalPrice} TRX
-                          </OrdersCardText1>
-                        </OrdersCardTextWrapper2>
-                      </MyOrderCardTextWrap>
-                    </MyOrderDetails>
-                  </>
-                ))}
+                        <MyOrderCardTextWrap>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText1>{myData.price}</OrdersCardText1>
+                          </OrdersCardTextWrapper2>
+                        </MyOrderCardTextWrap>
+
+                        <MyOrderCardTextWrap>
+                          <OrdersCardTextWrapper2>
+                            <OrdersCardText1>
+                              {myData.totalPrice} TRX
+                            </OrdersCardText1>
+                          </OrdersCardTextWrapper2>
+                        </MyOrderCardTextWrap>
+                      </MyOrderDetails>
+                    </>
+                  );
+                })}
               </OrdersCard>
             </MyOrdersScroll>
           </OrdersCarouselWrapper>
