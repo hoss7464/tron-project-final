@@ -54,7 +54,6 @@ const Navbar: React.FC = () => {
   const handleDisconnect = () => {
     disconnectWallet();
     dispatch(hoverDisableToggle("avatarToggle"));
-    dispatch(toggleRefresh())
   };
 
   const shortenAddress = (address: string) => {

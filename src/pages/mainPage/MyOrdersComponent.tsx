@@ -22,6 +22,12 @@ import {
   OrdersCardText1,
   OrdersCardText2,
   MyOrdersTextWrapper,
+  CheckedSignWrapper,
+  CheckedSign,
+  OrdersSellBtnWrapper,
+  OrdersSell,
+  CanceledSignWrapper,
+  CanceledSign,
 } from "./mainPageElements";
 import { OrderCardIconWrapper2 } from "./mainPageElements";
 import { LegacyCardName } from "./LegacySection/LegacyElements";
@@ -38,7 +44,7 @@ import { useLoading } from "../../contexts/LoaderContext";
 
 interface ServerResponse {
   success: boolean;
-  message : string;
+  message: string;
   data: MarketOrder[];
 }
 interface MarketOrder {
@@ -78,59 +84,62 @@ const MyOrdersComponent: React.FC = () => {
   );
 
   useEffect(() => {
-  // Clear the data when address is null
-  if (!address) {
-    setMyOrdersWholeData(null); 
-    return;
-  }
+    // Clear the data when address is null
+    if (!address) {
+      setMyOrdersWholeData(null);
+      return;
+    }
 
-  const baseUrl = process.env.REACT_APP_BASE_URL;
-  
-  const getMyOrdersServerData = async () => {
-    try {
-      incrementLoading()
-      const response = await axios.get<ServerResponse>(
-        `${baseUrl}/order/myOrder`,
-        {
-          headers: { "Content-Type": "application/json" },
-          timeout: axiosTimeOut,
-          withCredentials: true,
-        }
-      );
-      
-      if (response.data.success) {
-        setMyOrdersWholeData(response.data);
-      } else {
-        dispatch(
-          showNotification({
-            name: "error5",
-            message: "Error Fetching Data: " + (response.data.message || "Unknown error"),
-            severity: "error",
-          })
+    const baseUrl = process.env.REACT_APP_BASE_URL;
+
+    const getMyOrdersServerData = async () => {
+      try {
+        incrementLoading();
+        const response = await axios.get<ServerResponse>(
+          `${baseUrl}/order/myOrder`,
+          {
+            headers: { "Content-Type": "application/json" },
+            timeout: axiosTimeOut,
+            withCredentials: true,
+          }
         );
-      }
-    } catch (error) {
-      dispatch(
+
+        if (response.data.success) {
+          setMyOrdersWholeData(response.data);
+        } else {
+          dispatch(
+            showNotification({
+              name: "error5",
+              message:
+                "Error Fetching Data: " +
+                (response.data.message || "Unknown error"),
+              severity: "error",
+            })
+          );
+        }
+      } catch (error) {
+        dispatch(
           showNotification({
             name: "error5",
             message: "Error Fetching Data: " + error,
             severity: "error",
           })
         );
-    } finally{
-      decrementLoading()
-    }
-  };
+      } finally {
+        decrementLoading();
+      }
+    };
 
-  getMyOrdersServerData();
-
-}, [refreshTrigger, address]);
+    getMyOrdersServerData();
+  }, [refreshTrigger, address]);
 
   // Filter by status first (only processing and completed)
   const statusFilteredData2 = myOrdersWholeData?.data
     ? myOrdersWholeData.data.filter(
         (myOrder) =>
-          myOrder.status === "processing" || myOrder.status === "completed"
+          myOrder.status === "processing" ||
+          myOrder.status === "completed" ||
+          myOrder.status === "cancelled"
       )
     : [];
 
@@ -231,6 +240,24 @@ const MyOrdersComponent: React.FC = () => {
                             </OrdersCardText1>
                           </OrdersCardTextWrapper2>
                         </MyOrderCardTextWrap>
+
+                        {myData.status === "completed" && (
+                          <CheckedSignWrapper>
+                            <CheckedSign />
+                          </CheckedSignWrapper>
+                        )}
+
+                        {myData.status === "processing" && (
+                          <OrdersSellBtnWrapper>
+                            <OrdersSell>Cancel</OrdersSell>
+                          </OrdersSellBtnWrapper>
+                        )}
+
+                        {myData.status === "cancelled" && (
+                          <CanceledSignWrapper>
+                            <CanceledSign />
+                          </CanceledSignWrapper>
+                        )}
                       </MyOrderDetails>
                     </>
                   );

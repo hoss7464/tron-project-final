@@ -47,12 +47,13 @@ import { formatDateTime } from "../../utils/dateTime";
 import { formatStrictDuration } from "../../utils/fromSec";
 import { durationToNumber } from "../../utils/durationToNum";
 import { useLoading } from "../../contexts/LoaderContext";
+import PopUp3 from "../../components/Popup/PopUp3";
 
 interface ServerResponse {
   success: boolean;
   data: MarketOrder[];
 }
-interface MarketOrder {
+export interface MarketOrder {
   createdAt: string;
   durationSec: number;
   freeze: number;
@@ -82,6 +83,9 @@ export const OrdersComponent: React.FC = () => {
   const [wholeOrderData, setWholeOrderData] = useState<ServerResponse | null>(
     null
   );
+  const [selectedOrder, setSelectedOrder] = useState<MarketOrder | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [delegateValue, setDelegateValue] = useState<number | null>(null);
   //Selectors :
   const selectedFilter = useSelector(
     (state: RootState) => state.filters["orders"] || "All"
@@ -161,6 +165,14 @@ export const OrdersComponent: React.FC = () => {
     const calculatedAPY = ((myTotal / myFreeze) ^ 365) / duration;
     return parseFloat(calculatedAPY.toFixed(2));
   };
+  //------------------------------------------------------------------------------------------------------------
+  //Functions for popup :
+  const handleSellClick = (order: MarketOrder) => {
+    const value = order.freeze - order.frozen;
+    setDelegateValue(value);
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
 
   return (
     <>
@@ -203,11 +215,12 @@ export const OrdersComponent: React.FC = () => {
                 </OrderNavTextWrapper1>
               </OrderNavWrapper>
               <OrdersCard>
-                {paginatedData.map((myData) => {
+                {paginatedData.map((myData, index) => {
                   const { date, time } = formatDateTime(myData.createdAt);
+                 
                   return (
                     <>
-                      <OrdersDetail key={myData.receiver}>
+                      <OrdersDetail key={index}>
                         <OrdersCardTextWrap>
                           <OrdersCardTextWrapper2>
                             <OrdersCardText1>{time}</OrdersCardText1>
@@ -308,12 +321,15 @@ export const OrdersComponent: React.FC = () => {
                             />
                           </OrderCardLinearWrapper>
                         </OrderCardLinearWrapper2>
+
                         {myData.status === "completed" ? (
                           <CheckedSignWrapper>
                             <CheckedSign />
                           </CheckedSignWrapper>
                         ) : (
-                          <OrdersSellBtnWrapper>
+                          <OrdersSellBtnWrapper
+                            onClick={() => handleSellClick(myData)}
+                          >
                             <OrdersSell>Sell</OrdersSell>
                           </OrdersSellBtnWrapper>
                         )}
@@ -343,6 +359,12 @@ export const OrdersComponent: React.FC = () => {
           />
         </OedersPaginationWrapper>
       </OrdersWrapper>
+      <PopUp3
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        order={selectedOrder}
+        myDelegate={delegateValue}
+      />
     </>
   );
 };

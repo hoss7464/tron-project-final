@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { ThemeColor } from "../../core-UI/Theme";
+import { IoSettingsSharp } from "react-icons/io5";
 
 
 export const PopUpContainer = styled.div`
@@ -96,6 +97,39 @@ font-size: 15px;
 font-weight: 500;
 `
 
+export const Pop3Form = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+`
 
+export const  PopupFormInputWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+width: 100%;
+`
+
+export const FormMaxBtn = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 10px 16px;
+border-radius: 8px;
+cursor: pointer;
+background-color: ${ThemeColor.secondary1};
+margin-left: 0.5rem;
+`
+export const FormMaxBtnText = styled.p`
+color: ${ThemeColor.text2};
+font-size: 16px;
+font-weight: 500;
+`
+
+export const SettingIcon = styled(IoSettingsSharp)`
+color: ${ThemeColor.text2};
+width: 16px;
+height: 16px;
+`
 
 

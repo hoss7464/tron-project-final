@@ -4,6 +4,7 @@ import { IoCopy } from "react-icons/io5";
 import { MdOutlineAccountBalanceWallet } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { IoCheckbox } from "react-icons/io5";
+import { IoClose } from "react-icons/io5";
 
 //--------------------------------------------------------------------------
 //Main page styles :
@@ -810,10 +811,23 @@ export const CheckedSignWrapper = styled.div`
   right: 0.7rem;
 `;
 export const CheckedSign = styled(IoCheckbox)`
-  color: ${ThemeColor.secondary1};
+  color: ${ThemeColor.primary1};
   width: 32px;
   height: 32px;
 `;
+
+export const CanceledSignWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 0.7rem;
+`
+export const CanceledSign = styled(IoClose)`
+  color: ${ThemeColor.secondary1};
+  width: 32px;
+  height: 32px;
+`
 
 export const OedersPaginationWrapper = styled.div`
   display: flex;
@@ -920,3 +934,15 @@ export const MyOrderCardTextWrap = styled.div`
   width: 25%;
   height: 100%;
 `;
+
+export const CancledgButonWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+`
+
+export const CancledgButton = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+`
