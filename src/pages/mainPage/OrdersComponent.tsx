@@ -34,6 +34,7 @@ import {
   CheckedSignWrapper,
   CheckedSign,
 } from "./mainPageElements";
+import { useTronWallet } from "../../contexts/TronWalletContext";
 import { LegacyCardName } from "./LegacySection/LegacyElements";
 import LinearProgress from "@mui/material/LinearProgress";
 import Pagination from "@mui/material/Pagination";
@@ -79,16 +80,22 @@ export const OrdersComponent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 7;
   const { incrementLoading, decrementLoading } = useLoading();
+  const { address } = useTronWallet();
 
-  const [wholeOrderData, setWholeOrderData] = useState<ServerResponse | null>(null);
+  const [wholeOrderData, setWholeOrderData] = useState<ServerResponse | null>(
+    null
+  );
   const [selectedOrder, setSelectedOrder] = useState<MarketOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [delegateValue, setDelegateValue] = useState<number | null>(null);
 
   //Selectors :
   const selectedFilter = useSelector(
-    (state: RootState) => state.filters["orders"] || "All");
-  const refreshTrigger = useSelector((state: RootState) => state.refresh.refreshTrigger);
+    (state: RootState) => state.filters["orders"] || "All"
+  );
+  const refreshTrigger = useSelector(
+    (state: RootState) => state.refresh.refreshTrigger
+  );
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
   //------------------------------------------------------------------------------------------------------------
@@ -164,12 +171,21 @@ export const OrdersComponent: React.FC = () => {
   //------------------------------------------------------------------------------------------------------------
   //Functions for popup :
   const handleSellClick = (order: MarketOrder) => {
+    if (!address) {
+      dispatch(
+        showNotification({
+          name: "error6",
+          message: "Connect your wallet.",
+          severity: "error",
+        })
+      );
+      return;
+    }
     const value = order.freeze - order.frozen;
     setDelegateValue(value);
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
-
 
   return (
     <>
@@ -214,7 +230,7 @@ export const OrdersComponent: React.FC = () => {
               <OrdersCard>
                 {paginatedData.map((myData, index) => {
                   const { date, time } = formatDateTime(myData.createdAt);
-                 
+
                   return (
                     <>
                       <OrdersDetail key={index}>

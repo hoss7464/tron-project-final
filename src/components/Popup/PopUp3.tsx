@@ -76,6 +76,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   const [maxCandle, setMaxCandle] = useState<number | null>(null);
   //state for delegate input :
   const [delegatedAmount, setDelegatedAmount] = useState<string>("");
+  const [delegateInputError, setDelegateInputError] = useState<string>("");
 
   //-------------------------------------------------------------------------------------------
   //Functions for Payout target address input :
@@ -126,8 +127,11 @@ const PopUp3: React.FC<Popup3Types> = ({
         | "BANDWIDTH";
 
       // Fetch max delegatable amount (returns { max_size: number })
-      const { max_size: maxCandelegated } =
+
+      let { max_size: maxCandelegated } =
         await tronWeb.trx.getCanDelegatedMaxSize(address, resourceType);
+
+      maxCandelegated = maxCandelegated / 1_000_000;
 
       if (maxCandelegated > myDelegate) {
         setMaxCandle(myDelegate);
@@ -157,7 +161,9 @@ const PopUp3: React.FC<Popup3Types> = ({
   //Function for delegated input :
   const handleMaxClick = () => {
     if (maxCandle !== null) {
-      setDelegatedAmount(maxCandle.toFixed(2));
+      const roundedValue = Math.floor(maxCandle); // Rounds to nearest integer
+      setDelegatedAmount(roundedValue.toString());
+      setDelegateInputError("");
     }
   };
 
@@ -165,25 +171,63 @@ const PopUp3: React.FC<Popup3Types> = ({
   // Function for delegated input validation
   const handleDelegateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    const MIN_DELEGATE_AMOUNT = Number(
+      process.env.REACT_APP_MIN_DELEGATE_AMOUNT
+    );
 
-    // 1. Only allow numbers and single decimal point
-    if (!/^(\d+\.?\d*|\.\d+)?$/.test(value) && value !== "") {
+    // 1. Allow empty input (for deletion)
+    if (value === "") {
+      setDelegatedAmount("");
+      setDelegateInputError("");
       return;
     }
 
-    // 2. Convert to number for validation checks
-    const numericValue = parseFloat(value);
+    // 2. Block invalid characters (only numbers and .)
+    if (!/^\d*$/.test(value)) {
+      return;
+    }
 
-    // 3. Validate against maxCandle if it exists
-    if (maxCandle !== null && !isNaN(numericValue)) {
-      // 3a. Must be positive (greater than 0)
-      // 3b. Must not exceed maxCandle
-      if (numericValue > maxCandle || numericValue < 0) {
-        return; // Reject invalid input
+    // 3. Don't allow multiple decimal points
+    if ((value.match(/\./g) || []).length > 1) {
+      return;
+    }
+
+    // 4. Update the input value immediately (don't validate during typing)
+    setDelegatedAmount(value);
+    setDelegateInputError("");
+  };
+
+  // Add this new function to validate on blur
+  const handleDelegateBlur = () => {
+    const MIN_DELEGATE_AMOUNT = Number(
+      process.env.REACT_APP_MIN_DELEGATE_AMOUNT
+    );
+
+    if (delegatedAmount === "") return;
+
+    const numericValue = parseFloat(delegatedAmount);
+    const roundedMax = maxCandle !== null ? Math.floor(maxCandle) : null;
+
+    if (isNaN(numericValue)) {
+      setDelegateInputError("Enter a valid number");
+      return;
+    }
+
+    if (roundedMax !== null) {
+      if (numericValue > roundedMax) {
+        setDelegateInputError(`Cannot exceed ${roundedMax}`);
+        return;
+      } else if (numericValue < MIN_DELEGATE_AMOUNT) {
+        setDelegateInputError(`Min amount is ${MIN_DELEGATE_AMOUNT}`);
+        return;
+      } else if (numericValue <= 0) {
+        setDelegateInputError("Amount must be positive");
+        return;
       }
     }
 
-    setDelegatedAmount(value);
+    // Format the number to 2 decimal places when blurring
+    setDelegatedAmount(Math.round(numericValue).toString());
   };
 
   // Function to prevent invalid paste
@@ -195,7 +239,40 @@ const PopUp3: React.FC<Popup3Types> = ({
   };
   //-------------------------------------------------------------------------------------------
   const handleFill = async () => {
-    if (!order?.receiver || !maxCandle || !address) {
+    // Validate delegated amount first
+    const MIN_DELEGATE_AMOUNT = Number(
+      process.env.REACT_APP_MIN_DELEGATE_AMOUNT
+    );
+    const numericDelegatedAmount = parseFloat(delegatedAmount);
+    const roundedMax = maxCandle !== null ? Math.floor(maxCandle) : null;
+
+    // Check if delegated amount is valid
+    if (isNaN(numericDelegatedAmount)) {
+      setDelegateInputError("Enter a valid number");
+      return;
+    }
+
+    if (roundedMax !== null) {
+      if (numericDelegatedAmount > roundedMax) {
+        setDelegateInputError(`Cannot exceed ${roundedMax}`);
+        return;
+      } else if (numericDelegatedAmount < MIN_DELEGATE_AMOUNT) {
+        setDelegateInputError(`Min amount is ${MIN_DELEGATE_AMOUNT}`);
+        return;
+      } else if (numericDelegatedAmount <= 0) {
+        setDelegateInputError("Amount must be positive");
+        return;
+      }
+    }
+
+    // Validate requester address
+    if (!validationRequesterAdd(requesterInput)) {
+      setRequesterError("Invalid wallet address");
+      return;
+    }
+
+    // Check required fields
+    if (!order?.receiver || !address) {
       dispatch(
         showNotification({
           name: "Order-popuo-error3",
@@ -209,7 +286,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     try {
       const result = await fillOrder(
         order.receiver,
-        maxCandle,
+        numericDelegatedAmount,
         order.resourceType,
         address,
         false,
@@ -224,7 +301,8 @@ const PopUp3: React.FC<Popup3Types> = ({
             severity: "success",
           })
         );
-      } 
+        handleClose(); // Close the popup on success
+      }
     } catch (err) {
       dispatch(
         showNotification({
@@ -241,6 +319,8 @@ const PopUp3: React.FC<Popup3Types> = ({
   const handleClose = () => {
     setMaxCandle(null);
     setDelegatedAmount("");
+    setDelegateInputError("");
+    setRequesterError(null);
     onClose();
   };
   //-------------------------------------------------------------------------------------------
@@ -310,6 +390,13 @@ const PopUp3: React.FC<Popup3Types> = ({
         <FormAddInputLabelWrapper>
           <FormAddLabelWrapper>
             <FormAddLabel>To delegated amount (TRX)</FormAddLabel>
+            {delegateInputError ? (
+              <FormErrorWrapper>
+                <FormError>{delegateInputError}</FormError>
+              </FormErrorWrapper>
+            ) : (
+              ""
+            )}
           </FormAddLabelWrapper>
           <PopupFormInputWrapper>
             <FormAddInputWrapper style={{ height: "38px" }}>
@@ -317,9 +404,9 @@ const PopUp3: React.FC<Popup3Types> = ({
                 <FormAddInput
                   value={delegatedAmount}
                   onChange={handleDelegateChange}
+                  onBlur={handleDelegateBlur}
                   onPaste={handlePaste}
                   type="text"
-                  inputMode="decimal"
                   placeholder="0.00"
                 />
               </FormAddInputWrapper2>

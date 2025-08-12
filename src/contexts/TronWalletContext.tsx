@@ -647,11 +647,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Convert amount to sun (fixed type issue)
       const amountInSun = tronWeb.toSun(delegateAmount);
+      const amountInSun2 = Math.round(Number(amountInSun))
 
       // Create transaction (fixed parameter type issue)
       const transactionDelegated =
         await tronWeb.transactionBuilder.delegateResource(
-          Number(amountInSun),
+          amountInSun2,
           receiverAddress,
           resourceType2,
           requesterAddress,
