@@ -49,6 +49,8 @@ import { formatStrictDuration } from "../../utils/fromSec";
 import { formatDateTime } from "../../utils/dateTime";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import { TronWeb } from "tronweb";
+import { showNotification } from "../../redux/actions/notifSlice";
+import { useDispatch } from "react-redux";
 
 interface Popup3Types {
   open: boolean;
@@ -63,6 +65,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   order,
   myDelegate,
 }) => {
+  const dispatch = useDispatch();
   //States :
   //states for requester input :
   const [requesterInput, setRequesterInput] = useState("");
@@ -105,7 +108,13 @@ const PopUp3: React.FC<Popup3Types> = ({
   //Functions for maximum candelicate button :
   const maxCandleHandler = async () => {
     if (!address || !order || myDelegate === null) {
-      console.error("Missing required data (address, order, or myDelegate)");
+      dispatch(
+        showNotification({
+          name: "Order-popuo-error1",
+          message: "Missing required data.",
+          severity: "error",
+        })
+      );
       return;
     }
 
@@ -128,7 +137,14 @@ const PopUp3: React.FC<Popup3Types> = ({
         return;
       }
     } catch (error) {
-      console.error("Error in maxCandleHandler:", error);
+      dispatch(
+        showNotification({
+          name: "Order-popuo-error2",
+          message: "Error in maxCandleHandler:"+ error,
+          severity: "error",
+        })
+      );
+      
     }
   };
   //Function to run maxCandleHandler when popoup loads :
@@ -260,8 +276,8 @@ const PopUp3: React.FC<Popup3Types> = ({
                   value={delegatedAmount}
                   onChange={handleDelegateChange}
                   onPaste={handlePaste}
-                  type="text" 
-                  inputMode="decimal" 
+                  type="text"
+                  inputMode="decimal"
                   placeholder="0.00"
                 />
               </FormAddInputWrapper2>
