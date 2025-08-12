@@ -22,6 +22,16 @@ interface TronWalletContextProps {
   ) => Promise<TrxTransferResult>;
   isTransferring: boolean;
   transferError: string | null;
+  fillTRX: boolean;
+  fillTrxError: string | null;
+  fillOrder: (
+    receiverAddress: string,
+    delegateAmount: number,
+    resourceType: string | null,
+    requesterAddress: string,
+    lock: boolean,
+    lockPeriod: number
+  ) => Promise<fillOrder>;
 }
 //Disconnect interface :
 interface DisconnectResponse {
@@ -35,6 +45,12 @@ interface DisconnectResponse {
 }
 //Type for TRX transfer :
 type TrxTransferResult = {
+  success: boolean;
+  txId?: string;
+  error?: string;
+};
+
+type fillOrder = {
   success: boolean;
   txId?: string;
   error?: string;
@@ -72,6 +88,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //States for Transfering TRX :
   const [isTransferring, setIsTransferring] = useState(false);
   const [transferError, setTransferError] = useState<string | null>(null);
+  //States for filling sell button :
+  const [fillTRX, setFillTRX] = useState(false);
+  const [fillTrxError, setFillTrxError] = useState<string | null>("");
+
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
   //-------------------------------------------------------------------------------------
@@ -176,7 +196,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const access_Token = server_data_json.data.access_token;
       //To save refressh_token, access_token, wallet address into a json
       const localStorageSavedData = {
-        
         wallet_address: addr,
       };
       //To save localStorageSavedData in localStorage :
@@ -264,7 +283,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           {},
           { withCredentials: true, timeout: axiosTimeOut }
         );
-        console.log(response.data.success)
+        console.log(response.data.success);
         if (response.data.success === false) {
           dispatch(
             showNotification({
@@ -289,45 +308,45 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //-------------------------------------------------------------------------------------
   //Function to disconnect wallet :
   const disconnectWallet = async () => {
-  try {
-    // First try to logout from server
-    await localStorageDeleteData();
-    
-    // Clear local state only after successful server logout
-    setAddress(null);
-    setBalance(null);
-    setAllBandwidth(null);
-    setAvailableBandwidth(null);
-    setAllEnergy(null);
-    setAvailableEnergy(null);
-    toggleRefresh();
+    try {
+      // First try to logout from server
+      await localStorageDeleteData();
 
-    dispatch(
-      showNotification({
-        name: "tron-success6",
-        message: "Disconnect successful.",
-        severity: "success",
-      })
-    );
-  } catch (err) {
-    // If server logout fails, we still clear local state but show an error
-    setAddress(null);
-    setBalance(null);
-    setAllBandwidth(null);
-    setAvailableBandwidth(null);
-    setAllEnergy(null);
-    setAvailableEnergy(null);
-    toggleRefresh();
-    
-    dispatch(
-      showNotification({
-        name: "tron-error6",
-        message: "Disconnected locally but server logout failed",
-        severity: "warning",
-      })
-    );
-  }
-};
+      // Clear local state only after successful server logout
+      setAddress(null);
+      setBalance(null);
+      setAllBandwidth(null);
+      setAvailableBandwidth(null);
+      setAllEnergy(null);
+      setAvailableEnergy(null);
+      toggleRefresh();
+
+      dispatch(
+        showNotification({
+          name: "tron-success6",
+          message: "Disconnect successful.",
+          severity: "success",
+        })
+      );
+    } catch (err) {
+      // If server logout fails, we still clear local state but show an error
+      setAddress(null);
+      setBalance(null);
+      setAllBandwidth(null);
+      setAvailableBandwidth(null);
+      setAllEnergy(null);
+      setAvailableEnergy(null);
+      toggleRefresh();
+
+      dispatch(
+        showNotification({
+          name: "tron-error6",
+          message: "Disconnected locally but server logout failed",
+          severity: "warning",
+        })
+      );
+    }
+  };
   //-------------------------------------------------------------------------------------
   //Function sign the message :
   const signMessage = async (message: string): Promise<string | null> => {
@@ -538,8 +557,153 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
   //-------------------------------------------------------------------------------------
-  
-  
+  //Delegated other (this function is for filling trx in sell button) :
+  const fillOrder = async (
+    receiverAddress: string,
+    delegateAmount: number,
+    resourceType: string | null,
+    requesterAddress: string,
+    lock: boolean,
+    lockPeriod: number
+  ): Promise<fillOrder> => {
+    setFillTRX(true);
+    setFillTrxError(null);
+
+    try {
+      //validate connection :
+      const baseUrl = process.env.REACT_APP_TRON_API;
+      if (!address || !adapter.connected) {
+        dispatch(
+          showNotification({
+            name: "tron-error6",
+            message: "No wallet address found. Please connect your wallet.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "Wallet not connected" };
+      }
+
+    
+      //To import TronWeb localy :
+      const { TronWeb } = await import("tronweb");
+      //nile network url :
+      const tronNileUrl = process.env.REACT_APP_TRON_API;
+      //To get data from api.trongrid.io
+      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+      const MainAddress = process.env.REACT_APP_TRON_API;
+      if (window?.tronWeb?.fullNode.host !== MainAddress) {
+        dispatch(
+          showNotification({
+            name: "tron-error100",
+            message: "Switch to mainnet network.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "Switch to mainnet network." };
+      }
+
+      if (!tronWeb) {
+        dispatch(
+          showNotification({
+            name: "tron-error7",
+            message: "TronWeb is not available.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "TronWeb is not available." };
+      }
+
+      // Validate inputs
+      if (!tronWeb.isAddress(receiverAddress)) {
+        dispatch(
+          showNotification({
+            name: "tron-error8",
+            message: "Invalid recipient address.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "Invalid recipient address." };
+      }
+
+      // Check balance
+      const resourceType2 = resourceType?.toUpperCase() as
+        | "ENERGY"
+        | "BANDWIDTH";
+
+      const currentDelegated = await tronWeb.trx.getCanDelegatedMaxSize(
+        requesterAddress,
+        resourceType2
+      );
+      if (Number(currentDelegated) > delegateAmount) {
+        dispatch(
+          showNotification({
+            name: "tron-error10",
+            message: "Insufficient balance.",
+            severity: "error",
+          })
+        );
+        return { success: false, error: "Insufficient balance." };
+      }
+
+      // Convert amount to sun (fixed type issue)
+      const amountInSun = tronWeb.toSun(delegateAmount);
+
+      // Create transaction (fixed parameter type issue)
+      const transactionDelegated =
+        await tronWeb.transactionBuilder.delegateResource(
+          Number(amountInSun),
+          receiverAddress,
+          resourceType2,
+          requesterAddress,
+          lock,
+          0
+        );
+
+      // Sign transaction using adapter
+      const signedTx = await adapter.signTransaction(transactionDelegated);
+
+      // Broadcast transaction using TronWeb directly
+      const txResult = await tronWeb.trx.sendRawTransaction(signedTx);
+
+      // Verify transaction
+      if (!txResult?.transaction?.txID && !txResult?.txid) {
+        dispatch(
+          showNotification({
+            name: "tron-error11",
+            message: "Transaction failed: no transaction ID received.",
+            severity: "error",
+          })
+        );
+        return {
+          success: false,
+          error: "Transaction failed: no transaction ID received.",
+        };
+      }
+
+      return {
+        success: true,
+        txId: txResult.transaction?.txID || txResult.txid,
+      };
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Transfer failed";
+
+      dispatch(
+        showNotification({
+          name: "tron-error12",
+          message: errorMessage,
+          severity: "error",
+        })
+      );
+
+      setFillTrxError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setFillTRX(false);
+    }
+  };
+  //-------------------------------------------------------------------------------------
+
   return (
     <TronWalletContext.Provider
       value={{
@@ -555,6 +719,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         transferTrx,
         isTransferring,
         transferError,
+        fillOrder,
+        fillTRX,
+        fillTrxError,
       }}
     >
       {children}

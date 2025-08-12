@@ -71,7 +71,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   const [requesterInput, setRequesterInput] = useState("");
   const [requesterError, setRequesterError] = useState<string | null>(null);
   //to get address from useTronWallet :
-  const { address } = useTronWallet();
+  const { address, fillOrder, fillTRX, fillTrxError } = useTronWallet();
   //state for candelegated amount :
   const [maxCandle, setMaxCandle] = useState<number | null>(null);
   //state for delegate input :
@@ -140,11 +140,10 @@ const PopUp3: React.FC<Popup3Types> = ({
       dispatch(
         showNotification({
           name: "Order-popuo-error2",
-          message: "Error in maxCandleHandler:"+ error,
+          message: "Error in maxCandleHandler:" + error,
           severity: "error",
         })
       );
-      
     }
   };
   //Function to run maxCandleHandler when popoup loads :
@@ -179,7 +178,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     if (maxCandle !== null && !isNaN(numericValue)) {
       // 3a. Must be positive (greater than 0)
       // 3b. Must not exceed maxCandle
-      if (numericValue > maxCandle || numericValue <= 0) {
+      if (numericValue > maxCandle || numericValue < 0) {
         return; // Reject invalid input
       }
     }
@@ -192,6 +191,49 @@ const PopUp3: React.FC<Popup3Types> = ({
     const pastedData = e.clipboardData.getData("text");
     if (!/^(\d+\.?\d*|\.\d+)?$/.test(pastedData)) {
       e.preventDefault();
+    }
+  };
+  //-------------------------------------------------------------------------------------------
+  const handleFill = async () => {
+    if (!order?.receiver || !maxCandle || !address) {
+      dispatch(
+        showNotification({
+          name: "Order-popuo-error3",
+          message: "Missing required data",
+          severity: "error",
+        })
+      );
+      return;
+    }
+
+    try {
+      const result = await fillOrder(
+        order.receiver,
+        maxCandle,
+        order.resourceType,
+        address,
+        false,
+        0
+      );
+
+      if (result.success) {
+        dispatch(
+          showNotification({
+            name: "Order-popup-success",
+            message: "Delegation successful!",
+            severity: "success",
+          })
+        );
+      } 
+    } catch (err) {
+      dispatch(
+        showNotification({
+          name: "Order-popuo-error4",
+          message: err instanceof Error ? err.message : "Network failure",
+          severity: "error",
+        })
+      );
+      return;
     }
   };
   //-------------------------------------------------------------------------------------------
@@ -434,6 +476,7 @@ const PopUp3: React.FC<Popup3Types> = ({
               backgroundColor: "#430E00",
               borderRadius: "10px",
             }}
+            onClick={handleFill}
           >
             Fill
           </Button>
