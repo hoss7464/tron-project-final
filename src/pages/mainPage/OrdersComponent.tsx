@@ -80,19 +80,15 @@ export const OrdersComponent: React.FC = () => {
   const rowsPerPage = 7;
   const { incrementLoading, decrementLoading } = useLoading();
 
-  const [wholeOrderData, setWholeOrderData] = useState<ServerResponse | null>(
-    null
-  );
+  const [wholeOrderData, setWholeOrderData] = useState<ServerResponse | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<MarketOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [delegateValue, setDelegateValue] = useState<number | null>(null);
+
   //Selectors :
   const selectedFilter = useSelector(
-    (state: RootState) => state.filters["orders"] || "All"
-  );
-  const refreshTrigger = useSelector(
-    (state: RootState) => state.refresh.refreshTrigger
-  );
+    (state: RootState) => state.filters["orders"] || "All");
+  const refreshTrigger = useSelector((state: RootState) => state.refresh.refreshTrigger);
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
   //------------------------------------------------------------------------------------------------------------
@@ -173,6 +169,7 @@ export const OrdersComponent: React.FC = () => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
+
 
   return (
     <>

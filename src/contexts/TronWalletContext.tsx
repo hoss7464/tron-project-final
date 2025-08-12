@@ -101,7 +101,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //To get data from any network
       const window_tronweb = (window as any).tronWeb;
 
-      //To get data from api.trongrid.io
+      //To get data from tron nile :
       const tronWeb = new TronWeb({ fullHost: tronNileUrl });
       //base url :
       const baseURL = process.env.REACT_APP_BASE_URL;
@@ -538,6 +538,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
   //-------------------------------------------------------------------------------------
+  
+  
   return (
     <TronWalletContext.Provider
       value={{

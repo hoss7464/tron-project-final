@@ -126,6 +126,22 @@ font-size: 16px;
 font-weight: 500;
 `
 
+export const FormMaxCandleBtn = styled.button`
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 10px 16px;
+border-radius: 8px;
+border: none;
+outline: none;
+cursor: pointer;
+background-color: ${ThemeColor.secondary1};
+margin-left: 0.5rem;
+color: ${ThemeColor.text2};
+font-size: 16px;
+font-weight: 500;
+`
+
 export const SettingIcon = styled(IoSettingsSharp)`
 color: ${ThemeColor.text2};
 width: 16px;

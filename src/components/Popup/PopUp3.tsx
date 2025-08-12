@@ -23,6 +23,7 @@ import {
   PopupFormInputWrapper,
   FormMaxBtn,
   FormMaxBtnText,
+  FormMaxCandleBtn,
   SettingIcon,
 } from "./PopUpElements";
 import {
@@ -47,6 +48,7 @@ import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import { formatStrictDuration } from "../../utils/fromSec";
 import { formatDateTime } from "../../utils/dateTime";
 import { useTronWallet } from "../../contexts/TronWalletContext";
+import { TronWeb } from "tronweb";
 
 interface Popup3Types {
   open: boolean;
@@ -62,13 +64,18 @@ const PopUp3: React.FC<Popup3Types> = ({
   myDelegate,
 }) => {
   //States :
+  //states for requester input :
   const [requesterInput, setRequesterInput] = useState("");
   const [requesterError, setRequesterError] = useState<string | null>(null);
+  //to get address from useTronWallet :
   const { address } = useTronWallet();
+  //state for candelegated amount :
+  const [maxCandle, setMaxCandle] = useState<number | null>(null);
+  //state for delegate input :
+  const [delegatedAmount, setDelegatedAmount] = useState<string>("");
 
   //-------------------------------------------------------------------------------------------
   //Functions for Payout target address input :
-
   //Wallet address validation :
   const validationRequesterAdd = (address: string) => {
     const walletAddRegX = /^T[a-zA-Z0-9]{33}$/;
@@ -95,8 +102,93 @@ const PopUp3: React.FC<Popup3Types> = ({
     }
   };
   //-------------------------------------------------------------------------------------------
+  //Functions for maximum candelicate button :
+  const maxCandleHandler = async () => {
+    if (!address || !order || myDelegate === null) {
+      console.error("Missing required data (address, order, or myDelegate)");
+      return;
+    }
+
+    try {
+      const tronNileUrl = process.env.REACT_APP_TRON_API;
+      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+      const resourceType = order.resourceType.toUpperCase() as
+        | "ENERGY"
+        | "BANDWIDTH";
+
+      // Fetch max delegatable amount (returns { max_size: number })
+      const { max_size: maxCandelegated } =
+        await tronWeb.trx.getCanDelegatedMaxSize(address, resourceType);
+
+      if (maxCandelegated > myDelegate) {
+        setMaxCandle(myDelegate);
+      } else if (maxCandelegated < myDelegate) {
+        setMaxCandle(maxCandelegated);
+      } else {
+        return;
+      }
+    } catch (error) {
+      console.error("Error in maxCandleHandler:", error);
+    }
+  };
+  //Function to run maxCandleHandler when popoup loads :
+  useEffect(() => {
+    if (open && address && order && myDelegate !== null) {
+      maxCandleHandler();
+    }
+  }, [open, address, order, myDelegate]);
+
+  //-------------------------------------------------------------------------------------------
+  //Function for delegated input :
+  const handleMaxClick = () => {
+    if (maxCandle !== null) {
+      setDelegatedAmount(maxCandle.toFixed(2));
+    }
+  };
+
+  //-------------------------------------------------------------------------------------------
+  // Function for delegated input validation
+  const handleDelegateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // 1. Only allow numbers and single decimal point
+    if (!/^(\d+\.?\d*|\.\d+)?$/.test(value) && value !== "") {
+      return;
+    }
+
+    // 2. Convert to number for validation checks
+    const numericValue = parseFloat(value);
+
+    // 3. Validate against maxCandle if it exists
+    if (maxCandle !== null && !isNaN(numericValue)) {
+      // 3a. Must be positive (greater than 0)
+      // 3b. Must not exceed maxCandle
+      if (numericValue > maxCandle || numericValue <= 0) {
+        return; // Reject invalid input
+      }
+    }
+
+    setDelegatedAmount(value);
+  };
+
+  // Function to prevent invalid paste
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pastedData = e.clipboardData.getData("text");
+    if (!/^(\d+\.?\d*|\.\d+)?$/.test(pastedData)) {
+      e.preventDefault();
+    }
+  };
+  //-------------------------------------------------------------------------------------------
+  //Funtion to close popup :
+  const handleClose = () => {
+    setMaxCandle(null);
+    setDelegatedAmount("");
+    onClose();
+  };
+  //-------------------------------------------------------------------------------------------
   if (!order) return null;
   const { date, time } = formatDateTime(order.createdAt);
+
   return (
     <Pop3Form>
       <Dialog
@@ -105,7 +197,7 @@ const PopUp3: React.FC<Popup3Types> = ({
           if (reason === "backdropClick" || reason === "escapeKeyDown") {
             return;
           }
-          onClose();
+          handleClose();
         }}
         sx={{
           "& .MuiDialog-container": {
@@ -164,12 +256,19 @@ const PopUp3: React.FC<Popup3Types> = ({
           <PopupFormInputWrapper>
             <FormAddInputWrapper style={{ height: "38px" }}>
               <FormAddInputWrapper2>
-                <FormAddInput value="" />
+                <FormAddInput
+                  value={delegatedAmount}
+                  onChange={handleDelegateChange}
+                  onPaste={handlePaste}
+                  type="text" 
+                  inputMode="decimal" 
+                  placeholder="0.00"
+                />
               </FormAddInputWrapper2>
             </FormAddInputWrapper>
-            <FormMaxBtn>
-              <FormMaxBtnText>Max</FormMaxBtnText>
-            </FormMaxBtn>
+            <FormMaxCandleBtn onClick={handleMaxClick} value={maxCandle ?? 0}>
+              Max
+            </FormMaxCandleBtn>
           </PopupFormInputWrapper>
         </FormAddInputLabelWrapper>
 
@@ -336,7 +435,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                 backgroundColor: "rgba(67, 14, 0, 0.04)",
               },
             }}
-            onClick={onClose}
+            onClick={handleClose}
           >
             Cancel
           </Button>
