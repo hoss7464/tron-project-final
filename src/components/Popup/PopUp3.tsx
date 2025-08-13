@@ -75,7 +75,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   const [requesterInput, setRequesterInput] = useState("");
   const [requesterError, setRequesterError] = useState<string | null>(null);
   //to get address from useTronWallet :
-  const { address, fillOrder, fillTRX, fillTrxError } = useTronWallet();
+  const { address, fillOrder } = useTronWallet();
   //state for candelegated amount :
   const [maxCandle, setMaxCandle] = useState<number | null>(null);
   //state for delegate input :
@@ -83,7 +83,8 @@ const PopUp3: React.FC<Popup3Types> = ({
   const [delegateInputError, setDelegateInputError] = useState<string>("");
   //Multi signature states :
   const [multiSignature, setMultiSignature] = useState<string | null>(null);
-  const [signatureError, setSignatureError] = useState<string | null>("");
+  const [isSignatureTouched, setIsSignatureTouched] = useState(false);
+  const [signatureError, setSignatureError] = useState<string | null>(null);
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [settingBtn, setSettingBtn] = useState(false);
@@ -149,10 +150,9 @@ const PopUp3: React.FC<Popup3Types> = ({
         } else {
           return;
         }
-        //if settingBtn === true  use client input in getCanDelegatedMaxSize 
+        //if settingBtn === true  use client input in getCanDelegatedMaxSize
       } else if (settingBtn === true) {
         if (!multiSignature) {
-        setSignatureError("Multi-signature is not set ")
           return;
         }
 
@@ -175,13 +175,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         return;
       }
     } catch (error) {
-      dispatch(
-        showNotification({
-          name: "Order-popuo-error2",
-          message: "Error in maxCandleHandler:" + error,
-          severity: "error",
-        })
-      );
+      setSignatureError("Invalid address");
     }
   };
   //Function to run maxCandleHandler when popoup loads :
@@ -206,6 +200,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     const MIN_DELEGATE_AMOUNT = Number(
       process.env.REACT_APP_MIN_DELEGATE_AMOUNT
     );
+    const roundedMax = maxCandle !== null ? Math.floor(maxCandle) : null;
 
     // 1. Allow empty input (for deletion)
     if (value === "") {
@@ -219,14 +214,21 @@ const PopUp3: React.FC<Popup3Types> = ({
       return;
     }
 
-    // 3. Don't allow multiple decimal points
-    if ((value.match(/\./g) || []).length > 1) {
-      return;
-    }
-
     // 4. Update the input value immediately (don't validate during typing)
     setDelegatedAmount(value);
-    setDelegateInputError("");
+    // 4. Validate against min/max during typing (but don't show error until blur)
+    const numericValue = parseFloat(value);
+    if (!isNaN(numericValue)) {
+      if (roundedMax !== null && numericValue > roundedMax) {
+        setDelegateInputError(`Cannot exceed ${roundedMax}`);
+      } else if (numericValue < MIN_DELEGATE_AMOUNT) {
+        setDelegateInputError(`Min amount is ${MIN_DELEGATE_AMOUNT}`);
+      } else if (numericValue <= 0) {
+        setDelegateInputError("Amount must be positive");
+      } else {
+        setDelegateInputError(""); // Clear error if valid
+      }
+    }
   };
   // Function to validate blur :
   const handleDelegateBlur = () => {
@@ -352,7 +354,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     setDelegateInputError("");
     setRequesterError(null);
     setSettingBtn(false);
-    setMultiSignature(null)
+    setMultiSignature(null);
     setSignatureError("");
     onClose();
   };
@@ -370,8 +372,14 @@ const PopUp3: React.FC<Popup3Types> = ({
   const menuOpen = Boolean(anchorEl);
 
   const handleSettingFill = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let partialValue = event.target.checked;
+    const partialValue = event.target.checked;
     setSettingBtn(partialValue);
+    setDelegatedAmount("");
+    // Reset touched state when toggling
+    if (!partialValue) {
+      setIsSignatureTouched(false);
+      setSignatureError(null);
+    }
   };
   //-------------------------------------------------------------------------------------------
   //Functions for multi-signature :
@@ -385,7 +393,11 @@ const PopUp3: React.FC<Popup3Types> = ({
   ) => {
     const value = event.target.value;
     setMultiSignature(value);
-    if (!validationSignatureAdd(value)) {
+    setIsSignatureTouched(true);
+
+    if (!value) {
+      setSignatureError(null);
+    } else if (!validationSignatureAdd(value)) {
       setSignatureError("Invalid wallet address.");
     } else {
       setSignatureError(null);
@@ -476,7 +488,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                   onBlur={handleDelegateBlur}
                   onPaste={handlePaste}
                   type="text"
-                  placeholder="0.00"
+                  placeholder="0"
                 />
               </FormAddInputWrapper2>
             </FormAddInputWrapper>
@@ -509,7 +521,7 @@ const PopUp3: React.FC<Popup3Types> = ({
               </FormAddInputIconWrapper>
             </FormAddInputWrapper>
             <FormMaxBtn
-              style={{ padding: "10px 25px" }}
+              style={{ padding: "10px 17px" }}
               onClick={handleSettingClick}
             >
               <SettingIcon />
@@ -563,35 +575,29 @@ const PopUp3: React.FC<Popup3Types> = ({
           </PopupFormInputWrapper>
         </FormAddInputLabelWrapper>
         {/* pop up multi signature input */}
-        <FormAddInputLabelWrapper>
-          <FormAddLabelWrapper>
-            <FormAddLabel
-              style={
-                settingBtn === false
-                  ? { color: "#DCE3E5" }
-                  : { color: "#003543" }
-              }
-            >
-              Multi-Signature
-            </FormAddLabel>
-            {signatureError ? (
-              <FormErrorWrapper>
-                <FormError>{signatureError}</FormError>
-              </FormErrorWrapper>
-            ) : (
-              ""
-            )}
-          </FormAddLabelWrapper>
-          <FormAddInputWrapper style={{ height: "38px" }}>
-            <FormAddInputWrapper2>
-              <FormAddInput
-                value={multiSignature || ""}
-                onChange={handleSignatureChange}
-                disabled={!settingBtn}
-              />
-            </FormAddInputWrapper2>
-          </FormAddInputWrapper>
-        </FormAddInputLabelWrapper>
+        {settingBtn && (
+          <FormAddInputLabelWrapper>
+            <FormAddLabelWrapper>
+              <FormAddLabel>Multi-Signature</FormAddLabel>
+              {signatureError ? (
+                <FormErrorWrapper>
+                  <FormError>{signatureError}</FormError>
+                </FormErrorWrapper>
+              ) : (
+                ""
+              )}
+            </FormAddLabelWrapper>
+            <FormAddInputWrapper style={{ height: "38px" }}>
+              <FormAddInputWrapper2>
+                <FormAddInput
+                  value={multiSignature || ""}
+                  onChange={handleSignatureChange}
+                  onBlur={() => setIsSignatureTouched(true)}
+                />
+              </FormAddInputWrapper2>
+            </FormAddInputWrapper>
+          </FormAddInputLabelWrapper>
+        )}
 
         <DialogContent>
           <Box mb={2}>
