@@ -151,7 +151,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         }
         //if settingBtn === true  use client input in getCanDelegatedMaxSize 
       } else if (settingBtn === true) {
-        if (!multiSignature) {
+        if (!multiSignature || !validationSignatureAdd(multiSignature)) {
           dispatch(
             showNotification({
               name: "Order-popup-error",
@@ -161,11 +161,13 @@ const PopUp3: React.FC<Popup3Types> = ({
           );
           return;
         }
+
         let { max_size: maxCandelegated } =
           await tronWeb.trx.getCanDelegatedMaxSize(
             multiSignature,
             resourceType
           );
+
         maxCandelegated = maxCandelegated / 1_000_000;
 
         if (maxCandelegated > myDelegate) {
@@ -193,7 +195,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     if (open && address && order && myDelegate !== null) {
       maxCandleHandler();
     }
-  }, [open, address, order, myDelegate]);
+  }, [open, address, order, myDelegate, multiSignature, settingBtn]);
   //-------------------------------------------------------------------------------------------
   //Function for delegated input :
   const handleMaxClick = () => {
