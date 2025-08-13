@@ -6,6 +6,10 @@ import {
   Button,
   Box,
   Divider,
+  Menu,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { MarketOrder } from "../../pages/mainPage/OrdersComponent";
 import {
@@ -77,6 +81,12 @@ const PopUp3: React.FC<Popup3Types> = ({
   //state for delegate input :
   const [delegatedAmount, setDelegatedAmount] = useState<string>("");
   const [delegateInputError, setDelegateInputError] = useState<string>("");
+  //Multi signature states :
+  const [multiSignature, setMultiSignature] = useState<string | null>(null);
+  const [signatureError, setSignatureError] = useState<string | null>("");
+  //Setting dropdown states :
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [settingBtn, setSettingBtn] = useState(false);
 
   //-------------------------------------------------------------------------------------------
   //Functions for Payout target address input :
@@ -85,7 +95,6 @@ const PopUp3: React.FC<Popup3Types> = ({
     const walletAddRegX = /^T[a-zA-Z0-9]{33}$/;
     return walletAddRegX.test(address);
   };
-
   // When popup opens or order changes, set requesterInput to address
   useEffect(() => {
     if (open && address) {
@@ -93,7 +102,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       setRequesterError(null);
     }
   }, [open, address, order]);
-
+  //To change wallet address by user :
   const handleRequesterChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -126,17 +135,46 @@ const PopUp3: React.FC<Popup3Types> = ({
         | "ENERGY"
         | "BANDWIDTH";
 
-      // Fetch max delegatable amount (returns { max_size: number })
+      //To fetch delegated max size conditionally :
+      //if settingBtn === false   use requester address in getCanDelegatedMaxSize
+      if (settingBtn === false) {
+        let { max_size: maxCandelegated } =
+          await tronWeb.trx.getCanDelegatedMaxSize(address, resourceType);
+        maxCandelegated = maxCandelegated / 1_000_000;
 
-      let { max_size: maxCandelegated } =
-        await tronWeb.trx.getCanDelegatedMaxSize(address, resourceType);
+        if (maxCandelegated > myDelegate) {
+          setMaxCandle(myDelegate);
+        } else if (maxCandelegated < myDelegate) {
+          setMaxCandle(maxCandelegated);
+        } else {
+          return;
+        }
+        //if settingBtn === true  use client input in getCanDelegatedMaxSize 
+      } else if (settingBtn === true) {
+        if (!multiSignature) {
+          dispatch(
+            showNotification({
+              name: "Order-popup-error",
+              message: "Multi-signature address is not set",
+              severity: "error",
+            })
+          );
+          return;
+        }
+        let { max_size: maxCandelegated } =
+          await tronWeb.trx.getCanDelegatedMaxSize(
+            multiSignature,
+            resourceType
+          );
+        maxCandelegated = maxCandelegated / 1_000_000;
 
-      maxCandelegated = maxCandelegated / 1_000_000;
-
-      if (maxCandelegated > myDelegate) {
-        setMaxCandle(myDelegate);
-      } else if (maxCandelegated < myDelegate) {
-        setMaxCandle(maxCandelegated);
+        if (maxCandelegated > myDelegate) {
+          setMaxCandle(myDelegate);
+        } else if (maxCandelegated < myDelegate) {
+          setMaxCandle(maxCandelegated);
+        } else {
+          return;
+        }
       } else {
         return;
       }
@@ -156,7 +194,6 @@ const PopUp3: React.FC<Popup3Types> = ({
       maxCandleHandler();
     }
   }, [open, address, order, myDelegate]);
-
   //-------------------------------------------------------------------------------------------
   //Function for delegated input :
   const handleMaxClick = () => {
@@ -166,7 +203,6 @@ const PopUp3: React.FC<Popup3Types> = ({
       setDelegateInputError("");
     }
   };
-
   //-------------------------------------------------------------------------------------------
   // Function for delegated input validation
   const handleDelegateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,8 +232,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     setDelegatedAmount(value);
     setDelegateInputError("");
   };
-
-  // Add this new function to validate on blur
+  // Function to validate blur :
   const handleDelegateBlur = () => {
     const MIN_DELEGATE_AMOUNT = Number(
       process.env.REACT_APP_MIN_DELEGATE_AMOUNT
@@ -229,7 +264,6 @@ const PopUp3: React.FC<Popup3Types> = ({
     // Format the number to 2 decimal places when blurring
     setDelegatedAmount(Math.round(numericValue).toString());
   };
-
   // Function to prevent invalid paste
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const pastedData = e.clipboardData.getData("text");
@@ -321,7 +355,44 @@ const PopUp3: React.FC<Popup3Types> = ({
     setDelegatedAmount("");
     setDelegateInputError("");
     setRequesterError(null);
+    setSettingBtn(false);
+    setSignatureError("");
     onClose();
+  };
+  //-------------------------------------------------------------------------------------------
+  //Functions for setting button :
+  //checkbox click toggle function :
+  const handleSettingClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  //Function to close the checkbox when clicking anywhere :
+  const handleSettingClose = () => {
+    setAnchorEl(null);
+  };
+  const menuOpen = Boolean(anchorEl);
+
+  const handleSettingFill = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let partialValue = event.target.checked;
+    setSettingBtn(partialValue);
+  };
+  //-------------------------------------------------------------------------------------------
+  //Functions for multi-signature :
+  const validationSignatureAdd = (address: string) => {
+    const walletAddRegX = /^T[a-zA-Z0-9]{33}$/;
+    return walletAddRegX.test(address);
+  };
+
+  const handleSignatureChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value;
+    setMultiSignature(value);
+    if (!validationSignatureAdd(value)) {
+      setSignatureError("Invalid wallet address.");
+    } else {
+      setSignatureError(null);
+    }
   };
   //-------------------------------------------------------------------------------------------
   if (!order) return null;
@@ -349,6 +420,7 @@ const PopUp3: React.FC<Popup3Types> = ({
           },
         }}
       >
+        {/* pop up headers and img */}
         <Popup2ImgWrapper style={{ marginBottom: "1rem" }}>
           <LegacyCardIconWrapper1>
             <LegacyCardIconWrapper2
@@ -386,7 +458,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             </Popup2ItemName>
           </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>
-
+        {/* pop up delegate amount input */}
         <FormAddInputLabelWrapper>
           <FormAddLabelWrapper>
             <FormAddLabel>To delegated amount (TRX)</FormAddLabel>
@@ -416,7 +488,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             </FormMaxCandleBtn>
           </PopupFormInputWrapper>
         </FormAddInputLabelWrapper>
-
+        {/* pop up address input */}
         <FormAddInputLabelWrapper>
           <FormAddLabelWrapper>
             <FormAddLabel>Payout target address</FormAddLabel>
@@ -439,10 +511,89 @@ const PopUp3: React.FC<Popup3Types> = ({
                 </FormAddInputWrapper2>
               </FormAddInputIconWrapper>
             </FormAddInputWrapper>
-            <FormMaxBtn style={{ padding: "10px 25px" }}>
+            <FormMaxBtn
+              style={{ padding: "10px 25px" }}
+              onClick={handleSettingClick}
+            >
               <SettingIcon />
             </FormMaxBtn>
+            <Menu
+              anchorEl={anchorEl}
+              open={menuOpen}
+              onClose={handleSettingClose}
+              disableScrollLock
+              anchorOrigin={{
+                vertical: "bottom", // Aligns menu below anchor
+                horizontal: "right", // Aligns menu right edge to anchor's right edge
+              }}
+              transformOrigin={{
+                vertical: "top", // Menu grows downward
+                horizontal: "right", // Menu's right edge stays aligned
+              }}
+              MenuListProps={{
+                style: {
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                },
+              }}
+              sx={{
+                "& .MuiMenuItem-root:hover": {
+                  backgroundColor: "transparent !important",
+                },
+              }}
+            >
+              <MenuItem>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={settingBtn}
+                      onChange={handleSettingFill}
+                      sx={{
+                        color: "#430E00", // border color when unchecked
+                        "&.Mui-checked": {
+                          color: "#430E00", // color when checked
+                        },
+                        "& .MuiSvgIcon-root": {
+                          fontSize: 26,
+                        },
+                      }}
+                    />
+                  }
+                  label="Multi-Signature"
+                />
+              </MenuItem>
+            </Menu>
           </PopupFormInputWrapper>
+        </FormAddInputLabelWrapper>
+        {/* pop up multi signature input */}
+        <FormAddInputLabelWrapper>
+          <FormAddLabelWrapper>
+            <FormAddLabel
+              style={
+                settingBtn === false
+                  ? { color: "#DCE3E5" }
+                  : { color: "#003543" }
+              }
+            >
+              Multi-Signature
+            </FormAddLabel>
+            {signatureError ? (
+              <FormErrorWrapper>
+                <FormError>{signatureError}</FormError>
+              </FormErrorWrapper>
+            ) : (
+              ""
+            )}
+          </FormAddLabelWrapper>
+          <FormAddInputWrapper style={{ height: "38px" }}>
+            <FormAddInputWrapper2>
+              <FormAddInput
+                value={multiSignature || ""}
+                onChange={handleSignatureChange}
+                disabled={!settingBtn}
+              />
+            </FormAddInputWrapper2>
+          </FormAddInputWrapper>
         </FormAddInputLabelWrapper>
 
         <DialogContent>

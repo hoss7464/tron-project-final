@@ -15,6 +15,12 @@ import {
   Grid,
   ClickAwayListener,
   Divider,
+  ToggleButton,
+  ToggleButtonGroup,
+  Checkbox,
+  FormControlLabel,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import {
   FormWrapper,
@@ -57,14 +63,7 @@ import {
   HeroGridCardNumberIcon,
 } from "./HeroSection/HeroElements";
 import { HeroGridCardHeader } from "./HeroSection/HeroElements";
-import {
-  ToggleButton,
-  ToggleButtonGroup,
-  Checkbox,
-  FormControlLabel,
-  Menu,
-  MenuItem,
-} from "@mui/material";
+
 import Autocomplete from "@mui/material/Autocomplete";
 import { styled } from "@mui/material/styles";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
@@ -312,10 +311,10 @@ const OrderFormComponent: React.FC = () => {
 
   useEffect(() => {
     if (address) {
-    setWalletAdd(address); // Set when address exists
-  } else {
-    setWalletAdd(""); // Clear when address is null (disconnected)
-  }
+      setWalletAdd(address); // Set when address exists
+    } else {
+      setWalletAdd(""); // Clear when address is null (disconnected)
+    }
   }, [address]);
   //--------------------------------------------------------------------------------------
   //Function to store the whole data for order form in it from server :
@@ -742,7 +741,7 @@ const OrderFormComponent: React.FC = () => {
     //To get minimum value of each selected duration based on server data :
     const matchedRate = getMatchedRate(numericDuration);
     if (!matchedRate || !matchedRate.rate) {
-      return { totalPrice: 0 }; 
+      return { totalPrice: 0 };
     }
     const minOption =
       switchBtn === "energy"
@@ -750,12 +749,12 @@ const OrderFormComponent: React.FC = () => {
         : matchedRate.rate.bandwidth;
 
     if (pricePerUnit === null || numericAmount === null) {
-      return { totalPrice: 0 }; 
+      return { totalPrice: 0 };
     }
 
     if (pricePerUnit < minOption) {
-    return { totalPrice: 0 }; // Return 0 if price is too low
-  }
+      return { totalPrice: 0 }; // Return 0 if price is too low
+    }
 
     // Convert duration to seconds
     let totalSeconds = numericDuration;
