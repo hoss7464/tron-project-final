@@ -735,14 +735,14 @@ const OrderFormComponent: React.FC = () => {
     const numericAmount = getNumericAmount(amount);
     const numericDuration = getDurationInSeconds(durationValue);
     if (numericDuration === null) {
-      return null;
+      return { totalPrice: 0 };
     }
     const pricePerUnit = getNumericSelectedPrice(inputValue);
     const SUN = 1000000;
     //To get minimum value of each selected duration based on server data :
     const matchedRate = getMatchedRate(numericDuration);
     if (!matchedRate || !matchedRate.rate) {
-      return null; // or throw an error, or set a fallback
+      return { totalPrice: 0 }; 
     }
     const minOption =
       switchBtn === "energy"
@@ -750,8 +750,12 @@ const OrderFormComponent: React.FC = () => {
         : matchedRate.rate.bandwidth;
 
     if (pricePerUnit === null || numericAmount === null) {
-      return null; // don't calculate without valid inputs
+      return { totalPrice: 0 }; 
     }
+
+    if (pricePerUnit < minOption) {
+    return { totalPrice: 0 }; // Return 0 if price is too low
+  }
 
     // Convert duration to seconds
     let totalSeconds = numericDuration;
@@ -759,17 +763,17 @@ const OrderFormComponent: React.FC = () => {
 
     if (totalSeconds === 900) {
       // 15 minutes
-      totalPrice = (numericAmount / SUN) * 67;
+      totalPrice = (numericAmount / SUN) * pricePerUnit;
     } else if (totalSeconds === 3600) {
       // 1 hour
-      totalPrice = (numericAmount / SUN) * 70;
+      totalPrice = (numericAmount / SUN) * pricePerUnit;
     } else if (totalSeconds === 10800) {
       // 3 hours
-      totalPrice = (numericAmount / SUN) * 80;
+      totalPrice = (numericAmount / SUN) * pricePerUnit;
     } else if (totalSeconds % 86400 === 0) {
       // whole days
       const numberOfDays = totalSeconds / 86400;
-      totalPrice = (numericAmount / SUN) * minOption * numberOfDays;
+      totalPrice = (numericAmount / SUN) * pricePerUnit * numberOfDays;
     } else {
       return null; // Invalid time
     }
