@@ -13,7 +13,7 @@ module.exports = {
         },
       ];
 
-      // Optionally, exclude source-map-loader for those modules entirely
+      // Exclude problematic packages from source-map-loader
       webpackConfig.module.rules.forEach((rule) => {
         if (rule.oneOf) {
           rule.oneOf.forEach((oneOfRule) => {
@@ -26,7 +26,6 @@ module.exports = {
                   : useEntry.loader?.includes('source-map-loader')
               )
             ) {
-              // Exclude problematic packages
               oneOfRule.exclude = [
                 /node_modules\/@walletconnect/,
                 /node_modules\/@tronweb3\/walletconnect-tron/,
@@ -34,6 +33,12 @@ module.exports = {
             }
           });
         }
+      });
+
+      // ✅ Fix TronWeb .cjs import issue
+      webpackConfig.module.rules.push({
+        test: /\.cjs$/,
+        type: 'javascript/auto',
       });
 
       return webpackConfig;
