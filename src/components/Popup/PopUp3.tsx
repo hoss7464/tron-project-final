@@ -151,14 +151,8 @@ const PopUp3: React.FC<Popup3Types> = ({
         }
         //if settingBtn === true  use client input in getCanDelegatedMaxSize 
       } else if (settingBtn === true) {
-        if (!multiSignature || !validationSignatureAdd(multiSignature)) {
-          dispatch(
-            showNotification({
-              name: "Order-popup-error",
-              message: "Multi-signature address is not set",
-              severity: "error",
-            })
-          );
+        if (!multiSignature) {
+        setSignatureError("Multi-signature is not set ")
           return;
         }
 
@@ -358,6 +352,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     setDelegateInputError("");
     setRequesterError(null);
     setSettingBtn(false);
+    setMultiSignature(null)
     setSignatureError("");
     onClose();
   };
