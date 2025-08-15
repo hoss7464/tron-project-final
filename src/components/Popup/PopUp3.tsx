@@ -73,7 +73,7 @@ interface Permission {
 interface ExtendedAccount {
   address: string;
   balance: number;
-  // Other standard Account properties...
+  active_permission?: Permission[]; 
   permissions?: Permission[];
 }
 
@@ -431,18 +431,19 @@ const PopUp3: React.FC<Popup3Types> = ({
       const account = (await tronWeb.trx.getAccount(
         multiSignature
       )) as ExtendedAccount;
+      
       console.log("Account response:", account);
 
-      if (!account || !account.permissions) {
+      if (!account || !account.active_permission) {
         console.log("No permissions found for this account");
         throw new Error("No permissions found for this account");
       }
 
       // More detailed permission logging
-      console.log("Permissions found:", account.permissions);
+      console.log("Permissions found:", account.active_permission);
 
       // Find the active permission (typically used for transactions)
-      const activePermission = account.permissions.find(
+      const activePermission = account.active_permission.find(
         (permission: any) => permission.type === "Active"
       );
 
