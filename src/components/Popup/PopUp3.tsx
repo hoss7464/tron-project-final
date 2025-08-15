@@ -192,7 +192,6 @@ const PopUp3: React.FC<Popup3Types> = ({
       setSignatureError("Invalid address");
     }
   };
-  console.log(maxCandle);
   //Function to run maxCandleHandler when popoup loads :
   useEffect(() => {
     if (open && address && order && myDelegate !== null) {
@@ -289,6 +288,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     // Validate delegated amount first
     // First get the permission ID
   const permissionId = await handleSettingClick();
+
     const MIN_DELEGATE_AMOUNT = Number(
       process.env.REACT_APP_MIN_DELEGATE_AMOUNT
     );
@@ -338,7 +338,6 @@ const PopUp3: React.FC<Popup3Types> = ({
       if (settingBtn) {
         // Multi-signature case
         if (!multiSignature) {
-          setSignatureError("Multi-signature address is required");
           return;
         }
 
