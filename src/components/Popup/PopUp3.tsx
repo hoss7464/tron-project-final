@@ -62,6 +62,20 @@ interface Popup3Types {
   order: MarketOrder | null;
   myDelegate: number | null;
 }
+//interface for persmissions to get permission id :
+interface Permission {
+  type: "Owner" | "Active" | string;
+  id?: number;
+  permission_id?: number;
+  // Add other permission properties you need
+}
+
+interface ExtendedAccount {
+  address: string;
+  balance: number;
+  // Other standard Account properties...
+  permissions?: Permission[];
+}
 
 const PopUp3: React.FC<Popup3Types> = ({
   open,
@@ -159,8 +173,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         let { max_size: maxCandelegated } =
           await tronWeb.trx.getCanDelegatedMaxSize(
             multiSignature,
-            resourceType,
-
+            resourceType
           );
 
         maxCandelegated = maxCandelegated / 1_000_000;
@@ -179,6 +192,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       setSignatureError("Invalid address");
     }
   };
+  console.log(maxCandle);
   //Function to run maxCandleHandler when popoup loads :
   useEffect(() => {
     if (open && address && order && myDelegate !== null) {
@@ -273,6 +287,8 @@ const PopUp3: React.FC<Popup3Types> = ({
   //-------------------------------------------------------------------------------------------
   const handleFill = async () => {
     // Validate delegated amount first
+    // First get the permission ID
+  const permissionId = await handleSettingClick();
     const MIN_DELEGATE_AMOUNT = Number(
       process.env.REACT_APP_MIN_DELEGATE_AMOUNT
     );
@@ -317,56 +333,57 @@ const PopUp3: React.FC<Popup3Types> = ({
     }
 
     try {
-      let result = null
+      let result = null;
 
-       if (settingBtn) {
-      // Multi-signature case
-      if (!multiSignature) {
-        setSignatureError("Multi-signature address is required");
-        return;
-      }
-
-      if (!validationSignatureAdd(multiSignature)) {
-        setSignatureError("Invalid multi-signature address");
-        return;
-      }
-
-      result = await fillOrder(
-        order.receiver,
-        numericDelegatedAmount,
-        order.resourceType,
-        address, // requesterAddress
-        order.lock,    // lock
-        order.durationSec / 3,       // lockPeriod (example: 3 days)
-        true,    // isMultiSignature
-        {       // options
-          permissionId: 1, // example permission ID
-          address: multiSignature
+      if (settingBtn) {
+        // Multi-signature case
+        if (!multiSignature) {
+          setSignatureError("Multi-signature address is required");
+          return;
         }
-      );
-    } else {
-      // Regular case
-      result = await fillOrder(
-        order.receiver,
-        numericDelegatedAmount,
-        order.resourceType,
-        address, // requesterAddress
-        order.lock,   // lock
-        order.durationSec / 3        // lockPeriod
-        // isMultiSignature and options omitted (defaults to false/undefined)
-      );
-    }
 
-    if (result.success) {
-      dispatch(
-        showNotification({
-          name: "Order-popup-success",
-          message: "Delegation successful!",
-          severity: "success",
-        })
-      );
-      handleClose(); // Close the popup on success
-    }
+        if (!validationSignatureAdd(multiSignature)) {
+          setSignatureError("Invalid multi-signature address");
+          return;
+        }
+
+        result = await fillOrder(
+          order.receiver,
+          numericDelegatedAmount,
+          order.resourceType,
+          address, // requesterAddress
+          order.lock, // lock
+          order.durationSec / 3, // lockPeriod (example: 3 days)
+          true, // isMultiSignature
+          {
+            // options
+            permissionId: permissionId, // example permission ID
+            address: multiSignature,
+          }
+        );
+      } else {
+        // Regular case
+        result = await fillOrder(
+          order.receiver,
+          numericDelegatedAmount,
+          order.resourceType,
+          address, // requesterAddress
+          order.lock, // lock
+          order.durationSec / 3 // lockPeriod
+          // isMultiSignature and options omitted (defaults to false/undefined)
+        );
+      }
+
+      if (result.success) {
+        dispatch(
+          showNotification({
+            name: "Order-popup-success",
+            message: "Delegation successful!",
+            severity: "success",
+          })
+        );
+        handleClose(); // Close the popup on success
+      }
     } catch (err) {
       dispatch(
         showNotification({
@@ -393,8 +410,69 @@ const PopUp3: React.FC<Popup3Types> = ({
   //-------------------------------------------------------------------------------------------
   //Functions for setting button :
   //checkbox click toggle function :
-  const handleSettingClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleSettingClick = async (event?: React.MouseEvent<HTMLElement>) => {
+    if (event) {
     setAnchorEl(anchorEl ? null : event.currentTarget);
+  }
+    // Return early if no multiSignature address is set
+    if (!multiSignature) {
+      setSignatureError("Multi-signature address is required");
+      return;
+    }
+
+    try {
+      const { TronWeb } = await import("tronweb");
+      //nile network url :
+      const tronNileUrl = process.env.REACT_APP_TRON_API;
+      //To get data from api.trongrid.io
+      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+
+      // Get account details
+      console.log("Fetching account for:", multiSignature);
+      const account = (await tronWeb.trx.getAccount(
+        multiSignature
+      )) as ExtendedAccount;
+      console.log("Account response:", account);
+
+      if (!account || !account.permissions) {
+        console.log("No permissions found for this account");
+        throw new Error("No permissions found for this account");
+      }
+
+      // More detailed permission logging
+      console.log("Permissions found:", account.permissions);
+
+      // Find the active permission (typically used for transactions)
+      const activePermission = account.permissions.find(
+        (permission: any) => permission.type === "Active"
+      );
+
+      if (!activePermission) {
+        throw new Error("No active permission found");
+      }
+
+      // Get the permission ID (usually the first one is used)
+      const permissionId =
+        activePermission.id ??
+        activePermission.permission_id ??
+        (activePermission as any).permissionId;
+      if (permissionId === undefined) {
+        throw new Error("Permission ID not found in active permission");
+      }
+
+      console.log("Permission ID:", permissionId);
+      // You might want to store this permissionId in state or use it directly
+      return permissionId;
+    } catch (error) {
+      dispatch(
+        showNotification({
+          name: "Order-popup-error5",
+          message: "Error fetching permission ID:" + error,
+          severity: "error",
+        })
+      );
+      return null;
+    }
   };
 
   //Function to close the checkbox when clicking anywhere :

@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { showNotification } from "../redux/actions/notifSlice";
 import { toggleRefresh } from "../redux/actions/refreshSlice";
 
+
 // Context interface
 interface TronWalletContextProps {
   address: string | null;
