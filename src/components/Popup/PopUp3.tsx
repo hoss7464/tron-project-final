@@ -159,7 +159,8 @@ const PopUp3: React.FC<Popup3Types> = ({
         let { max_size: maxCandelegated } =
           await tronWeb.trx.getCanDelegatedMaxSize(
             multiSignature,
-            resourceType
+            resourceType,
+
           );
 
         maxCandelegated = maxCandelegated / 1_000_000;
@@ -316,25 +317,56 @@ const PopUp3: React.FC<Popup3Types> = ({
     }
 
     try {
-      const result = await fillOrder(
+      let result = null
+
+       if (settingBtn) {
+      // Multi-signature case
+      if (!multiSignature) {
+        setSignatureError("Multi-signature address is required");
+        return;
+      }
+
+      if (!validationSignatureAdd(multiSignature)) {
+        setSignatureError("Invalid multi-signature address");
+        return;
+      }
+
+      result = await fillOrder(
         order.receiver,
         numericDelegatedAmount,
         order.resourceType,
-        address,
-        false,
-        0
+        address, // requesterAddress
+        order.lock,    // lock
+        order.durationSec / 3,       // lockPeriod (example: 3 days)
+        true,    // isMultiSignature
+        {       // options
+          permissionId: 1, // example permission ID
+          address: multiSignature
+        }
       );
+    } else {
+      // Regular case
+      result = await fillOrder(
+        order.receiver,
+        numericDelegatedAmount,
+        order.resourceType,
+        address, // requesterAddress
+        order.lock,   // lock
+        order.durationSec / 3        // lockPeriod
+        // isMultiSignature and options omitted (defaults to false/undefined)
+      );
+    }
 
-      if (result.success) {
-        dispatch(
-          showNotification({
-            name: "Order-popup-success",
-            message: "Delegation successful!",
-            severity: "success",
-          })
-        );
-        handleClose(); // Close the popup on success
-      }
+    if (result.success) {
+      dispatch(
+        showNotification({
+          name: "Order-popup-success",
+          message: "Delegation successful!",
+          severity: "success",
+        })
+      );
+      handleClose(); // Close the popup on success
+    }
     } catch (err) {
       dispatch(
         showNotification({

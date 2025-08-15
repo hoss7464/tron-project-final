@@ -30,7 +30,9 @@ interface TronWalletContextProps {
     resourceType: string | null,
     requesterAddress: string,
     lock: boolean,
-    lockPeriod: number
+    lockPeriod?: number,
+    isMultiSignature?: boolean,
+    options?: any
   ) => Promise<fillOrder>;
 }
 //Disconnect interface :
@@ -563,8 +565,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     delegateAmount: number,
     resourceType: string | null,
     requesterAddress: string,
-    lock: boolean,
-    lockPeriod: number
+    lock: boolean = false,
+    lockPeriod: number = 0,
+    isMultiSignature: boolean = false,
+    options?: any
   ): Promise<fillOrder> => {
     setFillTRX(true);
     setFillTrxError(null);
@@ -583,7 +587,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         return { success: false, error: "Wallet not connected" };
       }
 
-    
       //To import TronWeb localy :
       const { TronWeb } = await import("tronweb");
       //nile network url :
@@ -629,9 +632,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const resourceType2 = resourceType?.toUpperCase() as
         | "ENERGY"
         | "BANDWIDTH";
+      const addressToCheck =
+        isMultiSignature && options?.address
+          ? options.address
+          : requesterAddress;
 
       const currentDelegated = await tronWeb.trx.getCanDelegatedMaxSize(
-        requesterAddress,
+        addressToCheck,
         resourceType2
       );
       if (Number(currentDelegated) > delegateAmount) {
@@ -647,7 +654,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Convert amount to sun (fixed type issue)
       const amountInSun = tronWeb.toSun(delegateAmount);
-      const amountInSun2 = Math.round(Number(amountInSun))
+      const amountInSun2 = Math.round(Number(amountInSun));
 
       // Create transaction (fixed parameter type issue)
       const transactionDelegated =
@@ -657,13 +664,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           resourceType2,
           requesterAddress,
           lock,
-          0
+          lockPeriod,
+          isMultiSignature ? options : undefined
         );
 
-      // Sign transaction using adapter
+      // Sign and broadcast transaction
       const signedTx = await adapter.signTransaction(transactionDelegated);
-
-      // Broadcast transaction using TronWeb directly
       const txResult = await tronWeb.trx.sendRawTransaction(signedTx);
 
       // Verify transaction
