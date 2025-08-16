@@ -799,7 +799,7 @@ export const OrdersSellBtnWrapper = styled.div`
 
 export const OrdersSell = styled.p`
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   color: ${colors.text9};
 `;
 
@@ -891,9 +891,10 @@ export const MyOrdersScroll = styled.div`
 
 export const MyOrdersNavTextWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
+
 `;
 
 export const MyOrdersCarouselWrapper = styled.div`
@@ -910,8 +911,9 @@ export const MyOrdersTextWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: 25%;
+  width: 19%;
   height: 100%;
+
 `;
 
 export const MyOrderDetails = styled.div`
@@ -931,7 +933,7 @@ export const MyOrderCardTextWrap = styled.div`
   justify-content: center;
   align-items: flex-start;
   flex-direction: column;
-  width: 25%;
+  width: 19%;
   height: 100%;
 `;
 
@@ -946,3 +948,21 @@ display: flex;
 justify-content: center;
 align-items: center;
 `
+
+export const MyOrdersSellBtnWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 7px 8px;
+  background-color: ${ThemeColor.secondary1};
+  border-radius: 6px;
+  cursor: pointer;
+  position: absolute;
+  right: 0.7rem;
+`;
+
+export const MyOrdersSell = styled.p`
+  font-size: 13px;
+  font-weight: 500;
+  color: ${colors.text9};
+`;

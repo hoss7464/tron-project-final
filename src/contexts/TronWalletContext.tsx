@@ -286,7 +286,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           {},
           { withCredentials: true, timeout: axiosTimeOut }
         );
-        console.log(response.data.success);
         if (response.data.success === false) {
           dispatch(
             showNotification({

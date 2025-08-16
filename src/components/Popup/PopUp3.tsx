@@ -55,6 +55,7 @@ import { useTronWallet } from "../../contexts/TronWalletContext";
 import { TronWeb } from "tronweb";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { useDispatch } from "react-redux";
+import axios from "axios";
 
 interface Popup3Types {
   open: boolean;
@@ -207,6 +208,9 @@ const PopUp3: React.FC<Popup3Types> = ({
   };
   //Function to run maxCandleHandler when popoup loads :
   useEffect(() => {
+    if (maxCandle === null) {
+      setDelegatedAmount("0");
+    }
     if (open && address && order && myDelegate !== null) {
       maxCandleHandler();
     }
@@ -361,7 +365,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         }
 
         // Get permission ID first
-        permissionId = await handleSettingClick();
+        permissionId = await handleSettingFill();
         if (!permissionId) {
           dispatch(
             showNotification({
@@ -402,11 +406,11 @@ const PopUp3: React.FC<Popup3Types> = ({
 
       if (result.success) {
         //verify payment :
-        const resultPayload = { txid: result.txId, orderId: order._id};
+        const resultPayload = { txid: result.txId, orderId: order._id };
         const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
         const verifyFillPayment = await axios.post<VerifyPaymentResponse>(
-          //اینجا عوض شود 
+          //اینجا عوض شود
           "",
           resultPayload,
           {
@@ -456,13 +460,31 @@ const PopUp3: React.FC<Popup3Types> = ({
   //-------------------------------------------------------------------------------------------
   //Functions for setting button :
   //checkbox click toggle function :
-  const handleSettingClick = async (event?: React.MouseEvent<HTMLElement>) => {
+  const handleSettingClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  //Function to close the checkbox when clicking anywhere :
+  const handleSettingClose = () => {
+    setAnchorEl(null);
+  };
+  const menuOpen = Boolean(anchorEl);
+
+  const handleSettingFill = async (
+    event?: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event) {
-      setAnchorEl(anchorEl ? null : event.currentTarget);
+      const partialValue = event.target.checked;
+      setSettingBtn(partialValue);
+      setDelegatedAmount("");
+      // Reset touched state when toggling
+      if (!partialValue) {
+        setIsSignatureTouched(false);
+        setSignatureError(null);
+      }
     }
 
     if (!multiSignature) {
-      setSignatureError("Multi-signature address is required");
       return null;
     }
 
@@ -517,23 +539,6 @@ const PopUp3: React.FC<Popup3Types> = ({
         })
       );
       return null;
-    }
-  };
-
-  //Function to close the checkbox when clicking anywhere :
-  const handleSettingClose = () => {
-    setAnchorEl(null);
-  };
-  const menuOpen = Boolean(anchorEl);
-
-  const handleSettingFill = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const partialValue = event.target.checked;
-    setSettingBtn(partialValue);
-    setDelegatedAmount("");
-    // Reset touched state when toggling
-    if (!partialValue) {
-      setIsSignatureTouched(false);
-      setSignatureError(null);
     }
   };
   //-------------------------------------------------------------------------------------------

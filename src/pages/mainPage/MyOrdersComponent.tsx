@@ -25,10 +25,18 @@ import {
   CheckedSignWrapper,
   CheckedSign,
   OrdersSellBtnWrapper,
+  MyOrdersSellBtnWrapper,
   OrdersSell,
+  MyOrdersSell,
   CanceledSignWrapper,
   CanceledSign,
+  OrderCardLinearWrapper2,
+  OrderCardLineraPercentWrapper,
+  OrderCardLineraPercent,
+  OrderCardLinearWrapper,
 } from "./mainPageElements";
+
+import LinearProgress from "@mui/material/LinearProgress";
 import { OrderCardIconWrapper2 } from "./mainPageElements";
 import { LegacyCardName } from "./LegacySection/LegacyElements";
 import {
@@ -41,6 +49,7 @@ import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import { formatDateTime } from "../../utils/dateTime";
 import { useLoading } from "../../contexts/LoaderContext";
+import { formatStrictDuration } from "../../utils/fromSec";
 
 interface ServerResponse {
   success: boolean;
@@ -180,6 +189,10 @@ const MyOrdersComponent: React.FC = () => {
                   <MyOrdersTextWrapper>
                     <OrderNavText>{t("payment")}</OrderNavText>
                   </MyOrdersTextWrapper>
+
+                  <MyOrdersTextWrapper>
+                    <OrderNavText>{t("fulfilled")}</OrderNavText>
+                  </MyOrdersTextWrapper>
                 </MyOrdersNavTextWrapper>
               </MyOrdersNavWrapper>
               <OrdersCard>
@@ -217,12 +230,12 @@ const MyOrdersComponent: React.FC = () => {
                               </OrderCardIconWrapper2>
                             )}
                             <OrdersCardText1>
-                              {myData.resourceAmount}
+                              {myData.resourceAmount.toLocaleString()}
                             </OrdersCardText1>
                           </OrdersCardTextWrapper2>
                           <OrdersCardTextWrapper2>
                             <OrdersCardText2>
-                              {myData.durationSec}
+                              {formatStrictDuration(myData.durationSec)}
                             </OrdersCardText2>
                           </OrdersCardTextWrapper2>
                         </MyOrderCardTextWrap>
@@ -241,6 +254,41 @@ const MyOrdersComponent: React.FC = () => {
                           </OrdersCardTextWrapper2>
                         </MyOrderCardTextWrap>
 
+                        <OrderCardLinearWrapper2>
+                          <OrderCardLineraPercentWrapper>
+                            <OrderCardLineraPercent>
+                              {(() => {
+                                const percent =
+                                  (myData.frozen / myData.freeze) * 100;
+                                const cappedPercent = Math.min(percent, 100);
+
+                                if (cappedPercent >= 100) return "100%";
+                                if (Number.isInteger(cappedPercent))
+                                  return `${cappedPercent}%`;
+                                return `${cappedPercent.toFixed(2)}%`;
+                              })()}
+                            </OrderCardLineraPercent>
+                          </OrderCardLineraPercentWrapper>
+                          <OrderCardLinearWrapper>
+                            <LinearProgress
+                              variant="determinate"
+                              value={Math.min(
+                                (myData.frozen / myData.freeze) * 100,
+                                100
+                              )}
+                              valueBuffer={myData.freeze}
+                              sx={{
+                                height: 5,
+                                borderRadius: 5,
+                                backgroundColor: "#C5B4B0",
+                                "& .MuiLinearProgress-bar": {
+                                  backgroundColor: "#430E00",
+                                },
+                              }}
+                            />
+                          </OrderCardLinearWrapper>
+                        </OrderCardLinearWrapper2>
+
                         {myData.status === "completed" && (
                           <CheckedSignWrapper>
                             <CheckedSign />
@@ -248,9 +296,9 @@ const MyOrdersComponent: React.FC = () => {
                         )}
 
                         {myData.status === "processing" && (
-                          <OrdersSellBtnWrapper>
-                            <OrdersSell>Cancel</OrdersSell>
-                          </OrdersSellBtnWrapper>
+                          <MyOrdersSellBtnWrapper>
+                            <MyOrdersSell>Cancel</MyOrdersSell>
+                          </MyOrdersSellBtnWrapper>
                         )}
 
                         {myData.status === "cancelled" && (
