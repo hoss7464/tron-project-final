@@ -518,6 +518,20 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       // Broadcast transaction using TronWeb directly
       const txResult = await tronWeb.trx.sendRawTransaction(signedTx);
 
+      if (txResult?.code) {
+        dispatch(
+          showNotification({
+            name: "tron-error11",
+            message: `Transaction failed: ${txResult.code}`,
+            severity: "error",
+          })
+        );
+        return {
+          success: false,
+          error: `Transaction failed: ${txResult.code}`,
+        };
+      }
+
       // Verify transaction
       if (!txResult?.transaction?.txID && !txResult?.txid) {
         dispatch(
@@ -594,7 +608,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const tronNileUrl = process.env.REACT_APP_TRON_API;
       //To get data from api.trongrid.io
       const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+      
       const MainAddress = process.env.REACT_APP_TRON_API;
+
       if (window?.tronWeb?.fullNode.host !== MainAddress) {
         dispatch(
           showNotification({
@@ -658,6 +674,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const amountInSun2 = Math.round(Number(amountInSun));
 
       // Create transaction (fixed parameter type issue)
+
       const transactionDelegated =
         await tronWeb.transactionBuilder.delegateResource(
           amountInSun2,
@@ -666,12 +683,46 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           requesterAddress,
           lock,
           lockPeriod,
-          isMultiSignature ? options : undefined
+          {
+            ...(isMultiSignature ? options : {}),
+            permissionId: options?.permissionId,
+          }
         );
-
+        
+      let signedTx :any;
+      console.log(transactionDelegated);
       // Sign and broadcast transaction
-      const signedTx = await adapter.signTransaction(transactionDelegated);
+
+      if (!transactionDelegated.raw_data.contract[0].Permission_id) {
+        signedTx = await adapter.signTransaction(transactionDelegated);
+      } else if (transactionDelegated.raw_data.contract[0].Permission_id) {
+        signedTx = await adapter.multiSign(transactionDelegated);
+      } else {
+        dispatch(
+          showNotification({
+            name: "tron-error16",
+            message: `Transaction failed: check your sign transaction`,
+            severity: "error",
+          })
+        );
+      }
+
+      console.log("my signed transaction: " + signedTx);
       const txResult = await tronWeb.trx.sendRawTransaction(signedTx);
+
+      if (txResult?.code) {
+        dispatch(
+          showNotification({
+            name: "tron-error11",
+            message: `Transaction failed: ${txResult.code}`,
+            severity: "error",
+          })
+        );
+        return {
+          success: false,
+          error: `Transaction failed: ${txResult.code}`,
+        };
+      }
 
       // Verify transaction
       if (!txResult?.transaction?.txID && !txResult?.txid) {

@@ -55,6 +55,7 @@ interface ServerResponse {
   data: MarketOrder[];
 }
 export interface MarketOrder {
+  _id: string;
   createdAt: string;
   durationSec: number;
   freeze: number;
