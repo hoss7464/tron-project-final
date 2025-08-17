@@ -117,6 +117,8 @@ const PopUp3: React.FC<Popup3Types> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [settingBtn, setSettingBtn] = useState(false);
 
+  const baseURL = process.env.REACT_APP_BASE_URL;
+
   //-------------------------------------------------------------------------------------------
   //Functions for Payout target address input :
   //Wallet address validation :
@@ -410,8 +412,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
         const verifyFillPayment = await axios.post<VerifyPaymentResponse>(
-          //اینجا عوض شود
-          "",
+          `${baseURL}/order/sellResource`,
           resultPayload,
           {
             headers: {
