@@ -38,11 +38,11 @@ export const MobileOrderFormWrapper = styled.div`
   }
 
   @media only screen and (min-width: 601px) and (max-width: 768px) {
-    width: 450px;
+    width: 100%;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    width: 450px;
+    width: 100%;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {

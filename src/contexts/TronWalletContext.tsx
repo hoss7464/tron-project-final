@@ -689,7 +689,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         
       let signedTx :any;
-      console.log(transactionDelegated);
       // Sign and broadcast transaction
 
       if (!transactionDelegated.raw_data.contract[0].Permission_id) {
@@ -706,7 +705,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         );
       }
 
-      console.log("my signed transaction: " + signedTx);
       const txResult = await tronWeb.trx.sendRawTransaction(signedTx);
 
       if (txResult?.code) {

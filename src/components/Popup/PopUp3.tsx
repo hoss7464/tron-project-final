@@ -435,7 +435,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         throw new Error(result.error);
       }
     } catch (err) {
-      console.error("Error in handleFill:", err);
+      
       dispatch(
         showNotification({
           name: "Order-popuo-error4",
@@ -524,10 +524,10 @@ const PopUp3: React.FC<Popup3Types> = ({
         throw new Error("Permission ID not found in the permission");
       }
 
-      console.log("Successfully retrieved permission ID:", permissionId);
+      
       return permissionId;
     } catch (error) {
-      console.error("Error in handleSettingClick:", error);
+      
       dispatch(
         showNotification({
           name: "Order-popup-error5",
