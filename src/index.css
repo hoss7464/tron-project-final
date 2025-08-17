@@ -6,3 +6,20 @@
   box-sizing: border-box;
   font-family: 'Montserrat', sans-serif;
 }
+
+
+
+::-webkit-scrollbar {
+  width: 15px;               /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: #B0C0C5;       /* Color of the track (background) */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #003543; 
+  border: solid 1px #B0C0C5;  
+  border-radius: 4px;       /* Color of the scroll thumb */
+}
+

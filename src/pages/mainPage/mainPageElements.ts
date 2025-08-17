@@ -703,7 +703,7 @@ export const OrderNavTextWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: 20%;
+  width: 19.3%;
 `;
 
 export const OrderCardIconWrapper = styled.div`
@@ -739,7 +739,7 @@ export const OrdersCardTextWrap = styled.div`
   justify-content: center;
   align-items: flex-start;
   flex-direction: column;
-  width: 20%;
+  width: 19.5%;
 `;
 
 export const OrdersCardTextWrapper2 = styled.div`

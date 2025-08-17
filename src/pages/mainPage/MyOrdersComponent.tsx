@@ -240,7 +240,7 @@ const MyOrdersComponent: React.FC = () => {
 
                         <MyOrderCardTextWrap>
                           <OrdersCardTextWrapper2>
-                            <OrdersCardText1>{myData.price}</OrdersCardText1>
+                            <OrdersCardText1>{myData.price} SUN</OrdersCardText1>
                           </OrdersCardTextWrapper2>
                         </MyOrderCardTextWrap>
 
@@ -259,7 +259,7 @@ const MyOrdersComponent: React.FC = () => {
                                 const percent =
                                   (myData.frozen / myData.freeze) * 100;
                                 const cappedPercent = Math.min(percent, 100);
-
+                                if (cappedPercent === 0) return "00.00%"; 
                                 if (cappedPercent >= 100) return "100%";
                                 if (Number.isInteger(cappedPercent))
                                   return `${cappedPercent}%`;
