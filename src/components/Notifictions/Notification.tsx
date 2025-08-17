@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import Alert, { AlertColor } from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import { useSelector, useDispatch } from "react-redux";
@@ -19,6 +19,25 @@ const Notification: React.FC = () => {
       ...notification,
     }));
 
+  useEffect(() => {
+    const notifTime = Number(process.env.REACT_APP_ERROR_TIME)
+    // Set timeouts for all active notifications
+    const timeouts: NodeJS.Timeout[] = [];
+
+    activeNotifications.forEach(({ name }) => {
+      const timeout = setTimeout(() => {
+        dispatch(hideNotification(name));
+      }, notifTime); //time to vanish
+
+      timeouts.push(timeout);
+    });
+
+    // Clean up timeouts when component unmounts or notifications change
+    return () => {
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+    };
+  }, [activeNotifications, dispatch]);
+
   if (activeNotifications.length === 0) {
     return null;
   }
@@ -27,10 +46,10 @@ const Notification: React.FC = () => {
       <Stack
         sx={{
           width: {
-            xs: "95%", 
-            sm: "85%", 
-            md: "85%", 
-            lg: "62%", 
+            xs: "95%",
+            sm: "85%",
+            md: "85%",
+            lg: "62%",
           },
           position: "fixed",
           top: 0,

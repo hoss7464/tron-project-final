@@ -96,7 +96,7 @@ const ResourceComponent: React.FC = () => {
   };
 
   useEffect(() => {
-    const timeToRefreshData = Number(process.env.REACT_APP_TIME_TO_REFRESH_DATA);
+    const timeToRefreshData = Number(process.env.REACT_APP_RESOURCE_REQ_TIME);
     //Make the initial request immediately when the component mounts
     resourceData();
     //Then make subsequent requests every 3 seconds

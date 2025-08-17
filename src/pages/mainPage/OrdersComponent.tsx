@@ -47,7 +47,6 @@ import {
 import { formatDateTime } from "../../utils/dateTime";
 import { formatStrictDuration } from "../../utils/fromSec";
 import { durationToNumber } from "../../utils/durationToNum";
-import { useLoading } from "../../contexts/LoaderContext";
 import PopUp3 from "../../components/Popup/PopUp3";
 
 interface ServerResponse {
@@ -157,7 +156,7 @@ export const OrdersComponent: React.FC = () => {
   };
   useEffect(() => {
     const timeToRefreshData = Number(
-      process.env.REACT_APP_TIME_TO_REFRESH_DATA
+      process.env.REACT_APP_ORDERS_REQ_TIME
     );
 
     getOrderList();

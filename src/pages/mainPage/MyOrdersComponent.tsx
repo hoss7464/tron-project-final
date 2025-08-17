@@ -90,13 +90,18 @@ const MyOrdersComponent: React.FC = () => {
     (state: RootState) => state.filters["myOrders"] || "All"
   );
 
+  useEffect(() => {
+    // Clear the data when address is null
+    if (!address) {
+      setMyOrdersWholeData(null);
+      return;
+    }
 
-  //To get the whole data from server :
-   const baseUrl = process.env.REACT_APP_BASE_URL;
+    const baseUrl = process.env.REACT_APP_BASE_URL;
 
     const getMyOrdersServerData = async () => {
       try {
-        
+        incrementLoading();
         const response = await axios.get<ServerResponse>(
           `${baseUrl}/order/myOrder`,
           {
@@ -127,25 +132,12 @@ const MyOrdersComponent: React.FC = () => {
             severity: "error",
           })
         );
-      } 
+      } finally {
+        decrementLoading();
+      }
     };
 
-  useEffect(() => {
-    // Clear the data when address is null
-    if (!address) {
-      setMyOrdersWholeData(null);
-      return;
-    }
     getMyOrdersServerData();
-    
-    const timeToRefreshData = Number(
-      process.env.REACT_APP_TIME_TO_REFRESH_DATA
-    );
-    
-
-    const intervalReq = setInterval(getMyOrdersServerData, timeToRefreshData)
-
-    return () => clearInterval(intervalReq)
   }, [refreshTrigger, address]);
 
   // Filter by status first (only processing and completed)

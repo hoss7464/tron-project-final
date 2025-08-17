@@ -1,3 +1,4 @@
+import {useEffect} from "react";
 import "./App.css";
 import {
   MainContainerWrapper,
@@ -14,9 +15,18 @@ import Notification from "./components/Notifictions/Notification";
 import Loader from "./components/Loader/Loader";
 import PopUp from "./components/Popup/PopUp";
 import SelectWalletComponent from "./components/SelectWalletComponent/SelectWalletComponent";
+import ScrollToTop from "./core-UI/scrollToTop";
 
 function App() {
     const popUpVisible = useSelector((state: RootState) => state.toggle.toggles.popUp);
+
+
+    useEffect(() => {
+    // Disable browser scroll restoration
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
     
   return (
     <>
@@ -26,10 +36,12 @@ function App() {
             <SelectWalletComponent />
           </PopUp>
         )}
+        
       <MainContainerWrapper>
         <LightMainContainerWrapper>
           <PrimeMainContainer>
             <Router>
+              <ScrollToTop />
               <Notification />
               <Navbar />
               <Routes>
