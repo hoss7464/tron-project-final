@@ -15,20 +15,11 @@ export const ConnectContainer = styled.div`
     width: 900px;
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px) {
     width: 900px;
     height: 550px;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    width: 900px;
-    height: 550px;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    width: 900px;
-    height: 550px;
-  }
 `;
 
 export const ConnectMainWrapper = styled.div`
@@ -39,13 +30,7 @@ export const ConnectMainWrapper = styled.div`
   width: 100%;
   height: 100%;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
-    flex-direction: column;
-    border-radius: 16px;
-    padding: 16px;
-  }
-
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     flex-direction: column;
     border-radius: 16px;
     padding: 16px;
@@ -77,31 +62,17 @@ export const ConnectUniqueTextWrapper = styled.div`
   width: 100%;
   z-index: 2;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     display: none;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    display: none;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px) {
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
 `;
 export const ConnectUniqueText = styled.img`
   width: 100%;
@@ -111,69 +82,36 @@ export const ConnectRightWrapper = styled.div`
   width: 50%;
   height: 100%;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     display: none;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    display: none;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px) {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     flex-direction: column;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    flex-direction: column;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    flex-direction: column;
-  }
 `;
 export const ConnectLeftWrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     width: 100%;
     justify-content: center;
     align-items: center;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    width: 100%;
-    justify-content: center;
-    align-items: center;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px){
     width: 50%;
     justify-content: flex-start;
     align-items: flex-start;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    width: 50%;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    width: 50%;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
 `;
 
 export const ConnectLeftHeaderWrapper = styled.div`
@@ -181,7 +119,6 @@ export const ConnectLeftHeaderWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-
   margin-bottom: 0.2rem;
 `;
 export const ConnectLeftHeader = styled.p`
@@ -192,21 +129,10 @@ export const ConnectLeftHeader = styled.p`
     font-size: 20px;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 577px) {
     font-size: 24px;
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    font-size: 24px;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    font-size: 24px;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    font-size: 24px;
-  }
 `;
 export const ConnectLeftSubheaderWrapper = styled.div`
   display: flex;
@@ -224,21 +150,10 @@ export const ConnectLeftSubheader = styled.p`
     font-size: 15px;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 577px) {
     font-size: 16px;
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    font-size: 16px;
-  }
-
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    font-size: 16px;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    font-size: 16px;
-  }
 `;
 
 export const ConnectBoxBtnWrapper = styled.div`
@@ -273,30 +188,16 @@ export const ConnectBox = styled.div<{ deactivated?: boolean }>`
   border-radius: 10px;
   cursor: ${({ deactivated }) => (deactivated ? "not-allowed" : "pointer")};
 
-  @media only screen and (min-width: 280px) and (max-width: 576px) {
+  @media only screen and (min-width: 280px) and (max-width: 768px) {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 769px){
     padding-top: 1rem;
     padding-bottom: 1rem;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-  }
-
-  @media only screen and (min-width: 1921px) {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-  }
 `;
 
 export const ConnectBoxImgWrapper = styled.div`
@@ -325,11 +226,7 @@ export const ConnectBoxText = styled.p<{ deactivated?: boolean }>`
     font-size: 13px;
   }
 
-  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    font-size: 15px;
-  }
-
-  @media only screen and (min-width: 1921px) {
+  @media only screen and (min-width: 1081px) {
     font-size: 15px;
   }
 `;
