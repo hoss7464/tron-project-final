@@ -1,47 +1,118 @@
-import React from "react";
+import React, { useEffect } from "react";
+import "./SelectWallet.css";
 import {
-  SelectContainer,
-  SelectHeaderWrapper,
-  SelectHeader,
-  SelectWalletWrapper,
-  SelectWalletWrapper2,
-  SelectWalletIconTextWrapper,
-  SelectWalletIconWrapper,
-  SelectWalletIcon,
-  SelectWalletTextWrapper,
-  SelectWalletText,
-  SelectWalletConnectBtnWrapper,
-  SelectWalletConnectBtn,
+  ConnectContainer,
+  ConnectMainWrapper,
+  ConnectUniqueTextWrapper,
+  ConnectUniqueText,
+  ConnectRightWrapper,
+  ConnectLeftWrapper,
+  ConnectLeftHeaderWrapper,
+  ConnectLeftHeader,
+  ConnectLeftSubheaderWrapper,
+  ConnectLeftSubheader,
+  ConnectBoxBtnWrapper,
+  ConnectBoxWrapper,
+  ConnectBox,
+  ConnectBoxImgWrapper,
+  ConnectBoxImg,
+  ConnectBoxTextWrapper,
+  ConnectBoxText,
+  ConnectBtnWrapper,
+  ConnectBtnText,
+  ConnectCloseBtnWrapper,
+  ConnectCloseBtn,
+  ConnectRightIconWrapper,
+  ConnectRightIcon,
+  ConnectRightNameWrapper,
+  ConnectRightName,
+  ConnectRightTextWrapper,
+  ConnectRightText,
 } from "./SelectWalletCompoElements";
+import { Grid } from "@mui/material";
+import connectUniiqueText from "../../assets/svg/TRONMAX.svg";
+import { useDispatch } from "react-redux";
+import { clickToggle } from "../../redux/actions/toggleSlice";
+import { ConnectPopupData1 } from "../../helpers/ConnectPopupData";
 import { useTronWallet } from "../../contexts/TronWalletContext";
-import tronIcon from "../../assets/svg/TronIcon.svg"
+import tronLinkImg from "../../assets/svg/TronLinkImg.svg";
 
 const SelectWalletComponent: React.FC = () => {
-  const { connectWallet } = useTronWallet();
-  
+  const dispatch = useDispatch();
+  const { connectWallet, address } = useTronWallet();
+
+  useEffect(() => {
+    if (address) {
+      dispatch(clickToggle("popUp"));
+    }
+  }, [address, dispatch]);
+
   return (
     <>
-      <SelectContainer>
-        <SelectHeaderWrapper>
-            <SelectHeader>Connect Wallet</SelectHeader>
-        </SelectHeaderWrapper>
-        <SelectWalletWrapper>
-            <SelectWalletWrapper2>
-                <SelectWalletIconTextWrapper>
-                    <SelectWalletIconWrapper>
-                        <SelectWalletIcon alt="TronLink" src={tronIcon} />
-                    </SelectWalletIconWrapper>
-                    <SelectWalletTextWrapper>
-                        <SelectWalletText>TronLink</SelectWalletText>
-                    </SelectWalletTextWrapper>
-                </SelectWalletIconTextWrapper>
-                <SelectWalletConnectBtnWrapper onClick={connectWallet}>
-                   <SelectWalletConnectBtn>Connect</SelectWalletConnectBtn>
-                </SelectWalletConnectBtnWrapper>
-            </SelectWalletWrapper2>
-        </SelectWalletWrapper>
-      </SelectContainer>
-      
+      <ConnectContainer>
+        <ConnectMainWrapper className="Select-Wallet">
+          <ConnectUniqueTextWrapper>
+            <ConnectUniqueText
+              alt="Connect-unique-text"
+              src={connectUniiqueText}
+            />
+          </ConnectUniqueTextWrapper>
+          <ConnectCloseBtnWrapper
+            onClick={() => dispatch(clickToggle("popUp"))}
+          >
+            <ConnectCloseBtn />
+          </ConnectCloseBtnWrapper>
+          <ConnectLeftWrapper>
+            <ConnectLeftHeaderWrapper>
+              <ConnectLeftHeader>Connect Your Wallet</ConnectLeftHeader>
+            </ConnectLeftHeaderWrapper>
+            <ConnectLeftSubheaderWrapper>
+              <ConnectLeftSubheader>
+                Choose a wallet to connect.
+              </ConnectLeftSubheader>
+            </ConnectLeftSubheaderWrapper>
+            <ConnectBoxBtnWrapper>
+              <ConnectBoxWrapper>
+                {ConnectPopupData1.map((myBox, index) => (
+                  <ConnectBox deactivated={myBox.deactivate} key={index}>
+                    <ConnectBoxImgWrapper>
+                      <ConnectBoxImg
+                        alt={myBox.alt}
+                        deactivated={myBox.deactivate}
+                        src={myBox.img}
+                      />
+                    </ConnectBoxImgWrapper>
+                    <ConnectBoxTextWrapper>
+                      <ConnectBoxText deactivated={myBox.deactivate}>
+                        {myBox.text}
+                      </ConnectBoxText>
+                    </ConnectBoxTextWrapper>
+                  </ConnectBox>
+                ))}
+              </ConnectBoxWrapper>
+
+              <ConnectBtnWrapper onClick={connectWallet}>
+                <ConnectBtnText>Connect</ConnectBtnText>
+              </ConnectBtnWrapper>
+            </ConnectBoxBtnWrapper>
+          </ConnectLeftWrapper>
+          {/* this block will change based on conditional rendering*/}
+          <ConnectRightWrapper>
+            <ConnectRightIconWrapper>
+              <ConnectRightIcon alt="tronlink" src={tronLinkImg} />
+            </ConnectRightIconWrapper>
+            <ConnectRightNameWrapper>
+              <ConnectRightName>TronLink</ConnectRightName>
+            </ConnectRightNameWrapper>
+            <ConnectRightTextWrapper>
+              <ConnectRightText>
+                To log into your wallet , firstly open TronLink browser
+                extension and unlock your wallet.{" "}
+              </ConnectRightText>
+            </ConnectRightTextWrapper>
+          </ConnectRightWrapper>
+        </ConnectMainWrapper>
+      </ConnectContainer>
     </>
   );
 };

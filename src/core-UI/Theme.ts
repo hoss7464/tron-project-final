@@ -31,6 +31,7 @@ export const ThemeColor = {
     border1 : "#D9E1E3",
     primary1 : "#003543",
     primary3 : "#EDEFF1",
+    primary4: "#CBD5D8",
     secondary1 : "#430E00",
     secondary2 : "#C5B4B0",
     text1 : "#000000",

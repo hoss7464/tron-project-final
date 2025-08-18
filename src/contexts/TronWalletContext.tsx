@@ -258,7 +258,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             (err instanceof Error ? err.message : "Unknown error"),
           severity: "error",
         })
+        
       );
+      
 
       // Only disconnect if it's NOT one of your 5 errors
       if (!isMyError) {

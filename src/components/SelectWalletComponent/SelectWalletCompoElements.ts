@@ -1,85 +1,409 @@
 import styled from "styled-components";
-import { colors } from "../../core-UI/Theme";
+import { ThemeColor } from "../../core-UI/Theme";
+import { IoClose } from "react-icons/io5";
 
-export const SelectContainer = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-flex-direction: column;
-background-color: ${colors.bg2};
-border:solid 2px ${colors.primary1};
-width: 350px;
-border-radius: 24px;
-padding: 16px;
-`
+export const ConnectContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-export const SelectHeaderWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-width: 100%;
-margin-bottom: 1rem;
-`
-export const SelectHeader = styled.p`
-font-size: 24px;
-font-weight: 800;
-`
-export const SelectWalletWrapper = styled.div`
-display: flex;
-justify-content: flex-start;
-align-items: center;
-flex-direction: column;
-width: 100%;
-height: 450px;
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    width: 900px;
+  }
 
-`
-export const SelectWalletWrapper2 = styled.div`
-display: flex;
-justify-content: space-between;
-align-items: center;
-width: 100%;
-margin-bottom: 1rem;
-border-radius: 8px;
-padding: 0.5rem;
-background-color: #F8F8F8;
-border: solid 2px ${colors.primary1};
-`
-export const SelectWalletIconTextWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-`
-export const SelectWalletIconWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-margin-right: 1rem;
-`
-export const SelectWalletIcon = styled.img`
-width: 39px;
-height: 39px;
-`
-export const SelectWalletTextWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-`
-export const SelectWalletText = styled.p`
-font-size: 20px;
-font-weight: 500;
-`
-export const SelectWalletConnectBtnWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-`
-export const SelectWalletConnectBtn = styled.button`
-font-size: 16px;
-border: none;
-background-color: ${colors.primary1};
-border-radius: 8px;
-padding: 6px 16px;
-cursor: pointer;
-color: ${colors.bg2};
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    width: 900px;
+  }
 
-`
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    width: 900px;
+    height: 550px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    width: 900px;
+    height: 550px;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    width: 900px;
+    height: 550px;
+  }
+`;
+
+export const ConnectMainWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    flex-direction: column;
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    flex-direction: column;
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    flex-direction: row;
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    flex-direction: row;
+    border-radius: 20px;
+    padding: 20px;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    flex-direction: row;
+    border-radius: 24px;
+    padding: 20px;
+  }
+`;
+
+export const ConnectUniqueTextWrapper = styled.div`
+  position: absolute;
+  left: 0;
+  bottom: 1rem;
+  width: 100%;
+  z-index: 2;
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    display: none;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    display: none;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+export const ConnectUniqueText = styled.img`
+  width: 100%;
+`;
+
+export const ConnectRightWrapper = styled.div`
+  width: 50%;
+  height: 100%;
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    display: none;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    display: none;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+  }
+`;
+export const ConnectLeftWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    width: 50%;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    width: 50%;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    width: 50%;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+`;
+
+export const ConnectLeftHeaderWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+
+  margin-bottom: 0.2rem;
+`;
+export const ConnectLeftHeader = styled.p`
+  font-weight: 800;
+  color: ${ThemeColor.primary1};
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    font-size: 20px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    font-size: 24px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    font-size: 24px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    font-size: 24px;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    font-size: 24px;
+  }
+`;
+export const ConnectLeftSubheaderWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+
+  margin-bottom: 1.5rem;
+`;
+export const ConnectLeftSubheader = styled.p`
+  font-weight: 500;
+  color: ${ThemeColor.primary1};
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    font-size: 15px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    font-size: 16px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    font-size: 16px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    font-size: 16px;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    font-size: 16px;
+  }
+`;
+
+export const ConnectBoxBtnWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 95%;
+`;
+export const ConnectBoxWrapper = styled.div`
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const ConnectBox = styled.div<{ deactivated?: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: ${ThemeColor.primary4};
+  flex-shrink: 0;
+  border-radius: 10px;
+  cursor: ${({ deactivated }) => (deactivated ? "not-allowed" : "pointer")};
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+`;
+
+export const ConnectBoxImgWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.8rem;
+`;
+export const ConnectBoxImg = styled.img<{ deactivated?: boolean }>`
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  opacity: ${({ deactivated }) => (deactivated ? 0.2 : 1)};
+`;
+export const ConnectBoxTextWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+export const ConnectBoxText = styled.p<{ deactivated?: boolean }>`
+  color: ${ThemeColor.primary1};
+  font-weight: 600;
+  opacity: ${({ deactivated }) => (deactivated ? 0.2 : 1)};
+
+  @media only screen and (min-width: 280px) and (max-width: 1080px) {
+    font-size: 13px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    font-size: 15px;
+  }
+
+  @media only screen and (min-width: 1921px) {
+    font-size: 15px;
+  }
+`;
+
+export const ConnectBtnWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background-color: ${ThemeColor.secondary1};
+  width: 100%;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+`;
+export const ConnectBtnText = styled.p`
+  font-size: 17px;
+  font-weight: 500;
+  color: ${ThemeColor.bg2};
+`;
+
+export const ConnectCloseBtnWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: ${ThemeColor.secondary1};
+  padding: 0.3rem;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  cursor: pointer;
+`;
+export const ConnectCloseBtn = styled(IoClose)`
+  color: ${ThemeColor.bg2};
+  width: 20px;
+  height: 20px;
+`;
+
+export const ConnectRightIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 5rem;
+  margin-bottom: 1rem;
+`;
+export const ConnectRightIcon = styled.img`
+  width: 124x;
+  height: 124px;
+  object-fit: cover;
+`;
+export const ConnectRightNameWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 5rem;
+`;
+export const ConnectRightName = styled.p`
+  font-size: 24px;
+  font-weight: 800;
+  color: ${ThemeColor.border1};
+`;
+export const ConnectRightTextWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+`;
+export const ConnectRightText = styled.p`
+  font-size: 17px;
+  font-weight: 400;
+  color: ${ThemeColor.border1};
+  text-align: center;
+`;

@@ -232,6 +232,7 @@ export const OrdersComponent: React.FC = () => {
                   </OrderNavTextWrapper>
                 </OrderNavTextWrapper1>
               </OrderNavWrapper>
+              
               <OrdersCard>
                 {paginatedData.map((myData, index) => {
                   const { date, time } = formatDateTime(myData.createdAt);

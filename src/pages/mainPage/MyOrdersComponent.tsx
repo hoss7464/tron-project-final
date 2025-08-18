@@ -198,7 +198,7 @@ const MyOrdersComponent: React.FC = () => {
                   const { date, time } = formatDateTime(myData.createdAt);
 
                   return (
-                    <>
+                    
                       <MyOrderDetails key={myData.receiver}>
                         <MyOrderCardTextWrap>
                           <OrdersCardTextWrapper2>
@@ -305,7 +305,7 @@ const MyOrdersComponent: React.FC = () => {
                           </CanceledSignWrapper>
                         )}
                       </MyOrderDetails>
-                    </>
+                    
                   );
                 })}
               </OrdersCard>

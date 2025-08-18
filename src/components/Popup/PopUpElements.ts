@@ -13,6 +13,7 @@ export const PopUpContainer = styled.div`
   z-index: 100;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(6px);
+  padding: 1rem;
 `;
 
 export const Popup2HeaderWrapper = styled.div`
