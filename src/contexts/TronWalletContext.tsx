@@ -5,7 +5,6 @@ import { useDispatch } from "react-redux";
 import { showNotification } from "../redux/actions/notifSlice";
 import { toggleRefresh } from "../redux/actions/refreshSlice";
 
-
 // Context interface
 interface TronWalletContextProps {
   address: string | null;
@@ -240,6 +239,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         })
       );
     } catch (err) {
+      // Check for TronLink rejection specifically
+      const isTronLinkRejection =
+        err instanceof Error &&
+        (err.message.includes("confirmation declined by user") ||
+          err.message.includes("User denied transaction signature") ||
+          err.message.includes("User rejected") ||
+          err.message.includes("rejected by user"));
       // Check if the error matches any of your 5 specific cases
       const isMyError =
         err instanceof Error &&
@@ -249,23 +255,28 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           err.message.includes("error fetching data from server") ||
           err.message.includes("Wallet connection failed"));
 
-      // Always show error5 for any unhandled error
-      dispatch(
-        showNotification({
-          name: "tron-error5",
-          message:
-            "Wallet connection failed: " +
-            (err instanceof Error ? err.message : "Unknown error"),
-          severity: "error",
-        })
-        
-      );
-      
-
-      // Only disconnect if it's NOT one of your 5 errors
-      if (!isMyError) {
-        disconnectWallet();
+      // Show appropriate error message
+      if (isTronLinkRejection) {
+        dispatch(
+          showNotification({
+            name: "tron-rejection",
+            message: "Confirmation declined by user",
+            severity: "warning",
+          })
+        );
+        return;
+      } else {
+        dispatch(
+          showNotification({
+            name: "tron-error5",
+            message:
+              "Wallet connection failed: " +
+              (err instanceof Error ? err.message : "Unknown error"),
+            severity: "error",
+          })
+        );
       }
+      //I removed disconnectWallet function in here :
     }
   };
   //-------------------------------------------------------------------------------------
@@ -609,7 +620,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const tronNileUrl = process.env.REACT_APP_TRON_API;
       //To get data from api.trongrid.io
       const tronWeb = new TronWeb({ fullHost: tronNileUrl });
-      
+
       const MainAddress = process.env.REACT_APP_TRON_API;
 
       if (window?.tronWeb?.fullNode.host !== MainAddress) {
@@ -689,8 +700,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             permissionId: options?.permissionId,
           }
         );
-        
-      let signedTx :any;
+
+      let signedTx: any;
       // Sign and broadcast transaction
 
       if (!transactionDelegated.raw_data.contract[0].Permission_id) {
@@ -708,6 +719,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const txResult = await tronWeb.trx.sendRawTransaction(signedTx);
+      console.log(txResult);
 
       if (txResult?.code) {
         dispatch(

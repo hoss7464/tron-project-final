@@ -91,6 +91,12 @@ interface VerifyPaymentResponse {
   message: string;
 }
 
+interface CheckOrderResponse {
+  success: boolean;
+  res_id :string
+  // add other properties you expect in the response
+}
+
 const PopUp3: React.FC<Popup3Types> = ({
   open,
   onClose,
@@ -303,41 +309,47 @@ const PopUp3: React.FC<Popup3Types> = ({
     }
   };
   //-------------------------------------------------------------------------------------------
-  const handleFill = async () => {
-    // Validate delegated amount
+  //function to send data towards server and tronLink :
+ const handleFill = async () => {
+    // To get minimum delegate amount from .env :
     const MIN_DELEGATE_AMOUNT = Number(
       process.env.REACT_APP_MIN_DELEGATE_AMOUNT
     );
+    //to get axios time out from .env :
+    const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+    //To get base url from .env :
+    const baseUrl = process.env.REACT_APP_BASE_URL;
+    //To cast data :
     const numericDelegatedAmount = parseFloat(delegatedAmount);
+    //To round the number downwards :
     const roundedMax = maxCandle !== null ? Math.floor(maxCandle) : null;
 
+    //if data is NaN return an error :
     if (isNaN(numericDelegatedAmount)) {
       setDelegateInputError("Enter a valid number");
       return;
     }
-
+    //if amount is not rounded and amount was more than max value return an error :
     if (roundedMax !== null && numericDelegatedAmount > roundedMax) {
       setDelegateInputError(`Cannot exceed ${roundedMax}`);
       return;
     }
-
+    //if amount was lower than minimum delegated amount return an error:
     if (numericDelegatedAmount < MIN_DELEGATE_AMOUNT) {
       setDelegateInputError(`Min amount is ${MIN_DELEGATE_AMOUNT}`);
       return;
     }
-
+    //if amount was negative number return an error :
     if (numericDelegatedAmount <= 0) {
       setDelegateInputError("Amount must be positive");
       return;
     }
-
-    // Validate requester address
+    //if requester input didn't meet the validation return an error :
     if (!validationRequesterAdd(requesterInput)) {
       setRequesterError("Invalid wallet address");
       return;
     }
-
-    // Check required fields
+    //if receiver address doesn't exist or the wallet is not connected return an error :
     if (!order?.receiver || !address) {
       dispatch(
         showNotification({
@@ -348,95 +360,119 @@ const PopUp3: React.FC<Popup3Types> = ({
       );
       return;
     }
-
+    //After checking all the validations data must ply between front ,server and tronlink :
     try {
-      let result = null;
-      let permissionId;
-      let options = {};
-
-      if (settingBtn) {
-        // Multi-signature case
-        if (!multiSignature) {
-          setSignatureError("Multi-signature address is required");
-          return;
+      //step1 ----> order._id and amount must send towards the server so that server checks if another client is filling the order or not :
+      const checkPayload = {
+        orderId: order._id,
+        Amount: delegatedAmount,
+      };
+      const checkResponse = await axios.post<CheckOrderResponse>(
+        `${baseUrl}/order/CheckOrder`,
+        checkPayload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: axiosTimeOut,
         }
-
-        if (!validationSignatureAdd(multiSignature)) {
-          setSignatureError("Invalid multi-signature address");
-          return;
+      );
+      //step2 ----> send data towards tronlink after checking data is successfull :
+      if (checkResponse.data.success === true) {
+        let result = null;
+        let permissionId;
+        let options = {};
+        //if settingBtn is true :
+        if (settingBtn) {
+          // if multi signature address was empty return an error :
+          if (!multiSignature) {
+            setSignatureError("Multi-signature address is required");
+            return;
+          }
+          //if multi signature address doesn't meet the validation return an error :
+          if (!validationSignatureAdd(multiSignature)) {
+            setSignatureError("Invalid multi-signature address");
+            return;
+          }
+          //After checking multi signature address get permission ID :
+          permissionId = await handleSettingFill();
+          //if permissionId doesn't exist return an error :
+          if (!permissionId) {
+            dispatch(
+              showNotification({
+                name: "Order-popup-error5",
+                message: "Failed to get permission ID",
+                severity: "error",
+              })
+            );
+            return;
+          }
+          //After checking all the validations send data towards tronLink :
+          options = {
+            permissionId: permissionId,
+            address: multiSignature,
+          };
+          result = await fillOrder(
+            order.receiver,
+            numericDelegatedAmount,
+            order.resourceType,
+            multiSignature, // requesterAddress
+            order.lock,
+            order.durationSec / 3,
+            true, // isMultiSignature
+            options
+          );
+        } else {
+          // if settingBtn is false send data towards tronLink without multisignature :
+          result = await fillOrder(
+            order.receiver,
+            numericDelegatedAmount,
+            order.resourceType,
+            address, // requesterAddress
+            order.lock,
+            order.durationSec / 3
+          );
         }
+        //step3 ----> if the result of sending data towards tronlink was successfull then send txid, orderId and checkResponse.res_id towards the server:
+        if (result.success) {
+          //verify payment :
+          const resultPayload = { txid: result.txId, orderId: order._id, orderCheck : checkResponse.data.res_id };
 
-        // Get permission ID first
-        permissionId = await handleSettingFill();
-        if (!permissionId) {
+          const verifyFillPayment = await axios.post<VerifyPaymentResponse>(
+            `${baseURL}/order/sellResource`,
+            resultPayload,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              timeout: axiosTimeOut,
+            }
+          );
+        }
+        //if result.success === true show a notification then close the popup :
+        if (result?.success) {
           dispatch(
             showNotification({
-              name: "Order-popup-error5",
-              message: "Failed to get permission ID",
-              severity: "error",
+              name: "Order-popup-success",
+              message: "Delegation successful!",
+              severity: "success",
             })
           );
-          return;
-        }
-
-        options = {
-          permissionId: permissionId,
-          address: multiSignature,
-        };
-
-        result = await fillOrder(
-          order.receiver,
-          numericDelegatedAmount,
-          order.resourceType,
-          multiSignature, // requesterAddress
-          order.lock,
-          order.durationSec / 3,
-          true, // isMultiSignature
-          options
-        );
-      } else {
-        // Regular case
-        result = await fillOrder(
-          order.receiver,
-          numericDelegatedAmount,
-          order.resourceType,
-          address, // requesterAddress
-          order.lock,
-          order.durationSec / 3
-        );
-      }
-
-      if (result.success) {
-        //verify payment :
-        const resultPayload = { txid: result.txId, orderId: order._id };
-        const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
-
-        const verifyFillPayment = await axios.post<VerifyPaymentResponse>(
-          `${baseURL}/order/sellResource`,
-          resultPayload,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            timeout: axiosTimeOut,
-          }
-        );
-      }
-
-      if (result?.success) {
+          handleClose();
+        } 
+      } else if (checkResponse.data.success === false) {
         dispatch(
           showNotification({
-            name: "Order-popup-success",
-            message: "Delegation successful!",
-            severity: "success",
+            name: "Order-popup-error6",
+            message: "Data is in processing try again 5 mins later.",
+            severity: "error",
           })
         );
-        handleClose();
-      } else if (result?.error) {
-        throw new Error(result.error);
+        return;
+      } else {
+        return {};
       }
     } catch (err) {
-      
       dispatch(
         showNotification({
           name: "Order-popuo-error4",
@@ -525,10 +561,8 @@ const PopUp3: React.FC<Popup3Types> = ({
         throw new Error("Permission ID not found in the permission");
       }
 
-      
       return permissionId;
     } catch (error) {
-      
       dispatch(
         showNotification({
           name: "Order-popup-error5",
@@ -587,6 +621,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             padding: "0.5rem 0.5rem",
             borderRadius: "16px !important",
             border: "solid 2px #D9E1E3",
+            minWidth: "30%"
           },
         }}
       >

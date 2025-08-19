@@ -146,6 +146,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             padding: "0.5rem 0.5rem",
             borderRadius: "16px !important",
             border: "solid 2px #D9E1E3",
+            minWidth: "30%"
           },
         }}
       >

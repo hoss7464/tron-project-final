@@ -29,7 +29,6 @@ import {
   ConnectRightTextWrapper,
   ConnectRightText,
 } from "./SelectWalletCompoElements";
-import { Grid } from "@mui/material";
 import connectUniiqueText from "../../assets/svg/TRONMAX.svg";
 import { useDispatch } from "react-redux";
 import { clickToggle } from "../../redux/actions/toggleSlice";

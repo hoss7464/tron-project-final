@@ -8,16 +8,16 @@ export const ConnectContainer = styled.div`
   align-items: center;
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
-    width: 900px;
+    width: 750px;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
-    width: 900px;
+    width: 750px;
   }
 
   @media only screen and (min-width: 769px) {
-    width: 900px;
-    height: 550px;
+    width: 750px;
+    height: 430px;
   }
 
 `;
@@ -61,7 +61,6 @@ export const ConnectUniqueTextWrapper = styled.div`
   bottom: 1rem;
   width: 100%;
   z-index: 2;
-
 
   @media only screen and (min-width: 280px) and (max-width: 768px) {
     display: none;
@@ -126,11 +125,11 @@ export const ConnectLeftHeader = styled.p`
   color: ${ThemeColor.primary1};
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   @media only screen and (min-width: 577px) {
-    font-size: 24px;
+    font-size: 20px;
   }
 
 `;
@@ -139,19 +138,18 @@ export const ConnectLeftSubheaderWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 `;
 export const ConnectLeftSubheader = styled.p`
   font-weight: 500;
   color: ${ThemeColor.primary1};
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   @media only screen and (min-width: 577px) {
-    font-size: 16px;
+    font-size: 15px;
   }
 
 `;
@@ -167,7 +165,7 @@ export const ConnectBoxWrapper = styled.div`
   display: grid;
   width: 100%;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  gap: 0.5rem;
 
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
@@ -194,8 +192,8 @@ export const ConnectBox = styled.div<{ deactivated?: boolean }>`
   }
 
   @media only screen and (min-width: 769px){
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 
 `;
@@ -204,11 +202,11 @@ export const ConnectBoxImgWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.9rem;
 `;
 export const ConnectBoxImg = styled.img<{ deactivated?: boolean }>`
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   object-fit: cover;
   opacity: ${({ deactivated }) => (deactivated ? 0.2 : 1)};
 `;
@@ -223,11 +221,11 @@ export const ConnectBoxText = styled.p<{ deactivated?: boolean }>`
   opacity: ${({ deactivated }) => (deactivated ? 0.2 : 1)};
 
   @media only screen and (min-width: 280px) and (max-width: 1080px) {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   @media only screen and (min-width: 1081px) {
-    font-size: 15px;
+    font-size: 13px;
   }
 `;
 
@@ -241,10 +239,10 @@ export const ConnectBtnWrapper = styled.div`
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
   border-radius: 8px;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 `;
 export const ConnectBtnText = styled.p`
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 500;
   color: ${ThemeColor.bg2};
 `;
@@ -263,8 +261,8 @@ export const ConnectCloseBtnWrapper = styled.div`
 `;
 export const ConnectCloseBtn = styled(IoClose)`
   color: ${ThemeColor.bg2};
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 `;
 
 export const ConnectRightIconWrapper = styled.div`
@@ -272,12 +270,12 @@ export const ConnectRightIconWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-top: 5rem;
+  margin-top: 4rem;
   margin-bottom: 1rem;
 `;
 export const ConnectRightIcon = styled.img`
-  width: 124x;
-  height: 124px;
+  width: 86x;
+  height: 86px;
   object-fit: cover;
 `;
 export const ConnectRightNameWrapper = styled.div`
@@ -285,10 +283,10 @@ export const ConnectRightNameWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: 5rem;
+  margin-bottom: 3.2rem;
 `;
 export const ConnectRightName = styled.p`
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   color: ${ThemeColor.border1};
 `;
@@ -299,7 +297,7 @@ export const ConnectRightTextWrapper = styled.div`
   width: 100%;
 `;
 export const ConnectRightText = styled.p`
-  font-size: 17px;
+  font-size: 14px;
   font-weight: 400;
   color: ${ThemeColor.border1};
   text-align: center;

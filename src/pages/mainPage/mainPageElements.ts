@@ -684,7 +684,7 @@ export const OrderNavWrapper = styled.div`
   align-items: flex-start;
   flex-direction: column;
   width: 100%;
-  min-width: 700px;
+  min-width: 750px;
   padding: 0.5rem;
   background-color: ${ThemeColor.bg2};
   margin-bottom: 0.5rem;
@@ -703,7 +703,7 @@ export const OrderNavTextWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: 19.3%;
+  width: 18.5%;
 `;
 
 export const OrderCardIconWrapper = styled.div`
@@ -739,7 +739,7 @@ export const OrdersCardTextWrap = styled.div`
   justify-content: center;
   align-items: flex-start;
   flex-direction: column;
-  width: 19.5%;
+  width: 18.5%;
 `;
 
 export const OrdersCardTextWrapper2 = styled.div`
@@ -778,6 +778,7 @@ export const OrderCardLineraPercentWrapper = styled.div`
   justify-content: center;
   align-items: center;
   margin-right: 0.2rem;
+  width: 60px;
 `;
 export const OrderCardLineraPercent = styled.p`
   font-size: 14px;
@@ -875,7 +876,7 @@ export const MyOrdersNavWrapper = styled.div`
   align-items: flex-start;
   flex-direction: column;
   width: 100%;
-  min-width: 700px;
+  min-width: 750px;
   padding: 0.5rem;
   border-radius: 8px;
   background-color: ${ThemeColor.bg2};
@@ -911,7 +912,7 @@ export const MyOrdersTextWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: 19%;
+  width: 18.5%;
   height: 100%;
 
 `;
@@ -933,7 +934,7 @@ export const MyOrderCardTextWrap = styled.div`
   justify-content: center;
   align-items: flex-start;
   flex-direction: column;
-  width: 19%;
+  width: 18.5%;
   height: 100%;
 `;
 
