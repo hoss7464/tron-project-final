@@ -437,18 +437,23 @@ const PopUp3: React.FC<Popup3Types> = ({
         }
         //step3 ----> if the result of sending data towards tronlink was successfull then send txid, orderId and checkResponse.res_id towards the server:
         if (result.success) {
-          
-          const finalAddress = settingBtn === true ? multiSignature : requesterInput
-
-          const resultPayload = {
-            txid: result.txId,
-            orderId: order._id,
-            resId: checkResponse.data.res_id,
-            multiAddress : finalAddress,
-            payOutAddress : requesterInput
-          };
-
-          console.log(resultPayload)
+          let resultPayload = null;
+          if (settingBtn === false) {
+            resultPayload = {
+              txid: result.txId,
+              orderId: order._id,
+              resId: checkResponse.data.res_id,
+              payOutAddress: requesterInput,
+            };
+          } else {
+            resultPayload = {
+              txid: result.txId,
+              orderId: order._id,
+              resId: checkResponse.data.res_id,
+              multiAddress: multiSignature,
+              payOutAddress: requesterInput,
+            };
+          }
 
           const verifyFillPayment = await axios.post<VerifyPaymentResponse>(
             `${baseURL}/order/sellResource`,
@@ -908,7 +913,8 @@ const PopUp3: React.FC<Popup3Types> = ({
                     color: "#430E00",
                   }}
                 >
-                  {Number(handlePayout(pairTrx, delegatedAmount).toFixed(3))} TRX
+                  {Number(handlePayout(pairTrx, delegatedAmount).toFixed(3))}{" "}
+                  TRX
                 </Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
