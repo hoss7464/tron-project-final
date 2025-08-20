@@ -908,7 +908,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                     color: "#430E00",
                   }}
                 >
-                  {handlePayout(pairTrx, delegatedAmount).toFixed(3)} TRX
+                  {Number(handlePayout(pairTrx, delegatedAmount).toFixed(3))} TRX
                 </Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
