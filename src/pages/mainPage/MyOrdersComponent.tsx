@@ -59,6 +59,7 @@ interface MarketOrder {
   durationSec: number;
   freeze: number;
   frozen: number;
+  energyPairTrx: number | null;
   lock: boolean;
   options: {
     allow_partial: boolean;
@@ -156,6 +157,15 @@ const MyOrdersComponent: React.FC = () => {
     selectedFilter === "All" ? "price" : (selectedFilter as SortOption)
   );
 
+    //Function to calculate total price :
+  const handleTotal = (myFreeze : number, myPair : number | null) => {
+    if (myPair === null) {
+      return 0;
+    }
+    const calcTotal = myFreeze * myPair
+    return calcTotal
+  }
+
   return (
     <>
       <MyOrdersWrapper className="my-orders-bg2">
@@ -247,7 +257,7 @@ const MyOrdersComponent: React.FC = () => {
                         <MyOrderCardTextWrap>
                           <OrdersCardTextWrapper2>
                             <OrdersCardText1>
-                              {myData.totalPrice} TRX
+                              {handleTotal(myData.freeze, myData.energyPairTrx).toFixed(2)} TRX
                             </OrdersCardText1>
                           </OrdersCardTextWrapper2>
                         </MyOrderCardTextWrap>

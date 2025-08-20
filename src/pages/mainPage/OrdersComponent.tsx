@@ -59,6 +59,7 @@ export interface MarketOrder {
   durationSec: number;
   freeze: number;
   frozen: number;
+  energyPairTrx: number | null;
   lock: boolean;
   options: {
     allow_partial: boolean;
@@ -87,6 +88,7 @@ export const OrdersComponent: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<MarketOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [delegateValue, setDelegateValue] = useState<number | null>(null);
+  const [pairTrx , setPairTrx] = useState<number | null>(null)
 
   //Selectors :
   const selectedFilter = useSelector(
@@ -187,10 +189,21 @@ export const OrdersComponent: React.FC = () => {
       return;
     }
     const value = order.freeze - order.frozen;
+    const myPairTrx = order.energyPairTrx
     setDelegateValue(value);
     setSelectedOrder(order);
     setIsModalOpen(true);
+    setPairTrx(myPairTrx)
   };
+  //------------------------------------------------------------------------------------------------------------
+  //Function to calculate total price :
+  const handleTotal = (myFreeze : number, myPair : number | null) => {
+    if (myPair === null) {
+      return 0;
+    }
+    const calcTotal = myFreeze * myPair
+    return calcTotal
+  }
 
   return (
     <>
@@ -236,6 +249,7 @@ export const OrdersComponent: React.FC = () => {
               <OrdersCard>
                 {paginatedData.map((myData, index) => {
                   const { date, time } = formatDateTime(myData.createdAt);
+                
 
                   return (
                     <OrdersDetail key={index}>
@@ -298,7 +312,7 @@ export const OrdersComponent: React.FC = () => {
                       <OrdersCardTextWrap>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>
-                            {myData.totalPrice} TRX
+                            {handleTotal(myData.freeze, myData.energyPairTrx).toFixed(2)} TRX
                           </OrdersCardText1>
                         </OrdersCardTextWrapper2>
                       </OrdersCardTextWrap>
@@ -379,6 +393,7 @@ export const OrdersComponent: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         order={selectedOrder}
         myDelegate={delegateValue}
+        pairTrx= {pairTrx}
       />
     </>
   );

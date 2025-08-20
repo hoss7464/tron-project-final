@@ -62,6 +62,7 @@ interface Popup3Types {
   onClose: () => void;
   order: MarketOrder | null;
   myDelegate: number | null;
+  pairTrx: number | null;
 }
 
 interface PermissionKey {
@@ -93,7 +94,7 @@ interface VerifyPaymentResponse {
 
 interface CheckOrderResponse {
   success: boolean;
-  res_id :string
+  res_id: string;
   // add other properties you expect in the response
 }
 
@@ -102,6 +103,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   onClose,
   order,
   myDelegate,
+  pairTrx,
 }) => {
   const dispatch = useDispatch();
   //States :
@@ -310,7 +312,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   };
   //-------------------------------------------------------------------------------------------
   //function to send data towards server and tronLink :
- const handleFill = async () => {
+  const handleFill = async () => {
     // To get minimum delegate amount from .env :
     const MIN_DELEGATE_AMOUNT = Number(
       process.env.REACT_APP_MIN_DELEGATE_AMOUNT
@@ -435,8 +437,17 @@ const PopUp3: React.FC<Popup3Types> = ({
         }
         //step3 ----> if the result of sending data towards tronlink was successfull then send txid, orderId and checkResponse.res_id towards the server:
         if (result.success) {
-          //verify payment :
-          const resultPayload = { txid: result.txId, orderId: order._id, orderCheck : checkResponse.data.res_id };
+          
+          const finalAddress = settingBtn === true ? multiSignature : requesterInput
+
+          const resultPayload = {
+            txid: result.txId,
+            orderId: order._id,
+            resId: checkResponse.data.res_id,
+            multiAddress : finalAddress,
+            payOutAddress : requesterInput
+          };
+          console.log(resultPayload)
 
           const verifyFillPayment = await axios.post<VerifyPaymentResponse>(
             `${baseURL}/order/sellResource`,
@@ -459,7 +470,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             })
           );
           handleClose();
-        } 
+        }
       } else if (checkResponse.data.success === false) {
         dispatch(
           showNotification({
@@ -599,6 +610,17 @@ const PopUp3: React.FC<Popup3Types> = ({
     }
   };
   //-------------------------------------------------------------------------------------------
+  //Function to calculate payout :
+  const handlePayout = (energyPair: number | null, myAmount: string) => {
+    if (energyPair === null) {
+      return 0;
+    }
+    const numericDelegateAmount = Number(myAmount);
+    const payoutCalc = energyPair * numericDelegateAmount;
+    return payoutCalc;
+  };
+
+  //-------------------------------------------------------------------------------------------
   if (!order) return null;
   const { date, time } = formatDateTime(order.createdAt);
 
@@ -621,7 +643,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             padding: "0.5rem 0.5rem",
             borderRadius: "16px !important",
             border: "solid 2px #D9E1E3",
-            minWidth: "30%"
+            minWidth: "30%",
           },
         }}
       >
@@ -806,7 +828,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                 <Popup2Name>Amount:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{order.resourceAmount}</Popup2Item>
+                <Popup2Item>{order.resourceAmount.toLocaleString()}</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
 
@@ -823,30 +845,29 @@ const PopUp3: React.FC<Popup3Types> = ({
 
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
-                <Popup2Name>Delegate:</Popup2Name>
+                <Popup2Name>Max-sDelegate:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{myDelegate?.toFixed(2)} TRX</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
-
-            <Popup2NameItemWrapper>
+            {/*<Popup2NameItemWrapper>
               <Popup2NameWrapper>
                 <Popup2Name>Date:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{date}</Popup2Item>
               </Popup2ItemWrapper>
-            </Popup2NameItemWrapper>
+            </Popup2NameItemWrapper> */}
 
-            <Popup2NameItemWrapper>
+            {/* <Popup2NameItemWrapper>
               <Popup2NameWrapper>
                 <Popup2Name>Time:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{time}</Popup2Item>
               </Popup2ItemWrapper>
-            </Popup2NameItemWrapper>
+            </Popup2NameItemWrapper>*/}
           </Box>
           <Divider
             orientation="horizontal"
@@ -886,7 +907,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                     color: "#430E00",
                   }}
                 >
-                  {order.totalPrice} TRX
+                  {handlePayout(pairTrx, delegatedAmount).toFixed(3)} TRX
                 </Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
