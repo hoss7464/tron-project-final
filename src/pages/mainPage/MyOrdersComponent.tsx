@@ -257,7 +257,7 @@ const MyOrdersComponent: React.FC = () => {
                         <MyOrderCardTextWrap>
                           <OrdersCardTextWrapper2>
                             <OrdersCardText1>
-                              {handleTotal(myData.freeze, myData.energyPairTrx).toFixed(2)} TRX
+                              {handleTotal(myData.freeze, myData.energyPairTrx).toFixed(3)} TRX
                             </OrdersCardText1>
                           </OrdersCardTextWrapper2>
                         </MyOrderCardTextWrap>

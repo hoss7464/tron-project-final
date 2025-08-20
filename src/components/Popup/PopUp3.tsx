@@ -447,6 +447,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             multiAddress : finalAddress,
             payOutAddress : requesterInput
           };
+
           console.log(resultPayload)
 
           const verifyFillPayment = await axios.post<VerifyPaymentResponse>(
@@ -845,7 +846,7 @@ const PopUp3: React.FC<Popup3Types> = ({
 
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
-                <Popup2Name>Max-sDelegate:</Popup2Name>
+                <Popup2Name>Max-Delegate:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{myDelegate?.toFixed(2)} TRX</Popup2Item>
