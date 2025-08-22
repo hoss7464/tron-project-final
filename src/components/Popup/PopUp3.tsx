@@ -191,23 +191,28 @@ const PopUp3: React.FC<Popup3Types> = ({
         //if settingBtn === true  use client input in getCanDelegatedMaxSize
       } else if (settingBtn === true) {
         if (!multiSignature) {
+          setMaxCandle(0);
           return;
         }
 
-        let { max_size: maxCandelegated } =
-          await tronWeb.trx.getCanDelegatedMaxSize(
-            multiSignature,
-            resourceType
-          );
+        try {
+          let { max_size: maxCandelegated } =
+            await tronWeb.trx.getCanDelegatedMaxSize(
+              multiSignature,
+              resourceType
+            );
 
-        maxCandelegated = maxCandelegated / 1_000_000;
-
-        if (maxCandelegated > myDelegate) {
-          setMaxCandle(myDelegate);
-        } else if (maxCandelegated < myDelegate) {
-          setMaxCandle(maxCandelegated);
-        } else {
-          return;
+          maxCandelegated = maxCandelegated / 1_000_000;
+          if (maxCandelegated > myDelegate) {
+            setMaxCandle(myDelegate);
+          } else if (maxCandelegated < myDelegate) {
+            setMaxCandle(maxCandelegated);
+          } else {
+            return;
+          }
+        } catch (error) {
+          console.error("Error getting max delegated size:", error);
+          setMaxCandle(0)
         }
       } else {
         return;
@@ -368,6 +373,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       const checkPayload = {
         orderId: order._id,
         Amount: delegatedAmount,
+        requester: address,
       };
       const checkResponse = await axios.post<CheckOrderResponse>(
         `${baseUrl}/order/CheckOrder`,
@@ -444,6 +450,7 @@ const PopUp3: React.FC<Popup3Types> = ({
               orderId: order._id,
               resId: checkResponse.data.res_id,
               payOutAddress: requesterInput,
+              requester: address,
             };
           } else {
             resultPayload = {
@@ -452,6 +459,7 @@ const PopUp3: React.FC<Popup3Types> = ({
               resId: checkResponse.data.res_id,
               multiAddress: multiSignature,
               payOutAddress: requesterInput,
+              requester: address,
             };
           }
 
