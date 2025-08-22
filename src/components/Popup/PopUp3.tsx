@@ -106,6 +106,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   pairTrx,
 }) => {
   const dispatch = useDispatch();
+
   //States :
   //states for requester input :
   const [requesterInput, setRequesterInput] = useState("");
@@ -121,12 +122,12 @@ const PopUp3: React.FC<Popup3Types> = ({
   const [multiSignature, setMultiSignature] = useState<string | null>(null);
   const [isSignatureTouched, setIsSignatureTouched] = useState(false);
   const [signatureError, setSignatureError] = useState<string | null>(null);
+  //states for validate multisignature permission :
+  const [permissionValid, setPermissionValid] = useState<boolean | null>(null);
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [settingBtn, setSettingBtn] = useState(false);
-
   const baseURL = process.env.REACT_APP_BASE_URL;
-
   //-------------------------------------------------------------------------------------------
   //Functions for Payout target address input :
   //Wallet address validation :
@@ -155,7 +156,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   };
   //-------------------------------------------------------------------------------------------
   //Functions for maximum candelicate button :
-  const maxCandleHandler = async () => {
+  const maxCandleHandler = async (currentSetting: boolean) => {
     if (!address || !order || myDelegate === null) {
       dispatch(
         showNotification({
@@ -176,7 +177,7 @@ const PopUp3: React.FC<Popup3Types> = ({
 
       //To fetch delegated max size conditionally :
       //if settingBtn === false   use requester address in getCanDelegatedMaxSize
-      if (settingBtn === false) {
+      if (currentSetting === false) {
         let { max_size: maxCandelegated } =
           await tronWeb.trx.getCanDelegatedMaxSize(address, resourceType);
         maxCandelegated = maxCandelegated / 1_000_000;
@@ -189,30 +190,26 @@ const PopUp3: React.FC<Popup3Types> = ({
           return;
         }
         //if settingBtn === true  use client input in getCanDelegatedMaxSize
-      } else if (settingBtn === true) {
+      } else if (currentSetting === true) {
         if (!multiSignature) {
           setMaxCandle(0);
           return;
         }
 
-        try {
-          let { max_size: maxCandelegated } =
-            await tronWeb.trx.getCanDelegatedMaxSize(
-              multiSignature,
-              resourceType
-            );
+        let { max_size: maxCandelegated } =
+          await tronWeb.trx.getCanDelegatedMaxSize(
+            multiSignature,
+            resourceType
+          );
 
-          maxCandelegated = maxCandelegated / 1_000_000;
-          if (maxCandelegated > myDelegate) {
-            setMaxCandle(myDelegate);
-          } else if (maxCandelegated < myDelegate) {
-            setMaxCandle(maxCandelegated);
-          } else {
-            return;
-          }
-        } catch (error) {
-          console.error("Error getting max delegated size:", error);
-          setMaxCandle(0)
+        maxCandelegated = maxCandelegated / 1_000_000;
+
+        if (maxCandelegated > myDelegate) {
+          setMaxCandle(myDelegate);
+        } else if (maxCandelegated < myDelegate) {
+          setMaxCandle(maxCandelegated);
+        } else {
+          return;
         }
       } else {
         return;
@@ -227,14 +224,26 @@ const PopUp3: React.FC<Popup3Types> = ({
       setDelegatedAmount("0");
     }
     if (open && address && order && myDelegate !== null) {
-      maxCandleHandler();
+      maxCandleHandler(settingBtn);
     }
-  }, [open, address, order, myDelegate, multiSignature, settingBtn]);
+  }, [open, address, order, myDelegate, multiSignature]);
+
+  useEffect(() => {
+    setDelegatedAmount("")
+    if (open && address && order && myDelegate !== null) {
+      maxCandleHandler(settingBtn);
+      
+    }
+  }, [settingBtn]);
   //-------------------------------------------------------------------------------------------
   //Function for delegated input :
-  const handleMaxClick = () => {
+  const handleMaxClick = async () => {
+    // First refresh the max value
+    await maxCandleHandler(settingBtn);
+
+    // Then set the delegated amount after maxCandle is updated
     if (maxCandle !== null) {
-      const roundedValue = Math.floor(maxCandle); // Rounds to nearest integer
+      const roundedValue = Math.floor(maxCandle);
       setDelegatedAmount(roundedValue.toString());
       setDelegateInputError("");
     }
@@ -543,9 +552,9 @@ const PopUp3: React.FC<Popup3Types> = ({
       if (!partialValue) {
         setIsSignatureTouched(false);
         setSignatureError(null);
+        setMultiSignature(null);
       }
     }
-
     if (!multiSignature) {
       return null;
     }
@@ -573,9 +582,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       );
 
       if (!relevantPermission) {
-        throw new Error(
-          "Your address doesn't have permission to act on this account"
-        );
+        return;
       }
 
       // Get permission ID (different TRON versions use different field names)
@@ -608,7 +615,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     return walletAddRegX.test(address);
   };
 
-  const handleSignatureChange = (
+  const handleSignatureChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const value = event.target.value;
@@ -617,10 +624,86 @@ const PopUp3: React.FC<Popup3Types> = ({
 
     if (!value) {
       setSignatureError(null);
+      setPermissionValid(null);
     } else if (!validationSignatureAdd(value)) {
       setSignatureError("Invalid wallet address.");
+      setPermissionValid(false);
     } else {
       setSignatureError(null);
+      await validateMultisigPermission(value);
+    }
+  };
+
+  //Function to validate multi-signature address permission :
+  const validateMultisigPermission = async (multisigAddress: string) => {
+    if (!multisigAddress || !address) {
+      setPermissionValid(false);
+      return false;
+    }
+
+    try {
+      const { TronWeb } = await import("tronweb");
+      const tronWeb = new TronWeb({ fullHost: process.env.REACT_APP_TRON_API });
+
+      // Get account details with permissions
+      const account = (await tronWeb.trx.getAccount(
+        multisigAddress
+      )) as ExtendedAccount;
+
+      if (!account || !account.active_permission) {
+        setPermissionValid(false);
+        dispatch(
+          showNotification({
+            name: "Order-popup-error10",
+            message:
+              "Your address doesn't have permission to act on this account",
+            severity: "error",
+          })
+        );
+        return false;
+      }
+
+      // Find the permission that includes our current address as a key
+      const relevantPermission = account.active_permission.find(
+        (permission) => {
+          return permission.keys?.some(
+            (key) => tronWeb.address.fromHex(key.address) === address
+          );
+        }
+      );
+
+      if (!relevantPermission) {
+        setPermissionValid(false);
+        dispatch(
+          showNotification({
+            name: "Order-popup-error10",
+            message:
+              "Your address doesn't have permission to act on this account",
+            severity: "error",
+          })
+        );
+        return false;
+      }
+
+      // Get permission ID
+      const permissionId =
+        relevantPermission.id ?? relevantPermission.permission_id;
+
+      if (permissionId === undefined) {
+        setPermissionValid(false);
+        setSignatureError("Permission ID not found");
+        return false;
+      }
+
+      setPermissionValid(true);
+      setSignatureError(null);
+      return true;
+    } catch (error) {
+      setPermissionValid(false);
+      setSignatureError(
+        error instanceof Error ? error.message : "Failed to validate permission"
+      );
+      return false;
     }
   };
   //-------------------------------------------------------------------------------------------
