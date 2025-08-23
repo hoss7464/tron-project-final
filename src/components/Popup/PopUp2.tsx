@@ -134,8 +134,10 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
         }
       );
 
-      const orderData = orderResponse.data.data;
+      
+
       if (orderResponse.data.success === true) {
+        const orderData = orderResponse.data.data;
          
         if (orderData === null) {
           return;
