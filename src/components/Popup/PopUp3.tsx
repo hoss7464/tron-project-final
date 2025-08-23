@@ -156,91 +156,98 @@ const PopUp3: React.FC<Popup3Types> = ({
   };
   //-------------------------------------------------------------------------------------------
   //Functions for maximum candelicate button :
-  const maxCandleHandler = async (currentSetting: boolean) => {
-    if (!address || !order || myDelegate === null) {
-      dispatch(
-        showNotification({
-          name: "Order-popuo-error1",
-          message: "Missing required data.",
-          severity: "error",
-        })
-      );
-      return;
-    }
-
-    try {
-      const tronNileUrl = process.env.REACT_APP_TRON_API;
-      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
-      const resourceType = order.resourceType.toUpperCase() as
-        | "ENERGY"
-        | "BANDWIDTH";
-
-      //To fetch delegated max size conditionally :
-      //if settingBtn === false   use requester address in getCanDelegatedMaxSize
-      if (currentSetting === false) {
-        let { max_size: maxCandelegated } =
-          await tronWeb.trx.getCanDelegatedMaxSize(address, resourceType);
-        maxCandelegated = maxCandelegated / 1_000_000;
-
-        if (maxCandelegated > myDelegate) {
-          setMaxCandle(myDelegate);
-        } else if (maxCandelegated < myDelegate) {
-          setMaxCandle(maxCandelegated);
-        } else {
-          return;
-        }
-        //if settingBtn === true  use client input in getCanDelegatedMaxSize
-      } else if (currentSetting === true) {
-        if (!multiSignature) {
-          setMaxCandle(0);
-          return;
-        }
-
-        let { max_size: maxCandelegated } =
-          await tronWeb.trx.getCanDelegatedMaxSize(
-            multiSignature,
-            resourceType
-          );
-
-        maxCandelegated = maxCandelegated / 1_000_000;
-
-        if (maxCandelegated > myDelegate) {
-          setMaxCandle(myDelegate);
-        } else if (maxCandelegated < myDelegate) {
-          setMaxCandle(maxCandelegated);
-        } else {
-          return;
-        }
-      } else {
-        return;
+  useEffect(() => {
+  const fetchMaxCandle = async () => {
+    if (open && address && order && myDelegate !== null) {
+      try {
+        await maxCandleHandler();
+      } catch (error) {
+        console.error("Error fetching max candle:", error);
       }
-    } catch (error) {
-      setSignatureError("Invalid address");
     }
   };
-  //Function to run maxCandleHandler when popoup loads :
-  useEffect(() => {
-    if (maxCandle === null) {
-      setDelegatedAmount("0");
-    }
-    if (open && address && order && myDelegate !== null) {
-      maxCandleHandler(settingBtn);
-    }
-  }, [open, address, order, myDelegate, multiSignature]);
 
-  useEffect(() => {
-    setDelegatedAmount("")
-    if (open && address && order && myDelegate !== null) {
-      maxCandleHandler(settingBtn);
+  fetchMaxCandle();
+}, [open, address, order, myDelegate, settingBtn, multiSignature]);
+
+
+const maxCandleHandler = async () => {
+  //If wallet is not connect or order doesn't exist or myDelegate === null return an error :
+  if (!address || !order || myDelegate === null) {
+    dispatch(
+      showNotification({
+        name: "Order-popup-error1",
+        message: "Missing required data.",
+        severity: "error",
+      })
+    );
+    return;
+  }
+ 
+  //To send request towards tronLink to get getCanDelegatedMaxSize :
+  try {
+    const tronNileUrl = process.env.REACT_APP_TRON_API;
+    const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+    const resourceType = order.resourceType.toUpperCase() as
+      | "ENERGY"
+      | "BANDWIDTH";
+
+    let targetAddress: string;
+
+    if (settingBtn) {
+      // Multi-signature mode
+      if (!multiSignature) {
+        setMaxCandle(null);
+        setDelegatedAmount(""); // Clear delegated amount when no multi-signature address
+        return;
+      }
       
+      if (!validationSignatureAdd(multiSignature)) {
+        setMaxCandle(null);
+        setDelegatedAmount(""); // Clear delegated amount for invalid address
+        return;
+      }
+      
+      targetAddress = multiSignature;
+    } else {
+      // Regular mode - use the connected wallet address
+      targetAddress = address;
     }
-  }, [settingBtn]);
+
+    let { max_size: maxCandelegated } =  await tronWeb.trx.getCanDelegatedMaxSize(targetAddress, resourceType);
+
+    if (maxCandelegated === null || maxCandelegated === undefined) {
+      maxCandelegated = 0
+    }
+    
+    maxCandelegated = maxCandelegated / 1_000_000;
+
+    const newMaxCandle = maxCandelegated > myDelegate ? myDelegate : maxCandelegated;
+    
+    setMaxCandle(newMaxCandle);
+    
+    // Clear delegated amount when max candle changes significantly
+    if (Math.abs((maxCandle || 0) - newMaxCandle) > 1) {
+      setDelegatedAmount("");
+    }
+
+  } catch (error) {
+    dispatch(
+      showNotification({
+        name: "Order-popup-error1",
+        message: "Error in maxCandleHandler:" + error,
+        severity: "error",
+      })
+    );
+    return;
+  }
+};
+  //Function to run maxCandleHandler when popoup loads :
+
   //-------------------------------------------------------------------------------------------
   //Function for delegated input :
-  const handleMaxClick = async () => {
-    // First refresh the max value
-    await maxCandleHandler(settingBtn);
 
+  const handleMaxClick = async () => {
     // Then set the delegated amount after maxCandle is updated
     if (maxCandle !== null) {
       const roundedValue = Math.floor(maxCandle);
@@ -545,16 +552,19 @@ const PopUp3: React.FC<Popup3Types> = ({
     event?: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event) {
-      const partialValue = event.target.checked;
-      setSettingBtn(partialValue);
-      setDelegatedAmount("");
-      // Reset touched state when toggling
-      if (!partialValue) {
-        setIsSignatureTouched(false);
-        setSignatureError(null);
-        setMultiSignature(null);
-      }
+    const partialValue = event.target.checked;
+    setSettingBtn(partialValue);
+    
+    // Reset multi-signature state when turning off
+    if (!partialValue) {
+      setIsSignatureTouched(false);
+      setSignatureError(null);
+      setMultiSignature(null);
     }
+    
+    // maxCandleHandler will be automatically called by the useEffect
+    // due to the settingBtn dependency change
+  }
     if (!multiSignature) {
       return null;
     }
