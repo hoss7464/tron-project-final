@@ -204,12 +204,12 @@ const MyOrdersComponent: React.FC = () => {
                 </MyOrdersNavTextWrapper>
               </MyOrdersNavWrapper>
               <OrdersCard>
-                {filteredAndSortedData.map((myData) => {
+                {filteredAndSortedData.map((myData, index) => {
                   const { date, time } = formatDateTime(myData.createdAt);
 
                   return (
                     
-                      <MyOrderDetails key={myData.receiver}>
+                      <MyOrderDetails key={index}>
                         <MyOrderCardTextWrap>
                           <OrdersCardTextWrapper2>
                             <OrdersCardText1>{date}</OrdersCardText1>

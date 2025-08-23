@@ -81,22 +81,6 @@ interface SettingUI {
   };
 }
 
-//Define type for API response for posting form data :
-interface OrderData {
-  payTo: string;
-  requester: string;
-  receiver: string;
-  totalPrice: number;
-  status: string;
-  _id: string;
-  createdAt: string;
-}
-
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data: OrderData;
-}
 //-------------------------------------------------------------------------------------
 //Duration input components :
 const boxStyle = {
@@ -209,12 +193,12 @@ const OrderFormComponent: React.FC = () => {
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  //create order popup component states :
-  const [createOrderResponseData, setCreateOrderResponseData] =
-    useState<OrderData | null>(null);
   const [popupOpen2, setPopupOpen2] = useState(false);
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+  //States for date and time :
+  const [currentDate, setCurrentDate] = useState<string>("");
+const [currentTime, setCurrentTime] = useState<string>("");
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -782,8 +766,21 @@ const OrderFormComponent: React.FC = () => {
   let myPrice = calculateTotalPrice();
   //--------------------------------------------------------------------------------------
   //Submit form function :
+  if (!myPrice) {
+    return;
+  }
+  const { totalPrice } = myPrice;
+  const durationNumericValue = getDurationInSeconds(durationValue)
+  let stringSelectedPrice = inputValue;
+  let numericSelectedPrice = getNumericSelectedPrice(stringSelectedPrice);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Set current date and time
+  const now = new Date();
+  setCurrentDate(now.toLocaleDateString());
+  setCurrentTime(now.toLocaleTimeString());
 
     if (!address) {
       dispatch(
@@ -835,10 +832,6 @@ const OrderFormComponent: React.FC = () => {
     }
     const { totalPrice } = myPrice;
 
-    //Setting button (allow partial fill) :
-    let partialFillValue = partialFill;
-    //Setting button (Bulk order) :
-    let bulkOrderValue = bulkOrder;
 
     if (
       formBtn === null ||
@@ -850,24 +843,6 @@ const OrderFormComponent: React.FC = () => {
       return;
     }
 
-    // Data object to send
-    const postData = {
-      resourceType: formBtn,
-      requester: address,
-      receiver: walletAddress,
-      resourceAmount: numericAmount,
-      durationSec: durationNumericValue,
-      price: numericSelectedPrice,
-      totalPrice: totalPrice,
-      options: {
-        allow_partial: partialFillValue,
-        bulk_order: bulkOrderValue,
-      },
-    };
-
-    //base url :
-    const baseURL = process.env.REACT_APP_BASE_URL;
-
     //Fetch data towards server :
 
     try {
@@ -875,32 +850,7 @@ const OrderFormComponent: React.FC = () => {
         const balanceNum = parseFloat(balance);
         //balance must be at least 0.4 more than total price :
         if (balanceNum >= totalPrice + 0.4) {
-          const response = await axios.post<ApiResponse>(
-            `${baseURL}/order/CreateOrder`,
-            postData,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-              timeout: axiosTimeOut,
-              withCredentials: true,
-            }
-          );
-
-          if (response.data.success === true) {
-            setCreateOrderResponseData(response.data.data);
-            setPopupOpen2(true);
-          } else {
-            dispatch(
-              showNotification({
-                name: "error2",
-                message: "Error sending data.",
-                severity: "error",
-              })
-            );
-            return;
-          }
-
+          setPopupOpen2(true);
           //if balance = total price ----> bandwidth must be at lease 500 or more :
         } else if (balanceNum === totalPrice) {
           if (!availableBandwidth || availableBandwidth <= 500) {
@@ -913,31 +863,7 @@ const OrderFormComponent: React.FC = () => {
             );
             return;
           } else {
-            const response = await axios.post<ApiResponse>(
-              `${baseURL}/order/CreateOrder`,
-              postData,
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                timeout: axiosTimeOut,
-                withCredentials: true,
-              }
-            );
-
-            if (response.data.success === true) {
-              setCreateOrderResponseData(response.data.data);
-              setPopupOpen2(true);
-            } else {
-              dispatch(
-                showNotification({
-                  name: "error2",
-                  message: "Error sending data.",
-                  severity: "error",
-                })
-              );
-              return;
-            }
+            setPopupOpen2(true);
           }
         } else {
           dispatch(
@@ -1589,13 +1515,20 @@ const OrderFormComponent: React.FC = () => {
           </Form>
         </FormWrapper2>
       </FormWrapper>
+
       <PopUp2
         open={popupOpen2}
         onClose={() => setPopupOpen2(false)}
-        orderData={createOrderResponseData}
         mySwitchBtn={switchBtn}
+        myWalletAddress={walletAdd || (address ?? "")}
         myAmount={amount}
-        myDuration={durationValue}
+        myDuration={durationNumericValue}
+        myNumericSelectedPrice={numericSelectedPrice}
+        myTotalPrice={totalPrice}
+        myPartialFill={partialFill}
+        myBulkOrder={bulkOrder}
+        myCurrentDate={currentDate}
+        myCurrentTime={currentTime}
         resetForm={() => {
           dispatch(toggleRefresh());
           setAmount("");

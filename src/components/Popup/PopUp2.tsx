@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import axios from "axios";
 import {
@@ -37,19 +37,34 @@ import { Divider } from "@mui/material";
 interface OrderSuccessPopupProps {
   open: boolean;
   onClose: () => void;
-  orderData: {
-    payTo: string;
-    requester: string;
-    receiver: string;
-    totalPrice: number;
-    status: string;
-    _id: string;
-    createdAt: string;
-  } | null;
   mySwitchBtn: string | null;
+  myWalletAddress: string | null;
   myAmount: string | null;
-  myDuration: string | null;
+  myDuration: number | null;
+  myNumericSelectedPrice:number | null;
+  myTotalPrice: number;
+  myPartialFill: boolean;
+  myBulkOrder: boolean;
+  myCurrentDate: string; 
+  myCurrentTime: string;
   resetForm: () => void;
+}
+
+//Define type for API response for posting form data :
+interface OrderData {
+  payTo: string;
+  requester: string;
+  receiver: string;
+  totalPrice: number;
+  status: string;
+  _id: string;
+  createdAt: string;
+}
+
+interface ApiResponse {
+  success: boolean;
+  message: string;
+  data: OrderData;
 }
 
 interface VerifyPaymentResponse {
@@ -60,58 +75,115 @@ interface VerifyPaymentResponse {
 const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   open,
   onClose,
-  orderData,
   mySwitchBtn,
+  myWalletAddress,
   myAmount,
   myDuration,
+  myNumericSelectedPrice,
+  myTotalPrice,
+  myPartialFill,
+  myBulkOrder,
+  myCurrentDate,
+  myCurrentTime,
   resetForm,
 }) => {
   const dispatch = useDispatch();
   const { transferTrx, isTransferring, address } = useTronWallet();
   const baseUrl = process.env.REACT_APP_BASE_URL;
   const [isProcessing, setIsProcessing] = useState(false);
+  //create order states :
+  
+
+  //base url :
+  const baseURL = process.env.REACT_APP_BASE_URL;
+  //to get axios timeout :
+  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
   const handleReject = () => {
     onClose();
   };
 
   const handleSendTrx = async () => {
-    if (!orderData) return;
-
     setIsProcessing(true); // Disable buttons
 
     try {
-      const result = await transferTrx(orderData.payTo, orderData.totalPrice);
+      //step1 ----> to send data towards server :
+      const postData = {
+        resourceType: mySwitchBtn,
+        requester: address,
+        receiver: myWalletAddress,
+        resourceAmount: myAmount,
+        durationSec: myDuration,
+        price: myNumericSelectedPrice,
+        totalPrice: myTotalPrice,
+        options: {
+          allow_partial: myPartialFill,
+          bulk_order: myBulkOrder,
+        },
+      };
 
-      if (result.success) {
-        //verify payment :
-        const resultPayload = { txid: result.txId, orderId: orderData._id };
-        //to get axios timeout :
-        const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+      const orderResponse = await axios.post<ApiResponse>(
+        `${baseURL}/order/CreateOrder`,
+        postData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: axiosTimeOut,
+          withCredentials: true,
+        }
+      );
 
-        const veryfyPayment = await axios.post<VerifyPaymentResponse>(
-          `${baseUrl}/order/verifyPayment`,
-          resultPayload,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            timeout: axiosTimeOut,
-          }
-        );
-
-        if (veryfyPayment.data.success === true) {
-          dispatch(
-            showNotification({
-              name: "success1",
-              message: "Transaction successful.",
-              severity: "success",
-            })
-          );
-          onClose(); // Close popup automatically on success
-          resetForm(); //reset order form
+      const orderData = orderResponse.data.data;
+      if (orderResponse.data.success === true) {
+         
+        if (orderData === null) {
           return;
         }
+
+        const result = await transferTrx(orderData.payTo, orderData.totalPrice);
+
+        if (result.success) {
+          //verify payment :
+          const resultPayload = { txid: result.txId, orderId: orderData._id };
+          //to get axios timeout :
+          const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+
+          const veryfyPayment = await axios.post<VerifyPaymentResponse>(
+            `${baseUrl}/order/verifyPayment`,
+            resultPayload,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+              timeout: axiosTimeOut,
+            }
+          );
+
+          if (veryfyPayment.data.success === true) {
+            dispatch(
+              showNotification({
+                name: "success1",
+                message: "Transaction successful.",
+                severity: "success",
+              })
+            );
+            onClose(); // Close popup automatically on success
+            resetForm(); //reset order form
+            return;
+          }
+        }
+          
+      } else {
+        //do something with orderResponse
+        dispatch(
+          showNotification({
+            name: "error10",
+            message: "There is something wrong with server.",
+            severity: "success",
+          })
+        );
+        return;
       }
     } catch (error) {
       dispatch(
@@ -126,7 +198,6 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
     }
   };
 
-  if (!orderData) return null;
   return (
     <>
       <Dialog
@@ -146,7 +217,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             padding: "0.5rem 0.5rem",
             borderRadius: "16px !important",
             border: "solid 2px #D9E1E3",
-            minWidth: "30%"
+            minWidth: "30%",
           },
         }}
       >
@@ -199,7 +270,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 <Popup2Name>Amount:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{myAmount}</Popup2Item>
+                <Popup2Item>{Number(myAmount).toLocaleString()}</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
 
@@ -208,7 +279,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 <Popup2Name>Duration:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{myDuration}</Popup2Item>
+                <Popup2Item>{Number(myDuration).toLocaleString()}</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
           </Box>
@@ -229,7 +300,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 <Popup2Name>Requester:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{orderData.requester}</Popup2Item>
+                <Popup2Item>{address}</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
 
@@ -240,7 +311,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 <Popup2Name>Receiver:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{orderData.receiver}</Popup2Item>
+                <Popup2Item>{myWalletAddress}</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
           </Box>
@@ -260,7 +331,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>
-                  {new Date(orderData.createdAt).toLocaleString()}
+                  {myCurrentDate} - {myCurrentTime}
                 </Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
@@ -285,7 +356,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                     color: "#430E00",
                   }}
                 >
-                  {orderData.totalPrice} TRX
+                  {myTotalPrice} TRX
                 </Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
