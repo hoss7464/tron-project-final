@@ -392,7 +392,7 @@ const maxCandleHandler = async () => {
         requester: address,
       };
       const checkResponse = await axios.post<CheckOrderResponse>(
-        `${baseUrl}/order/CheckOrder`,
+        `${baseUrl}/order/ManuallySell`,
         checkPayload,
         {
           headers: {
@@ -480,7 +480,7 @@ const maxCandleHandler = async () => {
           }
 
           const verifyFillPayment = await axios.post<VerifyPaymentResponse>(
-            `${baseURL}/order/sellResource`,
+            `${baseURL}/order/VerifyManuallySell`,
             resultPayload,
             {
               headers: {
