@@ -158,7 +158,7 @@ export const FooterIconWrapper = styled.div`
 
 export const FooterLogo = styled.img`
 box-sizing: border-box;
-height: 40px;
+height: 48px;
 `
 export const FooterHeaderWrapper = styled.div`
   display: flex;

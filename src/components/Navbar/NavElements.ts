@@ -72,7 +72,7 @@ export const NavbarLogoWrapper = styled.div`
 
 export const NavbarLogo = styled.img`
 box-sizing: border-box;
-height: 38px;
+height: 42px;
 `
 
 export const NavbarRightSection = styled.div`
