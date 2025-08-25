@@ -94,8 +94,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const baseUrl = process.env.REACT_APP_BASE_URL;
   const [isProcessing, setIsProcessing] = useState(false);
   //create order states :
-  
-console.log(myWalletAdd)
+
   //base url :
   const baseURL = process.env.REACT_APP_BASE_URL;
   //to get axios timeout :
@@ -112,8 +111,8 @@ console.log(myWalletAdd)
       //step1 ----> to send data towards server :
       const postData = {
         resourceType: mySwitchBtn,
-        requester: myWalletAdd,
-        receiver: myWalletAddress,
+        requester: address,
+        receiver: myWalletAdd,
         resourceAmount: myAmount,
         durationSec: myDuration,
         price: myNumericSelectedPrice,
