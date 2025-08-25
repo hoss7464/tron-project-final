@@ -198,7 +198,7 @@ const OrderFormComponent: React.FC = () => {
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
   //States for date and time :
   const [currentDate, setCurrentDate] = useState<string>("");
-const [currentTime, setCurrentTime] = useState<string>("");
+  const [currentTime, setCurrentTime] = useState<string>("");
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -888,7 +888,6 @@ const [currentTime, setCurrentTime] = useState<string>("");
         return;
       }
 
-      setWalletAdd(address);
     } catch (error) {
       dispatch(
         showNotification({
@@ -899,6 +898,8 @@ const [currentTime, setCurrentTime] = useState<string>("");
       );
     }
   };
+
+
   //--------------------------------------------------------------------------------------
 
   return (
@@ -1520,6 +1521,7 @@ const [currentTime, setCurrentTime] = useState<string>("");
         open={popupOpen2}
         onClose={() => setPopupOpen2(false)}
         mySwitchBtn={switchBtn}
+        myWalletAdd={walletAdd}
         myWalletAddress={walletAdd || (address ?? "")}
         myAmount={amount}
         myDuration={durationNumericValue}

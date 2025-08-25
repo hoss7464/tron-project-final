@@ -38,6 +38,7 @@ interface OrderSuccessPopupProps {
   open: boolean;
   onClose: () => void;
   mySwitchBtn: string | null;
+  myWalletAdd:string | null;
   myWalletAddress: string | null;
   myAmount: string | null;
   myDuration: number | null;
@@ -76,6 +77,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   open,
   onClose,
   mySwitchBtn,
+  myWalletAdd,
   myWalletAddress,
   myAmount,
   myDuration,
@@ -93,7 +95,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   //create order states :
   
-
+console.log(myWalletAdd)
   //base url :
   const baseURL = process.env.REACT_APP_BASE_URL;
   //to get axios timeout :
@@ -110,7 +112,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
       //step1 ----> to send data towards server :
       const postData = {
         resourceType: mySwitchBtn,
-        requester: address,
+        requester: myWalletAdd,
         receiver: myWalletAddress,
         resourceAmount: myAmount,
         durationSec: myDuration,
@@ -121,6 +123,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           bulk_order: myBulkOrder,
         },
       };
+      console.log(postData)
 
       const orderResponse = await axios.post<ApiResponse>(
         `${baseURL}/order/CreateOrder`,
@@ -313,7 +316,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 <Popup2Name>Receiver:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{myWalletAddress}</Popup2Item>
+                <Popup2Item>{myWalletAdd}</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
           </Box>
