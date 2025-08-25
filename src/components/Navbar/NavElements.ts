@@ -67,11 +67,12 @@ export const NavbarLogoWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-left: 0.2rem;
 `;
 
 export const NavbarLogo = styled.img`
 box-sizing: border-box;
-height: 36px;
+height: 38px;
 `
 
 export const NavbarRightSection = styled.div`

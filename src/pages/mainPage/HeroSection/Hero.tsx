@@ -17,7 +17,7 @@ import {
 import { useDispatch } from "react-redux";
 import { useTronWallet } from "../../../contexts/TronWalletContext";
 import { clickToggle } from "../../../redux/actions/toggleSlice";
-import uniqueText from "../../../assets/svg/unique/UniqueText.svg";
+import uniqueText from "../../../assets/svg/unique/UniqueText7.svg";
 import ResourceComponent from "./ResourceComponent";
 
 const Hero: React.FC = () => {

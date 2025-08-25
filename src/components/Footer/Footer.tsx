@@ -33,7 +33,7 @@ import {
   PrivacyTermsText,
 } from "./FooterElements";
 import { Divider } from "@mui/material";
-import Logo from "../../assets/svg/Logo/Logo.svg"
+import Logo from "../../assets/svg/Logo/Logo2.svg"
 
 const Footer: React.FC = () => {
   return (
