@@ -217,8 +217,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         targetAddress = address;
       }
 
-      let { max_size: maxCandelegated } =
-        await tronWeb.trx.getCanDelegatedMaxSize(targetAddress, resourceType);
+      let { max_size: maxCandelegated } = await tronWeb.trx.getCanDelegatedMaxSize(targetAddress, resourceType);
 
       if (maxCandelegated === null || maxCandelegated === undefined) {
         maxCandelegated = 0;

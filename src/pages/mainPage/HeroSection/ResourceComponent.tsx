@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./Hero.css";
+import { useFetchData } from "../../../contexts/FetchDataContext";
 import axios from "axios";
 import {
   HeroResourceContainer,
@@ -28,25 +29,10 @@ import recoveryIcon from "../../../assets/svg/RecoveryIcon.svg";
 import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg";
 
 //----------------------------------------------------------------------------------------
-type ResourceResponse = {
-  data: {
-    readyResource: {
-      energy: number | string;
-      bandwidth: number | string;
-    };
-    dailyRecovery: {
-      energy: number | string;
-      bandwidth: number | string;
-    };
-    apy: {
-      energy: number | string;
-      bandwidth: number | string;
-    };
-  };
-};
 
 const ResourceComponent: React.FC = () => {
   //states :
+  const {resourceData} = useFetchData()
   //ready resources states :
   const [energyReady, setEnergyReady] = useState<string | null>(null);
   const [bandwidthReady, setBandwidthReady] = useState<string | null>(null);
@@ -58,52 +44,27 @@ const ResourceComponent: React.FC = () => {
   const [bandwidthApySeller, setBandwidthApySeller] = useState<string | null>(null);
 
   //Helper formatter :
-  const formatNumber = (num: number | string) => Number(num).toLocaleString();
+  const formatNumber = (num: number | string | undefined) => Number(num).toLocaleString();
 
-  //To get data from server :
-  const resourceData = async () => {
-    const baseURL = process.env.REACT_APP_BASE_URL;
-    //to get axios timeout :
-    const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT)
+useEffect(() => {
+    if (resourceData && resourceData.success) {
+      // Extract data from resourceData
+      const energyReadyResource = resourceData.data.readyResource.energy;
+      const bandwidthReadyResource = resourceData.data.readyResource.bandwidth;
+      const energyDailyRecovery = resourceData.data.dailyRecovery.energy;
+      const bandwidthDailyRecovery = resourceData.data.dailyRecovery.bandwidth;
+      const energyApy = resourceData.data.apy.energy;
+      const bandwidthApy = resourceData.data.apy.bandwidth;
 
-    try{
-      const response = await axios.get<ResourceResponse>(`${baseURL}/Setting/UI`, {
-        headers: { "Content-Type": "application/json" },timeout :axiosTimeOut 
-      })
-
-      const myData = response.data 
-
-    //To extract ready resource :
-    const energyReadyResource = myData.data.readyResource.energy;
-    const bandwidthReadyResource = myData.data.readyResource.bandwidth;
-    //To extract 24 hours recovery :
-    const energyDailyRecovery = myData.data.dailyRecovery.energy;
-    const bandwidthDailyRecovery = myData.data.dailyRecovery.bandwidth;
-    //To extract apy for sellers :
-    const energyApy = myData.data.apy.energy;
-    const bandwidthApy = myData.data.apy.bandwidth;
-
-    //set states :
-    setEnergyReady(formatNumber(energyReadyResource));
-    setBandwidthReady(formatNumber(bandwidthReadyResource));
-    setEnergy24(formatNumber(energyDailyRecovery));
-    setBandwidth24(formatNumber(bandwidthDailyRecovery));
-    setEnergyApySeller(formatNumber(energyApy));
-    setBandwidthApySeller(formatNumber(bandwidthApy));
-    }catch(error){
-      console.log("error fetching data : ", error)
-    } 
-  };
-
-  useEffect(() => {
-    const timeToRefreshData = Number(process.env.REACT_APP_RESOURCE_REQ_TIME);
-    //Make the initial request immediately when the component mounts
-
-    //Then make subsequent requests every 3 seconds
-    const intervalId = setInterval(resourceData, timeToRefreshData); 
-    //Clean up the interval when the component unmounts to prevent memory leaks
-    return () => clearInterval(intervalId);
-  }, []);
+      // Set states
+      setEnergyReady(formatNumber(energyReadyResource));
+      setBandwidthReady(formatNumber(bandwidthReadyResource));
+      setEnergy24(formatNumber(energyDailyRecovery));
+      setBandwidth24(formatNumber(bandwidthDailyRecovery));
+      setEnergyApySeller(formatNumber(energyApy));
+      setBandwidthApySeller(formatNumber(bandwidthApy));
+    }
+  }, [resourceData]); // This effect runs whenever resourceData changes
 
   return (
     <>

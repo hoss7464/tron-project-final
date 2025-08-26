@@ -48,41 +48,16 @@ import { useTronWallet } from "../../contexts/TronWalletContext";
 import { formatDateTime } from "../../utils/dateTime";
 import { useLoading } from "../../contexts/LoaderContext";
 import { formatStrictDuration } from "../../utils/fromSec";
+import { useFetchData } from "../../contexts/FetchDataContext";
 
-interface ServerResponse {
-  success: boolean;
-  message: string;
-  data: MarketOrder[];
-}
-interface MarketOrder {
-  createdAt: string;
-  durationSec: number;
-  freeze: number;
-  frozen: number;
-  energyPairTrx: number | null;
-  lock: boolean;
-  options: {
-    allow_partial: boolean;
-    bulk_order: boolean;
-  };
-  price: number;
-  receiver: string;
-  resourceAmount: number;
-  resourceType: string;
-  status: "pending" | "processing" | "completed" | "failed" | "cancelled";
-  totalPrice: number;
-  type: string;
-}
+
 
 const MyOrdersComponent: React.FC = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { address } = useTronWallet();
+  const { address, disconnectWallet } = useTronWallet();
   const { incrementLoading, decrementLoading } = useLoading();
-  //to get axios timeout :
-  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
-  const [myOrdersWholeData, setMyOrdersWholeData] =
-    useState<ServerResponse | null>(null);
+  const { myOrderData } = useFetchData()
 
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
@@ -91,67 +66,9 @@ const MyOrdersComponent: React.FC = () => {
     (state: RootState) => state.filters["myOrders"] || "All"
   );
 
-  //To get data from server :
-  const baseUrl = process.env.REACT_APP_BASE_URL;
-
-  const getMyOrdersServerData = async () => {
-    try {
-      const response = await axios.get<ServerResponse>(
-        `${baseUrl}/order/myOrder`,
-        {
-          headers: { "Content-Type": "application/json" },
-          timeout: axiosTimeOut,
-          withCredentials: true,
-        }
-      );
-
-      if (response.data.success) {
-        setMyOrdersWholeData(response.data);
-      } else {
-        dispatch(
-          showNotification({
-            name: "error5",
-            message:
-              "Error Fetching Data: " +
-              (response.data.message || "Unknown error"),
-            severity: "error",
-          })
-        );
-      }
-    } catch (error) {
-      dispatch(
-        showNotification({
-          name: "error5",
-          message: "Error Fetching Data: " + error,
-          severity: "error",
-        })
-      );
-    }
-  };
-
-  useEffect(() => {
-    // Clear the data when address is null
-    if (!address) {
-      setMyOrdersWholeData(null);
-      return;
-    }
-    const timeToRefreshMyOrderData = Number(
-      process.env.REACT_APP_MYORDERS_REQ_TIME
-    );
-
-    getMyOrdersServerData();
-
-    const intervalReq = setInterval(
-      getMyOrdersServerData,
-      timeToRefreshMyOrderData
-    );
-
-    return () => clearInterval(intervalReq);
-  }, [refreshTrigger, address]);
-
   // Filter by status first (only processing and completed)
-  const statusFilteredData2 = myOrdersWholeData?.data
-    ? myOrdersWholeData.data.filter(
+  const statusFilteredData2 = myOrderData?.data
+    ? myOrderData.data.filter(
         (myOrder) =>
           myOrder.status === "processing" ||
           myOrder.status === "completed" ||

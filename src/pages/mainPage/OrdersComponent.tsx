@@ -48,6 +48,7 @@ import { formatDateTime } from "../../utils/dateTime";
 import { formatStrictDuration } from "../../utils/fromSec";
 import { durationToNumber } from "../../utils/durationToNum";
 import PopUp3 from "../../components/Popup/PopUp3";
+import { useFetchData } from "../../contexts/FetchDataContext";
 
 interface ServerResponse {
   success: boolean;
@@ -76,15 +77,13 @@ export interface MarketOrder {
 
 export const OrdersComponent: React.FC = () => {
   const dispatch = useDispatch();
+  const {orderData} = useFetchData()
   //States :
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 7;
   const { address } = useTronWallet();
 
-  const [wholeOrderData, setWholeOrderData] = useState<ServerResponse | null>(
-    null
-  );
   const [selectedOrder, setSelectedOrder] = useState<MarketOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [delegateValue, setDelegateValue] = useState<number | null>(null);
@@ -97,8 +96,7 @@ export const OrdersComponent: React.FC = () => {
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
   );
-  //to get axios timeout :
-  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+
   //------------------------------------------------------------------------------------------------------------
   //Function for pagination :
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
@@ -108,8 +106,8 @@ export const OrdersComponent: React.FC = () => {
   //Filter and sort data :
 
   // Filter by status first (only processing and completed)
-  const statusFilteredData = wholeOrderData?.data
-    ? wholeOrderData.data.filter(
+  const statusFilteredData = orderData?.data
+    ? orderData.data.filter(
         (order) => order.status === "processing" || order.status === "completed"
       )
     : [];
@@ -127,46 +125,7 @@ export const OrdersComponent: React.FC = () => {
   //Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / rowsPerPage);
   //------------------------------------------------------------------------------------------------------------
-  //Function to get data from server :
-  const baseUrl = process.env.REACT_APP_BASE_URL;
-
-  const getOrderList = async () => {
-    try {
-      const response = await axios.get<ServerResponse>(
-        `${baseUrl}/order/orders`,
-        {
-          headers: { "Content-Type": "application/json" },
-          timeout: axiosTimeOut,
-        }
-      );
-
-      if (response.data.success === true) {
-        setWholeOrderData(response.data);
-      } else {
-        dispatch(
-          showNotification({
-            name: "error5",
-            message: "Error Fetching Data.",
-            severity: "error",
-          })
-        );
-        return null;
-      }
-    } catch (error) {
-      console.error("Failed to fetch Orders:", error);
-    }
-  };
-  useEffect(() => {
-    const timeToRefreshData = Number(
-      process.env.REACT_APP_ORDERS_REQ_TIME
-    );
-
-    getOrderList();
-
-    const intervalReq = setInterval(getOrderList, timeToRefreshData);
-
-    return () => clearInterval(intervalReq);
-  }, [refreshTrigger]);
+ 
   //------------------------------------------------------------------------------------------------------------
   //Function to calculate APY :
   const calcAPY = (myTotal: number, myFreeze: number, myDuration: number) => {
