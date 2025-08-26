@@ -131,7 +131,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   const baseURL = process.env.REACT_APP_BASE_URL;
 
   // NEW: Function to track already delegated amounts
-const [alreadyDelegatedAmount, setAlreadyDelegatedAmount] = useState(0);
+  const [alreadyDelegatedAmount, setAlreadyDelegatedAmount] = useState(0);
   //-------------------------------------------------------------------------------------------
   //Functions for Payout target address input :
   //Wallet address validation :
@@ -161,112 +161,123 @@ const [alreadyDelegatedAmount, setAlreadyDelegatedAmount] = useState(0);
   //-------------------------------------------------------------------------------------------
   //Functions for maximum candelicate button :
   useEffect(() => {
-  const fetchMaxCandle = async () => {
-    if (open && address && order && myDelegate !== null) {
-      try {
-        await maxCandleHandler();
-      } catch (error) {
-        console.error("Error fetching max candle:", error);
+    const fetchMaxCandle = async () => {
+      if (open && address && order && myDelegate !== null) {
+        try {
+          await maxCandleHandler();
+        } catch (error) {
+          console.error("Error fetching max candle:", error);
+        }
       }
+    };
+
+    fetchMaxCandle();
+  }, [open, address, order, myDelegate, settingBtn, multiSignature]);
+
+  const maxCandleHandler = async () => {
+    //If wallet is not connect or order doesn't exist or myDelegate === null return an error :
+    if (!address || !order || myDelegate === null) {
+      dispatch(
+        showNotification({
+          name: "Order-popup-error1",
+          message: "Missing required data.",
+          severity: "error",
+        })
+      );
+      return;
+    }
+
+    //To send request towards tronLink to get getCanDelegatedMaxSize :
+    try {
+      const tronNileUrl = process.env.REACT_APP_TRON_API;
+      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+      const resourceType = order.resourceType.toUpperCase() as
+        | "ENERGY"
+        | "BANDWIDTH";
+
+      let targetAddress: string;
+
+      if (settingBtn) {
+        // Multi-signature mode
+        if (!multiSignature) {
+          setMaxCandle(null);
+          setDelegatedAmount(""); // Clear delegated amount when no multi-signature address
+          return;
+        }
+
+        if (!validationSignatureAdd(multiSignature)) {
+          setMaxCandle(null);
+          setDelegatedAmount(""); // Clear delegated amount for invalid address
+          return;
+        }
+
+        targetAddress = multiSignature;
+      } else {
+        // Regular mode - use the connected wallet address
+        targetAddress = address;
+      }
+
+      let { max_size: maxCandelegated } =
+        await tronWeb.trx.getCanDelegatedMaxSize(targetAddress, resourceType);
+
+      if (maxCandelegated === null || maxCandelegated === undefined) {
+        maxCandelegated = 0;
+      }
+
+      maxCandelegated = maxCandelegated / 1_000_000;
+
+      // NEW: Calculate already delegated amount in this session
+      const alreadyDelegated = calculateAlreadyDelegatedAmount();
+      // Subtract already delegated amount from the available max
+      const availableMax = Math.max(0, maxCandelegated - alreadyDelegated);
+
+      // Calculate the new maximum, considering myDelegate as the upper limit
+      const newMaxCandle = Math.min(availableMax, myDelegate);
+
+      setMaxCandle(newMaxCandle);
+
+      // Clear delegated amount when max candle changes significantly
+      if (Math.abs((maxCandle || 0) - newMaxCandle) > 1) {
+        setDelegatedAmount("");
+      }
+    } catch (error) {
+      dispatch(
+        showNotification({
+          name: "Order-popup-error1",
+          message: "Error in maxCandleHandler:" + error,
+          severity: "error",
+        })
+      );
+      return;
     }
   };
 
-  fetchMaxCandle();
-}, [open, address, order, myDelegate, settingBtn, multiSignature]);
-
-
-const maxCandleHandler = async () => {
-  //If wallet is not connect or order doesn't exist or myDelegate === null return an error :
-  if (!address || !order || myDelegate === null) {
-    dispatch(
-      showNotification({
-        name: "Order-popup-error1",
-        message: "Missing required data.",
-        severity: "error",
-      })
-    );
-    return;
-  }
- 
-  //To send request towards tronLink to get getCanDelegatedMaxSize :
-  try {
-    const tronNileUrl = process.env.REACT_APP_TRON_API;
-    const tronWeb = new TronWeb({ fullHost: tronNileUrl });
-    const resourceType = order.resourceType.toUpperCase() as
-      | "ENERGY"
-      | "BANDWIDTH";
-
-    let targetAddress: string;
-
-    if (settingBtn) {
-      // Multi-signature mode
-      if (!multiSignature) {
-        setMaxCandle(null);
-        setDelegatedAmount(""); // Clear delegated amount when no multi-signature address
-        return;
-      }
-      
-      if (!validationSignatureAdd(multiSignature)) {
-        setMaxCandle(null);
-        setDelegatedAmount(""); // Clear delegated amount for invalid address
-        return;
-      }
-      
-      targetAddress = multiSignature;
-    } else {
-      // Regular mode - use the connected wallet address
-      targetAddress = address;
-    }
-
-    let { max_size: maxCandelegated } =  await tronWeb.trx.getCanDelegatedMaxSize(targetAddress, resourceType);
-
-    if (maxCandelegated === null || maxCandelegated === undefined) {
-      maxCandelegated = 0
-    }
-    
-    maxCandelegated = maxCandelegated / 1_000_000;
-
-     // NEW: Calculate already delegated amount in this session
-    const alreadyDelegated = calculateAlreadyDelegatedAmount();
-    // Subtract already delegated amount from the available max
-    const availableMax = Math.max(0, maxCandelegated - alreadyDelegated);
-    
-    // Calculate the new maximum, considering myDelegate as the upper limit
-    const newMaxCandle = Math.min(availableMax, myDelegate);
-
-    setMaxCandle(newMaxCandle);
-    
-    // Clear delegated amount when max candle changes significantly
-    if (Math.abs((maxCandle || 0) - newMaxCandle) > 1) {
-      setDelegatedAmount("");
-    }
-
-  } catch (error) {
-    dispatch(
-      showNotification({
-        name: "Order-popup-error1",
-        message: "Error in maxCandleHandler:" + error,
-        severity: "error",
-      })
-    );
-    return;
-  }
-};
-
-const calculateAlreadyDelegatedAmount = () => {
-  return alreadyDelegatedAmount;
-};
-
+  const calculateAlreadyDelegatedAmount = () => {
+    return alreadyDelegatedAmount;
+  };
 
   //-------------------------------------------------------------------------------------------
   //Function for delegated input :
-
   const handleMaxClick = async () => {
-    // Then set the delegated amount after maxCandle is updated
-    if (maxCandle !== null) {
-      const roundedValue = Math.floor(maxCandle);
-      setDelegatedAmount(roundedValue.toString());
-      setDelegateInputError("");
+    try {
+      // First, update the maxCandle value by calling maxCandleHandler
+      await maxCandleHandler();
+      console.log(maxCandle)
+
+      // Then set the delegated amount after maxCandle is updated
+      if (maxCandle !== null) {
+        const roundedValue = Math.floor(maxCandle);
+        setDelegatedAmount(roundedValue.toString());
+        setDelegateInputError("");
+      }
+    } catch (error) {
+      dispatch(
+        showNotification({
+          name: "Order-popup-error-max",
+          message: "Failed to get maximum available amount",
+          severity: "error",
+        })
+      );
     }
   };
   //-------------------------------------------------------------------------------------------
@@ -507,7 +518,7 @@ const calculateAlreadyDelegatedAmount = () => {
         //if result.success === true show a notification then close the popup :
         if (result?.success) {
           // Track the delegated amount
-          setAlreadyDelegatedAmount(prev => prev + numericDelegatedAmount);
+          setAlreadyDelegatedAmount((prev) => prev + numericDelegatedAmount);
           dispatch(
             showNotification({
               name: "Order-popup-success",
@@ -516,7 +527,6 @@ const calculateAlreadyDelegatedAmount = () => {
             })
           );
           handleClose();
-          
         }
       } else if (checkResponse.data.success === false) {
         dispatch(
@@ -570,19 +580,19 @@ const calculateAlreadyDelegatedAmount = () => {
     event?: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event) {
-    const partialValue = event.target.checked;
-    setSettingBtn(partialValue);
-    
-    // Reset multi-signature state when turning off
-    if (!partialValue) {
-      setIsSignatureTouched(false);
-      setSignatureError(null);
-      setMultiSignature(null);
+      const partialValue = event.target.checked;
+      setSettingBtn(partialValue);
+
+      // Reset multi-signature state when turning off
+      if (!partialValue) {
+        setIsSignatureTouched(false);
+        setSignatureError(null);
+        setMultiSignature(null);
+      }
+
+      // maxCandleHandler will be automatically called by the useEffect
+      // due to the settingBtn dependency change
     }
-    
-    // maxCandleHandler will be automatically called by the useEffect
-    // due to the settingBtn dependency change
-  }
     if (!multiSignature) {
       return null;
     }
@@ -744,7 +754,7 @@ const calculateAlreadyDelegatedAmount = () => {
     const payoutCalc = energyPair * numericDelegateAmount;
     return payoutCalc;
   };
-   
+
   //-------------------------------------------------------------------------------------------
   if (!order) return null;
   const { date, time } = formatDateTime(order.createdAt);
