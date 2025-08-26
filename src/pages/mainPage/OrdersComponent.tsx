@@ -133,7 +133,7 @@ export const OrdersComponent: React.FC = () => {
   const getOrderList = async () => {
     try {
       const response = await axios.get<ServerResponse>(
-        `${baseUrl}/order/list`,
+        `${baseUrl}/order/orders`,
         {
           headers: { "Content-Type": "application/json" },
           timeout: axiosTimeOut,

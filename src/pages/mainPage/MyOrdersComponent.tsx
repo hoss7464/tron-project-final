@@ -91,54 +91,62 @@ const MyOrdersComponent: React.FC = () => {
     (state: RootState) => state.filters["myOrders"] || "All"
   );
 
+  //To get data from server :
+  const baseUrl = process.env.REACT_APP_BASE_URL;
+
+  const getMyOrdersServerData = async () => {
+    try {
+      const response = await axios.get<ServerResponse>(
+        `${baseUrl}/order/myOrder`,
+        {
+          headers: { "Content-Type": "application/json" },
+          timeout: axiosTimeOut,
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.success) {
+        setMyOrdersWholeData(response.data);
+      } else {
+        dispatch(
+          showNotification({
+            name: "error5",
+            message:
+              "Error Fetching Data: " +
+              (response.data.message || "Unknown error"),
+            severity: "error",
+          })
+        );
+      }
+    } catch (error) {
+      dispatch(
+        showNotification({
+          name: "error5",
+          message: "Error Fetching Data: " + error,
+          severity: "error",
+        })
+      );
+    }
+  };
+
   useEffect(() => {
     // Clear the data when address is null
     if (!address) {
       setMyOrdersWholeData(null);
       return;
     }
-
-    const baseUrl = process.env.REACT_APP_BASE_URL;
-
-    const getMyOrdersServerData = async () => {
-      try {
-        incrementLoading();
-        const response = await axios.get<ServerResponse>(
-          `${baseUrl}/order/myOrder`,
-          {
-            headers: { "Content-Type": "application/json" },
-            timeout: axiosTimeOut,
-            withCredentials: true,
-          }
-        );
-
-        if (response.data.success) {
-          setMyOrdersWholeData(response.data);
-        } else {
-          dispatch(
-            showNotification({
-              name: "error5",
-              message:
-                "Error Fetching Data: " +
-                (response.data.message || "Unknown error"),
-              severity: "error",
-            })
-          );
-        }
-      } catch (error) {
-        dispatch(
-          showNotification({
-            name: "error5",
-            message: "Error Fetching Data: " + error,
-            severity: "error",
-          })
-        );
-      } finally {
-        decrementLoading();
-      }
-    };
+    const timeToRefreshMyOrderData = Number(
+      process.env.REACT_APP_MYORDERS_REQ_TIME
+    );
 
     getMyOrdersServerData();
+
+    const intervalReq = setInterval(
+      getMyOrdersServerData,
+      timeToRefreshMyOrderData
+    );
+
+    return () => clearInterval(intervalReq);
   }, [refreshTrigger, address]);
 
   // Filter by status first (only processing and completed)
@@ -157,14 +165,14 @@ const MyOrdersComponent: React.FC = () => {
     selectedFilter === "All" ? "price" : (selectedFilter as SortOption)
   );
 
-    //Function to calculate total price :
-  const handleTotal = (myFreeze : number, myPair : number | null) => {
+  //Function to calculate total price :
+  const handleTotal = (myFreeze: number, myPair: number | null) => {
     if (myPair === null) {
       return 0;
     }
-    const calcTotal = myFreeze * myPair
-    return calcTotal
-  }
+    const calcTotal = myFreeze * myPair;
+    return calcTotal;
+  };
 
   return (
     <>
@@ -208,114 +216,118 @@ const MyOrdersComponent: React.FC = () => {
                   const { date, time } = formatDateTime(myData.createdAt);
 
                   return (
-                    
-                      <MyOrderDetails key={index}>
-                        <MyOrderCardTextWrap>
-                          <OrdersCardTextWrapper2>
-                            <OrdersCardText1>{date}</OrdersCardText1>
-                          </OrdersCardTextWrapper2>
-                          <OrdersCardTextWrapper2>
-                            <OrdersCardText2>{time}</OrdersCardText2>
-                          </OrdersCardTextWrapper2>
-                        </MyOrderCardTextWrap>
+                    <MyOrderDetails key={index}>
+                      <MyOrderCardTextWrap>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText1>{date}</OrdersCardText1>
+                        </OrdersCardTextWrapper2>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText2>{time}</OrdersCardText2>
+                        </OrdersCardTextWrapper2>
+                      </MyOrderCardTextWrap>
 
-                        <MyOrderCardTextWrap>
-                          <OrdersCardTextWrapper2>
-                            {myData.resourceType === "energy" ? (
-                              <OrderCardIconWrapper2
-                                style={{ backgroundColor: "#003543" }}
-                              >
-                                <OrderCardIcon alt="energy" src={energyIcon} />
-                              </OrderCardIconWrapper2>
-                            ) : (
-                              <OrderCardIconWrapper2
-                                style={{ backgroundColor: "#430E00" }}
-                              >
-                                <OrderCardIcon
-                                  alt="bandwidth"
-                                  src={bandwidthIcon}
-                                />
-                              </OrderCardIconWrapper2>
+                      <MyOrderCardTextWrap>
+                        <OrdersCardTextWrapper2>
+                          {myData.resourceType === "energy" ? (
+                            <OrderCardIconWrapper2
+                              style={{ backgroundColor: "#003543" }}
+                            >
+                              <OrderCardIcon alt="energy" src={energyIcon} />
+                            </OrderCardIconWrapper2>
+                          ) : (
+                            <OrderCardIconWrapper2
+                              style={{ backgroundColor: "#430E00" }}
+                            >
+                              <OrderCardIcon
+                                alt="bandwidth"
+                                src={bandwidthIcon}
+                              />
+                            </OrderCardIconWrapper2>
+                          )}
+                          <OrdersCardText1>
+                            {myData.resourceAmount.toLocaleString()}
+                          </OrdersCardText1>
+                        </OrdersCardTextWrapper2>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText2>
+                            {formatStrictDuration(myData.durationSec)}
+                          </OrdersCardText2>
+                        </OrdersCardTextWrapper2>
+                      </MyOrderCardTextWrap>
+
+                      <MyOrderCardTextWrap>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText1>{myData.price} SUN</OrdersCardText1>
+                        </OrdersCardTextWrapper2>
+                      </MyOrderCardTextWrap>
+
+                      <MyOrderCardTextWrap>
+                        <OrdersCardTextWrapper2>
+                          <OrdersCardText1>
+                            {Number(
+                              handleTotal(
+                                myData.freeze,
+                                myData.energyPairTrx
+                              ).toFixed(3)
+                            )}{" "}
+                            TRX
+                          </OrdersCardText1>
+                        </OrdersCardTextWrapper2>
+                      </MyOrderCardTextWrap>
+
+                      <OrderCardLinearWrapper2>
+                        <OrderCardLineraPercentWrapper>
+                          <OrderCardLineraPercent>
+                            {(() => {
+                              const percent =
+                                (myData.frozen / myData.freeze) * 100;
+                              const cappedPercent = Math.min(percent, 100);
+
+                              if (cappedPercent >= 100) return "100%";
+                              if (Number.isInteger(cappedPercent))
+                                return `${cappedPercent}%`;
+                              return `${cappedPercent.toFixed(2)}%`;
+                            })()}
+                          </OrderCardLineraPercent>
+                        </OrderCardLineraPercentWrapper>
+                        <OrderCardLinearWrapper>
+                          <LinearProgress
+                            variant="determinate"
+                            value={Math.min(
+                              (myData.frozen / myData.freeze) * 100,
+                              100
                             )}
-                            <OrdersCardText1>
-                              {myData.resourceAmount.toLocaleString()}
-                            </OrdersCardText1>
-                          </OrdersCardTextWrapper2>
-                          <OrdersCardTextWrapper2>
-                            <OrdersCardText2>
-                              {formatStrictDuration(myData.durationSec)}
-                            </OrdersCardText2>
-                          </OrdersCardTextWrapper2>
-                        </MyOrderCardTextWrap>
+                            valueBuffer={myData.freeze}
+                            sx={{
+                              height: 5,
+                              borderRadius: 5,
+                              backgroundColor: "#C5B4B0",
+                              "& .MuiLinearProgress-bar": {
+                                backgroundColor: "#430E00",
+                              },
+                            }}
+                          />
+                        </OrderCardLinearWrapper>
+                      </OrderCardLinearWrapper2>
 
-                        <MyOrderCardTextWrap>
-                          <OrdersCardTextWrapper2>
-                            <OrdersCardText1>{myData.price} SUN</OrdersCardText1>
-                          </OrdersCardTextWrapper2>
-                        </MyOrderCardTextWrap>
+                      {myData.status === "completed" && (
+                        <CheckedSignWrapper>
+                          <CheckedSign />
+                        </CheckedSignWrapper>
+                      )}
 
-                        <MyOrderCardTextWrap>
-                          <OrdersCardTextWrapper2>
-                            <OrdersCardText1>
-                              {Number(handleTotal(myData.freeze, myData.energyPairTrx).toFixed(3))} TRX
-                            </OrdersCardText1>
-                          </OrdersCardTextWrapper2>
-                        </MyOrderCardTextWrap>
+                      {myData.status === "processing" && (
+                        <MyOrdersSellBtnWrapper>
+                          <MyOrdersSell>Cancel</MyOrdersSell>
+                        </MyOrdersSellBtnWrapper>
+                      )}
 
-                        <OrderCardLinearWrapper2>
-                          <OrderCardLineraPercentWrapper>
-                            <OrderCardLineraPercent>
-                              {(() => {
-                                const percent =
-                                  (myData.frozen / myData.freeze) * 100;
-                                const cappedPercent = Math.min(percent, 100);
-                               
-                                if (cappedPercent >= 100) return "100%";
-                                if (Number.isInteger(cappedPercent))
-                                  return `${cappedPercent}%`;
-                                return `${cappedPercent.toFixed(2)}%`;
-                              })()}
-                            </OrderCardLineraPercent>
-                          </OrderCardLineraPercentWrapper>
-                          <OrderCardLinearWrapper>
-                            <LinearProgress
-                              variant="determinate"
-                              value={Math.min(
-                                (myData.frozen / myData.freeze) * 100,
-                                100
-                              )}
-                              valueBuffer={myData.freeze}
-                              sx={{
-                                height: 5,
-                                borderRadius: 5,
-                                backgroundColor: "#C5B4B0",
-                                "& .MuiLinearProgress-bar": {
-                                  backgroundColor: "#430E00",
-                                },
-                              }}
-                            />
-                          </OrderCardLinearWrapper>
-                        </OrderCardLinearWrapper2>
-
-                        {myData.status === "completed" && (
-                          <CheckedSignWrapper>
-                            <CheckedSign />
-                          </CheckedSignWrapper>
-                        )}
-
-                        {myData.status === "processing" && (
-                          <MyOrdersSellBtnWrapper>
-                            <MyOrdersSell>Cancel</MyOrdersSell>
-                          </MyOrdersSellBtnWrapper>
-                        )}
-
-                        {myData.status === "cancelled" && (
-                          <CanceledSignWrapper>
-                            <CanceledSign />
-                          </CanceledSignWrapper>
-                        )}
-                      </MyOrderDetails>
-                    
+                      {myData.status === "cancelled" && (
+                        <CanceledSignWrapper>
+                          <CanceledSign />
+                        </CanceledSignWrapper>
+                      )}
+                    </MyOrderDetails>
                   );
                 })}
               </OrdersCard>

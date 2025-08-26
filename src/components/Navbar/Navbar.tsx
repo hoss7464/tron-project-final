@@ -27,7 +27,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useTronWallet } from "../../contexts/TronWalletContext";
-import Logo from "../../assets/svg/Logo/Logo2.svg"
+import Logo from "../../assets/svg/Logo/Logo3.svg"
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 
 const Navbar: React.FC = () => {

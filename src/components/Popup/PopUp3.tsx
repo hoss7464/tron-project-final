@@ -56,6 +56,7 @@ import { TronWeb } from "tronweb";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import { toggleRefresh } from "../../redux/actions/refreshSlice";
 
 interface Popup3Types {
   open: boolean;
@@ -128,6 +129,9 @@ const PopUp3: React.FC<Popup3Types> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [settingBtn, setSettingBtn] = useState(false);
   const baseURL = process.env.REACT_APP_BASE_URL;
+
+  // NEW: Function to track already delegated amounts
+const [alreadyDelegatedAmount, setAlreadyDelegatedAmount] = useState(0);
   //-------------------------------------------------------------------------------------------
   //Functions for Payout target address input :
   //Wallet address validation :
@@ -222,8 +226,14 @@ const maxCandleHandler = async () => {
     
     maxCandelegated = maxCandelegated / 1_000_000;
 
-    const newMaxCandle = maxCandelegated > myDelegate ? myDelegate : maxCandelegated;
+     // NEW: Calculate already delegated amount in this session
+    const alreadyDelegated = calculateAlreadyDelegatedAmount();
+    // Subtract already delegated amount from the available max
+    const availableMax = Math.max(0, maxCandelegated - alreadyDelegated);
     
+    // Calculate the new maximum, considering myDelegate as the upper limit
+    const newMaxCandle = Math.min(availableMax, myDelegate);
+
     setMaxCandle(newMaxCandle);
     
     // Clear delegated amount when max candle changes significantly
@@ -242,7 +252,11 @@ const maxCandleHandler = async () => {
     return;
   }
 };
-  //Function to run maxCandleHandler when popoup loads :
+
+const calculateAlreadyDelegatedAmount = () => {
+  return alreadyDelegatedAmount;
+};
+
 
   //-------------------------------------------------------------------------------------------
   //Function for delegated input :
@@ -492,6 +506,8 @@ const maxCandleHandler = async () => {
         }
         //if result.success === true show a notification then close the popup :
         if (result?.success) {
+          // Track the delegated amount
+          setAlreadyDelegatedAmount(prev => prev + numericDelegatedAmount);
           dispatch(
             showNotification({
               name: "Order-popup-success",
@@ -500,6 +516,7 @@ const maxCandleHandler = async () => {
             })
           );
           handleClose();
+          
         }
       } else if (checkResponse.data.success === false) {
         dispatch(
@@ -523,6 +540,7 @@ const maxCandleHandler = async () => {
       );
     }
   };
+
   //-------------------------------------------------------------------------------------------
   //Funtion to close popup :
   const handleClose = () => {
@@ -726,7 +744,7 @@ const maxCandleHandler = async () => {
     const payoutCalc = energyPair * numericDelegateAmount;
     return payoutCalc;
   };
-
+   
   //-------------------------------------------------------------------------------------------
   if (!order) return null;
   const { date, time } = formatDateTime(order.createdAt);

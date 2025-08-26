@@ -33,6 +33,7 @@ import {
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import { Divider } from "@mui/material";
+import { formatStrictDuration } from "../../utils/fromSec";
 
 interface OrderSuccessPopupProps {
   open: boolean;
@@ -283,7 +284,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 <Popup2Name>Duration:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{Number(myDuration).toLocaleString()}</Popup2Item>
+                <Popup2Item>{formatStrictDuration(Number(myDuration))}</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
           </Box>
@@ -389,8 +390,8 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
               backgroundColor: "#430E00",
               borderRadius: "10px",
             }}
-          >
-            {isTransferring ? "Sending..." : "Send TRX"}
+          > {mySwitchBtn === "energy" ? "Sell energy" : "Sell bandwidth"}
+            
           </Button>
 
           <Button
