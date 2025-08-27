@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { fetchAllUiData } from '../services/requestService';
 import { OrdersResponse, MyOrdersResponse, ResourceResponse } from '../services/requestService';
+import { useTronWallet } from './TronWalletContext';
 
 
 //context type
@@ -20,6 +21,7 @@ interface FetchDataProviderProps {
 }
 
 export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({children}) => {
+  const {address} = useTronWallet()
   const [orderData, setOrderData] = useState<OrdersResponse | null>(null);
   const [myOrderData, setMyOrderData] = useState<MyOrdersResponse | null>(null);
   const [resourceData, setResourceData] = useState<ResourceResponse | null>(null);
@@ -31,7 +33,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({children}) 
   const fetchData = async () => {
     try {
         setLoading(true);
-        const allData = await fetchAllUiData()
+        const allData = await fetchAllUiData(address)
         setOrderData(allData.orders)
         setMyOrderData(allData.myOrders)
         setResourceData(allData.resources)
@@ -39,6 +41,8 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({children}) 
     } catch (error) {
       console.error('Error in global data fetch:', error);
         
+    } finally {
+      setLoading(false);
     }
   }
     useEffect(() => {
@@ -51,7 +55,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({children}) 
 
     // Cleanup: This ONE clearInterval will stop the global refresh
     return () => clearInterval(intervalId);
-  }, []); // Empty dependency array means this runs once on mount and once on unmount
+  }, [address]); // Empty dependency array means this runs once on mount and once on unmount
 
   const value: FetchDataContextType = {
     orderData,

@@ -1,5 +1,5 @@
 import axios from "axios";
-import Notification from "../components/Notifictions/Notification";
+
 //-------------------------------------------------------------------------------------
 //Interfaces:
 // Interface for orders response :
@@ -77,9 +77,11 @@ export interface ResourceResponse {
 const baseUrl = process.env.REACT_APP_BASE_URL;
 const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
+
 // Check if wallet connection data exists in localStorage
 const hasWalletConnection = (): boolean => {
   try {
+    
     const walletData = localStorage.getItem("tronWalletAddress");
     return !!walletData; // Returns true if data exists, false otherwise
   } catch (error) {
@@ -88,9 +90,10 @@ const hasWalletConnection = (): boolean => {
   }
 };
 
-export const fetchAllUiData = async () => {
+export const fetchAllUiData = async (walletAddress: string | null) => {
+
   try {
-    const hasConnectedWallet = hasWalletConnection();
+    const hasConnectedWallet = !!walletAddress;
     
     // Always fetch orders and resources
     const ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {

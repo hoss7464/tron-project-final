@@ -18,15 +18,15 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <LoadingProvider>
-      <FetchDataProvider>
-        <Provider store={store}>
-          <I18nextProvider i18n={i18n}>
-            <TronWalletProvider>
+      <Provider store={store}>  {/* ← Redux Provider first */}
+        <TronWalletProvider>  {/* ← Now TronWalletProvider can use useDispatch */}
+          <FetchDataProvider>
+            <I18nextProvider i18n={i18n}>
               <App />
-            </TronWalletProvider>
-          </I18nextProvider>
-        </Provider>
-      </FetchDataProvider>
+            </I18nextProvider>
+          </FetchDataProvider>
+        </TronWalletProvider>
+      </Provider>
     </LoadingProvider>
   </React.StrictMode>
 );
