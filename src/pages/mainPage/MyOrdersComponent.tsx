@@ -76,9 +76,9 @@ const MyOrdersComponent: React.FC = () => {
   
       if (refreshTrigger) {
         refreshData();
-        dispatch(toggleRefresh()); 
+       
       }
-    }, [refreshTrigger, fetchData, dispatch]);
+    }, [refreshTrigger, fetchData]);
 
   // Filter by status first (only processing and completed)
   const statusFilteredData2 = myOrderData?.data

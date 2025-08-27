@@ -112,9 +112,9 @@ export const OrdersComponent: React.FC = () => {
 
     if (refreshTrigger) {
       refreshData();
-      dispatch(toggleRefresh()); 
+    
     }
-  }, [refreshTrigger, fetchData, dispatch]);
+  }, [refreshTrigger, fetchData]);
 
   //------------------------------------------------------------------------------------------------------------
   //Function for pagination :
