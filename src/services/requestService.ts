@@ -72,61 +72,94 @@ export interface ResourceResponse {
     };
   };
 }
+//interface for error response
+interface ApiErrorResponse {
+  success: boolean;
+  message?: string;
+  code?: string;
+}
 //-------------------------------------------------------------------------------------
 //to get data from .env :
 const baseUrl = process.env.REACT_APP_BASE_URL;
 const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
-
-// Check if wallet connection data exists in localStorage
-const hasWalletConnection = (): boolean => {
-  try {
-    
-    const walletData = localStorage.getItem("tronWalletAddress");
-    return !!walletData; // Returns true if data exists, false otherwise
-  } catch (error) {
-    throw error
-   
-  }
-};
-
-export const fetchAllUiData = async (walletAddress: string | null) => {
-
+export const fetchAllUiData = async (
+  walletAddress: string | null,
+  onAuthFailure?: () => void
+) => {
   try {
     const hasConnectedWallet = !!walletAddress;
-    
+
     // Always fetch orders and resources
     const ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
       headers: { "Content-Type": "application/json" },
       timeout: axiosTimeOut,
     });
 
-    const resourcesPromise = axios.get<ResourceResponse>(`${baseUrl}/Setting/UI`, {
-      headers: { "Content-Type": "application/json" },
-      timeout: axiosTimeOut,
-    });
+    const resourcesPromise = axios.get<ResourceResponse>(
+      `${baseUrl}/Setting/UI`,
+      {
+        headers: { "Content-Type": "application/json" },
+        timeout: axiosTimeOut,
+      }
+    );
 
     let myOrdersResponse: MyOrdersResponse;
 
     if (hasConnectedWallet) {
-      const myOrdersRes = await axios.get<MyOrdersResponse>(`${baseUrl}/order/myOrder`, {
-        headers: { "Content-Type": "application/json" },
-        timeout: axiosTimeOut,
-        withCredentials: true,
-      });
-      myOrdersResponse = myOrdersRes.data;
+      try {
+        const myOrdersRes = await axios.get<MyOrdersResponse>(
+          `${baseUrl}/order/myOrder`,
+          {
+            headers: { "Content-Type": "application/json" },
+            timeout: axiosTimeOut,
+            withCredentials: true,
+          }
+        );
+
+        // Check if the response indicates failure
+        if (myOrdersRes.data.success === false) {
+          console.warn("My orders request failed, triggering disconnect");
+          if (onAuthFailure) {
+            onAuthFailure();
+          }
+          myOrdersResponse = {
+            success: false,
+            message: myOrdersRes.data.message || "Authentication failed",
+            data: [],
+          };
+        } else {
+          myOrdersResponse = myOrdersRes.data;
+        }
+      } catch (error: any) {
+        // Check if this is an API error with success: false
+        if (error.response?.data?.success === false) {
+          console.warn("API returned failure, triggering disconnect");
+          if (onAuthFailure) {
+            onAuthFailure();
+          }
+          myOrdersResponse = {
+            success: false,
+            message: error.response.data.message || "Authentication failed",
+            data: [],
+          };
+        } else {
+          // Re-throw other errors (network errors, etc.)
+          throw error;
+        }
+      }
     } else {
       // Create default data
       myOrdersResponse = {
         success: true,
         message: "No wallet connected",
-        data: []
+        data: [],
       };
     }
 
     const [ordersListRes, resourceRes] = await Promise.all([
       ordersPromise,
-      resourcesPromise
+      resourcesPromise,
     ]);
 
     // Return a single object containing all the data with proper typing
