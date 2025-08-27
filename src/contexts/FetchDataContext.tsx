@@ -52,7 +52,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
       const newCount = prev + 1;
 
       // If we get multiple auth errors, disconnect and stop polling
-      if (newCount >= 2) {
+      if (newCount > 1) {
         console.log("Multiple authentication failures, disconnecting wallet");
         disconnectWallet();
         setShouldStopPolling(true); // Stop further polling
