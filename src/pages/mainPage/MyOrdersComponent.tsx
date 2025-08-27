@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { RootState } from "../../redux/store/store";
+import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import {
   MyOrdersWrapper,
   OrderMainWrapper,
@@ -46,7 +46,6 @@ import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import { formatDateTime } from "../../utils/dateTime";
-import { useLoading } from "../../contexts/LoaderContext";
 import { formatStrictDuration } from "../../utils/fromSec";
 import { useFetchData } from "../../contexts/FetchDataContext";
 
@@ -55,9 +54,8 @@ import { useFetchData } from "../../contexts/FetchDataContext";
 const MyOrdersComponent: React.FC = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { address, disconnectWallet } = useTronWallet();
-  const { incrementLoading, decrementLoading } = useLoading();
-  const { myOrderData } = useFetchData()
+  const { address } = useTronWallet();
+  const { myOrderData, fetchData } = useFetchData()
 
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
@@ -65,6 +63,22 @@ const MyOrdersComponent: React.FC = () => {
   const selectedFilter = useSelector(
     (state: RootState) => state.filters["myOrders"] || "All"
   );
+
+  useEffect(() => {
+      const refreshData = async () => {
+        try {
+          await fetchData(); 
+         
+        } catch (error) {
+          console.error('Error refreshing data:', error);
+        }
+      };
+  
+      if (refreshTrigger) {
+        refreshData();
+        dispatch(toggleRefresh()); 
+      }
+    }, [refreshTrigger, fetchData, dispatch]);
 
   // Filter by status first (only processing and completed)
   const statusFilteredData2 = myOrderData?.data

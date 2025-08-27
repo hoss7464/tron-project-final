@@ -1,4 +1,5 @@
 import axios from "axios";
+import Notification from "../components/Notifictions/Notification";
 //-------------------------------------------------------------------------------------
 //Interfaces:
 // Interface for orders response :
@@ -82,8 +83,8 @@ const hasWalletConnection = (): boolean => {
     const walletData = localStorage.getItem("tronWalletAddress");
     return !!walletData; // Returns true if data exists, false otherwise
   } catch (error) {
-    console.error("Error reading from localStorage:", error);
-    return false;
+    throw error
+   
   }
 };
 

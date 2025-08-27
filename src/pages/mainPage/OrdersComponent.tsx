@@ -3,6 +3,7 @@ import "./mainPage.css";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
+import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { RootState } from "../../redux/store/store";
 import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
@@ -50,6 +51,7 @@ import { durationToNumber } from "../../utils/durationToNum";
 import PopUp3 from "../../components/Popup/PopUp3";
 import { useFetchData } from "../../contexts/FetchDataContext";
 
+
 interface ServerResponse {
   success: boolean;
   data: MarketOrder[];
@@ -77,7 +79,7 @@ export interface MarketOrder {
 
 export const OrdersComponent: React.FC = () => {
   const dispatch = useDispatch();
-  const {orderData} = useFetchData()
+  const {orderData, fetchData} = useFetchData()
   //States :
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
@@ -96,6 +98,23 @@ export const OrdersComponent: React.FC = () => {
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
   );
+  //------------------------------------------------------------------------------------------------------------
+  // Effect to refresh data when refreshTrigger changes
+  useEffect(() => {
+    const refreshData = async () => {
+      try {
+        await fetchData(); 
+       
+      } catch (error) {
+        console.error('Error refreshing data:', error);
+      }
+    };
+
+    if (refreshTrigger) {
+      refreshData();
+      dispatch(toggleRefresh()); 
+    }
+  }, [refreshTrigger, fetchData, dispatch]);
 
   //------------------------------------------------------------------------------------------------------------
   //Function for pagination :

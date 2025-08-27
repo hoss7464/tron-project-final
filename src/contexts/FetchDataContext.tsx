@@ -10,6 +10,7 @@ interface FetchDataContextType {
   resourceData: ResourceResponse | null; 
   loading: boolean;
   error: Error | null;
+  fetchData: () => Promise<void>;
 }
 
 const FetchDataContext = createContext<FetchDataContextType | undefined>(undefined);
@@ -56,6 +57,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({children}) 
     orderData,
     myOrderData,
     resourceData,
+    fetchData,
     loading,
     error,
   };
