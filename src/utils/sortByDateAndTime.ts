@@ -10,7 +10,7 @@ type ItemWithDateTime = {
 
 export function sortAndFilterOrders2<T extends ItemWithDateTime & { status: string }>(
   data: T[],
-  sortBy: SortOption = 'price'
+  sortBy: SortOption = 'latest'
 ): T[] {
   // First filter if needed
   let filteredData = [...data];

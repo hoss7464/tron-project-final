@@ -133,7 +133,7 @@ const MyOrdersComponent: React.FC = () => {
   // Then sort the filtered data
   const filteredAndSortedData = sortAndFilterOrders2(
     statusFilteredData2,
-    selectedFilter === "All" ? "price" : (selectedFilter as SortOption)
+    selectedFilter === "All" ? "latest" : (selectedFilter as SortOption)
   );
 
   //Function to calculate total price :
@@ -165,7 +165,7 @@ const MyOrdersComponent: React.FC = () => {
             <LegacyCardName>My Orders</LegacyCardName>
             <MyFilterComponent
               listKey="myOrders"
-              options={["price", "energy", "bandwidth", "latest", "oldest"]}
+              options={["latest", "energy", "bandwidth", "price", "oldest"]}
               label="Product"
             />
           </OrdersNavHeaderWrapper>
