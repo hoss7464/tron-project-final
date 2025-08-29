@@ -1539,7 +1539,7 @@ const OrderFormComponent: React.FC = () => {
           setAmountError("");
           setDurationError("");
           setPriceError("");
-          setPartialFill(false);
+          setPartialFill(true);
           setBulkOrder(false);
         }}
       />

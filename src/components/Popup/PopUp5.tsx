@@ -1,38 +1,27 @@
 import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogActions,
-  Button,
-  Box,
-} from "@mui/material";
+import axios from "axios";
+import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
 import {
   Popup2HeaderWrapper,
   Popup2Header,
   Popup2ImgWrapper,
   Popup2ItemNameWrapper,
   Popup2ItemName,
-  Popup2SubheaderWrapper,
-  Popup2Subheader,
-  Popup2NameItemWrapper,
-  Popup2NameWrapper,
-  Popup2Name,
-  Popup2ItemWrapper,
-  Popup2Item,
   Popup5TextWrapper,
   Popup5Text,
 } from "./PopUpElements";
-import { MyMarketOrder } from "../../services/requestService";
-
+import { MyMarketOrder, MyOrdersResponse } from "../../services/requestService";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
-
 import {
   LegacyCardIconWrapper1,
   LegacyCardIconWrapper2,
   LegacyCardIconWrapper3,
   LegacyCardIcon,
 } from "../../pages/mainPage/LegacySection/LegacyElements";
+import { useTronWallet } from "../../contexts/TronWalletContext";
+import { useDispatch } from "react-redux";
+import { showNotification } from "../../redux/actions/notifSlice";
 
 interface MyOrderCancelPopupProps {
   open: boolean;
@@ -45,10 +34,66 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
   onClose,
   orderData,
 }) => {
+  const { address } = useTronWallet();
+  const dispatch = useDispatch();
+
   const MyCancelReject = () => {
     onClose();
   };
-  const cancelTrxAmount = Number(process.env.REACT_APP_CANCEL_TRX_AMOUNT)
+  const cancelTrxAmount = Number(process.env.REACT_APP_CANCEL_TRX_AMOUNT);
+  const baseUrl = process.env.REACT_APP_BASE_URL;
+  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+
+  const handleConfirmClick = async () => {
+    try {
+      const confirmPayload = {
+        orderId: orderData?._id,
+        requester: address,
+      };
+      console.log(confirmPayload);
+
+      const confirmResponse = await axios.post<MyOrdersResponse>(
+        `${baseUrl}/order/cancelOrder`,
+        confirmPayload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: axiosTimeOut,
+          withCredentials: true,
+        }
+      );
+      if (confirmResponse.data.success === true) {
+        dispatch(
+          showNotification({
+            name: "cancel-success1",
+            message: "Cancel order successfull",
+            severity: "success",
+          })
+        );
+        return;
+      } else {
+        dispatch(
+          showNotification({
+            name: "cancel-error1",
+            message: `Cancel error : ${confirmResponse.data.message}`,
+            severity: "error",
+          })
+        );
+        return;
+      }
+    } catch (error) {
+      dispatch(
+        showNotification({
+          name: "cancel-error2",
+          message: `Cancel error : ${error}`,
+          severity: "error",
+        })
+      );
+      return;
+    }
+  };
+  
   if (!orderData) return null;
   return (
     <>
@@ -116,7 +161,8 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         <DialogContent>
           <Popup5TextWrapper>
             <Popup5Text>
-              To cancel this order you lose {cancelTrxAmount} TRX from your account,
+              To cancel this order you lose {cancelTrxAmount} TRX from your
+              account,
               <br /> Are you sure ?
             </Popup5Text>
           </Popup5TextWrapper>
@@ -137,6 +183,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         >
           <Button
             fullWidth
+            onClick={handleConfirmClick}
             color="primary"
             variant="contained"
             sx={{
@@ -145,7 +192,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
             }}
           >
             {" "}
-            cancel
+            confirm
           </Button>
           <Button
             fullWidth
@@ -162,7 +209,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
               },
             }}
           >
-            Reject
+            cancel
           </Button>
         </DialogActions>
       </Dialog>

@@ -41,6 +41,7 @@ interface Hold {
   settledAt: string;}
 
 export interface MyMarketOrder {
+   _id: string;
   createdAt: string;
   durationSec: number;
   freeze: number;

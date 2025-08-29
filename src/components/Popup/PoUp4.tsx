@@ -23,16 +23,16 @@ import {
 } from "./PopUpElements";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
-
 import {
   LegacyCardIconWrapper1,
   LegacyCardIconWrapper2,
   LegacyCardIconWrapper3,
   LegacyCardIcon,
 } from "../../pages/mainPage/LegacySection/LegacyElements";
-import { MyMarketOrder } from "../../services/requestService";
+import { MyMarketOrder} from "../../services/requestService";
 import { formatDateTime } from "../../utils/dateTime";
 import { truncateTxid } from "../../utils/truncate";
+
 
 interface MyOrderSuccessPopupProps {
   open: boolean;
@@ -67,6 +67,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
             borderRadius: "16px !important",
             border: "solid 2px #D9E1E3",
             minWidth: "30%",
+            maxHeight: "80vh",
           },
         }}
       >
@@ -114,7 +115,12 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
         </Popup2ImgWrapper>
         <DialogContent>
           <Box>
-            <TableContainer>
+            <TableContainer
+              sx={{
+                maxHeight: 400,
+                overflow: "auto",
+              }}
+            >
               <Table stickyHeader size="small">
                 <TableHead>
                   <TableRow>

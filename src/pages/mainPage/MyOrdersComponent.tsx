@@ -172,7 +172,7 @@ const MyOrdersComponent: React.FC = () => {
             <MyOrdersScroll>
               <MyOrdersNavWrapper>
                 <MyOrdersNavTextWrapper>
-                  <MyOrdersTextWrapper>
+                  <MyOrdersTextWrapper style={{ marginLeft: "3rem" }}>
                     <OrderNavText>{t("date")}</OrderNavText>
                   </MyOrdersTextWrapper>
 
@@ -204,6 +204,22 @@ const MyOrdersComponent: React.FC = () => {
 
                   return (
                     <MyOrderDetails key={index}>
+                      <MyOrdersInfoWrapper
+                        onClick={
+                          isDisabled ? undefined : () => handleInfoClick(myData)
+                        }
+                        style={{
+                          cursor: isDisabled ? "not-allowed" : "pointer",
+                          backgroundColor: isDisabled ? "#BECBCF" : "#430E00",
+                        }}
+                      >
+                        <MyOrdersInfoIcon
+                          style={{
+                            cursor: isDisabled ? "not-allowed" : "pointer",
+                          }}
+                        />
+                      </MyOrdersInfoWrapper>
+
                       <MyOrderCardTextWrap>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>{date}</OrdersCardText1>
@@ -294,22 +310,6 @@ const MyOrdersComponent: React.FC = () => {
                         </OrderCardLinearWrapper>
                       </OrderCardLinearWrapper2>
 
-                      <MyOrdersInfoWrapper
-                        onClick={
-                          isDisabled ? undefined : () => handleInfoClick(myData)
-                        }
-                        style={{
-                          cursor: isDisabled ? "not-allowed" : "pointer",
-                          backgroundColor: isDisabled ? "#BECBCF" : "#430E00",
-                        }}
-                      >
-                        <MyOrdersInfoIcon
-                          style={{
-                            cursor: isDisabled ? "not-allowed" : "pointer",
-                          }}
-                        />
-                      </MyOrdersInfoWrapper>
-
                       {myData.status === "completed" && (
                         <CheckedSignWrapper>
                           <CheckedSign />
@@ -317,7 +317,9 @@ const MyOrdersComponent: React.FC = () => {
                       )}
 
                       {myData.status === "processing" && (
-                        <MyOrdersSellBtnWrapper onClick={() => handleCancelClick(myData)}>
+                        <MyOrdersSellBtnWrapper
+                          onClick={() => handleCancelClick(myData)}
+                        >
                           <MyOrdersSell>Cancel</MyOrdersSell>
                         </MyOrdersSellBtnWrapper>
                       )}
@@ -339,12 +341,20 @@ const MyOrdersComponent: React.FC = () => {
       <PopUp4
         open={myModalOpen}
         onClose={() => setMyModalOpen(false)}
-        orderData={selectedOrder}
+        orderData={
+          selectedOrder
+            ? myOrderData?.data?.find(
+                (order) => order._id === selectedOrder._id
+              ) || selectedOrder
+            : null
+        }
       />
 
-      <PopUp5  open={myCancelOpen}
+      <PopUp5
+        open={myCancelOpen}
         onClose={() => setMyCancelOpen(false)}
-        orderData={selectedOrder} />
+        orderData={selectedOrder}
+      />
     </>
   );
 };

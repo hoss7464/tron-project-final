@@ -915,7 +915,7 @@ export const MyOrdersTextWrapper = styled.div`
   align-items: center;
   width: 17%;
   height: 100%;
-
+  
 `;
 
 export const MyOrderDetails = styled.div`
@@ -976,8 +976,7 @@ align-items: center;
 padding: 0.4rem;
 border-radius: 6px;
 cursor: pointer;
-position: absolute;
-right: 5rem;
+margin-right: 1rem;
 `
 export const MyOrdersInfoIcon = styled(BsInfoLg)`
 width: 17px;
