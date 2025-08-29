@@ -15,6 +15,7 @@ interface TronWalletContextProps {
   availableEnergy: number | null;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
+  disconnectWallet2: () => void;
   signMessage: (message: string) => Promise<string | null>;
   transferTrx: (
     toAddress: string,
@@ -360,6 +361,31 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           severity: "warning",
         })
       );
+    }
+  };
+
+  const disconnectWallet2 = async () => {
+    try {
+      // First try to logout from server
+      await localStorageDeleteData();
+
+      // Clear local state only after successful server logout
+      setAddress(null);
+      setBalance(null);
+      setAllBandwidth(null);
+      setAvailableBandwidth(null);
+      setAllEnergy(null);
+      setAvailableEnergy(null);
+      toggleRefresh();
+    } catch (err) {
+      // If server logout fails, we still clear local state but show an error
+      setAddress(null);
+      setBalance(null);
+      setAllBandwidth(null);
+      setAvailableBandwidth(null);
+      setAllEnergy(null);
+      setAvailableEnergy(null);
+      toggleRefresh();
     }
   };
   //-------------------------------------------------------------------------------------
@@ -785,6 +811,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         allEnergy,
         connectWallet,
         disconnectWallet,
+        disconnectWallet2,
         signMessage,
         transferTrx,
         isTransferring,

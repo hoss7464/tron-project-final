@@ -35,7 +35,7 @@ interface FetchDataProviderProps {
 export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   children,
 }) => {
-  const { address, disconnectWallet } = useTronWallet();
+  const { address, disconnectWallet2 } = useTronWallet();
   const [orderData, setOrderData] = useState<OrdersResponse | null>(null);
   const [myOrderData, setMyOrderData] = useState<MyOrdersResponse | null>(null);
   const [resourceData, setResourceData] = useState<ResourceResponse | null>(
@@ -53,14 +53,13 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
 
       // If we get multiple auth errors, disconnect and stop polling
       if (newCount > 1) {
-        console.log("Multiple authentication failures, disconnecting wallet");
-        disconnectWallet();
+        disconnectWallet2();
         setShouldStopPolling(true); // Stop further polling
         return 0; // Reset counter after disconnect
       }
       return newCount;
     });
-  }, [disconnectWallet]);
+  }, [disconnectWallet2]);
   //-----------------------------------------------------------------------------------------------
   //Function to fetch data :
   const fetchData = useCallback(async () => {
