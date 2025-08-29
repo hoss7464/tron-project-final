@@ -814,8 +814,8 @@ export const CheckedSignWrapper = styled.div`
 `;
 export const CheckedSign = styled(IoCheckbox)`
   color: ${ThemeColor.primary1};
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 `;
 
 export const CanceledSignWrapper = styled.div`
@@ -824,11 +824,13 @@ export const CanceledSignWrapper = styled.div`
   align-items: center;
   position: absolute;
   right: 0.7rem;
+  background-color: ${ThemeColor.secondary1};
+  border-radius: 6px;
 `
 export const CanceledSign = styled(IoClose)`
-  color: ${ThemeColor.secondary1};
-  width: 32px;
-  height: 32px;
+  color: ${ThemeColor.text2};
+  width: 28px;
+  height: 28px;
 `
 
 export const OedersPaginationWrapper = styled.div`

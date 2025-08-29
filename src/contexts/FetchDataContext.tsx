@@ -108,8 +108,8 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
     }
 
     // Set up the single, global interval
-    const globalIntervalTime = 3000;
-    const intervalId = setInterval(fetchData, globalIntervalTime);
+    const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME)
+    const intervalId = setInterval(fetchData, globalReqTime);
 
     // Cleanup: This ONE clearInterval will stop the global refresh
     return () => clearInterval(intervalId);

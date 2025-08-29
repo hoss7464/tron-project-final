@@ -108,6 +108,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+
+  const globalReqTime = Number(process.env.REACT_APP_TRON_REQ_TIME)
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapter = new TronLinkAdapter();
@@ -163,7 +165,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     // Set new interval (5000ms = 5 seconds)
     refreshIntervalRef.current = setInterval(async () => {
       await fetchWalletData(walletAddress);
-    }, 5000);
+    }, globalReqTime);
   };
 
   // Function to stop the refresh interval

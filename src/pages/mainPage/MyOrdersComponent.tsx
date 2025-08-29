@@ -53,6 +53,7 @@ import { useFetchData } from "../../contexts/FetchDataContext";
 import { MyMarketOrder } from "../../services/requestService";
 import PopUp4 from "../../components/Popup/PoUp4";
 import PopUp5 from "../../components/Popup/PopUp5";
+import { Tooltip } from "@mui/material";
 
 interface ServerResponse {
   success: boolean;
@@ -311,9 +312,11 @@ const MyOrdersComponent: React.FC = () => {
                       </OrderCardLinearWrapper2>
 
                       {myData.status === "completed" && (
+                        <Tooltip title="completed">
                         <CheckedSignWrapper>
                           <CheckedSign />
                         </CheckedSignWrapper>
+                        </Tooltip>
                       )}
 
                       {myData.status === "processing" && (
@@ -325,9 +328,11 @@ const MyOrdersComponent: React.FC = () => {
                       )}
 
                       {myData.status === "cancelled" && (
-                        <CanceledSignWrapper>
+                        <Tooltip title="canceled">
+                        <CanceledSignWrapper  >
                           <CanceledSign />
                         </CanceledSignWrapper>
+                        </Tooltip>
                       )}
                     </MyOrderDetails>
                   );
