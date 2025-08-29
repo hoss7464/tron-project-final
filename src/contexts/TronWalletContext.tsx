@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -13,6 +19,7 @@ interface TronWalletContextProps {
   availableBandwidth: number | null;
   allEnergy: number | null;
   availableEnergy: number | null;
+  isConnected: boolean;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   disconnectWallet2: () => void;
@@ -35,6 +42,7 @@ interface TronWalletContextProps {
     isMultiSignature?: boolean,
     options?: any
   ) => Promise<fillOrder>;
+  refreshWalletData: () => Promise<void>;
 }
 //Disconnect interface :
 interface DisconnectResponse {
@@ -94,12 +102,84 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //States for filling sell button :
   const [fillTRX, setFillTRX] = useState(false);
   const [fillTrxError, setFillTrxError] = useState<string | null>("");
+  //States for request data each 5000 ms to get refresh data :
+  const [isConnected, setIsConnected] = useState(false);
+  const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapter = new TronLinkAdapter();
+  //-------------------------------------------------------------------------------------
+  //function to send req each 5000 ms to get refresh data :
+  const fetchWalletData = async (walletAddress: string) => {
+    try {
+      const tronNileUrl = process.env.REACT_APP_TRON_API;
+      const { TronWeb } = await import("tronweb");
+      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+
+      // Get balance
+      const balanceInSun = await tronWeb.trx.getBalance(walletAddress);
+      const balanceTRX = tronWeb.fromSun(balanceInSun);
+      setBalance(Number(balanceTRX).toFixed(2));
+
+      // Get resources
+      const resource = await tronWeb.trx.getAccountResources(walletAddress);
+      const freeNetLimit = resource.freeNetLimit ?? 0;
+      const netLimit = resource.NetLimit ?? 0;
+      const netUsed = resource.NetUsed ?? 0;
+      const freeNetUsed = resource.freeNetUsed ?? 0;
+      const energyLimit = resource.EnergyLimit ?? 0;
+      const energyUsed = resource.EnergyUsed ?? 0;
+
+      const all_bw = freeNetLimit + netLimit - netUsed - freeNetUsed;
+      const totalBw = freeNetLimit + netLimit;
+      const all_energy = energyLimit;
+      const available_energy = energyLimit - energyUsed;
+
+      setAllBandwidth(all_bw);
+      setAvailableBandwidth(totalBw);
+      setAllEnergy(all_energy);
+      setAvailableEnergy(available_energy);
+    } catch (err) {
+      console.error("Error fetching wallet data:", err);
+      // Optional: show notification for refresh errors
+      dispatch(
+        showNotification({
+          name: "tron-refresh-error",
+          message: "Failed to refresh wallet data",
+          severity: "warning",
+        })
+      );
+    }
+  };
+
+  // Function to start the refresh interval
+  const startRefreshInterval = (walletAddress: string) => {
+    // Clear any existing interval
+    stopRefreshInterval();
+
+    // Set new interval (5000ms = 5 seconds)
+    refreshIntervalRef.current = setInterval(async () => {
+      await fetchWalletData(walletAddress);
+    }, 5000);
+  };
+
+  // Function to stop the refresh interval
+  const stopRefreshInterval = () => {
+    if (refreshIntervalRef.current) {
+      clearInterval(refreshIntervalRef.current);
+      refreshIntervalRef.current = null;
+    }
+  };
+
+  // Manual refresh function
+  const refreshWalletData = async () => {
+    if (address) {
+      await fetchWalletData(address);
+    }
+  };
   //-------------------------------------------------------------------------------------
   //Funtion to connect wallet :
   const connectWallet = async () => {
@@ -208,28 +288,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       //wallet address state :
       setAddress(addr);
-      //To get balance from tronWeb :
-      const balanceInSun = await tronWeb.trx.getBalance(addr);
-      const balanceTRX = tronWeb.fromSun(balanceInSun);
-      //To set balance with 2 digites after decimal point
-      setBalance(Number(balanceTRX).toFixed(2));
+      setIsConnected(true);
 
-      //bandwidth and energy calculation :
-      const resource = await tronWeb.trx.getAccountResources(addr);
-      const freeNetLimit = resource.freeNetLimit ?? 0;
-      const netLimit = resource.NetLimit ?? 0;
-      const netUsed = resource.NetUsed ?? 0;
-      const freeNetUsed = resource.freeNetUsed ?? 0;
-      const energyLimit = resource.EnergyLimit ?? 0;
-      const energyUsed = resource.EnergyUsed ?? 0;
-      const all_bw = freeNetLimit + netLimit - netUsed - freeNetUsed;
-      const totalBw = freeNetLimit + netLimit;
-      const all_energy = energyLimit;
-      const available_energy = energyLimit - energyUsed;
-      setAllBandwidth(all_bw);
-      setAvailableBandwidth(totalBw);
-      setAllEnergy(all_energy);
-      setAvailableEnergy(available_energy);
+      // Fetch initial data
+      await fetchWalletData(addr);
+
+      // Start refresh interval
+      startRefreshInterval(addr);
 
       //To show success notification after wallet connection :
       dispatch(
@@ -277,7 +342,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           })
         );
       }
-      //I removed disconnectWallet function in here :
+      // Clean up on error
+      setIsConnected(false);
+      stopRefreshInterval();
     }
   };
   //-------------------------------------------------------------------------------------
@@ -335,7 +402,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableBandwidth(null);
       setAllEnergy(null);
       setAvailableEnergy(null);
-      toggleRefresh();
+      setIsConnected(false);
+      stopRefreshInterval();
 
       dispatch(
         showNotification({
@@ -352,7 +420,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableBandwidth(null);
       setAllEnergy(null);
       setAvailableEnergy(null);
-      toggleRefresh();
+      setIsConnected(false);
+      stopRefreshInterval();
 
       dispatch(
         showNotification({
@@ -376,7 +445,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableBandwidth(null);
       setAllEnergy(null);
       setAvailableEnergy(null);
-      toggleRefresh();
+      setIsConnected(false);
+      stopRefreshInterval();
     } catch (err) {
       // If server logout fails, we still clear local state but show an error
       setAddress(null);
@@ -385,9 +455,17 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableBandwidth(null);
       setAllEnergy(null);
       setAvailableEnergy(null);
-      toggleRefresh();
+      setIsConnected(false);
+      stopRefreshInterval();
     }
   };
+
+  // Cleanup interval on component unmount
+  useEffect(() => {
+    return () => {
+      stopRefreshInterval();
+    };
+  }, []);
   //-------------------------------------------------------------------------------------
   //Function sign the message :
   const signMessage = async (message: string): Promise<string | null> => {
@@ -809,6 +887,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         availableBandwidth,
         availableEnergy,
         allEnergy,
+        isConnected,
         connectWallet,
         disconnectWallet,
         disconnectWallet2,
@@ -819,6 +898,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         fillOrder,
         fillTRX,
         fillTrxError,
+        refreshWalletData,
       }}
     >
       {children}

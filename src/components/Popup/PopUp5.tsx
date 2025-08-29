@@ -71,6 +71,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
             severity: "success",
           })
         );
+         onClose();
         return;
       } else {
         dispatch(
@@ -80,6 +81,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
             severity: "error",
           })
         );
+        onClose();
         return;
       }
     } catch (error) {
@@ -90,10 +92,11 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
           severity: "error",
         })
       );
+      onClose();
       return;
     }
   };
-  
+
   if (!orderData) return null;
   return (
     <>
