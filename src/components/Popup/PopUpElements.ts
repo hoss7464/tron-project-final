@@ -148,4 +148,18 @@ width: 16px;
 height: 16px;
 `
 
+export const Popup5TextWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+width: 100%;
+`
+
+export const Popup5Text = styled.p`
+color: ${ThemeColor.primary1};
+font-size: 16px;
+font-weight: 500;
+text-align: center;
+`
+
 

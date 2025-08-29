@@ -35,7 +35,12 @@ export interface MyOrdersResponse {
   data: MyMarketOrder[];
 }
 
-interface MyMarketOrder {
+interface Hold {
+  qty: number;
+  txid: string;
+  settledAt: string;}
+
+export interface MyMarketOrder {
   createdAt: string;
   durationSec: number;
   freeze: number;
@@ -53,6 +58,7 @@ interface MyMarketOrder {
   status: "pending" | "processing" | "completed" | "failed" | "cancelled";
   totalPrice: number;
   type: string;
+  holds: Hold[];
 }
 // Interface for resources response :
 export interface ResourceResponse {

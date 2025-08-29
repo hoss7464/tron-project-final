@@ -32,6 +32,8 @@ import {
   OrderCardLineraPercentWrapper,
   OrderCardLineraPercent,
   OrderCardLinearWrapper,
+  MyOrdersInfoWrapper,
+  MyOrdersInfoIcon,
 } from "./mainPageElements";
 
 import LinearProgress from "@mui/material/LinearProgress";
@@ -48,14 +50,53 @@ import { useTronWallet } from "../../contexts/TronWalletContext";
 import { formatDateTime } from "../../utils/dateTime";
 import { formatStrictDuration } from "../../utils/fromSec";
 import { useFetchData } from "../../contexts/FetchDataContext";
+import { MyMarketOrder } from "../../services/requestService";
+import PopUp4 from "../../components/Popup/PoUp4";
+import PopUp5 from "../../components/Popup/PopUp5";
 
+interface ServerResponse {
+  success: boolean;
+  data: MyInfoOrder[];
+}
 
+interface Hold {
+  qty: number;
+  txid: string;
+  settledAt: string; // or Date if you plan to convert to Date objects
+}
+
+export interface MyInfoOrder {
+  _id: string;
+  createdAt: string;
+  durationSec: number;
+  freeze: number;
+  frozen: number;
+  energyPairTrx: number | null;
+  lock: boolean;
+  options: {
+    allow_partial: boolean;
+    bulk_order: boolean;
+  };
+  price: number;
+  receiver: string;
+  resourceAmount: number;
+  resourceType: string;
+  status: "pending" | "processing" | "completed" | "failed" | "cancelled";
+  totalPrice: number;
+  type: string;
+  holds: Hold[];
+}
 
 const MyOrdersComponent: React.FC = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const { address } = useTronWallet();
-  const { myOrderData, fetchData } = useFetchData()
+  const { myOrderData, fetchData } = useFetchData();
+  const [myModalOpen, setMyModalOpen] = useState(false);
+  const [myCancelOpen, setMyCancelOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<MyMarketOrder | null>(
+    null
+  );
 
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
@@ -65,20 +106,18 @@ const MyOrdersComponent: React.FC = () => {
   );
 
   useEffect(() => {
-      const refreshData = async () => {
-        try {
-          await fetchData(); 
-         
-        } catch (error) {
-          console.error('Error refreshing data:', error);
-        }
-      };
-  
-      if (refreshTrigger) {
-        refreshData();
-       
+    const refreshData = async () => {
+      try {
+        await fetchData();
+      } catch (error) {
+        console.error("Error refreshing data:", error);
       }
-    }, [refreshTrigger, fetchData]);
+    };
+
+    if (refreshTrigger) {
+      refreshData();
+    }
+  }, [refreshTrigger, fetchData]);
 
   // Filter by status first (only processing and completed)
   const statusFilteredData2 = myOrderData?.data
@@ -103,6 +142,18 @@ const MyOrdersComponent: React.FC = () => {
     }
     const calcTotal = myFreeze * myPair;
     return calcTotal;
+  };
+
+  //Functions for info popup :
+  const handleInfoClick = (order: MyMarketOrder) => {
+    setMyModalOpen(true);
+    setSelectedOrder(order);
+  };
+
+  //Functions for info popup :
+  const handleCancelClick = (order: MyMarketOrder) => {
+    setMyCancelOpen(true);
+    setSelectedOrder(order);
   };
 
   return (
@@ -145,6 +196,11 @@ const MyOrdersComponent: React.FC = () => {
               <OrdersCard>
                 {filteredAndSortedData.map((myData, index) => {
                   const { date, time } = formatDateTime(myData.createdAt);
+                  const progressValue = Math.min(
+                    (myData.frozen / myData.freeze) * 100,
+                    100
+                  );
+                  const isDisabled = progressValue === 0;
 
                   return (
                     <MyOrderDetails key={index}>
@@ -224,10 +280,7 @@ const MyOrdersComponent: React.FC = () => {
                         <OrderCardLinearWrapper>
                           <LinearProgress
                             variant="determinate"
-                            value={Math.min(
-                              (myData.frozen / myData.freeze) * 100,
-                              100
-                            )}
+                            value={progressValue}
                             valueBuffer={myData.freeze}
                             sx={{
                               height: 5,
@@ -241,6 +294,22 @@ const MyOrdersComponent: React.FC = () => {
                         </OrderCardLinearWrapper>
                       </OrderCardLinearWrapper2>
 
+                      <MyOrdersInfoWrapper
+                        onClick={
+                          isDisabled ? undefined : () => handleInfoClick(myData)
+                        }
+                        style={{
+                          cursor: isDisabled ? "not-allowed" : "pointer",
+                          backgroundColor: isDisabled ? "#BECBCF" : "#430E00",
+                        }}
+                      >
+                        <MyOrdersInfoIcon
+                          style={{
+                            cursor: isDisabled ? "not-allowed" : "pointer",
+                          }}
+                        />
+                      </MyOrdersInfoWrapper>
+
                       {myData.status === "completed" && (
                         <CheckedSignWrapper>
                           <CheckedSign />
@@ -248,7 +317,7 @@ const MyOrdersComponent: React.FC = () => {
                       )}
 
                       {myData.status === "processing" && (
-                        <MyOrdersSellBtnWrapper>
+                        <MyOrdersSellBtnWrapper onClick={() => handleCancelClick(myData)}>
                           <MyOrdersSell>Cancel</MyOrdersSell>
                         </MyOrdersSellBtnWrapper>
                       )}
@@ -266,6 +335,16 @@ const MyOrdersComponent: React.FC = () => {
           </OrdersCarouselWrapper>
         </OrderMainWrapper>
       </MyOrdersWrapper>
+
+      <PopUp4
+        open={myModalOpen}
+        onClose={() => setMyModalOpen(false)}
+        orderData={selectedOrder}
+      />
+
+      <PopUp5  open={myCancelOpen}
+        onClose={() => setMyCancelOpen(false)}
+        orderData={selectedOrder} />
     </>
   );
 };

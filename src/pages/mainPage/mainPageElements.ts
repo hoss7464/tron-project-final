@@ -5,6 +5,7 @@ import { MdOutlineAccountBalanceWallet } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { IoCheckbox } from "react-icons/io5";
 import { IoClose } from "react-icons/io5";
+import { BsInfoLg } from "react-icons/bs";
 
 //--------------------------------------------------------------------------
 //Main page styles :
@@ -912,7 +913,7 @@ export const MyOrdersTextWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  width: 18.5%;
+  width: 17%;
   height: 100%;
 
 `;
@@ -934,7 +935,7 @@ export const MyOrderCardTextWrap = styled.div`
   justify-content: center;
   align-items: flex-start;
   flex-direction: column;
-  width: 18.5%;
+  width: 17%;
   height: 100%;
 `;
 
@@ -967,3 +968,20 @@ export const MyOrdersSell = styled.p`
   font-weight: 500;
   color: ${colors.text9};
 `;
+
+export const MyOrdersInfoWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 0.4rem;
+border-radius: 6px;
+cursor: pointer;
+position: absolute;
+right: 5rem;
+`
+export const MyOrdersInfoIcon = styled(BsInfoLg)`
+width: 17px;
+height: 17px;
+color: ${ThemeColor.bg2};
+cursor: pointer;
+`

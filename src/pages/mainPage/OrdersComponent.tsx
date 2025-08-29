@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./mainPage.css";
-import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
-import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { RootState } from "../../redux/store/store";
 import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
