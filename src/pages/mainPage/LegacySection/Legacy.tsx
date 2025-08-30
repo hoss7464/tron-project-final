@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import "./Legacy.css";
 import {
   LegacyContainer,
@@ -63,8 +63,7 @@ const Legacy: React.FC = () => {
     isConnected,
     refreshWalletData
   } = useTronWallet();
-
-    const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
+  const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const bandwidthPercentage =
@@ -83,20 +82,8 @@ const Legacy: React.FC = () => {
     }
   };
 
-    // useEffect to automatically refresh data when component mounts or connection changes
-  useEffect(() => {
-    if (isConnected) {
-      // Refresh data immediately when component mounts and wallet is connected
-      const initialRefresh = async () => {
-        setIsRefreshing(true);
-        await refreshWalletData();
-        setLastUpdateTime(new Date());
-        setIsRefreshing(false);
-      };
-      
-      initialRefresh();
-    }
-  }, [isConnected, refreshWalletData]);
+
+
   return (
     <>
       <LegacyContainer>

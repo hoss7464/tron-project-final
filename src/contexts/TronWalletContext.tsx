@@ -19,7 +19,6 @@ interface TronWalletContextProps {
   availableBandwidth: number | null;
   allEnergy: number | null;
   availableEnergy: number | null;
-  isConnected: boolean;
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   disconnectWallet2: () => void;
@@ -42,6 +41,7 @@ interface TronWalletContextProps {
     isMultiSignature?: boolean,
     options?: any
   ) => Promise<fillOrder>;
+  isConnected: boolean;
   refreshWalletData: () => Promise<void>;
 }
 //Disconnect interface :
@@ -87,6 +87,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   //dispatch :
   const dispatch = useDispatch();
+
+  const tronWebRef = useRef<any>(null);
   //States :
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
@@ -102,39 +104,47 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //States for filling sell button :
   const [fillTRX, setFillTRX] = useState(false);
   const [fillTrxError, setFillTrxError] = useState<string | null>("");
-  //States for request data each 5000 ms to get refresh data :
-  const [isConnected, setIsConnected] = useState(false);
+
+  const [isConnected, setIsConnected] = useState<boolean>(false);
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
-
-  const globalReqTime = Number(process.env.REACT_APP_TRON_REQ_TIME)
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapter = new TronLinkAdapter();
-  //-------------------------------------------------------------------------------------
-  //function to send req each 5000 ms to get refresh data :
-  const fetchWalletData = async (walletAddress: string) => {
-    try {
+  // Helper function to get or create TronWeb instance
+  const getTronWeb = async (): Promise<any> => {
+    if (!tronWebRef.current) {
       const tronNileUrl = process.env.REACT_APP_TRON_API;
       const { TronWeb } = await import("tronweb");
-      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+      tronWebRef.current = new TronWeb({ fullHost: tronNileUrl });
+    }
+    return tronWebRef.current;
+  };
+  //-------------------------------------------------------------------------------------
+  // Add cleanup on unmount
+  const fetchWalletData = async (walletAddress: string) => {
+    try {
+      const tronWeb = await getTronWeb();
 
-      // Get balance
-      const balanceInSun = await tronWeb.trx.getBalance(walletAddress);
+      // Make both requests in parallel
+      const [balanceInSun, resource] = await Promise.all([
+        // Get balance
+        tronWeb.trx.getBalance(walletAddress),
+        // Get resources
+        tronWeb.trx.getAccountResources(walletAddress),
+      ]);
+
       const balanceTRX = tronWeb.fromSun(balanceInSun);
       setBalance(Number(balanceTRX).toFixed(2));
 
-      // Get resources
-      const resource = await tronWeb.trx.getAccountResources(walletAddress);
       const freeNetLimit = resource.freeNetLimit ?? 0;
       const netLimit = resource.NetLimit ?? 0;
       const netUsed = resource.NetUsed ?? 0;
       const freeNetUsed = resource.freeNetUsed ?? 0;
       const energyLimit = resource.EnergyLimit ?? 0;
       const energyUsed = resource.EnergyUsed ?? 0;
-
       const all_bw = freeNetLimit + netLimit - netUsed - freeNetUsed;
       const totalBw = freeNetLimit + netLimit;
       const all_energy = energyLimit;
@@ -156,16 +166,18 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       );
     }
   };
-
   // Function to start the refresh interval
   const startRefreshInterval = (walletAddress: string) => {
     // Clear any existing interval
     stopRefreshInterval();
 
+    // Make initial call immediately
+    fetchWalletData(walletAddress);
+
     // Set new interval (5000ms = 5 seconds)
     refreshIntervalRef.current = setInterval(async () => {
       await fetchWalletData(walletAddress);
-    }, globalReqTime);
+    }, 20000);
   };
 
   // Function to stop the refresh interval
@@ -182,7 +194,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       await fetchWalletData(address);
     }
   };
-  //-------------------------------------------------------------------------------------
+
   //Funtion to connect wallet :
   const connectWallet = async () => {
     try {
@@ -199,15 +211,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         return;
       }
-      //nile network url :
-      const tronNileUrl = process.env.REACT_APP_TRON_API;
-      //To import TronWeb localy :
-      const { TronWeb } = await import("tronweb");
+      // Fetch initial data
+      // await fetchWalletData(addr);
       //To get data from any network
       const window_tronweb = (window as any).tronWeb;
-
-      //To get data from tron nile :
-      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
       //base url :
       const baseURL = process.env.REACT_APP_BASE_URL;
       //Message in signature form based nonce :
@@ -291,10 +298,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //wallet address state :
       setAddress(addr);
       setIsConnected(true);
-
-      // Fetch initial data
-      await fetchWalletData(addr);
-
       // Start refresh interval
       startRefreshInterval(addr);
 
@@ -344,11 +347,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           })
         );
       }
-      // Clean up on error
-      setIsConnected(false);
-      stopRefreshInterval();
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
+      }
     }
   };
+
   //-------------------------------------------------------------------------------------
   //Function to delete data from localStorage :
   const localStorageDeleteData = async () => {
@@ -422,8 +427,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableBandwidth(null);
       setAllEnergy(null);
       setAvailableEnergy(null);
-      setIsConnected(false);
-      stopRefreshInterval();
+      toggleRefresh();
 
       dispatch(
         showNotification({
@@ -457,17 +461,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableBandwidth(null);
       setAllEnergy(null);
       setAvailableEnergy(null);
-      setIsConnected(false);
-      stopRefreshInterval();
+      toggleRefresh();
     }
   };
-
-  // Cleanup interval on component unmount
-  useEffect(() => {
-    return () => {
-      stopRefreshInterval();
-    };
-  }, []);
   //-------------------------------------------------------------------------------------
   //Function sign the message :
   const signMessage = async (message: string): Promise<string | null> => {
@@ -483,6 +479,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
   //-------------------------------------------------------------------------------------
+
   useEffect(() => {
     //Function for auto connection :
     const autoConnect = async () => {
@@ -497,9 +494,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           //To coonect to adapter :
           await adapter.connect();
           //To import TronWeb localy :
-          const { TronWeb } = await import("tronweb");
-          //To get data from api.trongrid.io
-          const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+          const tronWeb = await getTronWeb();
           //Wallwet address state :
           setAddress(walletAddr);
           //To get balance from TronLink :
@@ -556,11 +551,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       //To import TronWeb localy :
-      const { TronWeb } = await import("tronweb");
-      //nile network url :
-      const tronNileUrl = process.env.REACT_APP_TRON_API;
-      //To get data from api.trongrid.io
-      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+      const tronWeb = await getTronWeb();
       const MainAddress = process.env.REACT_APP_TRON_API;
       if (window?.tronWeb?.fullNode.host !== MainAddress) {
         dispatch(
@@ -721,11 +712,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       //To import TronWeb localy :
-      const { TronWeb } = await import("tronweb");
-      //nile network url :
-      const tronNileUrl = process.env.REACT_APP_TRON_API;
-      //To get data from api.trongrid.io
-      const tronWeb = new TronWeb({ fullHost: tronNileUrl });
+      const tronWeb = await getTronWeb();
 
       const MainAddress = process.env.REACT_APP_TRON_API;
 
@@ -889,7 +876,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         availableBandwidth,
         availableEnergy,
         allEnergy,
-        isConnected,
         connectWallet,
         disconnectWallet,
         disconnectWallet2,
@@ -901,6 +887,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         fillTRX,
         fillTrxError,
         refreshWalletData,
+        isConnected,
       }}
     >
       {children}

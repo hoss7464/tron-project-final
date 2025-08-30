@@ -77,7 +77,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         dispatch(
           showNotification({
             name: "cancel-error1",
-            message: `Cancel error : ${confirmResponse.data.message}`,
+            message: `Cancel error 1000: ${confirmResponse.data.message}`,
             severity: "error",
           })
         );
