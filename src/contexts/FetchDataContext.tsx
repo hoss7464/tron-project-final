@@ -11,6 +11,7 @@ import {
   OrdersResponse,
   MyOrdersResponse,
   ResourceResponse,
+  AvailableResponse,
 } from "../services/requestService";
 import { useTronWallet } from "./TronWalletContext";
 
@@ -19,6 +20,7 @@ interface FetchDataContextType {
   orderData: OrdersResponse | null;
   myOrderData: MyOrdersResponse | null;
   resourceData: ResourceResponse | null;
+  availableData: AvailableResponse | null;
   loading: boolean;
   error: Error | null;
   fetchData: () => Promise<void>;
@@ -38,9 +40,8 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const { address, disconnectWallet2 } = useTronWallet();
   const [orderData, setOrderData] = useState<OrdersResponse | null>(null);
   const [myOrderData, setMyOrderData] = useState<MyOrdersResponse | null>(null);
-  const [resourceData, setResourceData] = useState<ResourceResponse | null>(
-    null
-  );
+  const [resourceData, setResourceData] = useState<ResourceResponse | null>(null);
+  const [availableData, setAvailableData] = useState<AvailableResponse | null>(null)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [authErrorCount, setAuthErrorCount] = useState(0);
@@ -77,6 +78,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
       setOrderData(allData.orders);
       setMyOrderData(allData.myOrders);
       setResourceData(allData.resources);
+      setAvailableData(allData.availables)
 
       // Reset auth error count on successful request
       if (authErrorCount > 0) {
@@ -119,6 +121,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
     orderData,
     myOrderData,
     resourceData,
+    availableData,
     fetchData,
     loading,
     error,

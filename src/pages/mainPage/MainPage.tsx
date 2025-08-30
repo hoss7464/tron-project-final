@@ -10,6 +10,7 @@ import {
 import OrdersComponent from "./OrdersComponent";
 import MyOrdersComponent from "./MyOrdersComponent";
 import OrderFormComponent from "./OrderFormComponent";
+import AvailableResource from "./AvailableResource";
 import Hero from "./HeroSection/Hero";
 import Legacy from "./LegacySection/Legacy";
 import MobileOrderForm from "./MobileOrderForm/MobileOrderForm";
@@ -26,6 +27,7 @@ const MainPage: React.FC = () => {
           <MainPageWrapper>
             <MainLeftSection>
               <OrderFormComponent />
+              <AvailableResource />
             </MainLeftSection>
             <MainRightSection>
               <OrdersComponent />

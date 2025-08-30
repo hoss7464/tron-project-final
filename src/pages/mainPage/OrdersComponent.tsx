@@ -142,14 +142,23 @@ export const OrdersComponent: React.FC = () => {
   //Pagination
   const totalPages = Math.ceil(filteredAndSortedData.length / rowsPerPage);
   //------------------------------------------------------------------------------------------------------------
- 
-  //------------------------------------------------------------------------------------------------------------
   //Function to calculate APY :
-  const calcAPY = (myTotal: number, myFreeze: number, myDuration: number) => {
-    const duration = durationToNumber(myDuration);
-    //To calculate APY :
-    const calculatedAPY = ((myTotal / myFreeze) ^ 365) / duration;
-    return parseFloat(calculatedAPY.toFixed(2));
+const calcAPY = (
+    myTotal: number,
+    myFreeze: number,
+    myDuration: number,
+    opts?: { compoundCapPerYear?: number }
+  ): number => {
+    let days = durationToNumber(myDuration); 
+  if (!myFreeze || !days) return 0;
+  if(days > 0 && days < 1){
+    days = 1;
+  }
+  const rPeriod = myTotal / myFreeze;
+  const rawN = 365 / days;
+  const n = opts?.compoundCapPerYear != null ? Math.min(rawN, opts.compoundCapPerYear) : rawN;
+ const APY = Number((Math.expm1(Math.log1p(rPeriod) * n) * 100).toFixed(2));
+  return APY 
   };
   //------------------------------------------------------------------------------------------------------------
   //Functions for popup :
@@ -180,6 +189,8 @@ export const OrdersComponent: React.FC = () => {
     const calcTotal = myFreeze * myPair
     return calcTotal
   }
+  //------------------------------------------------------------------------------------------------------------
+
 
   return (
     <>

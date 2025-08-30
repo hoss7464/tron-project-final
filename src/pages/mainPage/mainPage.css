@@ -25,3 +25,10 @@
     background-repeat: no-repeat;
     background-position: center;
 }
+
+.resource-available-bg2 {
+    background-image: url("../../assets/png/myOrders-bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}

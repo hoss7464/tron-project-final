@@ -82,8 +82,6 @@ const Legacy: React.FC = () => {
     }
   };
 
-
-
   return (
     <>
       <LegacyContainer>

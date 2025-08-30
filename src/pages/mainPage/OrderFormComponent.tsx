@@ -63,7 +63,6 @@ import {
   HeroGridCardNumberIcon,
 } from "./HeroSection/HeroElements";
 import { HeroGridCardHeader } from "./HeroSection/HeroElements";
-
 import Autocomplete from "@mui/material/Autocomplete";
 import { styled } from "@mui/material/styles";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
@@ -80,7 +79,6 @@ interface SettingUI {
     longTermData?: any;
   };
 }
-
 //-------------------------------------------------------------------------------------
 //Duration input components :
 const boxStyle = {
@@ -128,19 +126,6 @@ const DropdownIconWithText: React.FC = () => {
       }}
     >
       <span style={{ fontSize: "14px", color: "#003543" }}>SUN</span>
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#003543"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="6 9 12 15 18 9" />
-      </svg>
     </div>
   );
 };
@@ -192,7 +177,6 @@ const OrderFormComponent: React.FC = () => {
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
   const [popupOpen2, setPopupOpen2] = useState(false);
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
@@ -451,35 +435,7 @@ const OrderFormComponent: React.FC = () => {
     }
   };
   //funtion to post duration data towards the server :
-  const postDurationData = async (durationInSec: number) => {
-    if (durationInSec === null) {
-      return;
-    }
 
-    const payload = {
-      durationSec: durationInSec,
-      resourceType: switchBtn === "energy" ? "energy" : "bandwidth",
-    };
-
-    const baseURL = process.env.REACT_APP_BASE_URL;
-
-    try {
-      const response = await axios.post(
-        `${baseURL}/Setting/resource-available`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          timeout: axiosTimeOut,
-        }
-      );
-
-      return (response.data as { data: any }).data;
-    } catch (error) {
-      console.error("Error data:", error);
-    }
-  };
   //handleOption function on click :
   const handleOptionClick = (value: string) => {
     const durationInSeconds = getDurationInSeconds(value);
@@ -492,10 +448,6 @@ const OrderFormComponent: React.FC = () => {
 
     const errorMessage = validateDuration(value);
     setDurationError(errorMessage);
-
-    if (durationInSeconds !== null) {
-      postDurationData(durationInSeconds);
-    }
   };
   //--------------------------------------------------------------------------------------
   //Price input functions :
@@ -572,52 +524,6 @@ const OrderFormComponent: React.FC = () => {
     return "";
   };
 
-  //To change the color of the options :
-  const getOptionStyle = (option: string) => {
-    const inputNum = parseInt(inputValue, 10);
-    const optionNum = parseInt(option, 10);
-
-    if (isNaN(inputNum)) {
-      return { color: "black" }; // Default color
-    }
-
-    // First handle custom price (above max range)
-    if (inputNum > maxOption) {
-      return { color: "black" }; // Custom user price
-    }
-
-    // Then handle below min range
-    if (inputNum < minOption) {
-      return { color: "gray" }; // Below range
-    }
-
-    const parsedOptions = priceOptions.map((o) => parseInt(o.col1, 10));
-    const exactMatch = parsedOptions.includes(inputNum);
-
-    if (exactMatch) {
-      if (optionNum === inputNum) {
-        return { color: "green", fontWeight: "bold" };
-      } else if (optionNum > inputNum) {
-        return { color: "grey" };
-      } else {
-        return { color: "black" };
-      }
-    } else {
-      const smallerOptions = parsedOptions
-        .filter((num) => num < inputNum)
-        .sort((a, b) => b - a); // Descending
-
-      const nearestLess = smallerOptions[0];
-
-      if (optionNum === nearestLess) {
-        return { color: "green", fontWeight: "bold" };
-      } else if (optionNum < inputNum) {
-        return { color: "black" };
-      } else {
-        return { color: "grey" };
-      }
-    }
-  };
   //Function to filter the dropdown to shows nothing if the entered value was more than max-price :
   const filterPriceOptions = (
     options: typeof priceOptions,
@@ -654,20 +560,6 @@ const OrderFormComponent: React.FC = () => {
   };
 
   //--------------------------------------------------------------------------------------
-  //To fetch dynamic options data for price dropdown based on duration dropdown :
-  const fetchOptionsForDuration = async (durationInSec: number) => {
-    const data = await postDurationData(durationInSec);
-
-    if (data) {
-      // data is like [{price: 50, available: 120000}, ...]
-      const mappedOptions = data.map((item: any) => ({
-        col1: item.price.toString(), // convert number to string for col1
-        col2: item.available.toString(), // convert number to string for col2
-      }));
-
-      setPriceOptions(mappedOptions);
-    }
-  };
   //To render dynamic options in price dropdown :
   useEffect(() => {
     const defaultDuration = "30 days";
@@ -678,8 +570,6 @@ const OrderFormComponent: React.FC = () => {
 
   useEffect(() => {
     if (durationInSec !== null) {
-      fetchOptionsForDuration(durationInSec);
-
       const matchedItem = getMatchedRate(durationInSec);
       if (matchedItem) {
         const rate =
@@ -712,7 +602,6 @@ const OrderFormComponent: React.FC = () => {
   };
   const menuOpen = Boolean(anchorEl);
   //--------------------------------------------------------------------------------------
-
   //To calculate payout amount :
   const calculateTotalPrice = () => {
     const numericAmount = getNumericAmount(amount);
@@ -770,7 +659,7 @@ const OrderFormComponent: React.FC = () => {
     return;
   }
   const { totalPrice } = myPrice;
-  const durationNumericValue = getDurationInSeconds(durationValue)
+  const durationNumericValue = getDurationInSeconds(durationValue);
   let stringSelectedPrice = inputValue;
   let numericSelectedPrice = getNumericSelectedPrice(stringSelectedPrice);
 
@@ -778,9 +667,9 @@ const OrderFormComponent: React.FC = () => {
     e.preventDefault();
 
     // Set current date and time
-  const now = new Date();
-  setCurrentDate(now.toLocaleDateString());
-  setCurrentTime(now.toLocaleTimeString());
+    const now = new Date();
+    setCurrentDate(now.toLocaleDateString());
+    setCurrentTime(now.toLocaleTimeString());
 
     if (!address) {
       dispatch(
@@ -831,7 +720,6 @@ const OrderFormComponent: React.FC = () => {
       return;
     }
     const { totalPrice } = myPrice;
-
 
     if (
       formBtn === null ||
@@ -887,7 +775,6 @@ const OrderFormComponent: React.FC = () => {
         );
         return;
       }
-
     } catch (error) {
       dispatch(
         showNotification({
@@ -898,7 +785,6 @@ const OrderFormComponent: React.FC = () => {
       );
     }
   };
-
 
   //--------------------------------------------------------------------------------------
 
@@ -1036,7 +922,7 @@ const OrderFormComponent: React.FC = () => {
                   <FormAddInputWrapper2>
                     <FormAddInput
                       style={{ fontSize: "16px", marginLeft: "0.5rem" }}
-                      value={amount}
+                      value={Number(amount).toLocaleString()}
                       onChange={amountHandleChange}
                       placeholder={`Amount of ${
                         switchBtn === "energy"
@@ -1280,33 +1166,6 @@ const OrderFormComponent: React.FC = () => {
                   onInputChange={(_, newInputValue) =>
                     setInputValue(newInputValue)
                   }
-                  getOptionLabel={(option) => {
-                    if (typeof option === "string") return option;
-                    return `${option.col1} - ${option.col2}`;
-                  }}
-                  filterOptions={filterPriceOptions}
-                  renderOption={(props, option) => {
-                    // Destructure the 'key' out of 'props' before spreading the rest
-                    const { key, ...restProps } = props;
-                    return (
-                      <li
-                        key={key}
-                        {...restProps} // Spread the remaining props
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          ...getOptionStyle(option.col1),
-                          pointerEvents: "none", // disable interaction
-                        }}
-                      >
-                        <span>{option.col1}</span>
-                        <span style={{ marginLeft: "auto" }}>
-                          {option.col2}
-                        </span>
-                      </li>
-                    );
-                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -1472,7 +1331,7 @@ const OrderFormComponent: React.FC = () => {
                 </OrderInfoTextWrapper2>
                 <OrderInfoTextWrapper2>
                   <OrderInfoText style={{ color: "#003543" }}>
-                    {amount}
+                    {Number(amount).toLocaleString()}
                   </OrderInfoText>
                 </OrderInfoTextWrapper2>
               </OrderInfoTextWrapper>
@@ -1505,7 +1364,7 @@ const OrderFormComponent: React.FC = () => {
                       fontWeight: "800",
                     }}
                   >
-                    {myPrice?.totalPrice ?? 0} TRX
+                    {myPrice?.totalPrice.toLocaleString() ?? 0} TRX
                   </OrderInfoText>
                 </OrderInfoTextWrapper2>
               </OrderInfoTextWrapper>

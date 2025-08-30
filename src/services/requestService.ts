@@ -85,6 +85,23 @@ interface ApiErrorResponse {
   message?: string;
   code?: string;
 }
+
+//interfaces for available response : 
+export interface EnergyItem {
+  rate: number;
+  avilable: number; // Note: This appears to be a typo - should probably be "available"
+}
+
+export interface BandwidthItem {
+  rate: number;
+  avilable: number; // Note: This appears to be a typo - should probably be "available"
+}
+
+export interface AvailableResponse {
+  success: boolean;
+  energy: EnergyItem[];
+  bandwidth: BandwidthItem[];
+}
 //-------------------------------------------------------------------------------------
 //to get data from .env :
 const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -97,7 +114,7 @@ export const fetchAllUiData = async (
   try {
     const hasConnectedWallet = !!walletAddress;
 
-    // Always fetch orders and resources
+    // Always fetch orders and resources, and available resources 
     const ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
       headers: { "Content-Type": "application/json" },
       timeout: axiosTimeOut,
@@ -110,6 +127,11 @@ export const fetchAllUiData = async (
         timeout: axiosTimeOut,
       }
     );
+
+    const AvailablePromise = axios.get<AvailableResponse>(`${baseUrl}/Setting/resource-available`, {
+        headers: { "Content-Type": "application/json" },
+        timeout: axiosTimeOut,
+      })
 
     let myOrdersResponse: MyOrdersResponse;
 
@@ -126,7 +148,6 @@ export const fetchAllUiData = async (
 
         // Check if the response indicates failure
         if (myOrdersRes.data.success === false) {
-          console.warn("My orders request failed, triggering disconnect");
           if (onAuthFailure) {
             onAuthFailure();
           }
@@ -164,9 +185,10 @@ export const fetchAllUiData = async (
       };
     }
 
-    const [ordersListRes, resourceRes] = await Promise.all([
+    const [ordersListRes, resourceRes, AvailableRes] = await Promise.all([
       ordersPromise,
       resourcesPromise,
+      AvailablePromise,
     ]);
 
     // Return a single object containing all the data with proper typing
@@ -174,6 +196,7 @@ export const fetchAllUiData = async (
       orders: ordersListRes.data,
       myOrders: myOrdersResponse,
       resources: resourceRes.data,
+      availables: AvailableRes.data,
     };
   } catch (error) {
     throw error;

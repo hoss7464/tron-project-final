@@ -826,12 +826,12 @@ export const CanceledSignWrapper = styled.div`
   right: 0.7rem;
   background-color: ${ThemeColor.secondary1};
   border-radius: 6px;
-`
+`;
 export const CanceledSign = styled(IoClose)`
   color: ${ThemeColor.text2};
   width: 28px;
   height: 28px;
-`
+`;
 
 export const OedersPaginationWrapper = styled.div`
   display: flex;
@@ -898,7 +898,6 @@ export const MyOrdersNavTextWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-
 `;
 
 export const MyOrdersCarouselWrapper = styled.div`
@@ -917,7 +916,6 @@ export const MyOrdersTextWrapper = styled.div`
   align-items: center;
   width: 17%;
   height: 100%;
-  
 `;
 
 export const MyOrderDetails = styled.div`
@@ -942,16 +940,16 @@ export const MyOrderCardTextWrap = styled.div`
 `;
 
 export const CancledgButonWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 export const CancledgButton = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 export const MyOrdersSellBtnWrapper = styled.div`
   display: flex;
@@ -972,17 +970,72 @@ export const MyOrdersSell = styled.p`
 `;
 
 export const MyOrdersInfoWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 1rem;
+`;
+export const MyOrdersInfoIcon = styled(BsInfoLg)`
+  width: 17px;
+  height: 17px;
+  color: ${ThemeColor.bg2};
+  cursor: pointer;
+`;
+//------------------------------------------------------------------------
+//Resourse available :
+export const AvailableNavWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: center;
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background-color: ${ThemeColor.bg2};
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+`;
+
+export const AvailableNavTextWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const AvailableCard = styled.div`
+  width: 100%;
+  color: white;
+  border-radius: 10px;
+  flex-shrink: 0;
+`;
+
+export const AvailableDetails = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(6px);
+`;
+
+export const AvailableCardTextWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  height: 100%;
+  width: 100px;
+`;
+
+export const AvailableRateIconWrapper = styled.div`
 display: flex;
 justify-content: center;
 align-items: center;
-padding: 0.4rem;
-border-radius: 6px;
-cursor: pointer;
-margin-right: 1rem;
-`
-export const MyOrdersInfoIcon = styled(BsInfoLg)`
-width: 17px;
-height: 17px;
-color: ${ThemeColor.bg2};
-cursor: pointer;
+
 `
