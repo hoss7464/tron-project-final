@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import "./Legacy.css";
 import {
   LegacyContainer,
@@ -60,11 +60,7 @@ const Legacy: React.FC = () => {
     availableBandwidth,
     availableEnergy,
     allEnergy,
-    isConnected,
-    refreshWalletData
   } = useTronWallet();
-  const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const bandwidthPercentage =
   allBandwidth &&  availableBandwidth

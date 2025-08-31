@@ -74,49 +74,60 @@ export const MainPageWrapper2 = styled.div`
 export const MainPageWrapper = styled.div`
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   padding-top: 1rem;
 `;
 
-export const MainLeftSection = styled.div`
+export const MainTopSection = styled.div`
   @media only screen and (min-width: 280px) and (max-width: 992px) {
-    display: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
   }
   @media only screen and (min-width: 993px) and (max-width: 1200px) {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    flex-direction: column;
-    width: 35%;
+    flex-direction: row;
+    width: 100%;
   }
   @media only screen and (min-width: 1201px) {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    flex-direction: column;
-    width: 32.8%;
+    flex-direction: row;
+    width: 100%;
   }
 `;
 
-export const MainRightSection = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding-bottom: 1rem;
+export const MainBottomSection = styled.div`
+  margin-top: 1.2rem;
+  margin-bottom: 1rem;
 
   @media only screen and (min-width: 280px) and (max-width: 992px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column-reverse;
     width: 100%;
-    padding-left: 0;
   }
   @media only screen and (min-width: 993px) and (max-width: 1200px) {
-    width: 65%;
-    padding-left: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
   }
   @media only screen and (min-width: 1201px) {
-    width: 68.2%;
-    padding-left: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
   }
 `;
 //-------------------------------------------------------------------------
@@ -274,7 +285,26 @@ export const FormWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    width: 100%;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 992px) {
+    width: 100%;
+  }
+
+  @media only screen and (min-width: 993px) and (max-width: 1080px) {
+    width: 32.3%;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    width: 32.3%;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    width: 32.3%;
+  }
 `;
 
 export const FormWrapper2 = styled.div`
@@ -600,27 +630,33 @@ export const OrdersWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  width: 100%;
   padding: 0.5rem;
   border: solid 2px ${ThemeColor.border1};
   @media only screen and (min-width: 280px) and (max-width: 576px) {
+    width: 100%;
     border-radius: 16px;
+    margin-top: 1rem;
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 577px) and (max-width: 992px) {
+    width: 100%;
     border-radius: 16px;
+    margin-top: 1rem;
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 993px) and (max-width: 1080px) {
     border-radius: 16px;
+    width: 66%;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     border-radius: 20px;
+    width: 66%;
   }
 
   @media only screen and (min-width: 1921px) {
     border-radius: 24px;
+    width: 66%;
   }
 `;
 
@@ -848,28 +884,33 @@ export const MyOrdersWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  width: 100%;
-  margin-top: 1.2rem;
   padding: 0.5rem;
   border: solid 2px ${ThemeColor.border1};
   @media only screen and (min-width: 280px) and (max-width: 576px) {
+    width: 100%;
     border-radius: 16px;
+
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 577px) and (max-width: 992px) {
+    width: 100%;
     border-radius: 16px;
+
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 993px) and (max-width: 1080px) {
     border-radius: 16px;
+    width: 66%;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     border-radius: 20px;
+    width: 66%;
   }
 
   @media only screen and (min-width: 1921px) {
     border-radius: 24px;
+    width: 66%;
   }
 `;
 
@@ -986,6 +1027,41 @@ export const MyOrdersInfoIcon = styled(BsInfoLg)`
 `;
 //------------------------------------------------------------------------
 //Resourse available :
+export const AvailableWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column;
+  padding: 0.5rem;
+  border: solid 2px ${ThemeColor.border1};
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    width: 100%;
+    border-radius: 16px;
+    margin-top: 1rem;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 992px) {
+    width: 100%;
+    border-radius: 16px;
+    margin-top: 1rem;
+  }
+
+  @media only screen and (min-width: 993px) and (max-width: 1080px) {
+    width: 32.3%;
+    border-radius: 16px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    width: 32.3%;
+    border-radius: 20px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    width: 32.3%;
+    border-radius: 24px;
+  }
+`;
 export const AvailableNavWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -1034,8 +1110,7 @@ export const AvailableCardTextWrap = styled.div`
 `;
 
 export const AvailableRateIconWrapper = styled.div`
-display: flex;
-justify-content: center;
-align-items: center;
-
-`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;

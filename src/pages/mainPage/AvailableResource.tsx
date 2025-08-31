@@ -1,7 +1,7 @@
 import React, {useMemo, useState, useEffect} from "react";
 import "./mainPage.css";
 import {
-  MyOrdersWrapper,
+  AvailableWrapper,
   MyOrdersScroll,
   MyOrdersNavWrapper,
   MyOrdersNavTextWrapper,
@@ -112,10 +112,10 @@ const AvailableResource: React.FC = () => {
 
   return (
     <>
-      <MyOrdersWrapper className="resource-available-bg2">
+      <AvailableWrapper className="resource-available-bg2">
         <OrderMainWrapper>
           <OrdersNavHeaderWrapper>
-            <LegacyCardName>Available</LegacyCardName>
+            <LegacyCardName>Fast Sell</LegacyCardName>
             <MyFilterComponent
               listKey="availableResource"
               options={["All","energy", "bandwidth"]}
@@ -161,7 +161,7 @@ const AvailableResource: React.FC = () => {
             </MyOrdersScroll>
           </OrdersCarouselWrapper>
         </OrderMainWrapper>
-      </MyOrdersWrapper>
+      </AvailableWrapper>
     </>
   );
 };

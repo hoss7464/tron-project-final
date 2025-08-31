@@ -4,8 +4,8 @@ import {
   MainPageContainer,
   MainPageWrapper,
   MainPageWrapper2,
-  MainLeftSection,
-  MainRightSection,
+  MainTopSection,
+  MainBottomSection,
 } from "./mainPageElements";
 import OrdersComponent from "./OrdersComponent";
 import MyOrdersComponent from "./MyOrdersComponent";
@@ -13,7 +13,6 @@ import OrderFormComponent from "./OrderFormComponent";
 import AvailableResource from "./AvailableResource";
 import Hero from "./HeroSection/Hero";
 import Legacy from "./LegacySection/Legacy";
-import MobileOrderForm from "./MobileOrderForm/MobileOrderForm";
 import MobileLegacy from "./MobileLegacy/mobileLegacy";
 
 const MainPage: React.FC = () => {
@@ -21,19 +20,18 @@ const MainPage: React.FC = () => {
     <>
       <MainPageContainer>
         <Hero />
-        <MobileOrderForm />
         <Legacy />
         <MainPageWrapper2>
           <MainPageWrapper>
-            <MainLeftSection>
+            <MainTopSection>
               <OrderFormComponent />
-              <AvailableResource />
-            </MainLeftSection>
-            <MainRightSection>
               <OrdersComponent />
-              <MyOrdersComponent />
+            </MainTopSection>
+            <MainBottomSection>
               <MobileLegacy />
-            </MainRightSection>
+              <AvailableResource />
+              <MyOrdersComponent />
+            </MainBottomSection>
           </MainPageWrapper>
         </MainPageWrapper2>
       </MainPageContainer>

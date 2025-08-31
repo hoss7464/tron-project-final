@@ -2,8 +2,6 @@ import React from "react";
 import { MobileLegacyContainer } from "./mobileLegacyElements";
 import "../LegacySection/Legacy.css";
 import {
-  LegacyHeaderWrapper,
-  LegacyHeader,
   LegacyCardWrapper2,
   LegacyCardWrapper3,
   LegacyCardIconNameWrapper,
@@ -58,9 +56,6 @@ const MobileLegacy: React.FC = () => {
   return (
     <>
       <MobileLegacyContainer>
-        <LegacyHeaderWrapper>
-          <LegacyHeader>My Resource</LegacyHeader>
-        </LegacyHeaderWrapper>
         <LegacyCardWrapper2 style={{ width: "100%" }}>
           <LegacyCardWrapper3 className="card-bg">
             <LegacyCardIconNameWrapper>
@@ -179,10 +174,10 @@ const MobileLegacy: React.FC = () => {
                   {address ? (
                     <>
                       <LegacyNumber style={{ color: "#430E00" }}>
-                        {availableBandwidth}/{" "}
+                        {allBandwidth}/{" "}
                       </LegacyNumber>
                       <LegacyNumber style={{ color: "#430E00" }}>
-                        {allBandwidth}
+                         {availableBandwidth}
                       </LegacyNumber>
                     </>
                   ) : (

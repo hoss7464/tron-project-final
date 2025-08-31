@@ -4,12 +4,14 @@ import React, {
   useEffect,
   useState,
   useRef,
+  useCallback,
 } from "react";
 import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../redux/actions/notifSlice";
 import { toggleRefresh } from "../redux/actions/refreshSlice";
+import { TronLinkEventManager } from "./AutomaticSwitchWallet";
 
 // Context interface
 interface TronWalletContextProps {
@@ -43,6 +45,7 @@ interface TronWalletContextProps {
   ) => Promise<fillOrder>;
   isConnected: boolean;
   refreshWalletData: () => Promise<void>;
+
 }
 //Disconnect interface :
 interface DisconnectResponse {
@@ -67,6 +70,34 @@ type fillOrder = {
   error?: string;
 };
 
+
+interface TronLinkEventData {
+  name: string;
+  data: any;
+}
+
+// types/tronlink.d.ts (create this file)
+export interface TronLinkWallet {
+  tronWeb: {
+    defaultAddress: {
+      base58: string;
+      hex: string;
+    };
+    on: (event: string, callback: (data: any) => void) => void;
+    off: (event: string, callback: (data: any) => void) => void;
+    ready: boolean;
+    // Add commonly used methods
+    request?: (args: any) => Promise<any>;
+    trx?: {
+      getBalance: (address: string) => Promise<number>;
+      sendTransaction: (transaction: any) => Promise<any>;
+    };
+  };
+  // Add any other properties you might need
+}
+
+
+
 // Create context
 const TronWalletContext = createContext<TronWalletContextProps | undefined>(
   undefined
@@ -87,8 +118,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   //dispatch :
   const dispatch = useDispatch();
-
+  
   const tronWebRef = useRef<any>(null);
+
   //States :
   const [address, setAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
@@ -104,12 +136,16 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //States for filling sell button :
   const [fillTRX, setFillTRX] = useState(false);
   const [fillTrxError, setFillTrxError] = useState<string | null>("");
-
+  //states for getting data from server each 3000 ms:
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+
+  
+  // Add a ref to track event listeners
+  const eventListenersAdded = useRef(false);
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapter = new TronLinkAdapter();
@@ -122,6 +158,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     return tronWebRef.current;
   };
+  //-------------------------------------------------------------------------------------
+  //Functions for switch wallet :
+  
   //-------------------------------------------------------------------------------------
   // Add cleanup on unmount
   const fetchWalletData = async (walletAddress: string) => {
@@ -198,6 +237,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //Funtion to connect wallet :
   const connectWallet = async () => {
     try {
+      
       await adapter.connect();
       //wallet address :
       const addr = adapter.address;
@@ -211,8 +251,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         return;
       }
-      // Fetch initial data
-      // await fetchWalletData(addr);
+
       //To get data from any network
       const window_tronweb = (window as any).tronWeb;
       //base url :
@@ -309,6 +348,37 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           severity: "success",
         })
       );
+
+       // After successful connection, set up event listeners
+    if (window.tronLink) {
+      const handleAccountChanged = (eventData: TronLinkEventData) => {
+        if (eventData.name === 'accountsChanged') {
+          const newAddress = window.tronLink?.tronWeb.defaultAddress.base58;
+          
+          if (newAddress) {
+            console.log('Account changed to:', newAddress);
+            setAddress(newAddress);
+            
+            // Refresh wallet data with the new address
+            startRefreshInterval(newAddress);
+            fetchWalletData(newAddress);
+            
+            dispatch(
+              showNotification({
+                name: "tron-account-changed",
+                message: "Wallet account changed",
+                severity: "info",
+              })
+            );
+          } else {
+            disconnectWallet2();
+          }
+        }
+      };
+
+      window.tronLink.tronWeb.on('addressChanged', handleAccountChanged);
+    }
+
     } catch (err) {
       // Check for TronLink rejection specifically
       const isTronLinkRejection =
@@ -353,7 +423,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
   };
-
   //-------------------------------------------------------------------------------------
   //Function to delete data from localStorage :
   const localStorageDeleteData = async () => {
@@ -401,6 +470,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       // First try to logout from server
       await localStorageDeleteData();
+      
 
       // Clear local state only after successful server logout
       setAddress(null);
@@ -411,6 +481,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableEnergy(null);
       setIsConnected(false);
       stopRefreshInterval();
+      eventListenersAdded.current = false;
 
       dispatch(
         showNotification({
@@ -428,6 +499,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAllEnergy(null);
       setAvailableEnergy(null);
       toggleRefresh();
+      eventListenersAdded.current = false;
 
       dispatch(
         showNotification({
@@ -453,6 +525,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableEnergy(null);
       setIsConnected(false);
       stopRefreshInterval();
+      eventListenersAdded.current = false;
     } catch (err) {
       // If server logout fails, we still clear local state but show an error
       setAddress(null);
@@ -462,8 +535,144 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAllEnergy(null);
       setAvailableEnergy(null);
       toggleRefresh();
+      eventListenersAdded.current = false;
     }
   };
+
+    // Function to handle network changes
+  const handleNetworkChanged = useCallback((eventData: TronLinkEventData) => {
+    if (eventData.name === 'networkChanged') {
+      console.log('Network changed:', eventData.data);
+      
+      // You might want to refresh data or show a notification
+      dispatch(
+        showNotification({
+          name: "tron-network-changed",
+          message: "Network changed, please check your connection",
+          severity: "warning",
+        })
+      );
+      
+      // Refresh data if connected
+      if (address) {
+        refreshWalletData();
+      }
+    }
+  }, [address, dispatch, refreshWalletData]);
+
+    // Function to handle account changes
+  const handleAccountChanged = useCallback((eventData: TronLinkEventData) => {
+    if (eventData.name === 'accountsChanged') {
+      const newAddress = window.tronLink?.tronWeb.defaultAddress.base58;
+      
+      if (newAddress) {
+        console.log('Account changed to:', newAddress);
+        setAddress(newAddress);
+        setIsConnected(true);
+        
+        // Refresh wallet data with the new address
+        startRefreshInterval(newAddress);
+        fetchWalletData(newAddress);
+        
+        // Show notification
+        dispatch(
+          showNotification({
+            name: "tron-account-changed",
+            message: "Wallet account changed successfully",
+            severity: "info",
+          })
+        );
+      } else {
+        // User disconnected or switched to an account without permission
+        disconnectWallet2();
+      }
+    }
+  }, [dispatch, disconnectWallet2, fetchWalletData, startRefreshInterval]);
+
+// Add this useEffect to handle initial connection and events
+useEffect(() => {
+  const setupTronLinkEvents = () => {
+    if (window.tronLink && window.tronLink.tronWeb) {
+      try {
+        console.log('Setting up TronLink event listeners');
+        
+        // Remove any existing listeners first to avoid duplicates
+        if (eventListenersAdded.current) {
+          window.tronLink.tronWeb.off('addressChanged', handleAccountChanged);
+          window.tronLink.tronWeb.off('networkChanged', handleNetworkChanged);
+        }
+        
+        // Add new listeners
+        window.tronLink.tronWeb.on('addressChanged', handleAccountChanged);
+        window.tronLink.tronWeb.on('networkChanged', handleNetworkChanged);
+        
+        eventListenersAdded.current = true;
+        console.log('TronLink event listeners setup complete');
+      } catch (error) {
+        console.error('Error setting up TronLink event listeners:', error);
+      }
+    }
+  };
+
+  // Check if TronLink is already available
+  if (window.tronLink) {
+    setupTronLinkEvents();
+  } else {
+    // If not available yet, wait for it to be injected
+    const checkTronLink = setInterval(() => {
+      if (window.tronLink) {
+        clearInterval(checkTronLink);
+        setupTronLinkEvents();
+      }
+    }, 100);
+    
+    // Cleanup interval on unmount
+    return () => clearInterval(checkTronLink);
+  }
+
+  // Cleanup function
+  return () => {
+    if (window.tronLink && eventListenersAdded.current) {
+      try {
+        console.log('Removing TronLink event listeners');
+        window.tronLink.tronWeb.off('addressChanged', handleAccountChanged);
+        window.tronLink.tronWeb.off('networkChanged', handleNetworkChanged);
+        eventListenersAdded.current = false;
+      } catch (error) {
+        console.error('Error removing TronLink event listeners:', error);
+      }
+    }
+  };
+}, [handleAccountChanged, handleNetworkChanged]);
+
+  // Check for existing wallet connection on component mount
+  useEffect(() => {
+    const checkExistingConnection = async () => {
+      try {
+        const storedWallet = localStorage.getItem("tronWalletAddress");
+        if (storedWallet) {
+          const walletData = JSON.parse(storedWallet);
+          const currentAddress = walletData.wallet_address;
+          
+          // Verify the address is still accessible in TronLink
+          if (window.tronLink?.tronWeb?.defaultAddress?.base58 === currentAddress) {
+            setAddress(currentAddress);
+            setIsConnected(true);
+            startRefreshInterval(currentAddress);
+            console.log('Restored existing wallet connection');
+          } else {
+            // Address doesn't match, clear storage
+            localStorage.removeItem("tronWalletAddress");
+          }
+        }
+      } catch (error) {
+        console.error('Error checking existing connection:', error);
+        localStorage.removeItem("tronWalletAddress");
+      }
+    };
+
+    checkExistingConnection();
+  }, []);
   //-------------------------------------------------------------------------------------
   //Function sign the message :
   const signMessage = async (message: string): Promise<string | null> => {
@@ -519,6 +728,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           setAvailableBandwidth(totalBw);
           setAllEnergy(all_energy);
           setAvailableEnergy(available_energy);
+
         } catch (e) {
           console.error("Auto-connect failed:", e);
         }
@@ -888,6 +1098,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         fillTrxError,
         refreshWalletData,
         isConnected,
+
       }}
     >
       {children}
