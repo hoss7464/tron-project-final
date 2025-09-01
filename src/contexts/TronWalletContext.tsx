@@ -24,7 +24,6 @@ interface TronWalletContextProps {
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   disconnectWallet2: () => void;
-  signMessage: (message: string) => Promise<string | null>;
   transferTrx: (
     toAddress: string,
     amount: number
@@ -135,7 +134,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //states for getting data from server each 3000 ms:
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
   //-------------------------------------------------------------------------------------
@@ -226,7 +225,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-    //Function to delete data from localStorage :
+  //Function to delete data from localStorage :
   const localStorageDeleteData = async () => {
     const baseURL = process.env.REACT_APP_BASE_URL;
     try {
@@ -356,167 +355,176 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   //Function for switching account :
-// Add this ref to track authentication state
-const isAuthenticating = useRef(false);
+  // Add this ref to track authentication state
+  const isAuthenticating = useRef(false);
 
-// Modify the handleAccountChanged function
-const handleAccountChanged = useCallback(
-  async (payload: any) => {
-    // Prevent multiple simultaneous authentication attempts
-    if (isAuthenticating.current) return;
-    
-    isAuthenticating.current = true;
-    
-    try {
-      const nextAddress =
-        payload?.base58 ??
-        (typeof payload === "string" ? payload : null) ??
-        window.tronLink?.tronWeb?.defaultAddress?.base58 ??
-        null;
+  // Modify the handleAccountChanged function
+  const handleAccountChanged = useCallback(
+    async (payload: any) => {
+      // Prevent multiple simultaneous authentication attempts
+      if (isAuthenticating.current) return;
 
-      if (nextAddress) {
-        // If we already have an address and it's different from the new one
-        if (address && address !== nextAddress) {
-          // Clear local state without full server disconnect
-          setAddress(null);
-          setBalance(null);
-          setAllBandwidth(null);
-          setAvailableBandwidth(null);
-          setAllEnergy(null);
-          setAvailableEnergy(null);
-          stopRefreshInterval();
+      isAuthenticating.current = true;
 
-          // Get the new message from server and sign it
-          const baseURL = process.env.REACT_APP_BASE_URL;
-          const window_tronweb = (window as any).tronWeb;
-          
-          // Get message from server
-          const generate_msg = await axios.get<{
-            success: boolean;
-            data: { nonce: string };
-          }>(`${baseURL}/Auth/get-message`, {
-            headers: { "Content-Type": "application/json" },
-            timeout: axiosTimeOut,
-          });
-          
-          const responseBody = generate_msg.data;
-          if (responseBody.success === false) {
-            dispatch(
-              showNotification({
-                name: "tron-error2",
-                message: "Tron Error : Something went wrong.",
-                severity: "error",
-              })
-            );
-            // If getting message fails, do full disconnect
-            await disconnectWallet2();
-            return;
-          }
+      try {
+        const nextAddress =
+          payload?.base58 ??
+          (typeof payload === "string" ? payload : null) ??
+          window.tronLink?.tronWeb?.defaultAddress?.base58 ??
+          null;
 
-          const message = responseBody.data.nonce;
-          window_tronweb.toHex(message);
-          
-          // Sign the message with the new wallet
-          const signature = await adapter.signMessage(message);
-          if (!signature) {
-            dispatch(
-              showNotification({
-                name: "tron-error3",
-                message: "Tron Error : User rejected signing message.",
-                severity: "error",
-              })
-            );
-            // If signing fails, do full disconnect
-            await disconnectWallet2();
-            return;
-          }
-          
-          // Send address, message, and signature to server
-          const postServerData = await axios.post<{
-            success: boolean;
-            data: { access_token: string };
-          }>(
-            `${baseURL}/Auth/verify-request`,
-            {
-              address: nextAddress,
-              message,
-              signature,
-            },
-            {
+        if (nextAddress) {
+          // If we already have an address and it's different from the new one
+          if (address && address !== nextAddress) {
+            // Clear local state without full server disconnect
+            setAddress(null);
+            setBalance(null);
+            setAllBandwidth(null);
+            setAvailableBandwidth(null);
+            setAllEnergy(null);
+            setAvailableEnergy(null);
+            stopRefreshInterval();
+
+            // Get the new message from server and sign it
+            const baseURL = process.env.REACT_APP_BASE_URL;
+            const window_tronweb = (window as any).tronWeb;
+
+            // Get message from server
+            const generate_msg = await axios.get<{
+              success: boolean;
+              data: { nonce: string };
+            }>(`${baseURL}/Auth/get-message`, {
               headers: { "Content-Type": "application/json" },
-              withCredentials: true,
               timeout: axiosTimeOut,
+            });
+
+            const responseBody = generate_msg.data;
+            if (responseBody.success === false) {
+              dispatch(
+                showNotification({
+                  name: "tron-error2",
+                  message: "Tron Error : Something went wrong.",
+                  severity: "error",
+                })
+              );
+              // If getting message fails, do full disconnect
+              await disconnectWallet2();
+              return;
             }
-          );
 
-          const server_data_json = postServerData.data;
-          if (server_data_json.success === false) {
-            dispatch(
-              showNotification({
-                name: "tron-error4",
-                message: "Tron Error : error fetching data from server.",
-                severity: "error",
-              })
+            const message = responseBody.data.nonce;
+            window_tronweb.toHex(message);
+
+            // Sign the message with the new wallet
+            const signature = await adapter.signMessage(message);
+            if (!signature) {
+              dispatch(
+                showNotification({
+                  name: "tron-error3",
+                  message: "Tron Error : User rejected signing message.",
+                  severity: "error",
+                })
+              );
+              // If signing fails, do full disconnect
+              await disconnectWallet2();
+              return;
+            }
+
+            // Send address, message, and signature to server
+            const postServerData = await axios.post<{
+              success: boolean;
+              data: { access_token: string };
+            }>(
+              `${baseURL}/Auth/verify-request`,
+              {
+                address: nextAddress,
+                message,
+                signature,
+              },
+              {
+                headers: { "Content-Type": "application/json" },
+                withCredentials: true,
+                timeout: axiosTimeOut,
+              }
             );
-            await disconnectWallet2();
-            return;
-          }
 
-          // Save new wallet data to localStorage
-          const localStorageSavedData = {
-            wallet_address: nextAddress,
-          };
-          
-          localStorage.setItem(
-            "tronWalletAddress",
-            JSON.stringify(localStorageSavedData)
-          );
-          
-          // Update state with new address
-          setAddress(nextAddress);
-          setIsConnected(true);
-          
-          // Start refresh interval with new address
-          startRefreshInterval(nextAddress);
-          
-          dispatch(
-            showNotification({
-              name: "tron-account-changed",
-              message: "Wallet account changed successfully",
-              severity: "success",
-            })
-          );
-        } else {
-          // First connection or same address
-          setIsConnected(true);
-          setAddress(nextAddress);
-          startRefreshInterval(nextAddress);
-          fetchWalletData(nextAddress);
-          
-          if (address !== nextAddress) {
+            const server_data_json = postServerData.data;
+            if (server_data_json.success === false) {
+              dispatch(
+                showNotification({
+                  name: "tron-error4",
+                  message: "Tron Error : error fetching data from server.",
+                  severity: "error",
+                })
+              );
+              await disconnectWallet2();
+              return;
+            }
+
+            // Save new wallet data to localStorage
+            const localStorageSavedData = {
+              wallet_address: nextAddress,
+            };
+
+            localStorage.setItem(
+              "tronWalletAddress",
+              JSON.stringify(localStorageSavedData)
+            );
+
+            // Update state with new address
+            setAddress(nextAddress);
+            setIsConnected(true);
+
+            // Start refresh interval with new address
+            startRefreshInterval(nextAddress);
+
             dispatch(
               showNotification({
                 name: "tron-account-changed",
                 message: "Wallet account changed successfully",
-                severity: "info",
+                severity: "success",
               })
             );
+          } else {
+            // First connection or same address
+            setIsConnected(true);
+            setAddress(nextAddress);
+            startRefreshInterval(nextAddress);
+            fetchWalletData(nextAddress);
+
+            if (address !== nextAddress) {
+              dispatch(
+                showNotification({
+                  name: "tron-account-changed",
+                  message: "Wallet account changed successfully",
+                  severity: "info",
+                })
+              );
+            }
           }
+        } else {
+          // No address found, disconnect
+          disconnectWallet2();
         }
-      } else {
-        // No address found, disconnect
-        disconnectWallet2();
+      } catch (err) {
+        console.error("Error during wallet change authentication:", err);
+        // If authentication fails, fully disconnect
+        await disconnectWallet2();
+      } finally {
+        isAuthenticating.current = false;
       }
-    } catch (err) {
-      console.error("Error during wallet change authentication:", err);
-      // If authentication fails, fully disconnect
-      await disconnectWallet2();
-    } finally {
-      isAuthenticating.current = false;
-    }
-  },
-  [address, dispatch, axiosTimeOut, adapter, disconnectWallet2, startRefreshInterval, fetchWalletData, stopRefreshInterval]
-);
+    },
+    [
+      address,
+      dispatch,
+      axiosTimeOut,
+      adapter,
+      disconnectWallet2,
+      startRefreshInterval,
+      fetchWalletData,
+      stopRefreshInterval,
+    ]
+  );
   //to track listeners :
   useEffect(() => {
     const tw = window.tronLink?.tronWeb;
@@ -744,20 +752,6 @@ const handleAccountChanged = useCallback(
         clearInterval(refreshIntervalRef.current);
         refreshIntervalRef.current = null;
       }
-    }
-  };
-  //-------------------------------------------------------------------------------------
-  //Function sign the message :
-  const signMessage = async (message: string): Promise<string | null> => {
-    try {
-      const tronWeb = (window as any).tronWeb;
-      if (!tronWeb) throw new Error("TronWeb not found");
-
-      const hexMessage = tronWeb.toHex(message);
-      const signature = await tronWeb.trx.signMessage(hexMessage);
-      return signature;
-    } catch (error) {
-      return null;
     }
   };
   //-------------------------------------------------------------------------------------
@@ -1160,7 +1154,6 @@ const handleAccountChanged = useCallback(
         connectWallet,
         disconnectWallet,
         disconnectWallet2,
-        signMessage,
         transferTrx,
         isTransferring,
         transferError,
