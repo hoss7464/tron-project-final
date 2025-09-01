@@ -123,7 +123,6 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           bulk_order: myBulkOrder,
         },
       };
-      console.log(postData)
 
       const orderResponse = await axios.post<ApiResponse>(
         `${baseURL}/order/CreateOrder`,
