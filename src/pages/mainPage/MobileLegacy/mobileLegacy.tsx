@@ -36,6 +36,8 @@ import addressIcon from "../../../assets/svg/AddressIcon.svg";
 import balanceIcon from "../../../assets/svg/BalanceIcon.svg";
 import energyIcon from "../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
+import { useDispatch } from "react-redux";
+import { showNotification } from "../../../redux/actions/notifSlice";
 
 const MobileLegacy: React.FC = () => {
   const {
@@ -46,11 +48,19 @@ const MobileLegacy: React.FC = () => {
     availableEnergy,
     allEnergy,
   } = useTronWallet();
+  const dispatch = useDispatch();
 
   //Funtion for copy button :
   const handleCopy = () => {
     if (address) {
       navigator.clipboard.writeText(address);
+      dispatch(
+        showNotification({
+          name: "copy-notif",
+          message: "Copied to clipboard",
+          severity: "success",
+        })
+      );
     }
   };
   return (
@@ -177,7 +187,7 @@ const MobileLegacy: React.FC = () => {
                         {allBandwidth}/{" "}
                       </LegacyNumber>
                       <LegacyNumber style={{ color: "#430E00" }}>
-                         {availableBandwidth}
+                        {availableBandwidth}
                       </LegacyNumber>
                     </>
                   ) : (

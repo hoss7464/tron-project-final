@@ -51,6 +51,8 @@ import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { useTronWallet } from "../../../contexts/TronWalletContext";
+import { useDispatch } from "react-redux";
+import { showNotification } from "../../../redux/actions/notifSlice";
 
 const Legacy: React.FC = () => {
   const {
@@ -61,20 +63,28 @@ const Legacy: React.FC = () => {
     availableEnergy,
     allEnergy,
   } = useTronWallet();
+  const dispatch = useDispatch();
 
   const bandwidthPercentage =
-  allBandwidth &&  availableBandwidth
-    ? Math.round(( allBandwidth / availableBandwidth ) * 100)
-    : 0;
+    allBandwidth && availableBandwidth
+      ? Math.round((allBandwidth / availableBandwidth) * 100)
+      : 0;
 
   const energyPercantage =
-     availableEnergy && allEnergy
-      ? Math.round((availableEnergy /  allEnergy) * 100)
+    availableEnergy && allEnergy
+      ? Math.round((availableEnergy / allEnergy) * 100)
       : 0;
   //Funtion for copy button :
   const handleCopy = () => {
     if (address) {
       navigator.clipboard.writeText(address);
+      dispatch(
+        showNotification({
+          name: "copy-notif",
+          message: "Copied to clipboard",
+          severity: "success",
+        })
+      );
     }
   };
 
