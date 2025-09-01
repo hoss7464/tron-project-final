@@ -750,6 +750,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       return 0;
     }
     const numericDelegateAmount = Number(myAmount);
+    console.log(numericDelegateAmount)
     const payoutCalc = energyPair * numericDelegateAmount;
     return payoutCalc;
   };

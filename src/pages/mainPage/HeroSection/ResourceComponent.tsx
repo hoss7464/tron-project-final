@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./Hero.css";
 import { useFetchData } from "../../../contexts/FetchDataContext";
-import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../redux/store/store";
 import {
   HeroResourceContainer,
   HeroResourceWrapper,
@@ -32,7 +33,11 @@ import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg";
 
 const ResourceComponent: React.FC = () => {
   //states :
-  const {resourceData} = useFetchData()
+  const { resourceData, fetchData } = useFetchData();
+
+  const refreshTrigger = useSelector(
+    (state: RootState) => state.refresh.refreshTrigger
+  );
   //ready resources states :
   const [energyReady, setEnergyReady] = useState<string | null>(null);
   const [bandwidthReady, setBandwidthReady] = useState<string | null>(null);
@@ -41,12 +46,31 @@ const ResourceComponent: React.FC = () => {
   const [bandwidth24, setBandwidth24] = useState<string | null>(null);
   //apy states :
   const [energyApySeller, setEnergyApySeller] = useState<string | null>(null);
-  const [bandwidthApySeller, setBandwidthApySeller] = useState<string | null>(null);
+  const [bandwidthApySeller, setBandwidthApySeller] = useState<string | null>(
+    null
+  );
 
   //Helper formatter :
-  const formatNumber = (num: number | string | undefined) => Number(num).toLocaleString();
+  const formatNumber = (num: number | string | undefined) =>
+    Number(num).toLocaleString();
 
-useEffect(() => {
+  // Effect to refresh data when refreshTrigger changes
+  useEffect(() => {
+    const refreshData = async () => {
+      try {
+        await fetchData();
+      } catch (error) {
+        console.error("Error refreshing data:", error);
+      }
+    };
+
+    if (refreshTrigger) {
+      refreshData();
+    }
+  }, [refreshTrigger, fetchData]);
+  // This effect runs whenever resourceData changes
+
+  useEffect(() => {
     if (resourceData && resourceData.success) {
       // Extract data from resourceData
       const energyReadyResource = resourceData.data.readyResource.energy;
@@ -64,7 +88,7 @@ useEffect(() => {
       setEnergyApySeller(formatNumber(energyApy));
       setBandwidthApySeller(formatNumber(bandwidthApy));
     }
-  }, [resourceData]); // This effect runs whenever resourceData changes
+  }, [resourceData]);
 
   return (
     <>
