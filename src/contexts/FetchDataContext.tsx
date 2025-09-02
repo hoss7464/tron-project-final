@@ -5,6 +5,7 @@ import React, {
   useState,
   ReactNode,
   useCallback,
+  useRef,
 } from "react";
 import { fetchAllUiData } from "../services/requestService";
 import {
@@ -14,6 +15,7 @@ import {
   AvailableResponse,
 } from "../services/requestService";
 import { useTronWallet } from "./TronWalletContext";
+import { useLoading } from "./LoaderContext";
 
 //context type
 interface FetchDataContextType {
@@ -23,13 +25,13 @@ interface FetchDataContextType {
   availableData: AvailableResponse | null;
   loading: boolean;
   error: Error | null;
-  fetchData: () => Promise<void>;
+  fetchData: (isInitialLoad?: boolean) => Promise<void>;
 }
 
 const FetchDataContext = createContext<FetchDataContextType | undefined>(
   undefined
 );
-// Props for the Provider component
+
 interface FetchDataProviderProps {
   children: ReactNode;
 }
@@ -38,6 +40,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   children,
 }) => {
   const { address, disconnectWallet2 } = useTronWallet();
+  const { incrementLoading, decrementLoading } = useLoading(); // Get loader functions
   const [orderData, setOrderData] = useState<OrdersResponse | null>(null);
   const [myOrderData, setMyOrderData] = useState<MyOrdersResponse | null>(null);
   const [resourceData, setResourceData] = useState<ResourceResponse | null>(null);
@@ -46,25 +49,23 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const [error, setError] = useState<Error | null>(null);
   const [authErrorCount, setAuthErrorCount] = useState(0);
   const [shouldStopPolling, setShouldStopPolling] = useState(false);
-  //-----------------------------------------------------------------------------------------------
+  const initialLoadRef = useRef(true); // Track initial load
+  
   // Function to handle authentication failures
   const handleAuthFailure = useCallback(() => {
     setAuthErrorCount((prev) => {
       const newCount = prev + 1;
-
-      // If we get multiple auth errors, disconnect and stop polling
       if (newCount > 1) {
         disconnectWallet2();
-        setShouldStopPolling(true); // Stop further polling
-        return 0; // Reset counter after disconnect
+        setShouldStopPolling(true);
+        return 0;
       }
       return newCount;
     });
   }, [disconnectWallet2]);
-  //-----------------------------------------------------------------------------------------------
+
   //Function to fetch data :
-  const fetchData = useCallback(async () => {
-    // Stop polling if we've detected auth issues
+  const fetchData = useCallback(async (isInitialLoad: boolean = false) => {
     if (shouldStopPolling) {
       return;
     }
@@ -73,14 +74,18 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
       setLoading(true);
       setError(null);
 
+      // Only show loader for initial load
+      if (isInitialLoad) {
+        incrementLoading();
+      }
+
       const allData = await fetchAllUiData(address, handleAuthFailure);
 
       setOrderData(allData.orders);
       setMyOrderData(allData.myOrders);
       setResourceData(allData.resources);
-      setAvailableData(allData.availables)
+      setAvailableData(allData.availables);
 
-      // Reset auth error count on successful request
       if (authErrorCount > 0) {
         setAuthErrorCount(0);
       }
@@ -91,38 +96,45 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
       );
     } finally {
       setLoading(false);
+      // Only decrement for initial load
+      if (isInitialLoad) {
+        decrementLoading();
+      }
     }
-  }, [address, handleAuthFailure, authErrorCount, shouldStopPolling]);
-  //-----------------------------------------------------------------------------------------------
+  }, [address, handleAuthFailure, authErrorCount, shouldStopPolling, incrementLoading, decrementLoading]);
+
   useEffect(() => {
-    // Reset polling state when address changes (new wallet connection)
     setShouldStopPolling(false);
     setAuthErrorCount(0);
+    initialLoadRef.current = true; // Reset initial load flag when address changes
   }, [address]);
 
   useEffect(() => {
-    // Fetch data immediately on mount
-    fetchData();
+    // For initial load, pass true to show loader
+    if (initialLoadRef.current) {
+      fetchData(true);
+      initialLoadRef.current = false; // Mark initial load as done
+    }
 
-    // Don't set up interval if we should stop polling
     if (shouldStopPolling) {
       return;
     }
 
-    // Set up the single, global interval
     const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME)
-    const intervalId = setInterval(fetchData, globalReqTime);
+    const intervalId = setInterval(() => {
+      // Subsequent calls don't show loader
+      fetchData(false);
+    }, globalReqTime);
 
-    // Cleanup: This ONE clearInterval will stop the global refresh
     return () => clearInterval(intervalId);
-  }, [fetchData, shouldStopPolling]); // Add fetchData and shouldStopPolling to dependencies
+  }, [fetchData, shouldStopPolling]);
 
   const value: FetchDataContextType = {
     orderData,
     myOrderData,
     resourceData,
     availableData,
-    fetchData,
+    fetchData: () => fetchData(false), // Default to not showing loader
     loading,
     error,
   };
@@ -134,7 +146,6 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   );
 };
 
-// Custom hook to use the context
 export const useFetchData = (): FetchDataContextType => {
   const context = useContext(FetchDataContext);
   if (context === undefined) {
