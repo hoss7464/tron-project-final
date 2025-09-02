@@ -20,6 +20,7 @@ interface TronWalletContextProps {
   availableBandwidth: number | null;
   allEnergy: number | null;
   availableEnergy: number | null;
+  accessToken: string | null; //
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   disconnectWallet2: () => void;
@@ -133,6 +134,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //states for getting data from server each 3000 ms:
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  //state for access token : 
+  const [accessToken, setAccessTokenState] = useState<string | null>(null);
 
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
@@ -152,6 +155,31 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     return tronWebRef.current;
   };
+  //-------------------------------------------------------------------------------------
+  //access token functions: 
+  // Helper function to set access token with localStorage persistence
+  const setAccessToken = useCallback((token: string | null) => {
+    setAccessTokenState(token);
+    if (token) {
+      localStorage.setItem('tronAccessToken', token);
+    } else {
+      localStorage.removeItem('tronAccessToken');
+    }
+  }, []);
+
+    // Helper function to clear access token
+  const clearAccessToken = useCallback(() => {
+    setAccessTokenState(null);
+    localStorage.removeItem('tronAccessToken');
+  }, []);
+
+    // Load token from localStorage on initial render
+  useEffect(() => {
+    const storedToken = localStorage.getItem('tronAccessToken');
+    if (storedToken) {
+      setAccessTokenState(storedToken);
+    }
+  }, []);
   //-------------------------------------------------------------------------------------
   // Add cleanup on unmount
   const fetchWalletData = async (walletAddress: string) => {
@@ -283,6 +311,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsConnected(false);
       stopRefreshInterval();
       eventListenersAdded.current = false;
+      clearAccessToken();
 
       dispatch(
         showNotification({
@@ -327,6 +356,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsConnected(false);
       stopRefreshInterval();
       eventListenersAdded.current = false;
+      clearAccessToken();
     } catch (err) {
       // If server logout fails, we still clear local state but show an error
       setAddress(null);
@@ -464,6 +494,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
               return;
             }
 
+            const access_token =  server_data_json.data.access_token;
+            setAccessToken(access_token);
+
             // Save new wallet data to localStorage
             const localStorageSavedData = {
               wallet_address: nextAddress,
@@ -526,6 +559,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       startRefreshInterval,
       fetchWalletData,
       stopRefreshInterval,
+      accessToken,
     ]
   );
   //to track listeners :
@@ -692,6 +726,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       //To get access token :
       const access_Token = server_data_json.data.access_token;
+      setAccessToken(access_Token)
       //To save refressh_token, access_token, wallet address into a json
       const localStorageSavedData = {
         wallet_address: addr,
@@ -757,6 +792,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         clearInterval(refreshIntervalRef.current);
         refreshIntervalRef.current = null;
       }
+
+      clearAccessToken();
     }
   };
   //-------------------------------------------------------------------------------------
@@ -1155,6 +1192,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         availableBandwidth,
         availableEnergy,
         allEnergy,
+        accessToken,
         connectWallet,
         disconnectWallet,
         disconnectWallet2,

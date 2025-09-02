@@ -99,6 +99,7 @@ const MyOrdersComponent: React.FC = () => {
     null
   );
 
+
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
   );
