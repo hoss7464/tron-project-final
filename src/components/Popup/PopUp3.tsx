@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -111,7 +111,9 @@ const PopUp3: React.FC<Popup3Types> = ({
   //States :
   //states for requester input :
   const [requesterInput, setRequesterInput] = useState("");
+ 
   const [requesterError, setRequesterError] = useState<string | null>(null);
+    
   //to get address from useTronWallet :
   const { address, fillOrder } = useTronWallet();
   //state for candelegated amount :
@@ -261,7 +263,6 @@ const PopUp3: React.FC<Popup3Types> = ({
     try {
       // First, update the maxCandle value by calling maxCandleHandler
       await maxCandleHandler();
-      console.log(maxCandle);
 
       // Then set the delegated amount after maxCandle is updated
       if (maxCandle !== null) {
@@ -423,6 +424,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             "Content-Type": "application/json",
           },
           timeout: axiosTimeOut,
+          validateStatus : (status : number) => status < 500
         }
       );
       //step2 ----> send data towards tronlink after checking data is successfull :
@@ -511,6 +513,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                 "Content-Type": "application/json",
               },
               timeout: axiosTimeOut,
+              validateStatus : (status : number) => status < 500
             }
           );
         }
@@ -745,14 +748,14 @@ const PopUp3: React.FC<Popup3Types> = ({
   };
   //-------------------------------------------------------------------------------------------
   //Function to calculate payout :
-  const handlePayout = (energyPair: number | null, myAmount: string) => {
-    if (energyPair === null) {
+  const handlePayout = useMemo(() => {
+    if (pairTrx === null || delegatedAmount === "" || delegatedAmount === "0") {
       return 0;
     }
-    const numericDelegateAmount = Number(myAmount);
-    const payoutCalc = energyPair * numericDelegateAmount;
-    return payoutCalc;
-  };
+    const numericDelegateAmount = Number(delegatedAmount);
+    console.log("Payout calculated:", numericDelegateAmount);
+    return pairTrx * numericDelegateAmount;
+  }, [delegatedAmount, pairTrx]);
 
   //-------------------------------------------------------------------------------------------
   if (!order) return null;
@@ -1041,7 +1044,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                     color: "#430E00",
                   }}
                 >
-                  {Number(handlePayout(pairTrx, delegatedAmount).toFixed(3))}{" "}
+                  {Number(handlePayout.toFixed(3))}{" "}
                   TRX
                 </Popup2Item>
               </Popup2ItemWrapper>
@@ -1097,4 +1100,4 @@ const PopUp3: React.FC<Popup3Types> = ({
   );
 };
 
-export default PopUp3;
+export default React.memo(PopUp3);

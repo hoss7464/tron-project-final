@@ -135,6 +135,7 @@ export const fetchAllUiData = async (
     const ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
       headers: { "Content-Type": "application/json" },
       timeout: axiosTimeOut,
+      validateStatus : (status : number) => status < 500
     });
 
     const resourcesPromise = axios.get<ResourceResponse>(
@@ -142,6 +143,7 @@ export const fetchAllUiData = async (
       {
         headers: { "Content-Type": "application/json" },
         timeout: axiosTimeOut,
+        validateStatus : (status : number) => status < 500
       }
     );
 
@@ -150,6 +152,7 @@ export const fetchAllUiData = async (
       {
         headers: { "Content-Type": "application/json" },
         timeout: axiosTimeOut,
+        validateStatus : (status : number) => status < 500
       }
     );
 
@@ -164,6 +167,7 @@ export const fetchAllUiData = async (
             headers: { "Content-Type": "application/json" },
             timeout: axiosTimeOut,
             withCredentials: true,
+            validateStatus : (status : number) => status < 500
           }
         );
 

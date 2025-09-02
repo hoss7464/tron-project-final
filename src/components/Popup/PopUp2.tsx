@@ -133,6 +133,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           },
           timeout: axiosTimeOut,
           withCredentials: true,
+          validateStatus : (status : number) => status < 500
         }
       );
 
@@ -161,6 +162,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 "Content-Type": "application/json",
               },
               timeout: axiosTimeOut,
+              validateStatus : (status : number) => status < 500
             }
           );
 

@@ -243,7 +243,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         const response = await axios.post<DisconnectResponse>(
           `${baseURL}/Auth/disconnect`,
           {},
-          { withCredentials: true, timeout: axiosTimeOut }
+          { withCredentials: true, timeout: axiosTimeOut, validateStatus : (status : number) => status < 500 }
         );
         if (response.data.success === false) {
           dispatch(
@@ -397,6 +397,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             }>(`${baseURL}/Auth/get-message`, {
               headers: { "Content-Type": "application/json" },
               timeout: axiosTimeOut,
+              validateStatus : (status : number) => status < 500
             });
 
             const responseBody = generate_msg.data;
@@ -446,6 +447,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
                 timeout: axiosTimeOut,
+                validateStatus : (status : number) => status < 500
               }
             );
 
@@ -626,6 +628,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }>(`${baseURL}/Auth/get-message`, {
         headers: { "Content-Type": "application/json" },
         timeout: axiosTimeOut,
+        validateStatus : (status : number) => status < 500
       });
       //To convert he message into json :
       const responseBody = generate_msg.data;
@@ -670,6 +673,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
           timeout: axiosTimeOut,
+          validateStatus : (status : number) => status < 500
         }
       );
 
@@ -1088,7 +1092,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const txResult = await tronWeb.trx.sendRawTransaction(signedTx);
-      console.log(txResult);
 
       if (txResult?.code) {
         dispatch(

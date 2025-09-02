@@ -103,8 +103,7 @@ const Notification: React.FC = () => {
           lg: "35%",
         },
         position: "fixed",
-        top: 0,
-        right: 0,
+     
         zIndex: 9999,
         padding: "16px",
         boxSizing: "border-box",

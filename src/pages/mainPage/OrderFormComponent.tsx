@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useLoading } from "../../contexts/LoaderContext";
-import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
@@ -125,8 +123,6 @@ const DropdownIconWithText: React.FC = () => {
 //-------------------------------------------------------------------------------------
 const OrderFormComponent: React.FC = () => {
   //States :
-  //loader states :
-  const { incrementLoading, decrementLoading } = useLoading();
   //translation states :
   const { t } = useTranslation();
   const { resourceData, fetchData } = useFetchData();
@@ -514,19 +510,19 @@ const OrderFormComponent: React.FC = () => {
     return "";
   };
 
-const handlePriceChange = (
-  event: React.SyntheticEvent<Element, Event> | null, 
-  newValue: string | null
-) => {
-  const value = newValue || "";
-  setInputValue(value);
-  priceWasManuallyChanged.current = true;
-  
-  if (value.trim() !== "") {
-    const errorMessage = validatePrice(value);
-    setPriceError(errorMessage);
-  }
-};
+  const handlePriceChange = (
+    event: React.SyntheticEvent<Element, Event> | null,
+    newValue: string | null
+  ) => {
+    const value = newValue || "";
+    setInputValue(value);
+    priceWasManuallyChanged.current = true;
+
+    if (value.trim() !== "") {
+      const errorMessage = validatePrice(value);
+      setPriceError(errorMessage);
+    }
+  };
   //Function to filter the dropdown to shows nothing if the entered value was more than max-price :
   const filterPriceOptions = (
     options: typeof priceOptions,
@@ -562,34 +558,35 @@ const handlePriceChange = (
     return Number(selectedPrice); // Return the numeric value
   };
   //--------------------------------------------------------------------------------------
-    // Reset the flag when switchBtn changes
+  // Reset the flag when switchBtn changes
   useEffect(() => {
     durationWasManuallyChanged.current = false;
     priceWasManuallyChanged.current = false;
   }, [switchBtn]);
 
-    // 2. This useEffect immediately updates duration and price when switchBtn changes
-useEffect(() => {
-  // When switchBtn changes, immediately use the existing data if available
-  if (minAmountPrice.length > 0) {
-    const defaultDuration = "30 days";
-    const durationInSeconds = getDurationInSeconds(defaultDuration);
-    
-    // Set duration immediately
-    setDurationValue(defaultDuration);
-    setDurationInSec(durationInSeconds);
-    
-    // Set price immediately if we have the data
-    const matchedItem = getMatchedRate(durationInSeconds);
-    if (matchedItem) {
-      const rate = switchBtn === "energy" 
-        ? matchedItem.rate.energy 
-        : matchedItem.rate.bandwidth;
-      setDynamicPlaceholder(`Min price: ${rate}`);
-      setInputValue(rate.toString());
+  // 2. This useEffect immediately updates duration and price when switchBtn changes
+  useEffect(() => {
+    // When switchBtn changes, immediately use the existing data if available
+    if (minAmountPrice.length > 0) {
+      const defaultDuration = "30 days";
+      const durationInSeconds = getDurationInSeconds(defaultDuration);
+
+      // Set duration immediately
+      setDurationValue(defaultDuration);
+      setDurationInSec(durationInSeconds);
+
+      // Set price immediately if we have the data
+      const matchedItem = getMatchedRate(durationInSeconds);
+      if (matchedItem) {
+        const rate =
+          switchBtn === "energy"
+            ? matchedItem.rate.energy
+            : matchedItem.rate.bandwidth;
+        setDynamicPlaceholder(`Min price: ${rate}`);
+        setInputValue(rate.toString());
+      }
     }
-  }
-}, [switchBtn]);
+  }, [switchBtn]);
 
   //To render dynamic options in price dropdown :
   useEffect(() => {
@@ -602,7 +599,11 @@ useEffect(() => {
   }, [switchBtn, minAmountPrice]);
 
   useEffect(() => {
-    if (durationInSec !== null && !priceWasManuallyChanged.current && minAmountPrice.length > 0) {
+    if (
+      durationInSec !== null &&
+      !priceWasManuallyChanged.current &&
+      minAmountPrice.length > 0
+    ) {
       const matchedItem = getMatchedRate(durationInSec);
       if (matchedItem) {
         const rate =
@@ -926,7 +927,19 @@ useEffect(() => {
             {/** Form amount input component */}
             <FormAddInputLabelWrapper>
               <FormAddLabelWrapper>
-                <FormAddLabel>Amount</FormAddLabel>
+                <FormAddLabel>
+                  Amount
+                  {amount && (
+                    <span>
+                      {" "}
+                      (
+                      {switchBtn === "energy"
+                        ? `minimum ${minAmount.energy}K`
+                        : `minimum ${minAmount.bandwidth}K`}
+                      )
+                    </span>
+                  )}
+                </FormAddLabel>
                 {amountError && (
                   <FormErrorWrapper>
                     <FormError>{amountError}</FormError>
