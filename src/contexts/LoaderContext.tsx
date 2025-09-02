@@ -16,13 +16,14 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [loadingCount, setLoadingCount] = useState(0);
   const [showLoader, setShowLoader] = useState(false);
   const [minTimeElapsed, setMinTimeElapsed] = useState(false);
+  const loadingTime = Number(process.env.REACT_APP_LOADER_TIME)
 
   const incrementLoading = () => {
     setLoadingCount(prev => {
       if (prev === 0) {
         setShowLoader(true);
         setMinTimeElapsed(false);
-        setTimeout(() => setMinTimeElapsed(true), 3000); // Minimum 5 seconds
+        setTimeout(() => setMinTimeElapsed(true), loadingTime); // Minimum 3 seconds
       }
       return prev + 1;
     });

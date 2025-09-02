@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
 import { showNotification } from "../../redux/actions/notifSlice";
+import { useFetchData } from "../../contexts/FetchDataContext";
+import { ResourceResponse } from "../../services/requestService";
 import "./mainPage.css";
 import {
   FormControl,
@@ -71,15 +73,6 @@ import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import PopUp2 from "../../components/Popup/PopUp2";
 //-------------------------------------------------------------------------------------
-// Define the type for the data structure
-interface SettingUI {
-  data: {
-    minAmount?: any;
-    ratesByDuration?: any;
-    longTermData?: any;
-  };
-}
-//-------------------------------------------------------------------------------------
 //Duration input components :
 const boxStyle = {
   px: 1,
@@ -136,6 +129,7 @@ const OrderFormComponent: React.FC = () => {
   const { incrementLoading, decrementLoading } = useLoading();
   //translation states :
   const { t } = useTranslation();
+  const { resourceData, fetchData } = useFetchData();
   //redux dispatch :
   const dispatch = useDispatch();
   const refreshTrigger = useSelector(
@@ -153,7 +147,7 @@ const OrderFormComponent: React.FC = () => {
   //Setting button (Bulk order) states :
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   //Store whole fetch data in one state :
-  const [wholeData, setWholeData] = useState<SettingUI | null>(null);
+  const [wholeData, setWholeData] = useState<ResourceResponse | null>(null);
   //Amount input states:
   const [amount, setAmount] = useState("");
   const [minAmount, setMinAmount] = useState<{
@@ -183,6 +177,9 @@ const OrderFormComponent: React.FC = () => {
   //States for date and time :
   const [currentDate, setCurrentDate] = useState<string>("");
   const [currentTime, setCurrentTime] = useState<string>("");
+
+  const durationWasManuallyChanged = useRef(false);
+  const priceWasManuallyChanged = useRef(false);
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -287,39 +284,30 @@ const OrderFormComponent: React.FC = () => {
   //--------------------------------------------------------------------------------------
   //Function to store the whole data for order form in it from server :
   useEffect(() => {
-    const getMinimumAmountDuration = async () => {
-      const baseURL = process.env.REACT_APP_BASE_URL;
-      //we use the loader tracker that loader stays loading until minimum prices will get from server :
-      incrementLoading();
+    const refreshData = async () => {
       try {
-        const res = await axios.get<SettingUI>(`${baseURL}/Setting/UI`, {
-          headers: { "Content-Type": "application/json" },
-          timeout: axiosTimeOut,
-        });
-        // store full response in one state
-        setWholeData(res.data);
+        await fetchData();
       } catch (error) {
-        console.error("Failed to fetch setting UI:", error);
-      } finally {
-        //we finish the tracking operation when fetching data ends :
-        decrementLoading();
+        console.error("Error refreshing data:", error);
       }
     };
-    getMinimumAmountDuration();
-  }, [refreshTrigger]);
 
+    if (refreshTrigger) {
+      refreshData();
+    }
+  }, [refreshTrigger, fetchData]);
   //Function to get states from stored data :
   useEffect(() => {
     //Function to get minium amount and minimum price :
-    if (!wholeData || !wholeData.data) return;
+    if (!resourceData) return;
 
-    if (wholeData?.data?.minAmount) {
-      setMinAmount(wholeData.data.minAmount);
+    if (resourceData?.data?.minAmount) {
+      setMinAmount(resourceData.data.minAmount);
     }
-    if (wholeData?.data?.ratesByDuration) {
-      setMinAmountPrice(wholeData.data.ratesByDuration);
+    if (resourceData?.data?.ratesByDuration) {
+      setMinAmountPrice(resourceData.data.ratesByDuration);
     }
-  }, [wholeData]);
+  }, [resourceData]);
   //--------------------------------------------------------------------------------------
   //Amount input functions :
   //Function for amount validation :
@@ -448,6 +436,8 @@ const OrderFormComponent: React.FC = () => {
 
     const errorMessage = validateDuration(value);
     setDurationError(errorMessage);
+
+    durationWasManuallyChanged.current = true;
   };
   //--------------------------------------------------------------------------------------
   //Price input functions :
@@ -524,6 +514,19 @@ const OrderFormComponent: React.FC = () => {
     return "";
   };
 
+const handlePriceChange = (
+  event: React.SyntheticEvent<Element, Event> | null, 
+  newValue: string | null
+) => {
+  const value = newValue || "";
+  setInputValue(value);
+  priceWasManuallyChanged.current = true;
+  
+  if (value.trim() !== "") {
+    const errorMessage = validatePrice(value);
+    setPriceError(errorMessage);
+  }
+};
   //Function to filter the dropdown to shows nothing if the entered value was more than max-price :
   const filterPriceOptions = (
     options: typeof priceOptions,
@@ -558,18 +561,48 @@ const OrderFormComponent: React.FC = () => {
 
     return Number(selectedPrice); // Return the numeric value
   };
-
   //--------------------------------------------------------------------------------------
-  //To render dynamic options in price dropdown :
+    // Reset the flag when switchBtn changes
   useEffect(() => {
+    durationWasManuallyChanged.current = false;
+    priceWasManuallyChanged.current = false;
+  }, [switchBtn]);
+
+    // 2. This useEffect immediately updates duration and price when switchBtn changes
+useEffect(() => {
+  // When switchBtn changes, immediately use the existing data if available
+  if (minAmountPrice.length > 0) {
     const defaultDuration = "30 days";
     const durationInSeconds = getDurationInSeconds(defaultDuration);
+    
+    // Set duration immediately
     setDurationValue(defaultDuration);
     setDurationInSec(durationInSeconds);
+    
+    // Set price immediately if we have the data
+    const matchedItem = getMatchedRate(durationInSeconds);
+    if (matchedItem) {
+      const rate = switchBtn === "energy" 
+        ? matchedItem.rate.energy 
+        : matchedItem.rate.bandwidth;
+      setDynamicPlaceholder(`Min price: ${rate}`);
+      setInputValue(rate.toString());
+    }
+  }
+}, [switchBtn]);
+
+  //To render dynamic options in price dropdown :
+  useEffect(() => {
+    if (!durationWasManuallyChanged.current && minAmountPrice.length > 0) {
+      const defaultDuration = "30 days";
+      const durationInSeconds = getDurationInSeconds(defaultDuration);
+      setDurationValue(defaultDuration);
+      setDurationInSec(durationInSeconds);
+    }
   }, [switchBtn, minAmountPrice]);
 
   useEffect(() => {
-    if (durationInSec !== null) {
+    if (durationInSec !== null && !priceWasManuallyChanged.current && minAmountPrice.length > 0) {
       const matchedItem = getMatchedRate(durationInSec);
       if (matchedItem) {
         const rate =
@@ -581,7 +614,11 @@ const OrderFormComponent: React.FC = () => {
         setInputValue(rate.toString());
       }
     }
-  }, [durationInSec, minAmountPrice]);
+  }, [durationInSec, minAmountPrice, switchBtn]);
+
+  useEffect(() => {
+    priceWasManuallyChanged.current = false;
+  }, [durationValue]);
 
   useEffect(() => {
     if (inputValue.trim() !== "") {
@@ -1163,8 +1200,8 @@ const OrderFormComponent: React.FC = () => {
                   openOnFocus
                   options={priceOptions}
                   inputValue={inputValue}
-                  onInputChange={(_, newInputValue) =>
-                    setInputValue(newInputValue)
+                  onInputChange={(event, newValue) =>
+                    handlePriceChange(event, newValue)
                   }
                   renderInput={(params) => (
                     <TextField

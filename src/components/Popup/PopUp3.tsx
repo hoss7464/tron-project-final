@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -164,7 +164,6 @@ const PopUp3: React.FC<Popup3Types> = ({
     const fetchMaxCandle = async () => {
       if (open && address && order && myDelegate !== null) {
         try {
-          await maxCandleHandler();
         } catch (error) {
           console.error("Error fetching max candle:", error);
         }
@@ -217,7 +216,8 @@ const PopUp3: React.FC<Popup3Types> = ({
         targetAddress = address;
       }
 
-      let { max_size: maxCandelegated } = await tronWeb.trx.getCanDelegatedMaxSize(targetAddress, resourceType);
+      let { max_size: maxCandelegated } =
+        await tronWeb.trx.getCanDelegatedMaxSize(targetAddress, resourceType);
 
       if (maxCandelegated === null || maxCandelegated === undefined) {
         maxCandelegated = 0;
@@ -261,7 +261,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     try {
       // First, update the maxCandle value by calling maxCandleHandler
       await maxCandleHandler();
-      console.log(maxCandle)
+      console.log(maxCandle);
 
       // Then set the delegated amount after maxCandle is updated
       if (maxCandle !== null) {
@@ -750,7 +750,6 @@ const PopUp3: React.FC<Popup3Types> = ({
       return 0;
     }
     const numericDelegateAmount = Number(myAmount);
-    console.log(numericDelegateAmount)
     const payoutCalc = energyPair * numericDelegateAmount;
     return payoutCalc;
   };
@@ -983,7 +982,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                 <Popup2Name>Max-Delegate:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{myDelegate?.toFixed(2)} TRX</Popup2Item>
+                <Popup2Item>{Number(myDelegate?.toFixed(2))} TRX</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
             {/*<Popup2NameItemWrapper>

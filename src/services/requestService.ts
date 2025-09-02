@@ -38,10 +38,11 @@ export interface MyOrdersResponse {
 interface Hold {
   qty: number;
   txid: string;
-  settledAt: string;}
+  settledAt: string;
+}
 
 export interface MyMarketOrder {
-   _id: string;
+  _id: string;
   createdAt: string;
   durationSec: number;
   freeze: number;
@@ -77,6 +78,22 @@ export interface ResourceResponse {
       energy: number | string;
       bandwidth: number | string;
     };
+    minAmount: {
+      energy: number;
+      bandwidth: number;
+    };
+    ratesByDuration: RateByDuration[];
+  };
+}
+
+// Interface for rate by duration items
+export interface RateByDuration {
+  exactDurationSeconds?: number;
+  minDurationSeconds?: number;
+  maxDurationSeconds?: number;
+  rate: {
+    energy: number;
+    bandwidth: number;
   };
 }
 //interface for error response
@@ -86,7 +103,7 @@ interface ApiErrorResponse {
   code?: string;
 }
 
-//interfaces for available response : 
+//interfaces for available response :
 export interface EnergyItem {
   rate: number;
   avilable: number; // Note: This appears to be a typo - should probably be "available"
@@ -114,7 +131,7 @@ export const fetchAllUiData = async (
   try {
     const hasConnectedWallet = !!walletAddress;
 
-    // Always fetch orders and resources, and available resources 
+    // Always fetch orders and resources, and available resources
     const ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
       headers: { "Content-Type": "application/json" },
       timeout: axiosTimeOut,
@@ -128,10 +145,14 @@ export const fetchAllUiData = async (
       }
     );
 
-    const AvailablePromise = axios.get<AvailableResponse>(`${baseUrl}/Setting/resource-available`, {
+    const AvailablePromise = axios.get<AvailableResponse>(
+      `${baseUrl}/Setting/resource-available`,
+      {
         headers: { "Content-Type": "application/json" },
         timeout: axiosTimeOut,
-      })
+      }
+    );
+
 
     let myOrdersResponse: MyOrdersResponse;
 

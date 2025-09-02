@@ -11,7 +11,6 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../redux/actions/notifSlice";
 import { toggleRefresh } from "../redux/actions/refreshSlice";
-import { TronLinkEventManager } from "./AutomaticSwitchWallet";
 
 // Context interface
 interface TronWalletContextProps {
@@ -137,6 +136,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+  const accountRefreshDataTime = Number(process.env.REACT_APP_ACCOUNT_REFRESH_DATA)
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapterRef = useRef<TronLinkAdapter | null>(null);
@@ -198,6 +198,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   // Function to start the refresh interval
   const startRefreshInterval = (walletAddress: string) => {
+    
     // Clear any existing interval
     stopRefreshInterval();
 
@@ -207,7 +208,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     // Set new interval (5000ms = 5 seconds)
     refreshIntervalRef.current = setInterval(async () => {
       await fetchWalletData(walletAddress);
-    }, 20000);
+    }, accountRefreshDataTime);
   };
 
   // Function to stop the refresh interval

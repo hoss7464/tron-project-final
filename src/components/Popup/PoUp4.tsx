@@ -45,6 +45,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
   onClose,
   orderData,
 }) => {
+  const tronscanUrl = process.env.REACT_APP_TRONSCAN_TXID_URL
   const MyHandleReject = () => {
     onClose();
   };
@@ -166,7 +167,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
                 <TableBody>
                   {orderData.holds.map((holdData, index) => {
                     const { date, time } = formatDateTime(holdData.settledAt);
-                    const transactionUrl = `https://nile.tronscan.org/#/transaction/${holdData.txid}`;
+                    const transactionUrl = `${tronscanUrl}/#/transaction/${holdData.txid}`;
                     return (
                       <TableRow
                         key={index}
