@@ -229,4 +229,4 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
   );
 };
 
-export default PopUp4;
+export default React.memo(PopUp4) ;

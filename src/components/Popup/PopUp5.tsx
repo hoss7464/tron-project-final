@@ -221,4 +221,4 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
   );
 };
 
-export default PopUp5;
+export default React.memo(PopUp5);

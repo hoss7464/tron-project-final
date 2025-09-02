@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
@@ -91,7 +91,7 @@ export interface MyInfoOrder {
 const MyOrdersComponent: React.FC = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { address } = useTronWallet();
+  const { address, accessToken } = useTronWallet();
   const { myOrderData, fetchData } = useFetchData();
   const [myModalOpen, setMyModalOpen] = useState(false);
   const [myCancelOpen, setMyCancelOpen] = useState(false);
@@ -157,6 +157,14 @@ const MyOrdersComponent: React.FC = () => {
     setMyCancelOpen(true);
     setSelectedOrder(order);
   };
+
+    const handlePopup4Close = useCallback(() => {
+    setMyModalOpen(false)
+  }, []);
+
+  const handlePopup5Close = useCallback(() => {
+    setMyCancelOpen(false)
+  }, []);
 
   return (
     <>
@@ -346,7 +354,7 @@ const MyOrdersComponent: React.FC = () => {
 
       <PopUp4
         open={myModalOpen}
-        onClose={() => setMyModalOpen(false)}
+        onClose={handlePopup4Close}
         orderData={
           selectedOrder
             ? myOrderData?.data?.find(
@@ -358,7 +366,7 @@ const MyOrdersComponent: React.FC = () => {
 
       <PopUp5
         open={myCancelOpen}
-        onClose={() => setMyCancelOpen(false)}
+        onClose={handlePopup5Close}
         orderData={selectedOrder}
       />
     </>

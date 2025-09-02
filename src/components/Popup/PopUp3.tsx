@@ -111,7 +111,6 @@ const PopUp3: React.FC<Popup3Types> = ({
   //States :
   //states for requester input :
   const [requesterInput, setRequesterInput] = useState("");
- 
   const [requesterError, setRequesterError] = useState<string | null>(null);
     
   //to get address from useTronWallet :
@@ -147,7 +146,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       setRequesterInput(address);
       setRequesterError(null);
     }
-  }, [open, address, order]);
+  }, [open, address]);
   //To change wallet address by user :
   const handleRequesterChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -160,6 +159,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       setRequesterError(null);
     }
   };
+
   //-------------------------------------------------------------------------------------------
   //Functions for maximum candelicate button :
   useEffect(() => {

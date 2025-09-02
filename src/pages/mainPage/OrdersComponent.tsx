@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
@@ -190,6 +190,9 @@ const calcAPY = (
     return calcTotal
   }
   //------------------------------------------------------------------------------------------------------------
+  const handleClose = useCallback(() => {
+  setIsModalOpen(false);
+}, []);
 
 
   return (
@@ -377,7 +380,7 @@ const calcAPY = (
       </OrdersWrapper>
       <PopUp3
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleClose}
         order={selectedOrder}
         myDelegate={delegateValue}
         pairTrx= {pairTrx}

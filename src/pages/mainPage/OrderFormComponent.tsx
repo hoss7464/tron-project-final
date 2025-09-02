@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
@@ -691,6 +691,10 @@ const OrderFormComponent: React.FC = () => {
     return { totalPrice: Number(totalPrice.toFixed(3)) };
   };
   let myPrice = calculateTotalPrice();
+
+    const handlePopup2Close = useCallback(() => {
+    setPopupOpen2(false)
+  }, []);
   //--------------------------------------------------------------------------------------
   //Submit form function :
   if (!myPrice) {
@@ -825,6 +829,7 @@ const OrderFormComponent: React.FC = () => {
   };
 
   //--------------------------------------------------------------------------------------
+
 
   return (
     <>
@@ -1428,7 +1433,7 @@ const OrderFormComponent: React.FC = () => {
 
       <PopUp2
         open={popupOpen2}
-        onClose={() => setPopupOpen2(false)}
+        onClose={handlePopup2Close}
         mySwitchBtn={switchBtn}
         myWalletAdd={walletAdd}
         myWalletAddress={walletAdd || (address ?? "")}
