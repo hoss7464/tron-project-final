@@ -1,4 +1,6 @@
 import React, { useRef } from "react";
+import "./Navbar.css";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -13,6 +15,12 @@ import {
   NavbarLeftSection,
   NavbarLogoWrapper,
   NavbarLogo,
+  NavbarLinkWrapper,
+  NavLink,
+  NavLinkIconWrapper,
+  NavMarketIcon,
+  NavBuyersIcon,
+  NavSellersIcon,
   NavbarRightSection,
   TranslateConnectWrapper,
   TranslateWrapper,
@@ -22,15 +30,16 @@ import {
   ConnectIconWrapper,
   ConnectIcon,
 } from "./NavElements";
-import {Menu, Box } from "@mui/material";
+import { Menu, Box } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useTronWallet } from "../../contexts/TronWalletContext";
-import Logo from "../../assets/svg/Logo/Logo3.svg"
+import Logo from "../../assets/svg/Logo/Logo3.svg";
 import { toggleRefresh } from "../../redux/actions/refreshSlice";
 
 const Navbar: React.FC = () => {
+  const Location = useLocation();
   const [age, setAge] = React.useState("EN");
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
@@ -57,11 +66,9 @@ const Navbar: React.FC = () => {
   };
 
   const shortenAddress = (address: string) => {
-  if (address.length <= 6) return address;
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
-};
-
-
+    if (address.length <= 6) return address;
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
+  };
 
   return (
     <>
@@ -71,6 +78,59 @@ const Navbar: React.FC = () => {
             <NavbarLogoWrapper>
               <NavbarLogo alt="Logo" src={Logo} />
             </NavbarLogoWrapper>
+            <NavbarLinkWrapper>
+              <NavLink
+                to="/"
+                className={Location.pathname === "/" ? "active-color" : ""}
+                style={{marginRight : "0.5rem"}}
+              >
+                <NavLinkIconWrapper>
+                  <NavMarketIcon
+                    className={
+                      Location.pathname === "/"
+                        ? "active-icon-color"
+                        : ""
+                    }
+                  />
+                </NavLinkIconWrapper>{" "}
+                Market
+              </NavLink>
+              <NavLink
+                to="/Buyers"
+                className={
+                  Location.pathname === "/Buyers" ? "active-color" : ""
+                }
+                style={{marginRight : "0.5rem"}}
+              >
+                <NavLinkIconWrapper>
+                  <NavBuyersIcon
+                    className={
+                      Location.pathname === "/Buyers"
+                        ? "active-icon-color"
+                        : ""
+                    }
+                  />
+                </NavLinkIconWrapper>{" "}
+                Buyers
+              </NavLink>
+              <NavLink
+                to="/Sellers"
+                className={
+                  Location.pathname === "/Sellers" ? "active-color" : ""
+                }
+              >
+                <NavLinkIconWrapper>
+                  <NavSellersIcon
+                    className={
+                      Location.pathname === "/Sellers"
+                        ? "active-icon-color"
+                        : ""
+                    }
+                  />
+                </NavLinkIconWrapper>{" "}
+                Sellers
+              </NavLink>
+            </NavbarLinkWrapper>
           </NavbarLeftSection>
           <NavbarRightSection>
             <TranslateConnectWrapper>
@@ -145,13 +205,13 @@ const Navbar: React.FC = () => {
                   onMouseEnter={handleAvatarEnter}
                   onMouseLeave={handleAvatarLeave}
                 >
-                  <span ref={avatarRef} >
-                    <ConnectWrapper >
+                  <span ref={avatarRef}>
+                    <ConnectWrapper>
                       <ConnectIconWrapper>
                         <ConnectIcon />
                       </ConnectIconWrapper>
                       <ConnectBtn>
-                        <ConnectText >{shortenAddress(address)}</ConnectText>
+                        <ConnectText>{shortenAddress(address)}</ConnectText>
                       </ConnectBtn>
                     </ConnectWrapper>
                   </span>

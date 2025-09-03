@@ -126,6 +126,8 @@ const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
 export const fetchAllUiData = async (
   walletAddress: string | null,
+  accessToken: string | null,
+  address : string | null,
   onAuthFailure?: () => void
 ) => {
   try {
@@ -135,7 +137,7 @@ export const fetchAllUiData = async (
     const ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
       headers: { "Content-Type": "application/json" },
       timeout: axiosTimeOut,
-      validateStatus: (status: number) => status < 500
+      validateStatus: (status: number) => status < 500,
     });
 
     const resourcesPromise = axios.get<ResourceResponse>(
@@ -143,7 +145,7 @@ export const fetchAllUiData = async (
       {
         headers: { "Content-Type": "application/json" },
         timeout: axiosTimeOut,
-        validateStatus: (status: number) => status < 500
+        validateStatus: (status: number) => status < 500,
       }
     );
 
@@ -152,7 +154,7 @@ export const fetchAllUiData = async (
       {
         headers: { "Content-Type": "application/json" },
         timeout: axiosTimeOut,
-        validateStatus: (status: number) => status < 500
+        validateStatus: (status: number) => status < 500,
       }
     );
 
@@ -163,10 +165,14 @@ export const fetchAllUiData = async (
         const myOrdersRes = await axios.get<MyOrdersResponse>(
           `${baseUrl}/order/myOrder`,
           {
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              //"accessToken": accessToken,
+              //"address" : address,
+            },
             timeout: axiosTimeOut,
             withCredentials: true,
-            validateStatus: (status: number) => status < 500
+            validateStatus: (status: number) => status < 500,
           }
         );
 
@@ -210,18 +216,22 @@ export const fetchAllUiData = async (
     }
 
     // Use Promise.allSettled instead of Promise.all
-    const [ordersListResult, resourceResult, AvailableResult] = await Promise.allSettled([
-      ordersPromise,
-      resourcesPromise,
-      AvailablePromise,
-    ]);
+    const [ordersListResult, resourceResult, AvailableResult] =
+      await Promise.allSettled([
+        ordersPromise,
+        resourcesPromise,
+        AvailablePromise,
+      ]);
 
     // Helper function to handle settled promises
-    const handleSettledPromise = <T,>(result: PromiseSettledResult<any>, defaultValue: T): T => {
-      if (result.status === 'fulfilled') {
+    const handleSettledPromise = <T>(
+      result: PromiseSettledResult<any>,
+      defaultValue: T
+    ): T => {
+      if (result.status === "fulfilled") {
         return result.value.data;
       } else {
-        console.error('Request failed:', result.reason);
+        console.error("Request failed:", result.reason);
         // You might want to handle different types of errors differently
         return defaultValue;
       }
@@ -230,7 +240,7 @@ export const fetchAllUiData = async (
     // Create default responses for each type
     const defaultOrdersResponse: OrdersResponse = {
       success: false,
-      data: []
+      data: [],
     };
 
     const defaultResourceResponse: ResourceResponse = {
@@ -240,20 +250,29 @@ export const fetchAllUiData = async (
         dailyRecovery: { energy: 0, bandwidth: 0 },
         apy: { energy: 0, bandwidth: 0 },
         minAmount: { energy: 0, bandwidth: 0 },
-        ratesByDuration: []
-      }
+        ratesByDuration: [],
+      },
     };
 
     const defaultAvailableResponse: AvailableResponse = {
       success: false,
       energy: [],
-      bandwidth: []
+      bandwidth: [],
     };
 
     // Extract data from settled promises
-    const orders = handleSettledPromise(ordersListResult, defaultOrdersResponse);
-    const resources = handleSettledPromise(resourceResult, defaultResourceResponse);
-    const availables = handleSettledPromise(AvailableResult, defaultAvailableResponse);
+    const orders = handleSettledPromise(
+      ordersListResult,
+      defaultOrdersResponse
+    );
+    const resources = handleSettledPromise(
+      resourceResult,
+      defaultResourceResponse
+    );
+    const availables = handleSettledPromise(
+      AvailableResult,
+      defaultAvailableResponse
+    );
 
     // Return a single object containing all the data with proper typing
     return {

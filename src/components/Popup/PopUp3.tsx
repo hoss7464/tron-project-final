@@ -118,7 +118,6 @@ const PopUp3: React.FC<Popup3Types> = ({
   const [maxCandle, setMaxCandle] = useState<number | null>(null);
   //state for delegate input :
   const [delegatedAmount, setDelegatedAmount] = useState<string>("");
-  console.log(delegatedAmount)
   const [delegateInputError, setDelegateInputError] = useState<string>("");
   //Multi signature states :
   const [multiSignature, setMultiSignature] = useState<string | null>(null);

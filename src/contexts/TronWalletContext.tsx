@@ -134,12 +134,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //states for getting data from server each 3000 ms:
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  //state for access token : 
+  //state for access token :
   const [accessToken, setAccessTokenState] = useState<string | null>(null);
 
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
-  const accountRefreshDataTime = Number(process.env.REACT_APP_ACCOUNT_REFRESH_DATA)
+  const accountRefreshDataTime = Number(
+    process.env.REACT_APP_ACCOUNT_REFRESH_DATA
+  );
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapterRef = useRef<TronLinkAdapter | null>(null);
@@ -156,26 +158,26 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     return tronWebRef.current;
   };
   //-------------------------------------------------------------------------------------
-  //access token functions: 
+  //access token functions:
   // Helper function to set access token with localStorage persistence
   const setAccessToken = useCallback((token: string | null) => {
     setAccessTokenState(token);
     if (token) {
-      localStorage.setItem('tronAccessToken', token);
+      localStorage.setItem("tronAccessToken", token);
     } else {
-      localStorage.removeItem('tronAccessToken');
+      localStorage.removeItem("tronAccessToken");
     }
   }, []);
 
-    // Helper function to clear access token
+  // Helper function to clear access token
   const clearAccessToken = useCallback(() => {
     setAccessTokenState(null);
-    localStorage.removeItem('tronAccessToken');
+    localStorage.removeItem("tronAccessToken");
   }, []);
 
-    // Load token from localStorage on initial render
+  // Load token from localStorage on initial render
   useEffect(() => {
-    const storedToken = localStorage.getItem('tronAccessToken');
+    const storedToken = localStorage.getItem("tronAccessToken");
     if (storedToken) {
       setAccessTokenState(storedToken);
     }
@@ -226,7 +228,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   // Function to start the refresh interval
   const startRefreshInterval = (walletAddress: string) => {
-    
     // Clear any existing interval
     stopRefreshInterval();
 
@@ -271,7 +272,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         const response = await axios.post<DisconnectResponse>(
           `${baseURL}/Auth/disconnect`,
           {},
-          { withCredentials: true, timeout: axiosTimeOut, validateStatus : (status : number) => status < 500 }
+          {
+            headers: {
+              "Content-Type": "application/json",
+             // accessToken: accessToken,
+            },
+            withCredentials: true,
+            timeout: axiosTimeOut,
+            validateStatus: (status: number) => status < 500,
+          }
         );
         if (response.data.success === false) {
           dispatch(
@@ -427,7 +436,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             }>(`${baseURL}/Auth/get-message`, {
               headers: { "Content-Type": "application/json" },
               timeout: axiosTimeOut,
-              validateStatus : (status : number) => status < 500
+              validateStatus: (status: number) => status < 500,
             });
 
             const responseBody = generate_msg.data;
@@ -477,7 +486,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
                 timeout: axiosTimeOut,
-                validateStatus : (status : number) => status < 500
+                validateStatus: (status: number) => status < 500,
               }
             );
 
@@ -494,7 +503,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
               return;
             }
 
-            const access_token =  server_data_json.data.access_token;
+            const access_token = server_data_json.data.access_token;
             setAccessToken(access_token);
 
             // Save new wallet data to localStorage
@@ -662,7 +671,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }>(`${baseURL}/Auth/get-message`, {
         headers: { "Content-Type": "application/json" },
         timeout: axiosTimeOut,
-        validateStatus : (status : number) => status < 500
+        validateStatus: (status: number) => status < 500,
       });
       //To convert he message into json :
       const responseBody = generate_msg.data;
@@ -707,7 +716,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
           timeout: axiosTimeOut,
-          validateStatus : (status : number) => status < 500
+          validateStatus: (status: number) => status < 500,
         }
       );
 
@@ -726,7 +735,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       //To get access token :
       const access_Token = server_data_json.data.access_token;
-      setAccessToken(access_Token)
+      setAccessToken(access_Token);
       //To save refressh_token, access_token, wallet address into a json
       const localStorageSavedData = {
         wallet_address: addr,
