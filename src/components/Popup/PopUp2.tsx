@@ -421,4 +421,4 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   );
 };
 
-export default PopUp2;
+export default React.memo(PopUp2) ;
