@@ -39,15 +39,15 @@ interface OrderSuccessPopupProps {
   open: boolean;
   onClose: () => void;
   mySwitchBtn: string | null;
-  myWalletAdd:string | null;
+  myWalletAdd: string | null;
   myWalletAddress: string | null;
   myAmount: string | null;
   myDuration: number | null;
-  myNumericSelectedPrice:number | null;
+  myNumericSelectedPrice: number | null;
   myTotalPrice: number;
   myPartialFill: boolean;
   myBulkOrder: boolean;
-  myCurrentDate: string; 
+  myCurrentDate: string;
   myCurrentTime: string;
   resetForm: () => void;
 }
@@ -133,15 +133,13 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           },
           timeout: axiosTimeOut,
           withCredentials: true,
-          validateStatus : (status : number) => status < 500
+          validateStatus: (status: number) => status < 500,
         }
       );
 
-      
-
       if (orderResponse.data.success === true) {
         const orderData = orderResponse.data.data;
-         
+
         if (orderData === null) {
           return;
         }
@@ -162,7 +160,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 "Content-Type": "application/json",
               },
               timeout: axiosTimeOut,
-              validateStatus : (status : number) => status < 500
+              validateStatus: (status: number) => status < 500,
             }
           );
 
@@ -174,12 +172,12 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 severity: "success",
               })
             );
+            
             onClose(); // Close popup automatically on success
-            resetForm(); //reset order form
+
             return;
           }
         }
-          
       } else {
         //do something with orderResponse
         dispatch(
@@ -201,6 +199,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
       );
     } finally {
       setIsProcessing(false);
+      
     }
   };
 
@@ -285,7 +284,9 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 <Popup2Name>Duration:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{formatStrictDuration(Number(myDuration))}</Popup2Item>
+                <Popup2Item>
+                  {formatStrictDuration(Number(myDuration))}
+                </Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
           </Box>
@@ -391,8 +392,9 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
               backgroundColor: "#430E00",
               borderRadius: "10px",
             }}
-          > {mySwitchBtn === "energy" ? "Sell energy" : "Sell bandwidth"}
-            
+          >
+            {" "}
+            {mySwitchBtn === "energy" ? "Sell energy" : "Sell bandwidth"}
           </Button>
 
           <Button
@@ -419,4 +421,4 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   );
 };
 
-export default React.memo(PopUp2) ;
+export default PopUp2;
