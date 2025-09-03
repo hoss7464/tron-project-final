@@ -99,7 +99,6 @@ const MyOrdersComponent: React.FC = () => {
     null
   );
 
-
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
   );
@@ -158,12 +157,12 @@ const MyOrdersComponent: React.FC = () => {
     setSelectedOrder(order);
   };
 
-    const handlePopup4Close = useCallback(() => {
-    setMyModalOpen(false)
+  const handlePopup4Close = useCallback(() => {
+    setMyModalOpen(false);
   }, []);
 
   const handlePopup5Close = useCallback(() => {
-    setMyCancelOpen(false)
+    setMyCancelOpen(false);
   }, []);
 
   return (
@@ -322,9 +321,9 @@ const MyOrdersComponent: React.FC = () => {
 
                       {myData.status === "completed" && (
                         <Tooltip title="completed">
-                        <CheckedSignWrapper>
-                          <CheckedSign />
-                        </CheckedSignWrapper>
+                          <CheckedSignWrapper>
+                            <CheckedSign />
+                          </CheckedSignWrapper>
                         </Tooltip>
                       )}
 
@@ -338,9 +337,9 @@ const MyOrdersComponent: React.FC = () => {
 
                       {myData.status === "cancelled" && (
                         <Tooltip title="canceled">
-                        <CanceledSignWrapper  >
-                          <CanceledSign />
-                        </CanceledSignWrapper>
+                          <CanceledSignWrapper>
+                            <CanceledSign />
+                          </CanceledSignWrapper>
                         </Tooltip>
                       )}
                     </MyOrderDetails>
@@ -352,23 +351,27 @@ const MyOrdersComponent: React.FC = () => {
         </OrderMainWrapper>
       </MyOrdersWrapper>
 
-      <PopUp4
-        open={myModalOpen}
-        onClose={handlePopup4Close}
-        orderData={
-          selectedOrder
-            ? myOrderData?.data?.find(
-                (order) => order._id === selectedOrder._id
-              ) || selectedOrder
-            : null
-        }
-      />
+      {myModalOpen && (
+        <PopUp4
+          open={myModalOpen}
+          onClose={handlePopup4Close}
+          orderData={
+            selectedOrder
+              ? myOrderData?.data?.find(
+                  (order) => order._id === selectedOrder._id
+                ) || selectedOrder
+              : null
+          }
+        />
+      )}
 
-      <PopUp5
-        open={myCancelOpen}
-        onClose={handlePopup5Close}
-        orderData={selectedOrder}
-      />
+      {myCancelOpen && (
+        <PopUp5
+          open={myCancelOpen}
+          onClose={handlePopup5Close}
+          orderData={selectedOrder}
+        />
+      )}
     </>
   );
 };

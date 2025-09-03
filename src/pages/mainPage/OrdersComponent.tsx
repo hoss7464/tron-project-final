@@ -49,7 +49,6 @@ import { durationToNumber } from "../../utils/durationToNum";
 import PopUp3 from "../../components/Popup/PopUp3";
 import { useFetchData } from "../../contexts/FetchDataContext";
 
-
 interface ServerResponse {
   success: boolean;
   data: MarketOrder[];
@@ -77,7 +76,7 @@ export interface MarketOrder {
 
 export const OrdersComponent: React.FC = () => {
   const dispatch = useDispatch();
-  const {orderData, fetchData} = useFetchData()
+  const { orderData, fetchData } = useFetchData();
   //States :
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,7 +86,7 @@ export const OrdersComponent: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<MarketOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [delegateValue, setDelegateValue] = useState<number | null>(null);
-  const [pairTrx , setPairTrx] = useState<number | null>(null)
+  const [pairTrx, setPairTrx] = useState<number | null>(null);
 
   //Selectors :
   const selectedFilter = useSelector(
@@ -101,16 +100,14 @@ export const OrdersComponent: React.FC = () => {
   useEffect(() => {
     const refreshData = async () => {
       try {
-        await fetchData(); 
-       
+        await fetchData();
       } catch (error) {
-        console.error('Error refreshing data:', error);
+        console.error("Error refreshing data:", error);
       }
     };
 
     if (refreshTrigger) {
       refreshData();
-    
     }
   }, [refreshTrigger, fetchData]);
 
@@ -143,22 +140,25 @@ export const OrdersComponent: React.FC = () => {
   const totalPages = Math.ceil(filteredAndSortedData.length / rowsPerPage);
   //------------------------------------------------------------------------------------------------------------
   //Function to calculate APY :
-const calcAPY = (
+  const calcAPY = (
     myTotal: number,
     myFreeze: number,
     myDuration: number,
     opts?: { compoundCapPerYear?: number }
   ): number => {
-    let days = durationToNumber(myDuration); 
-  if (!myFreeze || !days) return 0;
-  if(days > 0 && days < 1){
-    days = 1;
-  }
-  const rPeriod = myTotal / myFreeze;
-  const rawN = 365 / days;
-  const n = opts?.compoundCapPerYear != null ? Math.min(rawN, opts.compoundCapPerYear) : rawN;
- const APY = Number((Math.expm1(Math.log1p(rPeriod) * n) * 100).toFixed(2));
-  return APY 
+    let days = durationToNumber(myDuration);
+    if (!myFreeze || !days) return 0;
+    if (days > 0 && days < 1) {
+      days = 1;
+    }
+    const rPeriod = myTotal / myFreeze;
+    const rawN = 365 / days;
+    const n =
+      opts?.compoundCapPerYear != null
+        ? Math.min(rawN, opts.compoundCapPerYear)
+        : rawN;
+    const APY = Number((Math.expm1(Math.log1p(rPeriod) * n) * 100).toFixed(2));
+    return APY;
   };
   //------------------------------------------------------------------------------------------------------------
   //Functions for popup :
@@ -174,26 +174,25 @@ const calcAPY = (
       return;
     }
     const value = order.freeze - order.frozen;
-    const myPairTrx = order.energyPairTrx
+    const myPairTrx = order.energyPairTrx;
     setDelegateValue(value);
     setSelectedOrder(order);
     setIsModalOpen(true);
-    setPairTrx(myPairTrx)
+    setPairTrx(myPairTrx);
   };
   //------------------------------------------------------------------------------------------------------------
   //Function to calculate total price :
-  const handleTotal = (myFreeze : number, myPair : number | null) => {
+  const handleTotal = (myFreeze: number, myPair: number | null) => {
     if (myPair === null) {
       return 0;
     }
-    const calcTotal = myFreeze * myPair
-    return calcTotal
-  }
+    const calcTotal = myFreeze * myPair;
+    return calcTotal;
+  };
   //------------------------------------------------------------------------------------------------------------
   const handleClose = useCallback(() => {
-  setIsModalOpen(false);
-}, []);
-
+    setIsModalOpen(false);
+  }, []);
 
   return (
     <>
@@ -235,11 +234,10 @@ const calcAPY = (
                   </OrderNavTextWrapper>
                 </OrderNavTextWrapper1>
               </OrderNavWrapper>
-              
+
               <OrdersCard>
                 {paginatedData.map((myData, index) => {
                   const { date, time } = formatDateTime(myData.createdAt);
-                
 
                   return (
                     <OrdersDetail key={index}>
@@ -302,7 +300,13 @@ const calcAPY = (
                       <OrdersCardTextWrap>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>
-                            {Number(handleTotal(myData.freeze, myData.energyPairTrx).toFixed(3))} TRX
+                            {Number(
+                              handleTotal(
+                                myData.freeze,
+                                myData.energyPairTrx
+                              ).toFixed(3)
+                            )}{" "}
+                            TRX
                           </OrdersCardText1>
                         </OrdersCardTextWrapper2>
                       </OrdersCardTextWrap>
@@ -314,7 +318,7 @@ const calcAPY = (
                               const percent =
                                 (myData.frozen / myData.freeze) * 100;
                               const cappedPercent = Math.min(percent, 100);
-                              
+
                               if (cappedPercent >= 100) return "100%";
                               if (Number.isInteger(cappedPercent))
                                 return `${cappedPercent}%`;
@@ -378,13 +382,15 @@ const calcAPY = (
           />
         </OedersPaginationWrapper>
       </OrdersWrapper>
-      <PopUp3
-        open={isModalOpen}
-        onClose={handleClose}
-        order={selectedOrder}
-        myDelegate={delegateValue}
-        pairTrx= {pairTrx}
-      />
+      {isModalOpen && (
+        <PopUp3
+          open={isModalOpen}
+          onClose={handleClose}
+          order={selectedOrder}
+          myDelegate={delegateValue}
+          pairTrx={pairTrx}
+        />
+      )}
     </>
   );
 };

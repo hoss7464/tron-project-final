@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -107,14 +107,13 @@ const PopUp3: React.FC<Popup3Types> = ({
   pairTrx,
 }) => {
   const dispatch = useDispatch();
-
+    //to get address from useTronWallet :
+  const { address, fillOrder } = useTronWallet();
   //States :
   //states for requester input :
-  const [requesterInput, setRequesterInput] = useState("");
+  const [requesterInput, setRequesterInput] = useState(address ?? "");
   const [requesterError, setRequesterError] = useState<string | null>(null);
-    
-  //to get address from useTronWallet :
-  const { address, fillOrder } = useTronWallet();
+
   //state for candelegated amount :
   const [maxCandle, setMaxCandle] = useState<number | null>(null);
   //state for delegate input :

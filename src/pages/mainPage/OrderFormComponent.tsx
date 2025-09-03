@@ -692,8 +692,8 @@ const OrderFormComponent: React.FC = () => {
   };
   let myPrice = calculateTotalPrice();
 
-    const handlePopup2Close = useCallback(() => {
-    setPopupOpen2(false)
+  const handlePopup2Close = useCallback(() => {
+    setPopupOpen2(false);
   }, []);
   //--------------------------------------------------------------------------------------
   //Submit form function :
@@ -829,7 +829,6 @@ const OrderFormComponent: React.FC = () => {
   };
 
   //--------------------------------------------------------------------------------------
-
 
   return (
     <>
@@ -1430,33 +1429,34 @@ const OrderFormComponent: React.FC = () => {
           </Form>
         </FormWrapper2>
       </FormWrapper>
-
-      <PopUp2
-        open={popupOpen2}
-        onClose={handlePopup2Close}
-        mySwitchBtn={switchBtn}
-        myWalletAdd={walletAdd}
-        myWalletAddress={walletAdd || (address ?? "")}
-        myAmount={amount}
-        myDuration={durationNumericValue}
-        myNumericSelectedPrice={numericSelectedPrice}
-        myTotalPrice={totalPrice}
-        myPartialFill={partialFill}
-        myBulkOrder={bulkOrder}
-        myCurrentDate={currentDate}
-        myCurrentTime={currentTime}
-        resetForm={() => {
-          dispatch(toggleRefresh());
-          setAmount("");
-          setDurationValue("");
-          setInputValue("");
-          setAmountError("");
-          setDurationError("");
-          setPriceError("");
-          setPartialFill(true);
-          setBulkOrder(false);
-        }}
-      />
+      {popupOpen2 && (
+        <PopUp2
+          open={popupOpen2}
+          onClose={handlePopup2Close}
+          mySwitchBtn={switchBtn}
+          myWalletAdd={walletAdd}
+          myWalletAddress={walletAdd || (address ?? "")}
+          myAmount={amount}
+          myDuration={durationNumericValue}
+          myNumericSelectedPrice={numericSelectedPrice}
+          myTotalPrice={totalPrice}
+          myPartialFill={partialFill}
+          myBulkOrder={bulkOrder}
+          myCurrentDate={currentDate}
+          myCurrentTime={currentTime}
+          resetForm={() => {
+            dispatch(toggleRefresh());
+            setAmount("");
+            setDurationValue("");
+            setInputValue("");
+            setAmountError("");
+            setDurationError("");
+            setPriceError("");
+            setPartialFill(true);
+            setBulkOrder(false);
+          }}
+        />
+      )}
     </>
   );
 };
