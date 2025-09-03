@@ -18,7 +18,7 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
- 
+    <React.StrictMode>
     <LoadingProvider>
       <Provider store={store}>  {/* ← Redux Provider first */}
         <TronWalletProvider>  {/* ← Now TronWalletProvider can use useDispatch */}
@@ -30,7 +30,7 @@ root.render(
         </TronWalletProvider>
       </Provider>
     </LoadingProvider>
-
+   </React.StrictMode>
 );
 
 reportWebVitals();

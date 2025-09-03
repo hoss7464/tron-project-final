@@ -135,7 +135,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   //state for access token :
-  const [accessToken, setAccessTokenState] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
@@ -159,28 +159,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   };
   //-------------------------------------------------------------------------------------
   //access token functions:
-  // Helper function to set access token with localStorage persistence
-  const setAccessToken = useCallback((token: string | null) => {
-    setAccessTokenState(token);
-    if (token) {
-      localStorage.setItem("tronAccessToken", token);
-    } else {
-      localStorage.removeItem("tronAccessToken");
-    }
-  }, []);
-
   // Helper function to clear access token
   const clearAccessToken = useCallback(() => {
-    setAccessTokenState(null);
-    localStorage.removeItem("tronAccessToken");
-  }, []);
-
-  // Load token from localStorage on initial render
-  useEffect(() => {
-    const storedToken = localStorage.getItem("tronAccessToken");
-    if (storedToken) {
-      setAccessTokenState(storedToken);
-    }
+    setAccessToken(null);
   }, []);
   //-------------------------------------------------------------------------------------
   // Add cleanup on unmount
@@ -256,9 +237,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   //Function to delete data from localStorage :
-  const localStorageDeleteData = async () => {
+  const localStorageDeleteData = async (currentAccessToken: string | null = accessToken) => {
     const baseURL = process.env.REACT_APP_BASE_URL;
     try {
+     
       const stored = localStorage.getItem("tronWalletAddress");
       // to remove localStorage :
       localStorage.removeItem("tronWalletAddress");
@@ -275,7 +257,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           {
             headers: {
               "Content-Type": "application/json",
-             // accessToken: accessToken,
+             // "accessToken": currentAccessToken,
             },
             withCredentials: true,
             timeout: axiosTimeOut,
@@ -504,7 +486,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             }
 
             const access_token = server_data_json.data.access_token;
-            setAccessToken(access_token);
+            setAccessToken(access_token)
 
             // Save new wallet data to localStorage
             const localStorageSavedData = {
@@ -735,7 +717,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       //To get access token :
       const access_Token = server_data_json.data.access_token;
-      setAccessToken(access_Token);
+      setAccessToken(access_Token)
+
       //To save refressh_token, access_token, wallet address into a json
       const localStorageSavedData = {
         wallet_address: addr,
