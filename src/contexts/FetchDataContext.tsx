@@ -79,7 +79,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
         incrementLoading();
       }
 
-      const allData = await fetchAllUiData(address, accessToken, address,handleAuthFailure);
+      const allData = await fetchAllUiData(address, accessToken,handleAuthFailure);
 
       setOrderData(allData.orders);
       setMyOrderData(allData.myOrders);

@@ -127,7 +127,7 @@ const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 export const fetchAllUiData = async (
   walletAddress: string | null,
   accessToken: string | null,
-  address : string | null,
+
   onAuthFailure?: () => void
 ) => {
   try {
@@ -168,7 +168,7 @@ export const fetchAllUiData = async (
             headers: {
               "Content-Type": "application/json",
               //"accessToken": accessToken,
-              //"address" : address,
+              //"address" : walletAddress,
             },
             timeout: axiosTimeOut,
             withCredentials: true,
