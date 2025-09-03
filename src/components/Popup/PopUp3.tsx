@@ -118,6 +118,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   const [maxCandle, setMaxCandle] = useState<number | null>(null);
   //state for delegate input :
   const [delegatedAmount, setDelegatedAmount] = useState<string>("");
+  console.log(delegatedAmount)
   const [delegateInputError, setDelegateInputError] = useState<string>("");
   //Multi signature states :
   const [multiSignature, setMultiSignature] = useState<string | null>(null);
@@ -174,7 +175,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     fetchMaxCandle();
   }, [open, address, order, myDelegate, settingBtn, multiSignature]);
 
-  const maxCandleHandler = async () => {
+  const maxCandleHandler = async (): Promise<number | null> => {
     //If wallet is not connect or order doesn't exist or myDelegate === null return an error :
     if (!address || !order || myDelegate === null) {
       dispatch(
@@ -184,7 +185,7 @@ const PopUp3: React.FC<Popup3Types> = ({
           severity: "error",
         })
       );
-      return;
+      return null;
     }
 
     //To send request towards tronLink to get getCanDelegatedMaxSize :
@@ -202,13 +203,13 @@ const PopUp3: React.FC<Popup3Types> = ({
         if (!multiSignature) {
           setMaxCandle(null);
           setDelegatedAmount(""); // Clear delegated amount when no multi-signature address
-          return;
+          return null;
         }
 
         if (!validationSignatureAdd(multiSignature)) {
           setMaxCandle(null);
           setDelegatedAmount(""); // Clear delegated amount for invalid address
-          return;
+          return null;
         }
 
         targetAddress = multiSignature;
@@ -240,6 +241,8 @@ const PopUp3: React.FC<Popup3Types> = ({
       if (Math.abs((maxCandle || 0) - newMaxCandle) > 1) {
         setDelegatedAmount("");
       }
+
+      return newMaxCandle;
     } catch (error) {
       dispatch(
         showNotification({
@@ -248,7 +251,7 @@ const PopUp3: React.FC<Popup3Types> = ({
           severity: "error",
         })
       );
-      return;
+      return null;
     }
   };
 
@@ -261,11 +264,11 @@ const PopUp3: React.FC<Popup3Types> = ({
   const handleMaxClick = async () => {
     try {
       // First, update the maxCandle value by calling maxCandleHandler
-      await maxCandleHandler();
+      const newMax = await maxCandleHandler();
 
       // Then set the delegated amount after maxCandle is updated
-      if (maxCandle !== null) {
-        const roundedValue = Math.floor(maxCandle);
+      if (newMax !== null) {
+        const roundedValue = Math.floor(newMax);
         setDelegatedAmount(roundedValue.toString());
         setDelegateInputError("");
       }
@@ -752,7 +755,6 @@ const PopUp3: React.FC<Popup3Types> = ({
       return 0;
     }
     const numericDelegateAmount = Number(delegatedAmount);
-    console.log("Payout calculated:", numericDelegateAmount);
     return pairTrx * numericDelegateAmount;
   }, [delegatedAmount, pairTrx]);
 
