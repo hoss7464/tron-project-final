@@ -80,34 +80,40 @@ const Navbar: React.FC = () => {
             </NavbarLogoWrapper>
             <NavbarLinkWrapper>
               <NavLink
+              className="navlink-margin"
                 to="/"
-                className={Location.pathname === "/" ? "active-color" : ""}
-                style={{marginRight : "0.5rem"}}
+                style={
+                  Location.pathname === "/"
+                    ? { backgroundColor: "#003543", color: "#ffffff" }
+                    : { backgroundColor: "", color: "#003543" }
+                }
               >
                 <NavLinkIconWrapper>
                   <NavMarketIcon
-                    className={
+                    style={
                       Location.pathname === "/"
-                        ? "active-icon-color"
-                        : ""
+                        ? { color: "#ffffff" }
+                        : { color: "#003543" }
                     }
                   />
                 </NavLinkIconWrapper>{" "}
                 Market
               </NavLink>
               <NavLink
+              className="navlink-margin"
                 to="/Buyers"
-                className={
-                  Location.pathname === "/Buyers" ? "active-color" : ""
+                style={
+                  Location.pathname === "/Buyers"
+                    ? { backgroundColor: "#003543", color: "#ffffff" }
+                    : { backgroundColor: "", color: "#003543" }
                 }
-                style={{marginRight : "0.5rem"}}
               >
                 <NavLinkIconWrapper>
                   <NavBuyersIcon
-                    className={
+                    style={
                       Location.pathname === "/Buyers"
-                        ? "active-icon-color"
-                        : ""
+                        ? { color: "#ffffff" }
+                        : { color: "#003543" }
                     }
                   />
                 </NavLinkIconWrapper>{" "}
@@ -115,16 +121,18 @@ const Navbar: React.FC = () => {
               </NavLink>
               <NavLink
                 to="/Sellers"
-                className={
-                  Location.pathname === "/Sellers" ? "active-color" : ""
+                style={
+                  Location.pathname === "/Sellers"
+                    ? { backgroundColor: "#003543", color: "#ffffff" }
+                    : { backgroundColor: "", color: "#003543" }
                 }
               >
                 <NavLinkIconWrapper>
                   <NavSellersIcon
-                    className={
+                    style={
                       Location.pathname === "/Sellers"
-                        ? "active-icon-color"
-                        : ""
+                        ? { color: "#ffffff" }
+                        : { color: "#003543" }
                     }
                   />
                 </NavLinkIconWrapper>{" "}

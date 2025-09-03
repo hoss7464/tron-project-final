@@ -93,8 +93,7 @@ export const NavLink = styled(Link)`
   transition: all 0.2s ease-in-out;
   border-radius: 8px;
   font-weight: 600;
-  color: ${ThemeColor.primary1};
- padding: 8px 12px;
+  padding: 8px 12px;
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     font-size: 12px;
   }
@@ -121,24 +120,21 @@ export const NavLinkIconWrapper = styled.div`
   justify-content: center;
   align-items: center;
   margin-right: 0.3rem;
-`
+`;
 export const NavMarketIcon = styled(BsShopWindow)`
   width: 20px;
   height: 20px;
-  color: ${ThemeColor.primary1};
-`
+`;
 
 export const NavBuyersIcon = styled(FaShoppingCart)`
   width: 20px;
   height: 20px;
-  color: ${ThemeColor.primary1};
-`
+`;
 
 export const NavSellersIcon = styled(FaHandshake)`
   width: 20px;
   height: 20px;
-  color: ${ThemeColor.primary1};
-`
+`;
 
 export const NavbarRightSection = styled.div`
   display: flex;
