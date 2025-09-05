@@ -1,0 +1,18 @@
+.Hero-bg {
+  background-image: url("../../../assets/png//Hero-bg.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+@media only screen and (min-width: 280px) and (max-width: 900px) {
+  .border {
+    border-right: none;
+  }
+}
+
+@media only screen and (min-width: 901px) {
+  .border {
+    border-right: solid 2px #b0c0c5;
+  }
+}

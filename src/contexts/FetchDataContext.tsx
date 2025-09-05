@@ -78,7 +78,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
       if (isInitialLoad) {
         incrementLoading();
       }
-
+      
       const allData = await fetchAllUiData(address, accessToken,handleAuthFailure);
 
       setOrderData(allData.orders);
