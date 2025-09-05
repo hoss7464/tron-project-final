@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
 import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
 import {
   Popup2HeaderWrapper,
@@ -34,7 +35,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
   onClose,
   orderData,
 }) => {
-  const { address } = useTronWallet();
+  const { address, adapter } = useTronWallet();
   const dispatch = useDispatch();
 
   const MyCancelReject = () => {
@@ -42,15 +43,65 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
   };
   const cancelTrxAmount = Number(process.env.REACT_APP_CANCEL_TRX_AMOUNT);
   const baseUrl = process.env.REACT_APP_BASE_URL;
-  const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+  
 
   const handleConfirmClick = async () => {
     try {
+      const window_tronweb = (window as any).tronWeb;
+      const baseURL = process.env.REACT_APP_BASE_URL;
+      const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+
+      // Check if adapter is available
+      if (!adapter) {
+        throw new Error("Wallet adapter not available");
+      }
+
+      // Get nonce from server
+      const generate_msg = await axios.get<{
+        success: boolean;
+        data: { nonce: string };
+      }>(`${baseURL}/Auth/get-message`, {
+        headers: { "Content-Type": "application/json" },
+        timeout: axiosTimeOut,
+        validateStatus: (status: number) => status < 500,
+      });
+
+      //To convert he message into json :
+      const responseBody = generate_msg.data;
+      if (responseBody.success === false) {
+        dispatch(
+          showNotification({
+            name: "tron-error2",
+            message: "Tron Error : Something went wrong.",
+            severity: "error",
+          })
+        );
+        return;
+      }
+
+      const message = responseBody.data.nonce;
+      //To convert message into hex :
+      window_tronweb.toHex(message);
+      //To sign the message :
+      const signature = await adapter.signMessage(message);
+      if (!signature) {
+        dispatch(
+          showNotification({
+            name: "tron-error3",
+            message: "Tron Error : User rejected signing message.",
+            severity: "error",
+          })
+        );
+        return;
+      }
+
       const confirmPayload = {
         orderId: orderData?._id,
         requester: address,
+        signature: signature,
+        nonce: message,
       };
-      console.log(confirmPayload);
+      console.log(confirmPayload)
 
       const confirmResponse = await axios.post<MyOrdersResponse>(
         `${baseUrl}/order/cancelOrder`,
@@ -61,9 +112,10 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
           },
           timeout: axiosTimeOut,
           withCredentials: true,
-          validateStatus : (status : number) => status < 500
+          validateStatus: (status: number) => status < 500,
         }
       );
+
       if (confirmResponse.data.success === true) {
         dispatch(
           showNotification({
@@ -72,7 +124,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
             severity: "success",
           })
         );
-         onClose();
+        onClose();
         return;
       } else {
         dispatch(

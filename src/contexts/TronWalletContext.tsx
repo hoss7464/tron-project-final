@@ -20,7 +20,8 @@ interface TronWalletContextProps {
   availableBandwidth: number | null;
   allEnergy: number | null;
   availableEnergy: number | null;
-  accessToken: string | null; //
+  accessToken: string | null; 
+  adapter: TronLinkAdapter | null
   connectWallet: () => Promise<void>;
   disconnectWallet: () => void;
   disconnectWallet2: () => void;
@@ -1178,6 +1179,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <TronWalletContext.Provider
       value={{
+        adapter,
         address,
         balance,
         allBandwidth,
