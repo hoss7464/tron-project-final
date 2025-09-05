@@ -43,7 +43,6 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
   };
   const cancelTrxAmount = Number(process.env.REACT_APP_CANCEL_TRX_AMOUNT);
   const baseUrl = process.env.REACT_APP_BASE_URL;
-  
 
   const handleConfirmClick = async () => {
     try {
@@ -57,33 +56,12 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
       }
 
       // Get nonce from server
-      const generate_msg = await axios.get<{
-        success: boolean;
-        data: { nonce: string };
-      }>(`${baseURL}/Auth/get-message`, {
-        headers: { "Content-Type": "application/json" },
-        timeout: axiosTimeOut,
-        validateStatus: (status: number) => status < 500,
-      });
-
-      //To convert he message into json :
-      const responseBody = generate_msg.data;
-      if (responseBody.success === false) {
-        dispatch(
-          showNotification({
-            name: "tron-error2",
-            message: "Tron Error : Something went wrong.",
-            severity: "error",
-          })
-        );
-        return;
-      }
-
-      const message = responseBody.data.nonce;
+      const message = orderData?._id + "";
       //To convert message into hex :
       window_tronweb.toHex(message);
       //To sign the message :
       const signature = await adapter.signMessage(message);
+
       if (!signature) {
         dispatch(
           showNotification({
@@ -99,9 +77,9 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         orderId: orderData?._id,
         requester: address,
         signature: signature,
-        nonce: message,
       };
-      console.log(confirmPayload)
+
+      console.log(confirmPayload);
 
       const confirmResponse = await axios.post<MyOrdersResponse>(
         `${baseUrl}/order/cancelOrder`,
@@ -130,7 +108,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         dispatch(
           showNotification({
             name: "cancel-error1",
-            message: `Cancel error 1000: ${confirmResponse.data.message}`,
+            message: `Cancel error: ${confirmResponse.data.message}`,
             severity: "error",
           })
         );
