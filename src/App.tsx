@@ -9,6 +9,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { RootState } from "./redux/store/store";
 import { useSelector } from "react-redux";
 import Navbar from "./components/Navbar/Navbar";
+import Sidebar from "./components/Sidebar/Sidebar";
+import HamburgerBtn from "./components/HamburgerBtn/HamburgerBtn";
+import { useSidebar } from "./hooks/useSidebar";
 import MainPage from "./pages/mainPage/MainPage";
 import Buyers from "./pages/investors/Buyers/Buyers";
 import Sellers from "./pages/investors/Sellers/Sellers";
@@ -22,6 +25,7 @@ import ScrollToTop from "./core-UI/scrollToTop";
 
 function App() {
     const popUpVisible = useSelector((state: RootState) => state.toggle.toggles.popUp);
+    const { isSidebarOpen, openSidebar, closeSidebar } = useSidebar();
 
 
     useEffect(() => {
@@ -47,6 +51,8 @@ function App() {
               <ScrollToTop />
               <Notification />
               <Navbar />
+              <HamburgerBtn onClick={openSidebar} />
+              <Sidebar open={isSidebarOpen} onClose={closeSidebar} />
               <Routes>
                 <Route path="/" element={<MainPage />} />
                 <Route path="/Buyers" element={<Buyers />} />

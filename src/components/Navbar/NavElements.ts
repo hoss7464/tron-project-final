@@ -7,36 +7,42 @@ import { FaShoppingCart } from "react-icons/fa";
 import { FaHandshake } from "react-icons/fa";
 
 export const NavContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
   z-index: 95;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(6px);
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
+    display: none;
     padding: 8px;
     width: 100%;
     border-radius: 0;
     border-bottom: solid 2px ${ThemeColor.border1};
   }
 
-  @media only screen and (min-width: 577px) and (max-width: 768px) {
+  @media only screen and (min-width: 577px) and (max-width: 892px) {
+    display: none;
     padding: 8px;
     width: 100%;
     border-radius: 0;
     border-bottom: solid 2px ${ThemeColor.border1};
   }
 
-  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+  @media only screen and (min-width: 893px) and (max-width: 1080px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
     padding: 4px;
-    width: 85%;
+    width: 90%;
     border-radius: 14px;
     border: solid 2px ${ThemeColor.border1};
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
     padding: 4px;
     width: 65%;
     border-radius: 14px;
@@ -44,6 +50,10 @@ export const NavContainer = styled.div`
   }
 
   @media only screen and (min-width: 1921px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
     padding: 4px;
     width: 65%;
     border-radius: 14px;
