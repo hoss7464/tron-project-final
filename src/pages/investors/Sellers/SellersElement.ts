@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { ThemeColor } from "../../../core-UI/Theme";
+import { IoMdSettings } from "react-icons/io";
 import { RiNumbersFill } from "react-icons/ri";
 import { FaEquals } from "react-icons/fa";
 import { MdCurrencyExchange } from "react-icons/md";
@@ -43,7 +44,7 @@ export const SellersMainWrapper = styled.div`
 
   @media only screen and (min-width: 280px) and (max-width: 768px) {
     width: 93%;
-    margin-top: 2rem;
+    margin-top: 3rem;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
@@ -60,6 +61,54 @@ export const SellersMainWrapper = styled.div`
     width: 80%;
     margin-top: 4rem;
   }
+`;
+
+export const SellersMainHeaderBtnWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  margin-bottom: 1rem;
+`;
+export const SellersMainHeaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+export const SellersMainHeader = styled.p`
+  color: ${ThemeColor.primary1};
+  font-size: 22px;
+  font-weight: 900;
+`;
+
+export const SellersBtnWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: ${ThemeColor.secondary1};
+`;
+
+export const SelersSettingIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 0.2rem;
+`
+export const SelersSettingIcon = styled(IoMdSettings)`
+color: ${ThemeColor.text2};
+width: 22px;
+height: 22px;
+`
+
+export const SellersBtnText = styled.p`
+  color: ${ThemeColor.text2};
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
 `;
 
 export const SellersTopWrapper = styled.div`
@@ -166,4 +215,20 @@ export const SellersCardThingsNumber = styled.p`
   font-size: 17px;
   color: ${ThemeColor.primary1};
   font-weight: 500;
+`;
+
+export const SellersHistoryWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+  margin-top: 1rem;
+`
+
+export const SellersNavTextWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 10%;
 `;

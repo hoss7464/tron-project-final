@@ -8,6 +8,8 @@ import {
   SellersPropertyWrapper,
   SellersPeopertyWrapper2,
   SellersCardIconHeaderWrapper,
+  SelersSettingIconWrapper,
+  SelersSettingIcon,
   SellersCountIcon,
   SellersTotalIcon,
   SellersEarnIcon,
@@ -20,6 +22,13 @@ import {
   SellersCardThingsName,
   SellersCardThingsNumberWrapper,
   SellersCardThingsNumber,
+  SellersMainHeaderBtnWrapper,
+  SellersMainHeaderWrapper,
+  SellersMainHeader,
+  SellersBtnWrapper,
+  SellersBtnText,
+  SellersHistoryWrapper,
+  SellersNavTextWrapper,
 } from "./SellersElement";
 import { HeroMainbgPhotoWrapper } from "../../mainPage/HeroSection/HeroElements";
 import {
@@ -33,7 +42,6 @@ import {
   LegacyBandwidthEnergyPropertyWrapper,
   LegacyBandwidthEnergyProperty,
   LegacyCardPropertyWrapper,
-  LegacyPropertyWrapper,
   LegacyPropertyHeaderWrapper,
   LegacyCardName,
   LegacyPropertyNumberWrapper,
@@ -46,12 +54,25 @@ import {
   HeroGridCardNumberIconWrapper3,
   HeroGridCardNumberIcon,
 } from "../../mainPage/HeroSection/HeroElements";
+import {
+  OrdersWrapper,
+  OrderMainWrapper,
+  OrdersNavHeaderWrapper,
+  OrdersCarouselWrapper,
+  OrdersScroll,
+  OrderNavWrapper,
+  OrderNavTextWrapper1,
+  OrderNavTextWrapper,
+  OrderNavText,
+  OrdersCard,
+} from "../../mainPage/mainPageElements";
 import { Grid } from "@mui/material";
 import energyIcon from "../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useTronWallet } from "../../../contexts/TronWalletContext";
 import { useFetchData } from "../../../contexts/FetchDataContext";
+import MyFilterComponent from "../../../components/FilterComponent/MyFilterComponent";
 
 const Sellers: React.FC = () => {
   const {
@@ -63,7 +84,8 @@ const Sellers: React.FC = () => {
     allEnergy,
   } = useTronWallet();
   const { resourceData } = useFetchData();
-
+  //----------------------------------------------------------------------------------------
+  //Functions for circular progress bars :
   const bandwidthPercentage =
     allBandwidth && availableBandwidth
       ? Math.round((allBandwidth / availableBandwidth) * 100)
@@ -73,11 +95,28 @@ const Sellers: React.FC = () => {
     availableEnergy && allEnergy
       ? Math.round((availableEnergy / allEnergy) * 100)
       : 0;
+  //----------------------------------------------------------------------------------------
+  //Function to get 30 days minimum price :
+  const minimumPrice = resourceData?.data.ratesByDuration.find(
+    (minRate) => minRate.maxDurationSeconds === 2592000
+  );
+
   return (
     <>
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>
         <SellersMainWrapper>
+          <SellersMainHeaderBtnWrapper>
+            <SellersMainHeaderWrapper>
+              <SellersMainHeader>Dashboard</SellersMainHeader>
+            </SellersMainHeaderWrapper>
+            <SellersBtnWrapper>
+              <SelersSettingIconWrapper>
+                <SelersSettingIcon />
+              </SelersSettingIconWrapper>
+              <SellersBtnText>Setting</SellersBtnText>
+            </SellersBtnWrapper>
+          </SellersMainHeaderBtnWrapper>
           <SellersTopWrapper>
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
@@ -122,7 +161,9 @@ const Sellers: React.FC = () => {
                       <SellersPropertyWrapper>
                         <SellersPeopertyWrapper2>
                           <LegacyPropertyHeaderWrapper>
-                            <LegacyCardName>Energy</LegacyCardName>
+                            <LegacyCardName style={{ fontWeight: "600" }}>
+                              Energy
+                            </LegacyCardName>
                           </LegacyPropertyHeaderWrapper>
                           <LegacyPropertyNumberWrapper>
                             {address ? (
@@ -138,14 +179,16 @@ const Sellers: React.FC = () => {
                         </SellersPeopertyWrapper2>
                         <SellersPeopertyWrapper2>
                           <LegacyPropertyHeaderWrapper>
-                            <LegacyCardName>Min-Price</LegacyCardName>
+                            <LegacyCardName style={{ fontWeight: "600" }}>
+                              Min-Price
+                            </LegacyCardName>
                           </LegacyPropertyHeaderWrapper>
                           <LegacyPropertyNumberWrapper>
                             {address ? (
                               <LegacyPropertyNumber
                                 style={{ fontSize: "18px" }}
                               >
-                                {availableEnergy}
+                                {minimumPrice?.rate.energy}
                               </LegacyPropertyNumber>
                             ) : (
                               <LegacyPropertyNumber>_ _</LegacyPropertyNumber>
@@ -169,7 +212,6 @@ const Sellers: React.FC = () => {
                   </LegacyCardWrapper3>
                 </LegacyCardWrapper2>
               </Grid>
-
               <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
                 <LegacyCardWrapper2>
                   <LegacyCardWrapper3 className="card-bg">
@@ -208,7 +250,9 @@ const Sellers: React.FC = () => {
                       <SellersPropertyWrapper>
                         <SellersPeopertyWrapper2>
                           <LegacyPropertyHeaderWrapper>
-                            <LegacyCardName>Bandwidth</LegacyCardName>
+                            <LegacyCardName style={{ fontWeight: "600" }}>
+                              Bandwidth
+                            </LegacyCardName>
                           </LegacyPropertyHeaderWrapper>
                           <LegacyPropertyNumberWrapper>
                             {address ? (
@@ -224,14 +268,16 @@ const Sellers: React.FC = () => {
                         </SellersPeopertyWrapper2>
                         <SellersPeopertyWrapper2>
                           <LegacyPropertyHeaderWrapper>
-                            <LegacyCardName>Min-Price</LegacyCardName>
+                            <LegacyCardName style={{ fontWeight: "600" }}>
+                              Min-Price
+                            </LegacyCardName>
                           </LegacyPropertyHeaderWrapper>
                           <LegacyPropertyNumberWrapper>
                             {address ? (
                               <LegacyPropertyNumber
                                 style={{ fontSize: "18px" }}
                               >
-                                {allBandwidth}
+                                {minimumPrice?.rate.bandwidth}
                               </LegacyPropertyNumber>
                             ) : (
                               <LegacyPropertyNumber>_ _</LegacyPropertyNumber>
@@ -506,6 +552,61 @@ const Sellers: React.FC = () => {
               </Grid>
             </Grid>
           </SellersBottomWrapper>
+          <SellersHistoryWrapper>
+            <OrdersWrapper className="history-bg" style={{width : "100%"}}>
+              <OrderMainWrapper>
+                <OrdersNavHeaderWrapper>
+                  <LegacyCardName style={{ color: "#003543" }}>
+                    History
+                  </LegacyCardName>
+                  <MyFilterComponent
+                    listKey="seller-history"
+                    options={[
+                      "price",
+                      "energy",
+                      "bandwidth",
+                      "latest",
+                      "oldest",
+                    ]}
+                    label="Product"
+                  />
+                </OrdersNavHeaderWrapper>
+                <OrdersCarouselWrapper>
+                  <OrdersScroll>
+                    <OrderNavWrapper>
+                      <OrderNavTextWrapper1 style={{justifyContent : "space-between"}} >
+                        <SellersNavTextWrapper>
+                          <OrderNavText>Date</OrderNavText>
+                        </SellersNavTextWrapper>
+                        <SellersNavTextWrapper>
+                          <OrderNavText>Type</OrderNavText>
+                        </SellersNavTextWrapper>
+                        <SellersNavTextWrapper>
+                          <OrderNavText>Receiver</OrderNavText>
+                        </SellersNavTextWrapper>
+                        <SellersNavTextWrapper>
+                          <OrderNavText>Resource</OrderNavText>
+                        </SellersNavTextWrapper>
+                        <SellersNavTextWrapper>
+                          <OrderNavText>Price</OrderNavText>
+                        </SellersNavTextWrapper>
+                        <SellersNavTextWrapper>
+                          <OrderNavText>Duration</OrderNavText>
+                        </SellersNavTextWrapper>
+                        <SellersNavTextWrapper>
+                          <OrderNavText>Paid-Amount</OrderNavText>
+                        </SellersNavTextWrapper>
+                        <SellersNavTextWrapper>
+                          <OrderNavText>Paid</OrderNavText>
+                        </SellersNavTextWrapper>
+                      </OrderNavTextWrapper1>
+                    </OrderNavWrapper>
+                    <OrdersCard></OrdersCard>
+                  </OrdersScroll>
+                </OrdersCarouselWrapper>
+              </OrderMainWrapper>
+            </OrdersWrapper>
+          </SellersHistoryWrapper>
         </SellersMainWrapper>
       </SellersContainer>
     </>

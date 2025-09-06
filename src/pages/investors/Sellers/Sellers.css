@@ -12,6 +12,13 @@
   background-position: center;
 }
 
+.history-bg {
+    background-image: url("../../../assets//png/Orders-bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 @media only screen and (min-width: 280px) and (max-width: 900px) {
   .border {
     border-right: none;
