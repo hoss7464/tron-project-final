@@ -322,13 +322,13 @@ const OrderFormComponent: React.FC = () => {
 
     if (switchBtn === "energy") {
       if (numericValue < minAmount.energy) {
-        return "Minimum limitation";
+        return`Less than ${minAmount.energy}k`;
       } else if (numericValue > 100000000) {
         return "Maximum limitation";
       }
     } else if (switchBtn === "bandwidth") {
       if (numericValue < minAmount.bandwidth) {
-        return "Minimum limitation";
+        return `Less than ${minAmount.bandwidth}k`;
       }
     } else {
     }
@@ -502,9 +502,9 @@ const OrderFormComponent: React.FC = () => {
     const rate_bandwidth = matchedItem.rate.bandwidth;
 
     if (switchBtn === "energy") {
-      return numValue < rate_energy ? "less than min amount" : "";
+      return numValue < rate_energy ? `Less than ${minAmount.energy}k ` : "";
     } else if (switchBtn === "bandwidth") {
-      return numValue < rate_bandwidth ? "less than min amount" : "";
+      return numValue < rate_bandwidth ? `Less than ${minAmount.bandwidth}k` : "";
     }
 
     return "";
@@ -933,16 +933,7 @@ const OrderFormComponent: React.FC = () => {
               <FormAddLabelWrapper>
                 <FormAddLabel>
                   Amount
-                  {amount && (
-                    <span>
-                      {" "}
-                      (
-                      {switchBtn === "energy"
-                        ? `minimum ${minAmount.energy}K`
-                        : `minimum ${minAmount.bandwidth}K`}
-                      )
-                    </span>
-                  )}
+                  
                 </FormAddLabel>
                 {amountError && (
                   <FormErrorWrapper>
@@ -1445,7 +1436,7 @@ const OrderFormComponent: React.FC = () => {
           myCurrentDate={currentDate}
           myCurrentTime={currentTime}
           resetForm={() => {
-            dispatch(toggleRefresh());
+           
             setAmount("");
             setDurationValue("");
             setInputValue("");

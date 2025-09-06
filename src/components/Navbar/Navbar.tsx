@@ -44,11 +44,22 @@ const Navbar: React.FC = () => {
   const { t, i18n } = useTranslation();
   const dispatch = useDispatch();
   const avatarRef = useRef<HTMLButtonElement | null>(null);
-  const { address, disconnectWallet } = useTronWallet();
+  const {
+    address,
+    disconnectWallet,
+    connectWallet,
+    connectWalletMarket,
+    isConnectedMarket,
+    isConnectedTrading,
+  } = useTronWallet();
 
   const avatarOpen = useSelector(
     (state: RootState) => state.toggle.toggles["avatarToggle"]
   );
+
+  const isMarketPage = Location.pathname === "/";
+  const isBuyersOrSellers =
+    Location.pathname === "/Buyers" || Location.pathname === "/Sellers";
 
   const handleChange = (event: SelectChangeEvent) => {
     setAge(event.target.value);
@@ -60,15 +71,15 @@ const Navbar: React.FC = () => {
   const handleAvatarLeave = () => {
     dispatch(hoverDisableToggle("avatarToggle"));
   };
-  const handleDisconnect = () => {
-    disconnectWallet();
-    dispatch(hoverDisableToggle("avatarToggle"));
-  };
 
   const shortenAddress = (address: string) => {
     if (address.length <= 6) return address;
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
+
+  const isConnected = isMarketPage ? isConnectedMarket : isConnectedTrading;
+  const handleConnect = isMarketPage ? connectWalletMarket : connectWallet;
+  const handleDisconnect = disconnectWallet;
 
   return (
     <>
@@ -80,7 +91,7 @@ const Navbar: React.FC = () => {
             </NavbarLogoWrapper>
             <NavbarLinkWrapper>
               <NavLink
-              className="navlink-margin"
+                className="navlink-margin"
                 to="/"
                 style={
                   Location.pathname === "/"
@@ -100,7 +111,7 @@ const Navbar: React.FC = () => {
                 Market
               </NavLink>
               <NavLink
-              className="navlink-margin"
+                className="navlink-margin"
                 to="/Buyers"
                 style={
                   Location.pathname === "/Buyers"
@@ -208,7 +219,8 @@ const Navbar: React.FC = () => {
                   </Select>
                 </FormControl>
               </TranslateWrapper>
-              {address ? (
+
+              {isConnected && address ? (
                 <Box
                   onMouseEnter={handleAvatarEnter}
                   onMouseLeave={handleAvatarLeave}
@@ -227,20 +239,12 @@ const Navbar: React.FC = () => {
                     anchorEl={avatarRef.current}
                     open={avatarOpen}
                     onClose={handleAvatarLeave}
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    transformOrigin={{ vertical: "top", horizontal: "right" }}
-                    disableScrollLock={true}
-                    MenuListProps={{
-                      onMouseEnter: handleAvatarEnter,
-                      onMouseLeave: handleAvatarLeave,
-                      sx: { pointerEvents: "auto", cursor: "pointer" },
-                    }}
                   >
                     <MenuItem onClick={handleDisconnect}>Disconnect</MenuItem>
                   </Menu>
                 </Box>
               ) : (
-                <ConnectWrapper onClick={() => dispatch(clickToggle("popUp"))}>
+                <ConnectWrapper onClick={handleConnect}>
                   <ConnectIconWrapper>
                     <ConnectIcon />
                   </ConnectIconWrapper>

@@ -172,7 +172,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 severity: "success",
               })
             );
-            
+            resetForm()
             onClose(); // Close popup automatically on success
 
             return;

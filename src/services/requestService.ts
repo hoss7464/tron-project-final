@@ -165,13 +165,11 @@ export const fetchAllUiData = async (
         const myOrdersRes = await axios.get<MyOrdersResponse>(
           `${baseUrl}/order/myOrder`,
           {
-            headers: {
-              "Content-Type": "application/json",
-              //"accessToken": accessToken,
-              //"address" : walletAddress,
+            params: {
+              requester: walletAddress,
             },
             timeout: axiosTimeOut,
-            withCredentials: true,
+
             validateStatus: (status: number) => status < 500,
           }
         );
