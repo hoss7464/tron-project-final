@@ -232,7 +232,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       const availableMax = Math.max(0, maxCandelegated - alreadyDelegated);
 
       // Calculate the new maximum, considering myDelegate as the upper limit
-      const newMaxCandle = Math.min(availableMax, myDelegate);
+      const newMaxCandle = Math.min(availableMax, myDelegate / 1e6);
 
       setMaxCandle(newMaxCandle);
 
@@ -469,7 +469,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             order.resourceType,
             multiSignature, // requesterAddress
             order.lock,
-            order.durationSec / 3,
+            (order.durationSec / 3) - 3,
             true, // isMultiSignature
             options
           );
@@ -481,7 +481,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             order.resourceType,
             address, // requesterAddress
             order.lock,
-            order.durationSec / 3
+            (order.durationSec / 3) - 3
           );
         }
         //step3 ----> if the result of sending data towards tronlink was successfull then send txid, orderId and checkResponse.res_id towards the server:
@@ -1044,7 +1044,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                     color: "#430E00",
                   }}
                 >
-                  {Number(handlePayout.toFixed(3))}{" "}
+                  {Number((handlePayout * 1e6).toFixed(3))}{" "}
                   TRX
                 </Popup2Item>
               </Popup2ItemWrapper>

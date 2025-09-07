@@ -89,7 +89,9 @@ const Navbar: React.FC = () => {
             <NavbarLogoWrapper>
               <NavbarLogo alt="Logo" src={Logo} />
             </NavbarLogoWrapper>
-            <NavbarLinkWrapper>
+            
+          </NavbarLeftSection>
+          <NavbarLinkWrapper>
               <NavLink
                 className="navlink-margin"
                 to="/"
@@ -150,7 +152,6 @@ const Navbar: React.FC = () => {
                 Sellers
               </NavLink>
             </NavbarLinkWrapper>
-          </NavbarLeftSection>
           <NavbarRightSection>
             <TranslateConnectWrapper>
               <TranslateWrapper>

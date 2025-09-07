@@ -44,7 +44,7 @@ export const NavContainer = styled.div`
     align-items: center;
     position: fixed;
     padding: 4px;
-    width: 65%;
+    width: 70%;
     border-radius: 14px;
     border: solid 2px ${ThemeColor.border1};
   }
@@ -55,7 +55,7 @@ export const NavContainer = styled.div`
     align-items: center;
     position: fixed;
     padding: 4px;
-    width: 65%;
+    width: 70%;
     border-radius: 14px;
     border: solid 2px ${ThemeColor.border1};
   }
@@ -148,10 +148,12 @@ export const NavSellersIcon = styled(FaHandshake)`
 
 export const NavbarRightSection = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   height: 100%;
   margin-right: 4px;
+  width: 230px;
+
 `;
 
 export const TranslateConnectWrapper = styled.div`

@@ -132,7 +132,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
                         color: "#003543",
                       }}
                     >
-                      Quantity
+                      Delegated
                     </TableCell>
                     <TableCell
                       sx={{
@@ -178,7 +178,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
                         }}
                       >
                         <TableCell sx={{ color: "#003543" }}>
-                          {holdData.qty.toLocaleString()}
+                          {(holdData.qty / 1e6).toLocaleString()}
                         </TableCell>
                         <TableCell>
                           <Link

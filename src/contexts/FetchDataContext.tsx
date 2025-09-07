@@ -50,6 +50,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const [authErrorCount, setAuthErrorCount] = useState(0);
   const [shouldStopPolling, setShouldStopPolling] = useState(false);
   const initialLoadRef = useRef(true); // Track initial load
+  const path1 = window.location.pathname
   
   // Function to handle authentication failures
   const handleAuthFailure = useCallback(() => {
@@ -79,7 +80,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
         incrementLoading();
       }
       
-      const allData = await fetchAllUiData(address, accessToken,handleAuthFailure);
+      const allData = await fetchAllUiData(address, accessToken,path1,handleAuthFailure);
 
       setOrderData(allData.orders);
       setMyOrderData(allData.myOrders);

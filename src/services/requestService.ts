@@ -124,22 +124,17 @@ export interface AvailableResponse {
 const baseUrl = process.env.REACT_APP_BASE_URL;
 const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
+
 export const fetchAllUiData = async (
   walletAddress: string | null,
   accessToken: string | null,
-
+  pathname: string,
   onAuthFailure?: () => void
 ) => {
   try {
     const hasConnectedWallet = !!walletAddress;
 
-    // Always fetch orders and resources, and available resources
-    const ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
-      headers: { "Content-Type": "application/json" },
-      timeout: axiosTimeOut,
-      validateStatus: (status: number) => status < 500,
-    });
-
+    // Always fetch resources
     const resourcesPromise = axios.get<ResourceResponse>(
       `${baseUrl}/Setting/UI`,
       {
@@ -149,36 +144,42 @@ export const fetchAllUiData = async (
       }
     );
 
-    const AvailablePromise = axios.get<AvailableResponse>(
-      `${baseUrl}/Setting/resource-available`,
-      {
+    // Only fetch these on "/"
+    let ordersPromise: ReturnType<typeof axios.get<OrdersResponse>> | null = null;
+let availablePromise: ReturnType<typeof axios.get<AvailableResponse>> | null = null;
+
+    if (pathname === "/") {
+      ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
         headers: { "Content-Type": "application/json" },
         timeout: axiosTimeOut,
         validateStatus: (status: number) => status < 500,
-      }
-    );
+      });
 
+      availablePromise = axios.get<AvailableResponse>(
+        `${baseUrl}/Setting/resource-available`,
+        {
+          headers: { "Content-Type": "application/json" },
+          timeout: axiosTimeOut,
+          validateStatus: (status: number) => status < 500,
+        }
+      );
+    }
+
+    // Handle myOrders (only on "/" + wallet connected)
     let myOrdersResponse: MyOrdersResponse;
-
-    if (hasConnectedWallet) {
+    if (hasConnectedWallet && pathname === "/") {
       try {
         const myOrdersRes = await axios.get<MyOrdersResponse>(
           `${baseUrl}/order/myOrder`,
           {
-            params: {
-              requester: walletAddress,
-            },
+            params: { requester: walletAddress },
             timeout: axiosTimeOut,
-
             validateStatus: (status: number) => status < 500,
           }
         );
 
-        // Check if the response indicates failure
         if (myOrdersRes.data.success === false) {
-          if (onAuthFailure) {
-            onAuthFailure();
-          }
+          if (onAuthFailure) onAuthFailure();
           myOrdersResponse = {
             success: false,
             message: myOrdersRes.data.message || "Authentication failed",
@@ -188,40 +189,33 @@ export const fetchAllUiData = async (
           myOrdersResponse = myOrdersRes.data;
         }
       } catch (error: any) {
-        // Check if this is an API error with success: false
         if (error.response?.data?.success === false) {
-          console.warn("API returned failure, triggering disconnect");
-          if (onAuthFailure) {
-            onAuthFailure();
-          }
+          if (onAuthFailure) onAuthFailure();
           myOrdersResponse = {
             success: false,
             message: error.response.data.message || "Authentication failed",
             data: [],
           };
         } else {
-          // Re-throw other errors (network errors, etc.)
           throw error;
         }
       }
     } else {
-      // Create default data
       myOrdersResponse = {
         success: true,
-        message: "No wallet connected",
+        message: "No wallet connected or not on /",
         data: [],
       };
     }
 
-    // Use Promise.allSettled instead of Promise.all
-    const [ordersListResult, resourceResult, AvailableResult] =
-      await Promise.allSettled([
-        ordersPromise,
-        resourcesPromise,
-        AvailablePromise,
-      ]);
+    // Collect promises dynamically
+    const results = await Promise.allSettled([
+      ordersPromise,
+      resourcesPromise,
+      availablePromise,
+    ].filter(Boolean)); // filter out nulls
 
-    // Helper function to handle settled promises
+    // Helper for settled promises
     const handleSettledPromise = <T>(
       result: PromiseSettledResult<any>,
       defaultValue: T
@@ -230,17 +224,12 @@ export const fetchAllUiData = async (
         return result.value.data;
       } else {
         console.error("Request failed:", result.reason);
-        // You might want to handle different types of errors differently
         return defaultValue;
       }
     };
 
-    // Create default responses for each type
-    const defaultOrdersResponse: OrdersResponse = {
-      success: false,
-      data: [],
-    };
-
+    // Defaults
+    const defaultOrdersResponse: OrdersResponse = { success: false, data: [] };
     const defaultResourceResponse: ResourceResponse = {
       success: false,
       data: {
@@ -251,35 +240,33 @@ export const fetchAllUiData = async (
         ratesByDuration: [],
       },
     };
-
     const defaultAvailableResponse: AvailableResponse = {
       success: false,
       energy: [],
       bandwidth: [],
     };
 
-    // Extract data from settled promises
-    const orders = handleSettledPromise(
-      ordersListResult,
-      defaultOrdersResponse
-    );
-    const resources = handleSettledPromise(
-      resourceResult,
-      defaultResourceResponse
-    );
-    const availables = handleSettledPromise(
-      AvailableResult,
-      defaultAvailableResponse
-    );
+    // Map results back
+    let orders = defaultOrdersResponse;
+    let resources = defaultResourceResponse;
+    let availables = defaultAvailableResponse;
 
-    // Return a single object containing all the data with proper typing
-    return {
-      orders,
-      myOrders: myOrdersResponse,
-      resources,
-      availables,
-    };
+    // results[0] = orders (if pathname === "/")
+    // results[1] = resources
+    // results[2] = available (if pathname === "/")
+
+    let i = 0;
+    if (pathname === "/") {
+      orders = handleSettledPromise(results[i++], defaultOrdersResponse);
+    }
+    resources = handleSettledPromise(results[i++], defaultResourceResponse);
+    if (pathname === "/") {
+      availables = handleSettledPromise(results[i++], defaultAvailableResponse);
+    }
+
+    return { orders, myOrders: myOrdersResponse, resources, availables };
   } catch (error) {
     throw error;
   }
 };
+
