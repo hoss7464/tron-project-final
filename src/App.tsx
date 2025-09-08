@@ -1,11 +1,11 @@
-import {useEffect} from "react";
+import { useEffect } from "react";
 import "./App.css";
 import {
   MainContainerWrapper,
   LightMainContainerWrapper,
   PrimeMainContainer,
 } from "./core-UI/mainContainer";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { RootState } from "./redux/store/store";
 import { useSelector } from "react-redux";
 import Navbar from "./components/Navbar/Navbar";
@@ -22,44 +22,42 @@ import PopUp from "./components/Popup/PopUp";
 import SelectWalletComponent from "./components/SelectWalletComponent/SelectWalletComponent";
 import ScrollToTop from "./core-UI/scrollToTop";
 
-
 function App() {
-    const popUpVisible = useSelector((state: RootState) => state.toggle.toggles.popUp);
-    const { isSidebarOpen, openSidebar, closeSidebar } = useSidebar();
+  const popUpVisible = useSelector(
+    (state: RootState) => state.toggle.toggles.popUp
+  );
+  const { isSidebarOpen, openSidebar, closeSidebar } = useSidebar();
 
-
-    useEffect(() => {
+  useEffect(() => {
     // Disable browser scroll restoration
-    if ('scrollRestoration' in window.history) {
-      window.history.scrollRestoration = 'manual';
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
     }
   }, []);
-    
+
   return (
     <>
       <Loader />
-       {popUpVisible && (
-          <PopUp>
-            <SelectWalletComponent />
-          </PopUp>
-        )}
-        
+      {popUpVisible && (
+        <PopUp>
+          <SelectWalletComponent />
+        </PopUp>
+      )}
+
       <MainContainerWrapper>
         <LightMainContainerWrapper>
           <PrimeMainContainer>
-            <Router>
-              <ScrollToTop />
-              <Notification />
-              <Navbar />
-              <HamburgerBtn onClick={openSidebar} />
-              <Sidebar open={isSidebarOpen} onClose={closeSidebar} />
-              <Routes>
-                <Route path="/" element={<MainPage />} />
-                <Route path="/Buyers" element={<Buyers />} />
-                <Route path="/Sellers" element={<Sellers />} />
-              </Routes>
-              <Footer />
-            </Router>
+            <ScrollToTop />
+            <Notification />
+            <Navbar />
+            <HamburgerBtn onClick={openSidebar} />
+            <Sidebar open={isSidebarOpen} onClose={closeSidebar} />
+            <Routes>
+              <Route path="/" element={<MainPage />} />
+              <Route path="/Buyers" element={<Buyers />} />
+              <Route path="/Sellers" element={<Sellers />} />
+            </Routes>
+            <Footer />
           </PrimeMainContainer>
         </LightMainContainerWrapper>
       </MainContainerWrapper>

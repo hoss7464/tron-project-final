@@ -1,4 +1,5 @@
 import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { LoadingProvider } from "./contexts/LoaderContext";
@@ -21,6 +22,7 @@ root.render(
     <React.StrictMode>
     <LoadingProvider>
       <Provider store={store}>  {/* ← Redux Provider first */}
+        <Router>
         <TronWalletProvider>  {/* ← Now TronWalletProvider can use useDispatch */}
           <FetchDataProvider>
             <I18nextProvider i18n={i18n}>
@@ -28,6 +30,7 @@ root.render(
             </I18nextProvider>
           </FetchDataProvider>
         </TronWalletProvider>
+        </Router>
       </Provider>
     </LoadingProvider>
    </React.StrictMode>

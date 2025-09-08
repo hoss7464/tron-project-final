@@ -124,7 +124,6 @@ export interface AvailableResponse {
 const baseUrl = process.env.REACT_APP_BASE_URL;
 const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
-
 export const fetchAllUiData = async (
   walletAddress: string | null,
   accessToken: string | null,
@@ -144,9 +143,14 @@ export const fetchAllUiData = async (
       }
     );
 
+  
+
     // Only fetch these on "/"
-    let ordersPromise: ReturnType<typeof axios.get<OrdersResponse>> | null = null;
-let availablePromise: ReturnType<typeof axios.get<AvailableResponse>> | null = null;
+    let ordersPromise: ReturnType<typeof axios.get<OrdersResponse>> | null =
+      null;
+    let availablePromise: ReturnType<
+      typeof axios.get<AvailableResponse>
+    > | null = null;
 
     if (pathname === "/") {
       ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
@@ -164,6 +168,9 @@ let availablePromise: ReturnType<typeof axios.get<AvailableResponse>> | null = n
         }
       );
     }
+
+      console.log(walletAddress)
+      console.log(pathname)
 
     // Handle myOrders (only on "/" + wallet connected)
     let myOrdersResponse: MyOrdersResponse;
@@ -209,11 +216,9 @@ let availablePromise: ReturnType<typeof axios.get<AvailableResponse>> | null = n
     }
 
     // Collect promises dynamically
-    const results = await Promise.allSettled([
-      ordersPromise,
-      resourcesPromise,
-      availablePromise,
-    ].filter(Boolean)); // filter out nulls
+    const results = await Promise.allSettled(
+      [ordersPromise, resourcesPromise, availablePromise].filter(Boolean)
+    ); // filter out nulls
 
     // Helper for settled promises
     const handleSettledPromise = <T>(
@@ -269,4 +274,3 @@ let availablePromise: ReturnType<typeof axios.get<AvailableResponse>> | null = n
     throw error;
   }
 };
-

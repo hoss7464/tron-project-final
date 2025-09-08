@@ -47,6 +47,7 @@ const Navbar: React.FC = () => {
   const {
     address,
     disconnectWallet,
+    disconnectWallet2,
     connectWallet,
     connectWalletMarket,
     isConnectedMarket,
@@ -58,8 +59,7 @@ const Navbar: React.FC = () => {
   );
 
   const isMarketPage = Location.pathname === "/";
-  const isBuyersOrSellers =
-    Location.pathname === "/Buyers" || Location.pathname === "/Sellers";
+  const isBuyersOrSellers = Location.pathname === "/Buyers" || Location.pathname === "/Sellers";
 
   const handleChange = (event: SelectChangeEvent) => {
     setAge(event.target.value);
@@ -79,7 +79,9 @@ const Navbar: React.FC = () => {
 
   const isConnected = isMarketPage ? isConnectedMarket : isConnectedTrading;
   const handleConnect = isMarketPage ? connectWalletMarket : connectWallet;
-  const handleDisconnect = disconnectWallet;
+  const handleDisconnect = isMarketPage ? disconnectWallet2 : disconnectWallet
+
+
 
   return (
     <>
@@ -222,12 +224,9 @@ const Navbar: React.FC = () => {
               </TranslateWrapper>
 
               {isConnected && address ? (
-                <Box
-                  onMouseEnter={handleAvatarEnter}
-                  onMouseLeave={handleAvatarLeave}
-                >
+                
                   <span ref={avatarRef}>
-                    <ConnectWrapper>
+                    <ConnectWrapper onClick={handleDisconnect}>
                       <ConnectIconWrapper>
                         <ConnectIcon />
                       </ConnectIconWrapper>
@@ -236,14 +235,8 @@ const Navbar: React.FC = () => {
                       </ConnectBtn>
                     </ConnectWrapper>
                   </span>
-                  <Menu
-                    anchorEl={avatarRef.current}
-                    open={avatarOpen}
-                    onClose={handleAvatarLeave}
-                  >
-                    <MenuItem onClick={handleDisconnect}>Disconnect</MenuItem>
-                  </Menu>
-                </Box>
+                  
+              
               ) : (
                 <ConnectWrapper onClick={handleConnect}>
                   <ConnectIconWrapper>

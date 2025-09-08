@@ -11,10 +11,12 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../redux/actions/notifSlice";
 import { toggleRefresh } from "../redux/actions/refreshSlice";
+import { useLocation } from "react-router-dom";
 
 // Context interface
 interface TronWalletContextProps {
   address: string | null;
+  setAddress: React.Dispatch<React.SetStateAction<string | null>>;
   balance: string | null;
   allBandwidth: number | null;
   availableBandwidth: number | null;
@@ -118,7 +120,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   //dispatch :
   const dispatch = useDispatch();
-
+  const location = useLocation();
   const tronWebRef = useRef<any>(null);
 
   //States :
@@ -301,12 +303,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const disconnectWallet = async () => {
     try {
       // First try to logout from server
+      const currentPath = window.location.pathname;
       await localStorageDeleteData();
 
-       localStorage.setItem("tronManualDisconnect", "true");
-      setShouldAutoConnect(false)
+      setShouldAutoConnect(false);
 
       // Clear local state only after successful server logout
+
+      eventListenersAdded.current = false;
+      clearAccessToken();
       setAddress(null);
       setBalance(null);
       setAllBandwidth(null);
@@ -315,9 +320,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAvailableEnergy(null);
       setIsConnected(false);
       stopRefreshInterval();
-      eventListenersAdded.current = false;
-      clearAccessToken();
-      setIsConnectedMarket(false);
       setIsConnectedTrading(false);
 
       dispatch(
@@ -351,12 +353,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const disconnectWallet2 = async () => {
     try {
       // First try to logout from server
-      await localStorageDeleteData();
 
-       localStorage.setItem("tronManualDisconnect", "true");
-      setShouldAutoConnect(false)
+      setShouldAutoConnect(false);
 
       // Clear local state only after successful server logout
+
       setAddress(null);
       setBalance(null);
       setAllBandwidth(null);
@@ -364,9 +365,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAllEnergy(null);
       setAvailableEnergy(null);
       setIsConnected(false);
+
       stopRefreshInterval();
       eventListenersAdded.current = false;
-      clearAccessToken();
+
+      setIsConnectedMarket(false);
     } catch (err) {
       // If server logout fails, we still clear local state but show an error
       setAddress(null);
@@ -743,13 +746,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         wallet_address: addr,
       };
       //To save localStorageSavedData in localStorage :
-      localStorage.setItem(
-        "tronWalletAddress",
-        JSON.stringify(localStorageSavedData)
-      );
+
       //wallet address state :
       setAddress(addr);
-      setIsConnectedMarket(false);
+
       setIsConnectedTrading(true);
 
       // Start refresh interval
@@ -827,14 +827,10 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
-      // Save to localStorage (separate key so it doesn’t collide with buyers/sellers auth)
-      localStorage.setItem("tronMarketWalletAddress", JSON.stringify({ wallet_address: addr }));
-
       // Update state
       setAddress(addr);
-      setIsConnectedTrading(false);
+
       setIsConnectedMarket(true);
-      setIsConnectedTrading(false);
 
       startRefreshInterval(addr);
 
@@ -860,85 +856,93 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   //-------------------------------------------------------------------------------------
-useEffect(() => {
-  const autoConnect = async () => {
-    try {
-      const currentPath = window.location.pathname;
-      let savedData: string | null = null;
 
-      if (currentPath === "/") {
-        savedData = localStorage.getItem("tronMarketWalletAddress");
+  useEffect(() => {
+    const autoConnect = async () => {
+      try {
+        let savedData: string | null = null;
+
+        /**  if (currentPath === "/") {
+          savedData = localStorage.getItem("tronMarketWalletAddress");
+        }
+        if (currentPath === "/Sellers" || currentPath === "/Buyers") {
+          savedData = localStorage.getItem("tronWalletAddress");
+        }
+
+        if (!savedData) return;
+
+        const parsedData = JSON.parse(savedData);
+        const walletAddr = parsedData.wallet_address;
+        if (!walletAddr) return;  */
+
+        // Connect the adapter
+        if (location.pathname !== "/" && isConnectedMarket) {
+          return;
+        }
+
+        await adapter.connect();
+
+        // Get TronWeb instance
+        const tronWeb = await getTronWeb();
+        const walletAddr = adapter.address;
+        if (walletAddr === null) {
+          return;
+        }
+
+        // Restore wallet address
+        setAddress(walletAddr);
+
+        // Get balance
+        const balanceInSun = await tronWeb.trx.getBalance(walletAddr);
+        setBalance(Number(tronWeb.fromSun(balanceInSun)).toFixed(2));
+
+        // Get bandwidth and energy
+        const resource = await tronWeb.trx.getAccountResources(walletAddr);
+        const freeNetLimit = resource.freeNetLimit ?? 0;
+        const netLimit = resource.NetLimit ?? 0;
+        const netUsed = resource.NetUsed ?? 0;
+        const freeNetUsed = resource.freeNetUsed ?? 0;
+        const energyLimit = resource.EnergyLimit ?? 0;
+        const energyUsed = resource.EnergyUsed ?? 0;
+
+        setAllBandwidth(freeNetLimit + netLimit - netUsed - freeNetUsed);
+        setAvailableBandwidth(freeNetLimit + netLimit);
+        setAllEnergy(energyLimit);
+        setAvailableEnergy(energyLimit - energyUsed);
+
+        // Set connection flags
+        setIsConnected(true);
+        setIsConnectedMarket(true);
+
+        // Start refreshing wallet data automatically
+
+        startRefreshInterval(walletAddr);
+        if (location.pathname === "/" && !isConnectedMarket) {
+          dispatch(
+            showNotification({
+              name: "tron-auto-connect",
+              message: "Wallet reconnected successfully",
+              severity: "success",
+            })
+          );
+        }
+      } catch (err) {
+        console.error("Auto-connect failed:", err);
+        // If something fails, clear local state
+        setAddress(null);
+        setBalance(null);
+        setAllBandwidth(null);
+        setAvailableBandwidth(null);
+        setAllEnergy(null);
+        setAvailableEnergy(null);
+        setIsConnected(false);
+        setIsConnectedMarket(false);
+        setIsConnectedTrading(false);
       }
-      if (currentPath === "/Sellers" || currentPath === "/Buyers") {
-        savedData = localStorage.getItem("tronWalletAddress");
-      }
+    };
 
-      if (!savedData) return;
-
-      const parsedData = JSON.parse(savedData);
-      const walletAddr = parsedData.wallet_address;
-      if (!walletAddr) return;
-
-      // Connect the adapter
-      await adapter.connect();
-
-      // Get TronWeb instance
-      const tronWeb = await getTronWeb();
-
-      // Restore wallet address
-      setAddress(walletAddr);
-
-      // Get balance
-      const balanceInSun = await tronWeb.trx.getBalance(walletAddr);
-      setBalance(Number(tronWeb.fromSun(balanceInSun)).toFixed(2));
-
-      // Get bandwidth and energy
-      const resource = await tronWeb.trx.getAccountResources(walletAddr);
-      const freeNetLimit = resource.freeNetLimit ?? 0;
-      const netLimit = resource.NetLimit ?? 0;
-      const netUsed = resource.NetUsed ?? 0;
-      const freeNetUsed = resource.freeNetUsed ?? 0;
-      const energyLimit = resource.EnergyLimit ?? 0;
-      const energyUsed = resource.EnergyUsed ?? 0;
-
-      setAllBandwidth(freeNetLimit + netLimit - netUsed - freeNetUsed);
-      setAvailableBandwidth(freeNetLimit + netLimit);
-      setAllEnergy(energyLimit);
-      setAvailableEnergy(energyLimit - energyUsed);
-
-      // Set connection flags
-      setIsConnected(true);
-      setIsConnectedMarket(currentPath === "/");
-      setIsConnectedTrading(currentPath === "/Sellers" || currentPath === "/Buyers");
-
-      // Start refreshing wallet data automatically
-      startRefreshInterval(walletAddr);
-
-      dispatch(
-        showNotification({
-          name: "tron-auto-connect",
-          message: "Wallet reconnected successfully",
-          severity: "success",
-        })
-      );
-    } catch (err) {
-      console.error("Auto-connect failed:", err);
-      // If something fails, clear local state
-      setAddress(null);
-      setBalance(null);
-      setAllBandwidth(null);
-      setAvailableBandwidth(null);
-      setAllEnergy(null);
-      setAvailableEnergy(null);
-      setIsConnected(false);
-      setIsConnectedMarket(false);
-      setIsConnectedTrading(false);
-    }
-  };
-
-  autoConnect();
-}, []);
-
+    autoConnect();
+  }, [location.pathname]);
 
   //-------------------------------------------------------------------------------------
   //To transfer TRX :
@@ -1284,6 +1288,7 @@ useEffect(() => {
       value={{
         adapter,
         address,
+        setAddress,
         balance,
         allBandwidth,
         availableBandwidth,

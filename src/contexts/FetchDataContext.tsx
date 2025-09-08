@@ -39,7 +39,7 @@ interface FetchDataProviderProps {
 export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   children,
 }) => {
-  const { address, disconnectWallet2, accessToken } = useTronWallet();
+  const { address, disconnectWallet2, accessToken, setAddress, adapter } = useTronWallet();
   const { incrementLoading, decrementLoading } = useLoading(); // Get loader functions
   const [orderData, setOrderData] = useState<OrdersResponse | null>(null);
   const [myOrderData, setMyOrderData] = useState<MyOrdersResponse | null>(null);
@@ -79,7 +79,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
       if (isInitialLoad) {
         incrementLoading();
       }
-      
+
       const allData = await fetchAllUiData(address, accessToken,path1,handleAuthFailure);
 
       setOrderData(allData.orders);
