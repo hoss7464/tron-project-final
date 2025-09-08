@@ -151,7 +151,7 @@ export const OrdersComponent: React.FC = () => {
     if (days > 0 && days < 1) {
       days = 1;
     }
-    const rPeriod = myTotal / myFreeze;
+    const rPeriod = myTotal / (myFreeze / 1e6 );
     const rawN = 365 / days;
     const n =
       opts?.compoundCapPerYear != null
