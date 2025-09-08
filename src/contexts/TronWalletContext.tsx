@@ -403,33 +403,36 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const isAuthenticating = useRef(false);
 
   // Modify the handleAccountChanged function
-  const handleAccountChanged = useCallback(
-    async (payload: any) => {
-      // Prevent multiple simultaneous authentication attempts
-      if (isAuthenticating.current) return;
+ const handleAccountChanged = useCallback(
+  async (payload: any) => {
+    if (isAuthenticating.current) return;
 
-      isAuthenticating.current = true;
+    isAuthenticating.current = true;
 
-      try {
-        const nextAddress =
-          payload?.base58 ??
-          (typeof payload === "string" ? payload : null) ??
-          window.tronLink?.tronWeb?.defaultAddress?.base58 ??
-          null;
+    try {
+      const nextAddress =
+        payload?.base58 ??
+        (typeof payload === "string" ? payload : null) ??
+        window.tronLink?.tronWeb?.defaultAddress?.base58 ??
+        null;
 
-        if (nextAddress) {
-          // If we already have an address and it's different from the new one
-          if (address && address !== nextAddress) {
-            // Clear local state without full server disconnect
-            setAddress(null);
-            setBalance(null);
-            setAllBandwidth(null);
-            setAvailableBandwidth(null);
-            setAllEnergy(null);
-            setAvailableEnergy(null);
-            stopRefreshInterval();
+      if (nextAddress) {
+        // If we already have an address and it's different from the new one
+        if (address && address !== nextAddress) {
+          // Clear local state without full server disconnect
+          setAddress(null);
+          setBalance(null);
+          setAllBandwidth(null);
+          setAvailableBandwidth(null);
+          setAllEnergy(null);
+          setAvailableEnergy(null);
+          stopRefreshInterval();
 
-            // Get the new message from server and sign it
+          const isBuyersOrSellers =
+            location.pathname === "/Buyers" || location.pathname === "/Sellers";
+
+          if (isBuyersOrSellers) {
+            //  Require signing message only in Buyers/Sellers
             const baseURL = process.env.REACT_APP_BASE_URL;
             const window_tronweb = (window as any).tronWeb;
 
@@ -452,8 +455,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
                   severity: "error",
                 })
               );
-              // If getting message fails, do full disconnect
-              await disconnectWallet2();
+              await disconnectWallet();
               return;
             }
 
@@ -470,22 +472,17 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
                   severity: "error",
                 })
               );
-              // If signing fails, do full disconnect
-              await disconnectWallet2();
+              await disconnectWallet();
               return;
             }
 
-            // Send address, message, and signature to server
+            // Verify on server
             const postServerData = await axios.post<{
               success: boolean;
               data: { access_token: string };
             }>(
               `${baseURL}/Auth/verify-request`,
-              {
-                address: nextAddress,
-                message,
-                signature,
-              },
+              { address: nextAddress, message, signature },
               {
                 headers: { "Content-Type": "application/json" },
                 withCredentials: true,
@@ -503,78 +500,79 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
                   severity: "error",
                 })
               );
-              await disconnectWallet2();
+              await disconnectWallet();
               return;
             }
 
             const access_token = server_data_json.data.access_token;
             setAccessToken(access_token);
 
-            // Save new wallet data to localStorage
-            const localStorageSavedData = {
-              wallet_address: nextAddress,
-            };
-
             localStorage.setItem(
               "tronWalletAddress",
-              JSON.stringify(localStorageSavedData)
+              JSON.stringify({ wallet_address: nextAddress })
             );
+          } else {
+            // On "/" → just store the new address locally, no signing
+            localStorage.setItem(
+              "tronMarketWalletAddress",
+              JSON.stringify({ wallet_address: nextAddress })
+            );
+          }
 
-            // Update state with new address
-            setAddress(nextAddress);
-            setIsConnected(true);
+          // Update state with new address
+          setAddress(nextAddress);
+          setIsConnected(true);
 
-            // Start refresh interval with new address
-            startRefreshInterval(nextAddress);
+          // Start refresh interval with new address
+          startRefreshInterval(nextAddress);
 
+          dispatch(
+            showNotification({
+              name: "tron-account-changed",
+              message: "Wallet account changed successfully",
+              severity: "success",
+            })
+          );
+        } else {
+          // First connection or same address
+          setIsConnected(true);
+          setAddress(nextAddress);
+          startRefreshInterval(nextAddress);
+          fetchWalletData(nextAddress);
+
+          if (address !== nextAddress) {
             dispatch(
               showNotification({
                 name: "tron-account-changed",
                 message: "Wallet account changed successfully",
-                severity: "success",
+                severity: "info",
               })
             );
-          } else {
-            // First connection or same address
-            setIsConnected(true);
-            setAddress(nextAddress);
-            startRefreshInterval(nextAddress);
-            fetchWalletData(nextAddress);
-
-            if (address !== nextAddress) {
-              dispatch(
-                showNotification({
-                  name: "tron-account-changed",
-                  message: "Wallet account changed successfully",
-                  severity: "info",
-                })
-              );
-            }
           }
-        } else {
-          // No address found, disconnect
-          disconnectWallet2();
         }
-      } catch (err) {
-        console.error("Error during wallet change authentication:", err);
-        // If authentication fails, fully disconnect
-        await disconnectWallet2();
-      } finally {
-        isAuthenticating.current = false;
+      } else {
+        disconnectWallet2();
       }
-    },
-    [
-      address,
-      dispatch,
-      axiosTimeOut,
-      adapter,
-      disconnectWallet2,
-      startRefreshInterval,
-      fetchWalletData,
-      stopRefreshInterval,
-      accessToken,
-    ]
-  );
+    } catch (err) {
+      console.error("Error during wallet change authentication:", err);
+      await disconnectWallet2();
+    } finally {
+      isAuthenticating.current = false;
+    }
+  },
+  [
+    address,
+    dispatch,
+    axiosTimeOut,
+    adapter,
+    disconnectWallet2,
+    startRefreshInterval,
+    fetchWalletData,
+    stopRefreshInterval,
+    accessToken,
+  ]
+);
+
   //to track listeners :
   useEffect(() => {
     const tw = window.tronLink?.tronWeb;
