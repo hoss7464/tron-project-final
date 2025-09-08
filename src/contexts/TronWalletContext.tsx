@@ -249,62 +249,71 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   //Function to delete data from localStorage :
-  const localStorageDeleteData = async (
-    currentAccessToken: string | null = accessToken
-  ) => {
-    const baseURL = process.env.REACT_APP_BASE_URL;
-    try {
-      const stored = localStorage.getItem("tronWalletAddress");
-      // to remove localStorage :
-      localStorage.removeItem("tronWalletAddress");
-      if (stored) {
-        /*
-        we use {} in out axios because the data format of posting with axios is something like this: 
-          axios.post(url, data?, config?)
-        If you skip the data parameter, the config (like withCredentials) becomes the second argument.
-        This can cause confusion because Axios may misinterpret your intention.
-        */
-        const response = await axios.post<DisconnectResponse>(
-          `${baseURL}/Auth/disconnect`,
-          {},
-          {
-            headers: {
-              "Content-Type": "application/json",
-              // "accessToken": currentAccessToken,
-            },
-            withCredentials: true,
-            timeout: axiosTimeOut,
-            validateStatus: (status: number) => status < 500,
-          }
-        );
-        if (response.data.success === false) {
-          dispatch(
-            showNotification({
-              name: "disconnect-error",
-              message: `${response.data.message}`,
-              severity: "error",
-            })
-          );
-          return;
-        }
+const disconnectWalletFromServer = async (
+  currentAccessToken: string | null = accessToken
+) => {
+  const baseURL = process.env.REACT_APP_BASE_URL;
+
+  try {
+    if (!address) {
+      // No active wallet → nothing to disconnect
+      return;
+    }
+
+    const response = await axios.post<DisconnectResponse>(
+      `${baseURL}/Auth/disconnect`,
+      {}, // important: keep the empty object so config isn't misinterpreted
+      {
+        headers: {
+          "Content-Type": "application/json",
+          accessToken: currentAccessToken ?? "",
+        },
+        withCredentials: true,
+        timeout: axiosTimeOut,
+        validateStatus: (status: number) => status < 500,
       }
-    } catch (err) {
+    );
+
+    if (response.data.success === false) {
       dispatch(
         showNotification({
-          name: "tron-error6",
-          message: `Error during logout process : ${err}`,
+          name: "disconnect-error",
+          message: `${response.data.message}`,
           severity: "error",
         })
       );
+      return;
     }
-  };
+
+    //Reset state (clear everything related to wallet)
+    setAddress(null);
+    setAccessToken(null);
+    setBalance(null);
+    setAllBandwidth(null);
+    setAvailableBandwidth(null);
+    setAllEnergy(null);
+    setAvailableEnergy(null);
+    setIsConnected(false);
+    stopRefreshInterval();
+
+  } catch (err) {
+    dispatch(
+      showNotification({
+        name: "tron-error6",
+        message: `Error during logout process : ${err}`,
+        severity: "error",
+      })
+    );
+  }
+};
+
   //-------------------------------------------------------------------------------------
   //Function to disconnect wallet :
   const disconnectWallet = async () => {
     try {
       // First try to logout from server
       const currentPath = window.location.pathname;
-      await localStorageDeleteData();
+      await disconnectWalletFromServer();
 
       setShouldAutoConnect(false);
 
@@ -403,23 +412,25 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const isAuthenticating = useRef(false);
 
   // Modify the handleAccountChanged function
- const handleAccountChanged = useCallback(
-  async (payload: any) => {
-    if (isAuthenticating.current) return;
+  const handleAccountChanged = useCallback(
+    async (payload: any) => {
+      if (isAuthenticating.current) return;
+      isAuthenticating.current = true;
 
-    isAuthenticating.current = true;
+      try {
+        const nextAddress =
+          payload?.base58 ??
+          (typeof payload === "string" ? payload : null) ??
+          window.tronLink?.tronWeb?.defaultAddress?.base58 ??
+          null;
 
-    try {
-      const nextAddress =
-        payload?.base58 ??
-        (typeof payload === "string" ? payload : null) ??
-        window.tronLink?.tronWeb?.defaultAddress?.base58 ??
-        null;
+        if (!nextAddress) {
+          await disconnectWallet2();
+          return;
+        }
 
-      if (nextAddress) {
-        // If we already have an address and it's different from the new one
         if (address && address !== nextAddress) {
-          // Clear local state without full server disconnect
+          // Reset current state
           setAddress(null);
           setBalance(null);
           setAllBandwidth(null);
@@ -427,151 +438,113 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           setAllEnergy(null);
           setAvailableEnergy(null);
           stopRefreshInterval();
+        }
 
-          const isBuyersOrSellers =
-            location.pathname === "/Buyers" || location.pathname === "/Sellers";
+        const isBuyersOrSellers =
+          location.pathname === "/Buyers" || location.pathname === "/Sellers";
 
-          if (isBuyersOrSellers) {
-            //  Require signing message only in Buyers/Sellers
-            const baseURL = process.env.REACT_APP_BASE_URL;
-            const window_tronweb = (window as any).tronWeb;
+        if (isBuyersOrSellers) {
+          // Require signing in Buyers/Sellers
+          const baseURL = process.env.REACT_APP_BASE_URL;
+          const window_tronweb = (window as any).tronWeb;
 
-            // Get message from server
-            const generate_msg = await axios.get<{
-              success: boolean;
-              data: { nonce: string };
-            }>(`${baseURL}/Auth/get-message`, {
-              headers: { "Content-Type": "application/json" },
-              timeout: axiosTimeOut,
-              validateStatus: (status: number) => status < 500,
-            });
+          const generate_msg = await axios.get<{
+            success: boolean;
+            data: { nonce: string };
+          }>(`${baseURL}/Auth/get-message`, {
+            headers: { "Content-Type": "application/json" },
+            timeout: axiosTimeOut,
+            validateStatus: (status: number) => status < 500,
+          });
 
-            const responseBody = generate_msg.data;
-            if (responseBody.success === false) {
-              dispatch(
-                showNotification({
-                  name: "tron-error2",
-                  message: "Tron Error : Something went wrong.",
-                  severity: "error",
-                })
-              );
-              await disconnectWallet();
-              return;
-            }
-
-            const message = responseBody.data.nonce;
-            window_tronweb.toHex(message);
-
-            // Sign the message with the new wallet
-            const signature = await adapter.signMessage(message);
-            if (!signature) {
-              dispatch(
-                showNotification({
-                  name: "tron-error3",
-                  message: "Tron Error : User rejected signing message.",
-                  severity: "error",
-                })
-              );
-              await disconnectWallet();
-              return;
-            }
-
-            // Verify on server
-            const postServerData = await axios.post<{
-              success: boolean;
-              data: { access_token: string };
-            }>(
-              `${baseURL}/Auth/verify-request`,
-              { address: nextAddress, message, signature },
-              {
-                headers: { "Content-Type": "application/json" },
-                withCredentials: true,
-                timeout: axiosTimeOut,
-                validateStatus: (status: number) => status < 500,
-              }
-            );
-
-            const server_data_json = postServerData.data;
-            if (server_data_json.success === false) {
-              dispatch(
-                showNotification({
-                  name: "tron-error4",
-                  message: "Tron Error : error fetching data from server.",
-                  severity: "error",
-                })
-              );
-              await disconnectWallet();
-              return;
-            }
-
-            const access_token = server_data_json.data.access_token;
-            setAccessToken(access_token);
-
-            localStorage.setItem(
-              "tronWalletAddress",
-              JSON.stringify({ wallet_address: nextAddress })
-            );
-          } else {
-            // On "/" → just store the new address locally, no signing
-            localStorage.setItem(
-              "tronMarketWalletAddress",
-              JSON.stringify({ wallet_address: nextAddress })
-            );
-          }
-
-          // Update state with new address
-          setAddress(nextAddress);
-          setIsConnected(true);
-
-          // Start refresh interval with new address
-          startRefreshInterval(nextAddress);
-
-          dispatch(
-            showNotification({
-              name: "tron-account-changed",
-              message: "Wallet account changed successfully",
-              severity: "success",
-            })
-          );
-        } else {
-          // First connection or same address
-          setIsConnected(true);
-          setAddress(nextAddress);
-          startRefreshInterval(nextAddress);
-          fetchWalletData(nextAddress);
-
-          if (address !== nextAddress) {
+          if (!generate_msg.data.success) {
             dispatch(
               showNotification({
-                name: "tron-account-changed",
-                message: "Wallet account changed successfully",
-                severity: "info",
+                name: "tron-error2",
+                message: "Tron Error : Something went wrong.",
+                severity: "error",
               })
             );
+            await disconnectWallet();
+            return;
           }
+
+          const message = generate_msg.data.data.nonce;
+          window_tronweb.toHex(message);
+
+          const signature = await adapter.signMessage(message);
+          if (!signature) {
+            dispatch(
+              showNotification({
+                name: "tron-error3",
+                message: "User rejected signing message.",
+                severity: "error",
+              })
+            );
+            await disconnectWallet();
+            return;
+          }
+
+          const verifyResp = await axios.post<{
+            success: boolean;
+            data: { access_token: string };
+          }>(
+            `${baseURL}/Auth/verify-request`,
+            { address: nextAddress, message, signature },
+            {
+              headers: { "Content-Type": "application/json" },
+              withCredentials: true,
+              timeout: axiosTimeOut,
+              validateStatus: (status: number) => status < 500,
+            }
+          );
+
+          if (!verifyResp.data.success) {
+            dispatch(
+              showNotification({
+                name: "tron-error4",
+                message: "Verification failed.",
+                severity: "error",
+              })
+            );
+            await disconnectWallet();
+            return;
+          }
+
+          setAccessToken(verifyResp.data.data.access_token);
         }
-      } else {
-        disconnectWallet2();
+
+        // Update React state (this is the source of truth!)
+        setAddress(nextAddress);
+        setIsConnected(true);
+
+        startRefreshInterval(nextAddress);
+        fetchWalletData(nextAddress);
+
+        dispatch(
+          showNotification({
+            name: "tron-account-changed",
+            message: "Wallet account changed successfully",
+            severity: "success",
+          })
+        );
+      } catch (err) {
+        console.error("Error during wallet change:", err);
+        await disconnectWallet2();
+      } finally {
+        isAuthenticating.current = false;
       }
-    } catch (err) {
-      console.error("Error during wallet change authentication:", err);
-      await disconnectWallet2();
-    } finally {
-      isAuthenticating.current = false;
-    }
-  },
-  [
-    address,
-    dispatch,
-    axiosTimeOut,
-    adapter,
-    disconnectWallet2,
-    startRefreshInterval,
-    fetchWalletData,
-    stopRefreshInterval,
-    accessToken,
-  ]
-);
+    },
+    [
+      address,
+      dispatch,
+      axiosTimeOut,
+      adapter,
+      disconnectWallet,
+      disconnectWallet2,
+      location.pathname,
+    ]
+  );
 
   //to track listeners :
   useEffect(() => {
@@ -597,53 +570,16 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [isConnected, handleAccountChanged, handleNetworkChanged]);
 
-  // پولینگ فقط اگر API رویدادها در دسترس نیست
-  useEffect(() => {
-    const tw = window.tronLink?.tronWeb;
-    if (!isConnected || !tw?.on || !tw?.off) return;
-
-    try {
-      tw.on("addressChanged", handleAccountChanged);
-      tw.on("networkChanged", handleNetworkChanged);
-      eventListenersAdded.current = true;
-    } catch (e) {
-      console.error("Error setting up TronLink listeners:", e);
-    }
-
-    return () => {
-      try {
-        tw.off("addressChanged", handleAccountChanged);
-        tw.off("networkChanged", handleNetworkChanged);
-        eventListenersAdded.current = false;
-      } catch (e) {
-        console.error("Error removing TronLink listeners:", e);
-      }
-    };
-  }, [isConnected, handleAccountChanged, handleNetworkChanged]);
-
-  // بازیابی اتصال از localStorage در mount
-  useEffect(() => {
-    const checkExistingConnection = async () => {
-      try {
-        const storedWallet = localStorage.getItem("tronWalletAddress");
-        if (storedWallet) {
-          const walletData = JSON.parse(storedWallet);
-          const currentAddress = walletData.wallet_address;
-          if (currentAddress) {
-            setAddress(currentAddress);
-            setIsConnected(true);
-            startRefreshInterval(currentAddress);
-          } else {
-            localStorage.removeItem("tronWalletAddress");
-          }
-        }
-      } catch (error) {
-        console.error("Error checking existing connection:", error);
-        localStorage.removeItem("tronWalletAddress");
-      }
-    };
-    checkExistingConnection();
-  }, []);
+useEffect(() => {
+  // If we already have an address in state when the app loads
+  if (address) {
+    setIsConnected(true);
+    startRefreshInterval(address);
+  } else {
+    setIsConnected(false);
+    stopRefreshInterval();
+  }
+}, [address, startRefreshInterval, stopRefreshInterval]);
 
   //Funtion to connect wallet :
   const connectWallet = async () => {
@@ -858,21 +794,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const autoConnect = async () => {
       try {
-        let savedData: string | null = null;
-
-        /**  if (currentPath === "/") {
-          savedData = localStorage.getItem("tronMarketWalletAddress");
-        }
-        if (currentPath === "/Sellers" || currentPath === "/Buyers") {
-          savedData = localStorage.getItem("tronWalletAddress");
-        }
-
-        if (!savedData) return;
-
-        const parsedData = JSON.parse(savedData);
-        const walletAddr = parsedData.wallet_address;
-        if (!walletAddr) return;  */
-
         // Connect the adapter
         if (location.pathname !== "/" && isConnectedMarket) {
           return;
