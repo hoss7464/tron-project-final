@@ -169,9 +169,6 @@ export const fetchAllUiData = async (
       );
     }
 
-      console.log(walletAddress)
-      console.log(pathname)
-
     // Handle myOrders (only on "/" + wallet connected)
     let myOrdersResponse: MyOrdersResponse;
     if (hasConnectedWallet && pathname === "/") {

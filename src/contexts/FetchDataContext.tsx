@@ -51,6 +51,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const [shouldStopPolling, setShouldStopPolling] = useState(false);
   const initialLoadRef = useRef(true); // Track initial load
   const path1 = window.location.pathname
+
   
   // Function to handle authentication failures
   const handleAuthFailure = useCallback(() => {

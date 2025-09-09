@@ -249,63 +249,62 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   //Function to delete data from localStorage :
-const disconnectWalletFromServer = async (
-  currentAccessToken: string | null = accessToken
-) => {
-  const baseURL = process.env.REACT_APP_BASE_URL;
+  const disconnectWalletFromServer = async (
+    currentAccessToken: string | null = accessToken
+  ) => {
+    const baseURL = process.env.REACT_APP_BASE_URL;
 
-  try {
-    if (!address) {
-      // No active wallet → nothing to disconnect
-      return;
-    }
-
-    const response = await axios.post<DisconnectResponse>(
-      `${baseURL}/Auth/disconnect`,
-      {}, // important: keep the empty object so config isn't misinterpreted
-      {
-        headers: {
-          "Content-Type": "application/json",
-          accessToken: currentAccessToken ?? "",
-        },
-        withCredentials: true,
-        timeout: axiosTimeOut,
-        validateStatus: (status: number) => status < 500,
+    try {
+      if (!address) {
+        // No active wallet → nothing to disconnect
+        return;
       }
-    );
 
-    if (response.data.success === false) {
+      const response = await axios.post<DisconnectResponse>(
+        `${baseURL}/Auth/disconnect`,
+        {}, // important: keep the empty object so config isn't misinterpreted
+        {
+          headers: {
+            "Content-Type": "application/json",
+            accessToken: currentAccessToken ?? "",
+          },
+          withCredentials: true,
+          timeout: axiosTimeOut,
+          validateStatus: (status: number) => status < 500,
+        }
+      );
+
+      if (response.data.success === false) {
+        dispatch(
+          showNotification({
+            name: "disconnect-error",
+            message: `${response.data.message}`,
+            severity: "error",
+          })
+        );
+        return;
+      }
+
+      //Reset state (clear everything related to wallet)
+      setAddress(null);
+      setAccessToken(null);
+      setBalance(null);
+      setAllBandwidth(null);
+      setAvailableBandwidth(null);
+      setAllEnergy(null);
+      setAvailableEnergy(null);
+      setIsConnected(false);
+      stopRefreshInterval();
+    } catch (err) {
       dispatch(
         showNotification({
-          name: "disconnect-error",
-          message: `${response.data.message}`,
+          name: "tron-error6",
+          message: `Error during logout process : ${err}`,
           severity: "error",
         })
       );
-      return;
     }
-
-    //Reset state (clear everything related to wallet)
-    setAddress(null);
-    setAccessToken(null);
-    setBalance(null);
-    setAllBandwidth(null);
-    setAvailableBandwidth(null);
-    setAllEnergy(null);
-    setAvailableEnergy(null);
-    setIsConnected(false);
-    stopRefreshInterval();
-
-  } catch (err) {
-    dispatch(
-      showNotification({
-        name: "tron-error6",
-        message: `Error during logout process : ${err}`,
-        severity: "error",
-      })
-    );
-  }
-};
+  };
 
   //-------------------------------------------------------------------------------------
   //Function to disconnect wallet :
@@ -570,16 +569,34 @@ const disconnectWalletFromServer = async (
     };
   }, [isConnected, handleAccountChanged, handleNetworkChanged]);
 
-useEffect(() => {
-  // If we already have an address in state when the app loads
-  if (address) {
-    setIsConnected(true);
-    startRefreshInterval(address);
-  } else {
-    setIsConnected(false);
-    stopRefreshInterval();
-  }
-}, [address, startRefreshInterval, stopRefreshInterval]);
+  // useEffect to disconnect wallet when we lock tronLink
+  useEffect(() => {
+    if (!window.tronLink) return;
+
+    const checkWalletStatus = async () => {
+      const tronWeb = (window as any).tronWeb;
+      const addr = tronWeb?.defaultAddress?.base58 || null;
+
+      // If previously connected but now no address → wallet is locked
+      if (!addr && address) {
+        await disconnectWallet2();
+      }
+    };
+
+    const interval = setInterval(checkWalletStatus, 1000); // check every 1 sec
+    return () => clearInterval(interval);
+  }, [address, disconnectWallet2]);
+
+  useEffect(() => {
+    // If we already have an address in state when the app loads
+    if (address) {
+      setIsConnected(true);
+      startRefreshInterval(address);
+    } else {
+      setIsConnected(false);
+      stopRefreshInterval();
+    }
+  }, [address, startRefreshInterval, stopRefreshInterval]);
 
   //Funtion to connect wallet :
   const connectWallet = async () => {
