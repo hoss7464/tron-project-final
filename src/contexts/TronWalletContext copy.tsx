@@ -45,6 +45,7 @@ interface TronWalletContextProps {
   ) => Promise<fillOrder>;
   isConnected: boolean;
   refreshWalletData: () => Promise<void>;
+
 }
 //Disconnect interface :
 interface DisconnectResponse {
@@ -137,6 +138,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   //state for access token :
   const [accessToken, setAccessToken] = useState<string | null>(null);
+
 
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
@@ -1198,6 +1200,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         fillTrxError,
         refreshWalletData,
         isConnected,
+  
       }}
     >
       {children}

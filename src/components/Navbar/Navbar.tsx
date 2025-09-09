@@ -54,6 +54,9 @@ const Navbar: React.FC = () => {
     isConnectedTrading,
   } = useTronWallet();
 
+  const isHighZ =
+    Location.pathname === "/Sellers" || Location.pathname === "/Buyers";
+
   const avatarOpen = useSelector(
     (state: RootState) => state.toggle.toggles["avatarToggle"]
   );
@@ -85,7 +88,7 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      <NavContainer>
+      <NavContainer $isHighZ={isHighZ}>
         <NavbarActiveArea>
           <NavbarLeftSection>
             <NavbarLogoWrapper>

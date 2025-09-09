@@ -51,6 +51,7 @@ interface TronWalletContextProps {
   isConnectedTrading: boolean;
   refreshWalletData: () => Promise<void>;
   getTronWeb: () => Promise<any>;
+  sellersPermission: boolean;
 }
 //Disconnect interface :
 interface DisconnectResponse {
@@ -145,6 +146,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   //state for access token :
   const [accessToken, setAccessToken] = useState<string | null>(null);
+    //State for sellers permission : 
+  const [sellersPermission, setSellersPermission] = useState<boolean>(false)
   //state for auto connect :
   const [shouldAutoConnect, setShouldAutoConnect] = useState(true);
 
@@ -613,6 +616,17 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           })
         );
         return;
+      }
+
+      if (location.pathname === "/Sellers" || sellersPermission === false) {
+        dispatch(
+          showNotification({
+            name: "tron-error20",
+            message: "You are not authorized to access this page.",
+            severity: "error",
+          })
+        );
+        return 
       }
 
       //To get data from any network
@@ -1246,6 +1260,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         isConnectedMarket,
         isConnectedTrading,
         getTronWeb,
+        sellersPermission,
       }}
     >
       {children}

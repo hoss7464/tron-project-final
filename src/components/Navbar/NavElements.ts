@@ -6,8 +6,8 @@ import { BsShopWindow } from "react-icons/bs";
 import { FaShoppingCart } from "react-icons/fa";
 import { FaHandshake } from "react-icons/fa";
 
-export const NavContainer = styled.div`
-  z-index: 95;
+export const NavContainer = styled.div<{ $isHighZ: boolean }>`
+  z-index: ${({ $isHighZ }) => ($isHighZ ? 1500 : 95)};
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(6px);
 

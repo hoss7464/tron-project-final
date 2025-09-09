@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import { ThemeColor } from "../../core-UI/Theme";
 import { IoSettingsSharp } from "react-icons/io5";
+import { FaLock } from "react-icons/fa";
+import { IoCopy } from "react-icons/io5";
 
 
 export const PopUpContainer = styled.div`
@@ -161,5 +163,51 @@ font-size: 16px;
 font-weight: 500;
 text-align: center;
 `
+
+export const Popup6Icon = styled(FaLock)`
+width: 24px;
+height: 24px;
+color: ${ThemeColor.text2};
+`
+
+export const PopUp6Wrapper1 = styled.div`
+display: flex;
+justify-content: center;
+align-items: flex-start;
+flex-direction: column;
+`
+
+export const PopUp6CopyIconWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+background-color:  ${ThemeColor.secondary1};
+border-radius: 6px;
+padding: 0.4rem;
+cursor: pointer;
+`
+export const PopUp6CopyIcon = styled(IoCopy)`
+width: 16px;
+height: 16px;
+color: ${ThemeColor.text2};
+cursor: pointer;
+`
+
+export const Popup6TextWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+padding: 4px 10px;
+background-color: ${ThemeColor.primary1};
+border-radius: 6px;
+margin-top: 0.5rem;
+
+`
+export const Popup6Text = styled.p`
+font-size: 13px;
+font-weight: 600;
+color: ${ThemeColor.text2};
+`
+
 
 

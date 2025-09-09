@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Sellers.css";
 import {
   SellersContainer,
@@ -73,6 +73,7 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useTronWallet } from "../../../contexts/TronWalletContext";
 import { useFetchData } from "../../../contexts/FetchDataContext";
 import MyFilterComponent from "../../../components/FilterComponent/MyFilterComponent";
+import PopUp6 from "../../../components/Popup/PopUp6";
 
 const Sellers: React.FC = () => {
   const {
@@ -82,8 +83,10 @@ const Sellers: React.FC = () => {
     availableBandwidth,
     availableEnergy,
     allEnergy,
+    sellersPermission,
   } = useTronWallet();
   const { resourceData } = useFetchData();
+  const [popup6Open, setPopup6Open] = useState(!sellersPermission);
   //----------------------------------------------------------------------------------------
   //Functions for circular progress bars :
   const bandwidthPercentage =
@@ -100,9 +103,19 @@ const Sellers: React.FC = () => {
   const minimumPrice = resourceData?.data.ratesByDuration.find(
     (minRate) => minRate.maxDurationSeconds === 2592000
   );
+  //----------------------------------------------------------------------------------------
+  const handleClose = () => {
+    setPopup6Open(false);
+  };
+  //----------------------------------------------------------------------------------------
+  useEffect(() => {
+    setPopup6Open(!sellersPermission);
+  }, [sellersPermission]);
 
   return (
     <>
+      {!sellersPermission && <PopUp6 open={popup6Open} onClose={handleClose} />}
+
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>
         <SellersMainWrapper>
@@ -553,7 +566,7 @@ const Sellers: React.FC = () => {
             </Grid>
           </SellersBottomWrapper>
           <SellersHistoryWrapper>
-            <OrdersWrapper className="history-bg" style={{width : "100%"}}>
+            <OrdersWrapper className="history-bg" style={{ width: "100%" }}>
               <OrderMainWrapper>
                 <OrdersNavHeaderWrapper>
                   <LegacyCardName style={{ color: "#003543" }}>
@@ -574,7 +587,9 @@ const Sellers: React.FC = () => {
                 <OrdersCarouselWrapper>
                   <OrdersScroll>
                     <OrderNavWrapper>
-                      <OrderNavTextWrapper1 style={{justifyContent : "space-between"}} >
+                      <OrderNavTextWrapper1
+                        style={{ justifyContent: "space-between" }}
+                      >
                         <SellersNavTextWrapper>
                           <OrderNavText>Date</OrderNavText>
                         </SellersNavTextWrapper>

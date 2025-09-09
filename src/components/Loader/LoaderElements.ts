@@ -9,5 +9,5 @@ export const LoaderContainer = styled.div`
   position: fixed;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(6px);
-  z-index: 1000;
+  z-index: 1600;
 `;
