@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
+import { useFetchData } from "../../contexts/FetchDataContext";
 import {
   Dialog,
   DialogContent,
@@ -44,6 +45,8 @@ interface SellersPermissionPopUp {
 
 const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
   const dispatch = useDispatch();
+  const {resourceData} = useFetchData()
+
   const handleCopy = (text?: string) => {
     if (text) {
       navigator.clipboard.writeText(text);
@@ -63,7 +66,7 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
         open={open}
         sx={{
           "& .MuiDialog-container": {
-            backdropFilter: "blur(2px)",
+            backdropFilter: "blur(9px)",
             background: "rgba(255, 255, 255, 0.5)",
           },
           "& .MuiPaper-root": {
@@ -73,6 +76,7 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
             minWidth: "30%",
             minHeight: "200px",
             zIndex: "90",
+            marginTop: "5rem",
           },
         }}
       >
@@ -88,14 +92,14 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
             </LegacyCardIconWrapper2>
           </LegacyCardIconWrapper1>
           <Popup2ItemNameWrapper>
-            <Popup2ItemName>Information</Popup2ItemName>
+            <Popup2ItemName>Get Permission</Popup2ItemName>
           </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>
 
         <DialogContent
           sx={{
-            minHeight: "380px",
-            maxHeight: "380px", // lock it to 300px
+            minHeight: "430px",
+            maxHeight: "430px", // lock it to 300px
             overflowY: "auto", // scroll if content is taller
           }}
         >
@@ -140,12 +144,12 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item style={{ marginTop: "0.5rem" }}>
-                  TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j
+                  {resourceData?.data.DappAddress}
                 </Popup2Item>
               </Popup2ItemWrapper>
             </PopUp6Wrapper1>
             <PopUp6CopyIconWrapper
-              onClick={() => handleCopy("TNrhQcsJyLHSd66KRGzHATXwXzWPJDLR3j")}
+              onClick={() => handleCopy(resourceData?.data.DappAddress)}
             >
               <PopUp6CopyIcon />
             </PopUp6CopyIconWrapper>
@@ -169,23 +173,44 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
             <Popup6TextWrapper>
               <Popup6Text>Reclaim Resources(Required)</Popup6Text>
             </Popup6TextWrapper>
+
+            <Popup6TextWrapper style={{ backgroundColor: "#430E00" }}>
+              <Popup6Text>Vote claim</Popup6Text>
+            </Popup6TextWrapper>
+            <Popup6TextWrapper style={{ backgroundColor: "#430E00" }}>
+              <Popup6Text>Voting</Popup6Text>
+            </Popup6TextWrapper>
+            <Popup6TextWrapper style={{ backgroundColor: "#430E00" }}>
+              <Popup6Text>Rewards TRX stake(2.0)</Popup6Text>
+            </Popup6TextWrapper>
           </Popup2NameItemWrapper>
 
           <Popup2NameItemWrapper
             style={{
+              justifyContent: "flex-start",
               alignItems: "flex-start",
-              flexDirection: "column",
               marginTop: "1rem",
             }}
           >
-            <Popup2NameWrapper>
-              <Popup2Name style={{ fontWeight: "700" }}>
-                Threshold and weight:
-              </Popup2Name>
-            </Popup2NameWrapper>
-            <Popup6TextWrapper>
-              <Popup6Text>1</Popup6Text>
-            </Popup6TextWrapper>
+            <PopUp6Wrapper1 style={{marginRight : "2rem"}} >
+              <Popup2NameWrapper>
+                <Popup2Name style={{ fontWeight: "700" }}>
+                  Threshold:
+                </Popup2Name>
+              </Popup2NameWrapper>
+              <Popup6TextWrapper>
+                <Popup6Text>1</Popup6Text>
+              </Popup6TextWrapper>
+            </PopUp6Wrapper1>
+
+            <PopUp6Wrapper1>
+              <Popup2NameWrapper>
+                <Popup2Name style={{ fontWeight: "700" }}>weight:</Popup2Name>
+              </Popup2NameWrapper>
+              <Popup6TextWrapper>
+                <Popup6Text>1</Popup6Text>
+              </Popup6TextWrapper>
+            </PopUp6Wrapper1>
           </Popup2NameItemWrapper>
         </DialogContent>
       </Dialog>

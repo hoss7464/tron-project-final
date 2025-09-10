@@ -84,6 +84,7 @@ const Sellers: React.FC = () => {
     availableEnergy,
     allEnergy,
     sellersPermission,
+    isConnectedTrading,
   } = useTronWallet();
   const { resourceData } = useFetchData();
   const [popup6Open, setPopup6Open] = useState(!sellersPermission);
@@ -108,13 +109,28 @@ const Sellers: React.FC = () => {
     setPopup6Open(false);
   };
   //----------------------------------------------------------------------------------------
-  useEffect(() => {
-    setPopup6Open(!sellersPermission);
-  }, [sellersPermission]);
+    useEffect(() => {
+    // Disconnected → popup open
+    if (!isConnectedTrading) {
+      setPopup6Open(true);
+      return;
+    }
+
+    // Connected but no seller permission → popup open
+    if (isConnectedTrading && !sellersPermission) {
+      setPopup6Open(true);
+      return;
+    }
+
+    // Connected AND has seller permission → popup closed
+    if (isConnectedTrading && sellersPermission) {
+      setPopup6Open(false);
+    }
+  }, [isConnectedTrading, sellersPermission, address]);
 
   return (
     <>
-      {!sellersPermission && <PopUp6 open={popup6Open} onClose={handleClose} />}
+       <PopUp6 open={popup6Open} onClose={handleClose} />
 
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>

@@ -66,6 +66,7 @@ export interface MyMarketOrder {
 export interface ResourceResponse {
   success: boolean;
   data: {
+    DappAddress:string,
     readyResource: {
       energy: number | string;
       bandwidth: number | string;
@@ -235,6 +236,7 @@ export const fetchAllUiData = async (
     const defaultResourceResponse: ResourceResponse = {
       success: false,
       data: {
+        DappAddress : "",
         readyResource: { energy: 0, bandwidth: 0 },
         dailyRecovery: { energy: 0, bandwidth: 0 },
         apy: { energy: 0, bandwidth: 0 },
