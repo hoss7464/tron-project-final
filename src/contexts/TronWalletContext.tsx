@@ -146,8 +146,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   //state for access token :
   const [accessToken, setAccessToken] = useState<string | null>(null);
-    //State for sellers permission : 
-  const [sellersPermission, setSellersPermission] = useState<boolean>(false)
+  //State for sellers permission :
+  const [sellersPermission, setSellersPermission] = useState<boolean>(false);
   //state for auto connect :
   const [shouldAutoConnect, setShouldAutoConnect] = useState(true);
 
@@ -523,13 +523,22 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         startRefreshInterval(nextAddress);
         fetchWalletData(nextAddress);
 
-        dispatch(
+        if (
+        !(
+          location.pathname === "/Sellers" &&
+          !sellersPermission
+        )
+      )  {
+         dispatch(
           showNotification({
             name: "tron-account-changed",
             message: "Wallet account changed successfully",
             severity: "success",
           })
         );
+      }
+
+       
       } catch (err) {
         console.error("Error during wallet change:", err);
         await disconnectWallet2();
@@ -616,17 +625,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           })
         );
         return;
-      }
-
-      if (location.pathname === "/Sellers" || sellersPermission === false) {
-        dispatch(
-          showNotification({
-            name: "tron-error20",
-            message: "You are not authorized to access this page.",
-            severity: "error",
-          })
-        );
-        return 
       }
 
       //To get data from any network
@@ -721,13 +719,21 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       startRefreshInterval(addr);
 
       //To show success notification after wallet connection :
-      dispatch(
-        showNotification({
-          name: "tron-success5",
-          message: "Wallet connection successful.",
-          severity: "success",
-        })
-      );
+
+      if (
+        !(
+          location.pathname === "/Sellers" &&
+          !sellersPermission
+        )
+      ) {
+        dispatch(
+          showNotification({
+            name: "tron-success5",
+            message: "Wallet connection successful.",
+            severity: "success",
+          })
+        );
+      }
     } catch (err) {
       setIsConnectedTrading(false);
       // Check for TronLink rejection specifically
@@ -867,6 +873,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         // Start refreshing wallet data automatically
 
         startRefreshInterval(walletAddr);
+
         if (location.pathname === "/" && !isConnectedMarket) {
           dispatch(
             showNotification({
@@ -893,6 +900,24 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
     autoConnect();
   }, [location.pathname]);
+
+  useEffect(() => {
+    // Check for restricted access on /Sellers
+    if (
+      location.pathname === "/Sellers" &&
+      isConnectedTrading === true &&
+      sellersPermission === false
+    ) {
+      dispatch(
+        showNotification({
+          name: "tron-seller-error",
+          message:
+            "Access denied: You need seller permission to use this page.",
+          severity: "error",
+        })
+      );
+    }
+  }, [location.pathname, isConnectedTrading, sellersPermission]);
 
   //-------------------------------------------------------------------------------------
   //To transfer TRX :
