@@ -32,6 +32,9 @@ const FetchDataContext = createContext<FetchDataContextType | undefined>(
   undefined
 );
 
+// Create a ref to expose resourceData
+export const FetchDataResourceRef = React.createRef<ResourceResponse | null>();
+
 interface FetchDataProviderProps {
   children: ReactNode;
 }
@@ -51,7 +54,6 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const [shouldStopPolling, setShouldStopPolling] = useState(false);
   const initialLoadRef = useRef(true); // Track initial load
   const path1 = window.location.pathname
-
   
   // Function to handle authentication failures
   const handleAuthFailure = useCallback(() => {
@@ -131,6 +133,10 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
     return () => clearInterval(intervalId);
   }, [fetchData, shouldStopPolling]);
 
+    useEffect(() => {
+    FetchDataResourceRef.current = resourceData;
+  }, [resourceData]);
+
   const value: FetchDataContextType = {
     orderData,
     myOrderData,
@@ -151,7 +157,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
 export const useFetchData = (): FetchDataContextType => {
   const context = useContext(FetchDataContext);
   if (context === undefined) {
-    throw new Error("useDashboard must be used within a DashboardProvider");
+    throw new Error("useFetchData must be used within fetchDataProvider");
   }
   return context;
 };

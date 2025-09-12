@@ -23,7 +23,7 @@ export const LoadingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (prev === 0) {
         setShowLoader(true);
         setMinTimeElapsed(false);
-        setTimeout(() => setMinTimeElapsed(true), loadingTime); // Minimum 3 seconds
+        setTimeout(() => setMinTimeElapsed(true), loadingTime); 
       }
       return prev + 1;
     });

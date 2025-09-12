@@ -13,6 +13,8 @@ import { showNotification } from "../redux/actions/notifSlice";
 import { toggleRefresh } from "../redux/actions/refreshSlice";
 import { useLocation } from "react-router-dom";
 import { Buffer } from "buffer";
+import { FetchDataResourceRef } from "./FetchDataContext";
+import { ResourceResponse } from "../services/requestService";
 
 
 
@@ -195,6 +197,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     setAccessToken(null);
   }, []);
 
+  //-------------------------------------------------------------------------------------
+  //Function to get resourceData from fetchDataContext :
+    const getResourceData = useCallback((): ResourceResponse | null => {
+    return FetchDataResourceRef.current;
+  }, []);
+
   //ali ezafe karde-------------------------------------------------------------------------------------
   function hasBothDelegateOps(opsHex?: string | null): boolean {
     if (!opsHex || typeof opsHex !== "string") return false;
@@ -212,6 +220,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchWalletData = async (walletAddress: string) => {
     try {
       const tronWeb = await getTronWeb();
+
+    // Get resource data
+    const resourceData = getResourceData();
+    const myDappAddress = resourceData?.data.DappAddress;
+
+    // Determine which address to use based on sellersPermission
+    const addressToUse = sellersPermission && myDappAddress 
+      ? myDappAddress 
+      : walletAddress;
 
       // Make both requests in parallel
       const [account, resource] = await Promise.all([
@@ -239,7 +256,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       // mohasebe perm
       let havedperm = false;
       const meHex = tronWeb.address
-        .toHex("T9zrvJiJjZMnPwKwSEjejcbBpvXc3qhdxd")
+        .toHex(addressToUse)
         .toLowerCase();
       let havedStake = false;
 
@@ -252,7 +269,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       }
 
-      console.log("haveperm : ", havedperm);
       const raw = account?.active_permission;
       const actives = Array.isArray(raw) ? raw : raw ? [raw] : [];
       const quickCheck = (p: ActivePermission) => {
