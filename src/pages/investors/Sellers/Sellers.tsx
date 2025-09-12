@@ -74,6 +74,7 @@ import { useTronWallet } from "../../../contexts/TronWalletContext";
 import { useFetchData } from "../../../contexts/FetchDataContext";
 import MyFilterComponent from "../../../components/FilterComponent/MyFilterComponent";
 import PopUp6 from "../../../components/Popup/PopUp6";
+import PopUp7 from "../../../components/Popup/PopUp7";
 
 const Sellers: React.FC = () => {
   const {
@@ -130,7 +131,11 @@ const Sellers: React.FC = () => {
 
   return (
     <>
-       <PopUp6 open={popup6Open} onClose={handleClose} />
+       
+      {!isConnectedTrading ?  <PopUp7 /> : ""}
+      
+      {isConnectedTrading && <PopUp6 open={popup6Open} onClose={handleClose} />}
+      
 
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>

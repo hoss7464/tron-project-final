@@ -149,9 +149,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isConnectedTrading, setIsConnectedTrading] = useState(false);
   const [balance, setBalance] = useState<string | null>(null);
   const [allBandwidth, setAllBandwidth] = useState<number | null>(null);
-  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(
-    null
-  );
+  const [availableBandwidth, setAvailableBandwidth] = useState<number | null>(null);
   const [allEnergy, setAllEnergy] = useState<number | null>(null);
   const [availableEnergy, setAvailableEnergy] = useState<number | null>(null);
   //States for Transfering TRX :
@@ -217,9 +215,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     return isSet(57) && isSet(58);
   }
   // Add cleanup on unmount
-  const fetchWalletData = async (walletAddress: string) => {
-    try {
-      const tronWeb = await getTronWeb();
+const fetchWalletData = async (walletAddress: string) => {
+  try {
+    const tronWeb = await getTronWeb();
 
     // Get resource data
     const resourceData = getResourceData();
@@ -230,91 +228,108 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       ? myDappAddress 
       : walletAddress;
 
-      // Make both requests in parallel
-      const [account, resource] = await Promise.all([
-        // Get balance
-        tronWeb.trx.getAccount(walletAddress),
-        // Get resources
-        tronWeb.trx.getAccountResources(walletAddress),
-      ]);
+    // Use Promise.allSettled instead of Promise.all
+    const [accountResult, resourceResult] = await Promise.allSettled([
+      // Get balance
+      tronWeb.trx.getAccount(walletAddress),
+      // Get resources
+      tronWeb.trx.getAccountResources(walletAddress),
+    ]);
 
-      const balanceTRX = tronWeb.fromSun(account.balance);
-      setBalance(Number(balanceTRX).toFixed(2));
-
-      const freeNetLimit = resource.freeNetLimit ?? 0;
-      const netLimit = resource.NetLimit ?? 0;
-      const netUsed = resource.NetUsed ?? 0;
-      const freeNetUsed = resource.freeNetUsed ?? 0;
-      const energyLimit = resource.EnergyLimit ?? 0;
-      const energyUsed = resource.EnergyUsed ?? 0;
-      const all_bw = freeNetLimit + netLimit - netUsed - freeNetUsed;
-      const totalBw = freeNetLimit + netLimit;
-      const all_energy = energyLimit;
-      const available_energy = energyLimit - energyUsed;
-      // perm
-
-      // mohasebe perm
-      let havedperm = false;
-      const meHex = tronWeb.address
-        .toHex(addressToUse)
-        .toLowerCase();
-      let havedStake = false;
-
-      if (Array.isArray(account?.frozenV2) && account.frozenV2.length > 0) {
-        if (
-          account.frozenV2[0]?.amount >= 1e6 ||
-          account.frozenV2[1]?.amount >= 1e6
-        ) {
-          havedStake = true;
-        }
-      }
-
-      const raw = account?.active_permission;
-      const actives = Array.isArray(raw) ? raw : raw ? [raw] : [];
-      const quickCheck = (p: ActivePermission) => {
-        const keys = Array.isArray(p?.keys) ? p.keys : [];
-        let weightSum = 0;
-        for (const k of keys) {
-          const kHex = tronWeb.address.toHex(k?.address).toLowerCase();
-          if (kHex && kHex === meHex) weightSum += Number(k?.weight || 0);
-        }
-
-        const threshold = Number(p?.threshold ?? 1);
-        const hasAddress = weightSum > 0;
-        const opsOk = hasBothDelegateOps(p?.operations);
-        const passes =
-          hasAddress && weightSum === 1 && threshold === 1 && opsOk;
-        return { hasAddress, weightSum, threshold, opsOk, passes };
-      };
-
-      if (havedStake) {
-        for (const perm of actives) {
-          const c = quickCheck(perm);
-          if (c.passes) {
-            havedperm = true;
-            break;
-          }
-        }
-      }
-
-      setSellersPermission(havedperm);
-
-      setAllBandwidth(all_bw);
-      setAvailableBandwidth(totalBw);
-      setAllEnergy(all_energy);
-      setAvailableEnergy(available_energy);
-    } catch (err) {
-      console.error("Error fetching wallet data:", err);
-      // Optional: show notification for refresh errors
-      dispatch(
-        showNotification({
-          name: "tron-refresh-error",
-          message: "Failed to refresh wallet data",
-          severity: "warning",
-        })
-      );
+    // Handle account result
+    let account: any = null;
+    if (accountResult.status === 'fulfilled') {
+      account = accountResult.value;
+    } else {
+      console.error('Failed to get account:', accountResult.reason);
+      throw new Error('Failed to fetch account data');
     }
-  };
+
+    // Handle resource result
+    let resource: any = null;
+    if (resourceResult.status === 'fulfilled') {
+      resource = resourceResult.value;
+    } else {
+      console.error('Failed to get resources:', resourceResult.reason);
+      throw new Error('Failed to fetch resource data');
+    }
+
+    const balanceTRX = tronWeb.fromSun(account.balance);
+    setBalance(Number(balanceTRX).toFixed(2));
+
+    const freeNetLimit = resource.freeNetLimit ?? 0;
+    const netLimit = resource.NetLimit ?? 0;
+    const netUsed = resource.NetUsed ?? 0;
+    const freeNetUsed = resource.freeNetUsed ?? 0;
+    const energyLimit = resource.EnergyLimit ?? 0;
+    const energyUsed = resource.EnergyUsed ?? 0;
+    const all_bw = freeNetLimit + netLimit - netUsed - freeNetUsed;
+    const totalBw = freeNetLimit + netLimit;
+    const all_energy = energyLimit;
+    const available_energy = energyLimit - energyUsed;
+
+    // perm
+    let havedperm = false;
+    const meHex = tronWeb.address
+      .toHex(addressToUse)
+      .toLowerCase();
+    let havedStake = false;
+
+    if (Array.isArray(account?.frozenV2) && account.frozenV2.length > 0) {
+      if (
+        account.frozenV2[0]?.amount >= 1e6 ||
+        account.frozenV2[1]?.amount >= 1e6
+      ) {
+        havedStake = true;
+      }
+    }
+
+    const raw = account?.active_permission;
+    const actives = Array.isArray(raw) ? raw : raw ? [raw] : [];
+    const quickCheck = (p: ActivePermission) => {
+      const keys = Array.isArray(p?.keys) ? p.keys : [];
+      let weightSum = 0;
+      for (const k of keys) {
+        const kHex = tronWeb.address.toHex(k?.address).toLowerCase();
+        if (kHex && kHex === meHex) weightSum += Number(k?.weight || 0);
+      }
+
+      const threshold = Number(p?.threshold ?? 1);
+      const hasAddress = weightSum > 0;
+      const opsOk = hasBothDelegateOps(p?.operations);
+      const passes =
+        hasAddress && weightSum === 1 && threshold === 1 && opsOk;
+      return { hasAddress, weightSum, threshold, opsOk, passes };
+    };
+
+    if (havedStake) {
+      for (const perm of actives) {
+        const c = quickCheck(perm);
+        if (c.passes) {
+          havedperm = true;
+          break;
+        }
+      }
+    }
+
+    setSellersPermission(havedperm);
+
+    setAllBandwidth(all_bw);
+    setAvailableBandwidth(totalBw);
+    setAllEnergy(all_energy);
+    setAvailableEnergy(available_energy);
+  } catch (err) {
+    console.error("Error fetching wallet data:", err);
+    // Optional: show notification for refresh errors
+    dispatch(
+      showNotification({
+        name: "tron-refresh-error",
+        message: "Failed to refresh wallet data",
+        severity: "warning",
+      })
+    );
+  }
+};
 
   // Function to start the refresh interval
   const startRefreshInterval = (walletAddress: string) => {

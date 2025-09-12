@@ -2,19 +2,10 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { useFetchData } from "../../contexts/FetchDataContext";
-import {
-  Dialog,
-  DialogContent,
-  Box,
-  Divider,
-  DialogActions,
-  Button,
-} from "@mui/material";
+import { Dialog, DialogContent, Box } from "@mui/material";
 import {
   Popup2HeaderWrapper,
   Popup2Header,
-  Popup2SubheaderWrapper,
-  Popup2Subheader,
   Popup2NameItemWrapper,
   Popup2NameWrapper,
   Popup2Name,
@@ -23,8 +14,6 @@ import {
   Popup2ImgWrapper,
   Popup2ItemNameWrapper,
   Popup2ItemName,
-  Popup5TextWrapper,
-  Popup5Text,
   Popup6Icon,
   PopUp6Wrapper1,
   PopUp6CopyIconWrapper,
@@ -45,7 +34,7 @@ interface SellersPermissionPopUp {
 
 const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
   const dispatch = useDispatch();
-  const {resourceData} = useFetchData()
+  const { resourceData } = useFetchData();
 
   const handleCopy = (text?: string) => {
     if (text) {
@@ -76,7 +65,7 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
             minWidth: "30%",
             minHeight: "200px",
             zIndex: "90",
-            marginTop: "5rem",
+            marginTop: "4rem",
           },
         }}
       >
@@ -91,9 +80,6 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
               </LegacyCardIconWrapper3>
             </LegacyCardIconWrapper2>
           </LegacyCardIconWrapper1>
-          <Popup2ItemNameWrapper>
-            <Popup2ItemName>Get Permission</Popup2ItemName>
-          </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>
 
         <DialogContent
@@ -192,7 +178,7 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
               marginTop: "1rem",
             }}
           >
-            <PopUp6Wrapper1 style={{marginRight : "2rem"}} >
+            <PopUp6Wrapper1 style={{ marginRight: "2rem" }}>
               <Popup2NameWrapper>
                 <Popup2Name style={{ fontWeight: "700" }}>
                   Threshold:

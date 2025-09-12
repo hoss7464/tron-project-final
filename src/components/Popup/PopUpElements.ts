@@ -10,12 +10,13 @@ export const PopUpContainer = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   position: fixed;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(6px);
-  padding: 1rem;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
 `;
 
 export const Popup2HeaderWrapper = styled.div`
