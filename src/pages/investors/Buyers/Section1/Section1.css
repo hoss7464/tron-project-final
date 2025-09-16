@@ -1,0 +1,6 @@
+.card-bg {
+  background-image: url("../../../../assets//png/Card-bg.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
