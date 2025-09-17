@@ -163,7 +163,6 @@ const Section1: React.FC = () => {
                 </LegacyCardWrapper3>
               </LegacyCardWrapper2>
             </Grid>
-
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
               <LegacyCardWrapper2>
                 <LegacyCardWrapper3 className="card-bg">

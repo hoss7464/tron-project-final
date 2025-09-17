@@ -1,0 +1,13 @@
+.form-bg1 {
+    background-image: url("../../../../../assets//png//form-bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.form-bg2 {
+    background-image: url("../../../../../assets/png/form-bg2.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}

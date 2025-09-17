@@ -29,6 +29,7 @@ export const BuyersContainer = styled.div`
     min-height: 760px;
   }
 `;
+
 export const BuyerssMainWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -39,6 +40,7 @@ export const BuyerssMainWrapper = styled.div`
   z-index: 10;
   padding-top: 20px;
   padding-bottom: 20px;
+  margin-bottom: 1rem;
  
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     padding: 0 24px 0 24px;
@@ -65,3 +67,8 @@ export const BuyerssMainWrapper = styled.div`
     margin-top: 5rem;
   }
 `;
+
+export const Sec2Wrapper = styled.div`
+width: 100%;
+margin-top: 20px;
+`

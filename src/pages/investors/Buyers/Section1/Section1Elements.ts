@@ -59,8 +59,8 @@ border-radius: 6px;
 cursor: pointer;
 `
 export const Sec1CopyIcon = styled(IoCopy)`
-width: 26px;
-height: 26px;
+width: 22px;
+height: 22px;
 color: ${ThemeColor.secondary1};
 cursor: pointer;
 margin-top: 0.1rem;
