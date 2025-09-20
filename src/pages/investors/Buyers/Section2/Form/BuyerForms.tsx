@@ -4,8 +4,9 @@ import {
   BuyersFormsContainer,
   FormSwitchBtnWrapper,
   BuyerFormContentWrapper,
+  BuyersForm,
 } from "./BuyerFormsElements";
-import { FormWrapper2, Form } from "../../../../mainPage/mainPageElements";
+import { FormWrapper2 } from "../../../../mainPage/mainPageElements";
 import { styled } from "@mui/material/styles";
 import { ToggleButtonGroup, ToggleButton } from "@mui/material";
 import Form1 from "./Form1/Form1";
@@ -62,7 +63,7 @@ const BuyerForms: React.FC = () => {
     <>
       <BuyersFormsContainer>
         <FormWrapper2 className="form-bg1" style={{ height: "100%" }}>
-          <Form className="form-bg2" style={{ height: "100%", padding : "0" }}>
+          <BuyersForm className="form-bg2" style={{ height: "100%", padding : "0"}}>
             {/*Switch btn 1 to change the form */}
             <FormSwitchBtnWrapper>
               <FullWidthToggleButtonGroup
@@ -74,11 +75,11 @@ const BuyerForms: React.FC = () => {
                 <CustomToggleButton value="Auto">Auto</CustomToggleButton>
               </FullWidthToggleButtonGroup>
             </FormSwitchBtnWrapper>
-            <BuyerFormContentWrapper>
+            <BuyerFormContentWrapper >
                 {buyerSwitchBtn === "Manual" ? <Form1 /> : <Form2 />}
-            </BuyerFormContentWrapper>
+            </BuyerFormContentWrapper> 
 
-          </Form>
+          </BuyersForm>
         </FormWrapper2>
       </BuyersFormsContainer>
     </>
