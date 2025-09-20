@@ -9,7 +9,7 @@ import { HeroMainbgPhotoWrapper } from "../../mainPage/HeroSection/HeroElements"
 import Section1 from "./Section1/Section1";
 import { Grid } from "@mui/material";
 import BuyerForms from "./Section2/Form/BuyerForms";
-import BuyersTable1 from "./Section2/Table/BuyersTable1";
+import BuyersTables from "./Section2/Table/BuyersTables";
 
 const Buyers: React.FC = () => {
   return (
@@ -24,7 +24,7 @@ const Buyers: React.FC = () => {
                 <BuyerForms />
               </Grid>
               <Grid size={{ xs: 12, sm: 12, md: 12, lg: 8 }}>
-                <BuyersTable1 />
+               <BuyersTables />
               </Grid>
             </Grid>
           </Sec2Wrapper>

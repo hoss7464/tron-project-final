@@ -718,7 +718,7 @@ const Form1: React.FC = () => {
     setCurrentDate(now.toLocaleDateString());
     setCurrentTime(now.toLocaleTimeString());
 
-    if (!address) {
+    if (!address && isConnectedTrading === false) {
       dispatch(
         showNotification({
           name: "error1",

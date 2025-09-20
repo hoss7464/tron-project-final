@@ -1,6 +1,5 @@
 import React from "react";
-import "./BuyersTable.css";
-import { BuyersTableContainer1 } from "./BuyersTableElements";
+import "../BuyersTable.css";
 import {
   OrderMainWrapper,
   OrdersNavHeaderWrapper,
@@ -9,18 +8,14 @@ import {
   AvailableNavWrapper,
   AvailableNavTextWrapper,
   OrderNavText,
-} from "../../../../mainPage/mainPageElements";
-import { LegacyCardName } from "../../../../mainPage/LegacySection/LegacyElements";
+} from "../../../../../mainPage/mainPageElements";
+import { LegacyCardName } from "../../../../../mainPage/LegacySection/LegacyElements";
 
 const BuyersTable1: React.FC = () => {
   return (
     <>
-      <BuyersTableContainer1 className="buyers-table-bg">
-        <OrderMainWrapper>
-          <OrdersNavHeaderWrapper>
-            <LegacyCardName>Orders History</LegacyCardName>
-          </OrdersNavHeaderWrapper>
-
+      
+        <OrderMainWrapper style={{ padding : "0"}}>
           <OrdersCarouselWrapper>
             <MyOrdersScroll>
               <AvailableNavWrapper>
@@ -55,7 +50,7 @@ const BuyersTable1: React.FC = () => {
             </MyOrdersScroll>
           </OrdersCarouselWrapper>
         </OrderMainWrapper>
-      </BuyersTableContainer1>
+      
     </>
   );
 };
