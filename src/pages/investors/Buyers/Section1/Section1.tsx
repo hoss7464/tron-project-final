@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import "./Section1.css";
+import { useTronWallet } from "../../../../contexts/TronWalletContext";
 import {
   Sec1Contrainer,
   SecSummaryIcon,
@@ -9,6 +10,10 @@ import {
   Sec1CardThingsWrapper,
   Sec1CopyIcon,
 } from "./Section1Elements";
+import {
+  FormErrorWrapper,
+  FormError,
+} from "../../../mainPage/mainPageElements";
 import {
   LegacyCardWrapper,
   LegacyCardWrapper2,
@@ -46,8 +51,52 @@ import { Grid } from "@mui/material";
 import balanceIcon from "../../../../assets/svg/BalanceIcon.svg";
 import energyIcon from "../../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../../assets/svg/BandwidthIcon.svg";
+import PopUp8 from "../../../../components/Popup/PopUp8";
+import { useLocation } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { showNotification } from "../../../../redux/actions/notifSlice";
 
 const Section1: React.FC = () => {
+  const dispatch = useDispatch();
+  const { address, isConnectedTrading } = useTronWallet();
+  const [deposit, setDeposit] = useState<string>("");
+  const [depositError, setDepositError] = useState<string>("");
+  const [changeApiOpen, setChangeApiOpen] = useState(false);
+
+  const handleDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    // Allow only numbers and empty string
+    if (value === "" || /^\d+$/.test(value)) {
+      setDeposit(value);
+
+      // Validate immediately after setting the allowed value
+      if (value && Number(value) < 10) {
+        setDepositError("Minimum deposit: 10 TRX");
+      } else {
+        setDepositError("");
+      }
+    }
+  };
+
+  const handlePopUp8Click = () => {
+    if (!address || isConnectedTrading === false) {
+      dispatch(
+        showNotification({
+          name: "deposit-error-1",
+          message: "Connect your wallet.",
+          severity: "error",
+        })
+      );
+      return;
+    }
+    setChangeApiOpen(true);
+  };
+
+  const handlePopup8Close = useCallback(() => {
+    setChangeApiOpen(false);
+  }, []);
+
   return (
     <>
       <Sec1Contrainer>
@@ -65,65 +114,39 @@ const Section1: React.FC = () => {
                       </LegacyCardIconWrapper2>
                     </LegacyCardIconWrapper1>
                     <LegacyCardNameWrapper>
-                      <LegacyCardName>Daily Summary</LegacyCardName>
+                      <LegacyCardName>Deposit</LegacyCardName>
                     </LegacyCardNameWrapper>
                   </LegacyCardIconNameWrapper>
                   <SellersCardThingsWrapper>
-                    <SellersCardThingsWrapper2>
-                      <SellersCardThingsNameIconWrapper>
-                        <HeroGridCardNumberIconWrapper>
-                          <HeroGridCardNumberIconWrapper2
-                            style={{ border: "solid 1px #003543" }}
-                          >
-                            <HeroGridCardNumberIconWrapper3
-                              style={{ backgroundColor: "#003543" }}
-                            >
-                              <HeroGridCardNumberIcon
-                                alt="energy icon"
-                                src={energyIcon}
-                              />
-                            </HeroGridCardNumberIconWrapper3>
-                          </HeroGridCardNumberIconWrapper2>
-                        </HeroGridCardNumberIconWrapper>
-                        <SellersCardThingsNameWrapper>
-                          <SellersCardThingsName>Energy</SellersCardThingsName>
-                        </SellersCardThingsNameWrapper>
-                      </SellersCardThingsNameIconWrapper>
-                      <SellersCardThingsNumberWrapper>
-                        <SellersCardThingsNumber>
-                          123456
-                        </SellersCardThingsNumber>
-                      </SellersCardThingsNumberWrapper>
-                    </SellersCardThingsWrapper2>
-
-                    <SellersCardThingsWrapper2>
-                      <SellersCardThingsNameIconWrapper>
-                        <HeroGridCardNumberIconWrapper>
-                          <HeroGridCardNumberIconWrapper2
-                            style={{ border: "solid 1px #430E00" }}
-                          >
-                            <HeroGridCardNumberIconWrapper3
-                              style={{ backgroundColor: "#430E00" }}
-                            >
-                              <HeroGridCardNumberIcon
-                                alt="energy icon"
-                                src={bandwidthIcon}
-                              />
-                            </HeroGridCardNumberIconWrapper3>
-                          </HeroGridCardNumberIconWrapper2>
-                        </HeroGridCardNumberIconWrapper>
-                        <SellersCardThingsNameWrapper>
-                          <SellersCardThingsName>
-                            Bandwidth
-                          </SellersCardThingsName>
-                        </SellersCardThingsNameWrapper>
-                      </SellersCardThingsNameIconWrapper>
-                      <SellersCardThingsNumberWrapper>
-                        <SellersCardThingsNumber>
-                          123456
-                        </SellersCardThingsNumber>
-                      </SellersCardThingsNumberWrapper>
-                    </SellersCardThingsWrapper2>
+                    {/*put input here */}
+                    <Sec1CardThingsWrapper
+                      style={{
+                        alignItems: "flex-start",
+                        justifyContent: "flex-start",
+                      }}
+                    >
+                      {depositError && (
+                        <FormErrorWrapper>
+                          <FormError>{depositError}</FormError>
+                        </FormErrorWrapper>
+                      )}
+                      <FormAddInputWrapper style={{ marginBottom: "1rem" }}>
+                        <FormAddInputIconWrapper>
+                          <FormAddInputWrapper2>
+                            <FormAddInput
+                              value={deposit}
+                              placeholder="min-amount: 10 TRX"
+                              style={{ height: "25px" }}
+                              onChange={handleDepositChange}
+                            />
+                          </FormAddInputWrapper2>
+                        </FormAddInputIconWrapper>
+                      </FormAddInputWrapper>
+                      <Sec1ButtonWrapper>
+                        <Sec1ButtonText>Deposit</Sec1ButtonText>
+                      </Sec1ButtonWrapper>
+                    </Sec1CardThingsWrapper>
+                    {/*put botton here */}
                   </SellersCardThingsWrapper>
                 </LegacyCardWrapper3>
               </LegacyCardWrapper2>
@@ -156,9 +179,6 @@ const Section1: React.FC = () => {
                         </SellersCardThingsNumber>
                       </SellersCardThingsNumberWrapper>
                     </SellersCardThingsWrapper2>
-                    <Sec1ButtonWrapper>
-                      <Sec1ButtonText>Recharge</Sec1ButtonText>
-                    </Sec1ButtonWrapper>
                   </Sec1CardThingsWrapper>
                 </LegacyCardWrapper3>
               </LegacyCardWrapper2>
@@ -179,7 +199,7 @@ const Section1: React.FC = () => {
                     </LegacyCardNameWrapper>
                   </LegacyCardIconNameWrapper>
                   <Sec1CardThingsWrapper>
-                    <FormAddInputWrapper style={{marginBottom : "1rem"}} >
+                    <FormAddInputWrapper style={{ marginBottom: "1rem" }}>
                       <FormAddInputIconWrapper>
                         <FormAddInputWrapper2>
                           <FormAddInput value="" placeholder="API key" />
@@ -188,7 +208,7 @@ const Section1: React.FC = () => {
                         <Sec1CopyIcon />
                       </FormAddInputIconWrapper>
                     </FormAddInputWrapper>
-                    <Sec1ButtonWrapper>
+                    <Sec1ButtonWrapper onClick={handlePopUp8Click}>
                       <Sec1ButtonText>Change API</Sec1ButtonText>
                     </Sec1ButtonWrapper>
                   </Sec1CardThingsWrapper>
@@ -198,6 +218,9 @@ const Section1: React.FC = () => {
           </Grid>
         </LegacyCardWrapper>
       </Sec1Contrainer>
+      {changeApiOpen && (
+        <PopUp8 open={changeApiOpen} onClose={handlePopup8Close} />
+      )}
     </>
   );
 };

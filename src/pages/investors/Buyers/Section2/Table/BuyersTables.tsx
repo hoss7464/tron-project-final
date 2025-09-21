@@ -32,7 +32,7 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   fontWeight: "bold",
   fontSize: "13px",
   border: "2px solid #430E00",
-  borderRadius: 12,
+  borderRadius: 8,
   padding: "2px 6px",
   flex: 1,
   width: "80px",
