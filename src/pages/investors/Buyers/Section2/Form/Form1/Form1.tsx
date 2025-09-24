@@ -84,7 +84,7 @@ const boxStyle = {
 };
 
 //-------------------------------------------------------------------------------------
-//Custom switch btn 1 to change the form :
+//Custom switch btn 1:
 const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   textTransform: "none",
   fontWeight: "bold",
