@@ -42,3 +42,10 @@ export const Form2IconWrapper = styled.div`
   padding: 3px;
 `;
 
+export const Form2AmountDurationWrapper = styled.div`
+width: 100%;
+
+`
+
+
+

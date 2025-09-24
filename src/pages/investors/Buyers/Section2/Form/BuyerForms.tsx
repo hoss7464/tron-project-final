@@ -26,8 +26,8 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   fontWeight: "bold",
   fontSize: "14px",
   border: "2px solid #430E00",
-  borderRadius: 12,
-  padding: "4px 6px",
+  borderRadius: 8,
+  padding: "0px 6px",
   flex: 1,
   width: "100px",
   "&.Mui-selected": {
