@@ -137,7 +137,7 @@ const Form2: React.FC = () => {
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
   const [walletAdd, setWalletAdd] = useState<string>("");
-  const [walletAddError, setWalletAddError] = useState<string | null>("");
+  const [walletAddError, setWalletAddError] = useState<string>("");
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   const [bulkOrderPopupOpen, setBulkOrderPopupOpen] = useState<boolean>(false);
   //--------------------------------------------------------------------------------------
@@ -427,6 +427,7 @@ const Form2: React.FC = () => {
           walletAdd={walletAdd}
           setWalletAdd={setWalletAdd}
           setBulkOrder={setBulkOrder}
+          setWalletAddError={setWalletAddError}
         />
       )}
     </>

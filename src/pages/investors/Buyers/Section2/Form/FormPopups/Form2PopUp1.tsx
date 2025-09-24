@@ -31,6 +31,7 @@ interface bulkOrderPopupProps {
   walletAdd: string;
   setWalletAdd: React.Dispatch<React.SetStateAction<string>>;
   setBulkOrder: React.Dispatch<React.SetStateAction<boolean>>;
+  setWalletAddError: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const Form2PopUp1: React.FC<bulkOrderPopupProps> = ({
@@ -39,6 +40,7 @@ const Form2PopUp1: React.FC<bulkOrderPopupProps> = ({
   walletAdd,
   setWalletAdd,
   setBulkOrder,
+  setWalletAddError,
 }) => {
   const dispatch = useDispatch();
   const [bulkOrderAdds, setBulkOrderAdds] = useState<string>("");
@@ -159,11 +161,12 @@ const handleBulkOrderClick = () => {
     );
     return;
   }
-
+   setWalletAddError("")
   // All addresses are valid and unique - JOIN THEM WITH COMMAS AND SET TO walletAdd
   const formattedAddresses = lines.join(","); // Join with commas, no spaces
   setWalletAdd(formattedAddresses); // This updates the walletAdd in Form2 component
   setBulkOrder(true); // Enable bulk order mode
+ 
 
   dispatch(
     showNotification({
@@ -172,8 +175,6 @@ const handleBulkOrderClick = () => {
       severity: "success",
     })
   );
-
-  console.log("Valid addresses:", formattedAddresses);
 
   // Reset and close
   setBulkOrderAdds("");
