@@ -66,7 +66,7 @@ export interface MyMarketOrder {
 export interface ResourceResponse {
   success: boolean;
   data: {
-    DappAddress:string,
+    DappAddress: string;
     readyResource: {
       energy: number | string;
       bandwidth: number | string;
@@ -74,6 +74,30 @@ export interface ResourceResponse {
     dailyRecovery: {
       energy: number | string;
       bandwidth: number | string;
+    };
+    fastSellRate: {
+      energy: number;
+      bandwidth: number;
+    };
+    fastChargeSetting: {
+      fastChargeRate: {
+        energy: number;
+        bandwidth: number;
+      };
+      fastChargeMin: {
+        energy: number;
+        bandwidth: number;
+      };
+      fastChargeMax: {
+        energy: number;
+        bandwidth: number;
+      };
+    };
+    settingsOrder: {
+      partialFill: {
+        energy: number;
+        bandwidth: number;
+      };
     };
     apy: {
       energy: number | string;
@@ -143,8 +167,6 @@ export const fetchAllUiData = async (
         validateStatus: (status: number) => status < 500,
       }
     );
-
-  
 
     // Only fetch these on "/"
     let ordersPromise: ReturnType<typeof axios.get<OrdersResponse>> | null =
@@ -236,9 +258,33 @@ export const fetchAllUiData = async (
     const defaultResourceResponse: ResourceResponse = {
       success: false,
       data: {
-        DappAddress : "",
+        DappAddress: "",
         readyResource: { energy: 0, bandwidth: 0 },
         dailyRecovery: { energy: 0, bandwidth: 0 },
+        fastSellRate: {
+          energy: 0,
+          bandwidth: 0,
+        },
+        fastChargeSetting: {
+          fastChargeRate: {
+            energy: 0,
+            bandwidth: 0,
+          },
+          fastChargeMin: {
+            energy: 0,
+            bandwidth: 0,
+          },
+          fastChargeMax: {
+            energy: 0,
+            bandwidth: 0,
+          },
+        },
+        settingsOrder: {
+          partialFill: {
+            energy: 0,
+            bandwidth: 0,
+          },
+        },
         apy: { energy: 0, bandwidth: 0 },
         minAmount: { energy: 0, bandwidth: 0 },
         ratesByDuration: [],

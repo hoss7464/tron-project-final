@@ -23,6 +23,8 @@ import {
   FormControlLabel,
   Menu,
   MenuItem,
+  RadioGroup,
+  Radio,
 } from "@mui/material";
 import {
   FormHeaderSwitchWrapper,
@@ -166,6 +168,30 @@ const Form2: React.FC = () => {
   const [minAmountPrice, setMinAmountPrice] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
+  const [radioPrice, setRadionPrice] = useState("fast");
+  const [fastSellRate, setFastSellRate] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
+
+  const [pullFastCharge, setPullFastCharge] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
+  const [pullFastChargeMinAmount, setPullFastChargeMinAmount] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
+  const [pullFastChargeMaxAmount, setPullFastChargeMaxAmount] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
+  //State for partial field input :
+  const [partialField, setPartialField] = useState("");
+  const [partialFieldValue, setPartialFieldValue] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
 
   const durationWasManuallyChanged = useRef(false);
   const priceWasManuallyChanged = useRef(false);
@@ -189,6 +215,7 @@ const Form2: React.FC = () => {
     setPriceError("");
     setDurationError("");
     setAmountError("");
+    setRadionPrice("fast");
   };
   //-------------------------------------------------------------------------------------
   //Functions for wallet address :
@@ -322,7 +349,27 @@ const Form2: React.FC = () => {
     if (resourceData?.data?.ratesByDuration) {
       setMinAmountPrice(resourceData.data.ratesByDuration);
     }
+    if (resourceData?.data?.fastSellRate) {
+      setFastSellRate(resourceData.data.fastSellRate);
+    }
+    if (resourceData?.data?.fastChargeSetting.fastChargeRate) {
+      setPullFastCharge(resourceData.data.fastChargeSetting.fastChargeRate);
+    }
+    if (resourceData?.data?.fastChargeSetting.fastChargeMin) {
+      setPullFastChargeMinAmount(
+        resourceData.data.fastChargeSetting.fastChargeMin
+      );
+    }
+    if (resourceData?.data?.fastChargeSetting.fastChargeMax) {
+      setPullFastChargeMaxAmount(
+        resourceData.data.fastChargeSetting.fastChargeMax
+      );
+      if (resourceData?.data?.settingsOrder.partialFill) {
+        setPartialFieldValue(resourceData.data.settingsOrder.partialFill);
+      }
+    }
   }, [resourceData]);
+
   //-------------------------------------------------------------------------------------
   //Functions for amount input :
   //Function for amount validation :
@@ -339,17 +386,35 @@ const Form2: React.FC = () => {
       return "required";
     }
 
-    if (switchBtn === "energy") {
-      if (numericValue < minAmount.energy) {
-        return `Less than ${minAmount.energy}k`;
-      } else if (numericValue > 100000000) {
-        return "Maximum limitation";
-      }
-    } else if (switchBtn === "bandwidth") {
-      if (numericValue < minAmount.bandwidth) {
-        return `Less than ${minAmount.bandwidth}k`;
+    if (radioPrice === "pull_fast_charge") {
+      if (switchBtn === "energy") {
+        if (numericValue < pullFastChargeMinAmount.energy) {
+          return `Less than ${pullFastChargeMinAmount.energy}`;
+        } else if (numericValue > pullFastChargeMaxAmount.energy) {
+          return `More than ${pullFastChargeMaxAmount.energy}`;
+        } else {
+        }
+      } else {
+        if (numericValue < pullFastChargeMinAmount.bandwidth) {
+          return `Less than ${pullFastChargeMinAmount.bandwidth}`;
+        } else if (numericValue > pullFastChargeMaxAmount.bandwidth) {
+          return `More than ${pullFastChargeMaxAmount.bandwidth}`;
+        } else {
+        }
       }
     } else {
+      if (switchBtn === "energy") {
+        if (numericValue < minAmount.energy) {
+          return `Less than ${minAmount.energy}k`;
+        } else if (numericValue > 100000000) {
+          return "Maximum limitation";
+        }
+      } else if (switchBtn === "bandwidth") {
+        if (numericValue < minAmount.bandwidth) {
+          return `Less than ${minAmount.bandwidth}k`;
+        }
+      } else {
+      }
     }
 
     return "";
@@ -496,34 +561,34 @@ const Form2: React.FC = () => {
       return "";
     }
 
-    // Match the item based on exact or range duration
-    const matchedItem = minAmountPrice.find((item) => {
-      const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } =
-        item;
+    if (radioPrice === "manual") {
+      // Match the item based on exact or range duration
+      const matchedItem = minAmountPrice.find((item) => {
+        const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } =
+          item;
 
-      return (
-        durationInSec === exactDurationSeconds ||
-        (durationInSec !== null &&
-          minDurationSeconds !== undefined &&
-          maxDurationSeconds !== undefined &&
-          durationInSec >= minDurationSeconds &&
-          durationInSec <= maxDurationSeconds)
-      );
-    });
+        return (
+          durationInSec === exactDurationSeconds ||
+          (durationInSec !== null &&
+            minDurationSeconds !== undefined &&
+            maxDurationSeconds !== undefined &&
+            durationInSec >= minDurationSeconds &&
+            durationInSec <= maxDurationSeconds)
+        );
+      });
 
-    if (!matchedItem) {
-      return "Invalid price";
-    }
+      if (!matchedItem) {
+        return "Invalid price";
+      }
 
-    const rate_energy = matchedItem.rate.energy;
-    const rate_bandwidth = matchedItem.rate.bandwidth;
+      const rate_energy = matchedItem.rate.energy;
+      const rate_bandwidth = matchedItem.rate.bandwidth;
 
-    if (switchBtn === "energy") {
-      return numValue < rate_energy ? `Less than ${minAmount.energy}k ` : "";
-    } else if (switchBtn === "bandwidth") {
-      return numValue < rate_bandwidth
-        ? `Less than ${minAmount.bandwidth}k`
-        : "";
+      if (switchBtn === "energy") {
+        return numValue < rate_energy ? `less than ${rate_energy} ` : "";
+      } else if (switchBtn === "bandwidth") {
+        return numValue < rate_bandwidth ? `less than ${rate_bandwidth} ` : "";
+      }
     }
 
     return "";
@@ -576,6 +641,33 @@ const Form2: React.FC = () => {
 
     return Number(selectedPrice); // Return the numeric value
   };
+  //Function for radio button change :
+  const handleRadioPriceChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = (event.target as HTMLInputElement).value;
+    setRadionPrice(newValue);
+
+    if (newValue === "fast") {
+      if (switchBtn === "energy") {
+        const energyFastSellRateString = fastSellRate.energy;
+        setInputValue(energyFastSellRateString.toString());
+      } else {
+        const bandwidthFastSellRateString = fastSellRate.bandwidth;
+        setInputValue(bandwidthFastSellRateString.toString());
+      }
+    } else if (newValue === "pull_fast_charge") {
+      if (switchBtn === "energy") {
+        const energyPullFastCharge = pullFastCharge.energy;
+        setInputValue(energyPullFastCharge.toString());
+      } else {
+        const bandwidthPullFastCharge = pullFastCharge.bandwidth;
+        setInputValue(bandwidthPullFastCharge.toString());
+      }
+    } else {
+      // you set radio price on manual mode
+    }
+  };
   //-------------------------------------------------------------------------------------
   // Reset the flag when switchBtn changes
   useEffect(() => {
@@ -595,14 +687,32 @@ const Form2: React.FC = () => {
       setDurationInSec(durationInSeconds);
 
       // Set price immediately if we have the data
-      const matchedItem = getMatchedRate(durationInSeconds);
-      if (matchedItem) {
-        const rate =
-          switchBtn === "energy"
-            ? matchedItem.rate.energy
-            : matchedItem.rate.bandwidth;
-        setDynamicPlaceholder(`Min price: ${rate}`);
-        setInputValue(rate.toString());
+      if (radioPrice === "fast") {
+        if (switchBtn === "energy") {
+          const energyFastSellRateString = fastSellRate.energy;
+          setInputValue(energyFastSellRateString.toString());
+        } else {
+          const bandwidthFastSellRateString = fastSellRate.bandwidth;
+          setInputValue(bandwidthFastSellRateString.toString());
+        }
+      } else if (radioPrice === "pull_fast_charge") {
+        if (switchBtn === "energy") {
+          const energyPullFastCharge = pullFastCharge.energy;
+          setInputValue(energyPullFastCharge.toString());
+        } else {
+          const bandwidthPullFastCharge = pullFastCharge.bandwidth;
+          setInputValue(bandwidthPullFastCharge.toString());
+        }
+      } else {
+        const matchedItem = getMatchedRate(durationInSeconds);
+        if (matchedItem) {
+          const rate =
+            switchBtn === "energy"
+              ? matchedItem.rate.energy
+              : matchedItem.rate.bandwidth;
+          setDynamicPlaceholder(`Min price: ${rate}`);
+          setInputValue(rate.toString());
+        }
       }
     }
   }, [switchBtn]);
@@ -623,18 +733,39 @@ const Form2: React.FC = () => {
       !priceWasManuallyChanged.current &&
       minAmountPrice.length > 0
     ) {
-      const matchedItem = getMatchedRate(durationInSec);
-      if (matchedItem) {
-        const rate =
-          switchBtn === "energy"
-            ? matchedItem.rate.energy
-            : matchedItem.rate.bandwidth;
+      //when radio price changes its state it resets the error :
+      setAmountError("");
 
-        setDynamicPlaceholder(`Min price: ${rate}`);
-        setInputValue(rate.toString());
+      if (radioPrice === "fast") {
+        if (switchBtn === "energy") {
+          const energyFastSellRateString = fastSellRate.energy;
+          setInputValue(energyFastSellRateString.toString());
+        } else {
+          const bandwidthFastSellRateString = fastSellRate.bandwidth;
+          setInputValue(bandwidthFastSellRateString.toString());
+        }
+      } else if (radioPrice === "pull_fast_charge") {
+        if (switchBtn === "energy") {
+          const energyPullFastCharge = pullFastCharge.energy;
+          setInputValue(energyPullFastCharge.toString());
+        } else {
+          const bandwidthPullFastCharge = pullFastCharge.bandwidth;
+          setInputValue(bandwidthPullFastCharge.toString());
+        }
+      } else {
+        const matchedItem = getMatchedRate(durationInSec);
+        if (matchedItem) {
+          const rate =
+            switchBtn === "energy"
+              ? matchedItem.rate.energy
+              : matchedItem.rate.bandwidth;
+
+          setDynamicPlaceholder(`Min price: ${rate}`);
+          setInputValue(rate.toString());
+        }
       }
     }
-  }, [durationInSec, minAmountPrice, switchBtn]);
+  }, [durationInSec, minAmountPrice, switchBtn, radioPrice]);
 
   useEffect(() => {
     priceWasManuallyChanged.current = false;
@@ -646,7 +777,73 @@ const Form2: React.FC = () => {
       setPriceError(errorMessage);
     }
   }, [inputValue, validatePrice]);
+  //-------------------------------------------------------------------------------------
+  //Function for partial field input :
+  const handlePartialFieldChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = event.target.value;
+    if (switchBtn === "energy") {
+      const energyPartialFieldS = partialFieldValue.energy;
+      setPartialField(energyPartialFieldS.toString());
+    } else {
+      const bandwidthPartialFieldS = partialFieldValue.bandwidth;
+      setPartialField(bandwidthPartialFieldS.toString());
+    }
+  };
 
+  //-------------------------------------------------------------------------------------
+  //Function to calculate total price :
+  const calculateTotalPrice = () => {
+    const numericAmount = getNumericAmount(amount);
+    const numericDuration = getDurationInSeconds(durationValue);
+    if (numericDuration === null) {
+      return { totalPrice: 0 };
+    }
+    const pricePerUnit = getNumericSelectedPrice(inputValue);
+    const SUN = 1000000;
+    //To get minimum value of each selected duration based on server data :
+    const matchedRate = getMatchedRate(numericDuration);
+    if (!matchedRate || !matchedRate.rate) {
+      return { totalPrice: 0 };
+    }
+    const minOption =
+      switchBtn === "energy"
+        ? matchedRate.rate.energy
+        : matchedRate.rate.bandwidth;
+
+    if (pricePerUnit === null || numericAmount === null) {
+      return { totalPrice: 0 };
+    }
+
+    if (pricePerUnit < minOption) {
+      return { totalPrice: 0 }; // Return 0 if price is too low
+    }
+
+    // Convert duration to seconds
+    let totalSeconds = numericDuration;
+    let totalPrice = 0;
+
+    if (totalSeconds === 900) {
+      // 15 minutes
+      totalPrice = (numericAmount / SUN) * pricePerUnit;
+    } else if (totalSeconds === 3600) {
+      // 1 hour
+      totalPrice = (numericAmount / SUN) * pricePerUnit;
+    } else if (totalSeconds === 10800) {
+      // 3 hours
+      totalPrice = (numericAmount / SUN) * pricePerUnit;
+    } else if (totalSeconds % 86400 === 0) {
+      // whole days
+      const numberOfDays = totalSeconds / 86400;
+      totalPrice = (numericAmount / SUN) * pricePerUnit * numberOfDays;
+    } else {
+      return null; // Invalid time
+    }
+
+    return { totalPrice: Number(totalPrice.toFixed(3)) };
+  };
+  let myPrice = calculateTotalPrice();
   //-------------------------------------------------------------------------------------
   //Function to submit data towards the server :
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -675,6 +872,7 @@ const Form2: React.FC = () => {
       requester: address,
       receiver: requeserAddress,
       bulk_order: bulkOrder,
+      radio_price: radioPrice,
     };
     console.log(submitPayload);
 
@@ -801,357 +999,432 @@ const Form2: React.FC = () => {
               </FormAddInputIconWrapper>
             </FormAddInputWrapper>
           </FormAddInputLabelWrapper>
-          <Form2AmountDurationWrapper>
-            <Grid container spacing={0.5}>
-              <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
-                {/** Form amount input component */}
-                <FormAddInputLabelWrapper>
-                  <FormAddLabelWrapper>
-                    <FormAddLabel>Amount</FormAddLabel>
-                    {amountError && (
-                      <FormErrorWrapper>
-                        <FormError>{amountError}</FormError>
-                      </FormErrorWrapper>
-                    )}
-                  </FormAddLabelWrapper>
-                  <FormAddInputWrapper>
-                    <FormAddInputIconWrapper>
-                      <FormAddInputWrapper2 style={{ height: "24px" }}>
-                        <FormAddInput
-                          style={{ fontSize: "16px", marginLeft: "0.5rem" }}
-                          value={Number(amount).toLocaleString()}
-                          onChange={amountHandleChange}
-                          placeholder={`Amount of ${
-                            switchBtn === "energy"
-                              ? `energy (${minAmount.energy} - 100,000,000)`
-                              : `bandwidth (${minAmount.bandwidth} - ...)`
-                          }`}
-                        />
-                      </FormAddInputWrapper2>
-                    </FormAddInputIconWrapper>
-                  </FormAddInputWrapper>
+          {/** Form amount input component */}
+          <FormAddInputLabelWrapper>
+            <FormAddLabelWrapper>
+              <FormAddLabel>Amount</FormAddLabel>
+              {amountError && (
+                <FormErrorWrapper>
+                  <FormError>{amountError}</FormError>
+                </FormErrorWrapper>
+              )}
+            </FormAddLabelWrapper>
+            <FormAddInputWrapper>
+              <FormAddInputIconWrapper>
+                <FormAddInputWrapper2 style={{ height: "24px" }}>
+                  <FormAddInput
+                    style={{ fontSize: "16px", marginLeft: "0.5rem" }}
+                    value={Number(amount).toLocaleString()}
+                    onChange={amountHandleChange}
+                    placeholder={`Amount of ${
+                      switchBtn === "energy"
+                        ? `energy (${minAmount.energy} - 100,000,000)`
+                        : `bandwidth (${minAmount.bandwidth} - ...)`
+                    }`}
+                  />
+                </FormAddInputWrapper2>
+              </FormAddInputIconWrapper>
+            </FormAddInputWrapper>
 
-                  {switchBtn === "energy" ? (
-                    <InputMiniBtnWrapper
-                      style={{ paddingLeft: "0", height: "28px" }}
-                    >
-                      {/** Form input mini btns component */}
-                      <InputMiniBtnWrapper2>
-                        <InputMiniBtn
-                          type="button"
-                          onClick={() => amountHandleChange("64,350")}
-                          value="64,350"
-                          style={{ width: "67px", padding: "2px 0px" }}
-                        >
-                          USDT Tsf
-                        </InputMiniBtn>
-                      </InputMiniBtnWrapper2>
-                      <InputMiniBtnWrapper2>
-                        <InputMiniBtn
-                          type="button"
-                          onClick={() => amountHandleChange("100,000")}
-                          value="100,000"
-                          style={{ padding: "2px 2px" }}
-                        >
-                          100k
-                        </InputMiniBtn>
-                      </InputMiniBtnWrapper2>
-                      <InputMiniBtnWrapper2>
-                        <InputMiniBtn
-                          type="button"
-                          onClick={() => amountHandleChange("1,000,000")}
-                          value="1,000,000"
-                          style={{ padding: "2px 2px" }}
-                        >
-                          1m
-                        </InputMiniBtn>
-                      </InputMiniBtnWrapper2>
-                      <InputMiniBtnWrapper2>
-                        <InputMiniBtn
-                          type="button"
-                          onClick={() => amountHandleChange("2,000,000")}
-                          value="2,000,000"
-                          style={{ padding: "2px 2px" }}
-                        >
-                          2m
-                        </InputMiniBtn>
-                      </InputMiniBtnWrapper2>
-                      <InputMiniBtnWrapper2>
-                        <InputMiniBtn
-                          type="button"
-                          onClick={() => amountHandleChange("10,000,000")}
-                          value="10,000,000"
-                          style={{ padding: "2px 2px" }}
-                        >
-                          10m
-                        </InputMiniBtn>
-                      </InputMiniBtnWrapper2>
-                    </InputMiniBtnWrapper>
-                  ) : (
-                    <InputMiniBtnWrapper
-                      style={{ paddingLeft: "0", height: "28px" }}
-                    >
-                      <InputMiniBtnWrapper2>
-                        <InputMiniBtn
-                          type="button"
-                          onClick={() => amountHandleChange("1,000")}
-                          value="1,000"
-                        >
-                          1k
-                        </InputMiniBtn>
-                      </InputMiniBtnWrapper2>
-                      <InputMiniBtnWrapper2>
-                        <InputMiniBtn
-                          type="button"
-                          onClick={() => amountHandleChange("2,000")}
-                          value="2,000"
-                        >
-                          2k
-                        </InputMiniBtn>
-                      </InputMiniBtnWrapper2>
-                      <InputMiniBtnWrapper2>
-                        <InputMiniBtn
-                          type="button"
-                          onClick={() => amountHandleChange("5,000")}
-                          value="5,000"
-                        >
-                          5k
-                        </InputMiniBtn>
-                      </InputMiniBtnWrapper2>
-                      <InputMiniBtnWrapper2>
-                        <InputMiniBtn
-                          type="button"
-                          onClick={() => amountHandleChange("10,000")}
-                          value="10,000"
-                        >
-                          10k
-                        </InputMiniBtn>
-                      </InputMiniBtnWrapper2>
-                    </InputMiniBtnWrapper>
-                  )}
-                </FormAddInputLabelWrapper>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
-                {/** Form duration dropdown component */}
-                <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
-                  <FormAddLabelWrapper>
-                    <FormAddLabel>Duration</FormAddLabel>
-                    {durationError && (
-                      <FormErrorWrapper>
-                        <FormError>{durationError}</FormError>
-                      </FormErrorWrapper>
-                    )}
-                  </FormAddLabelWrapper>
-                  <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
-                    <ClickAwayListener onClickAway={() => setOpen(false)}>
-                      <Box>
-                        <TextField
-                          placeholder="Duration"
-                          value={durationValue}
-                          onChange={(e) => setDurationValue(e.target.value)}
-                          onFocus={() => setOpen(true)}
-                          inputRef={anchorRef}
-                          onBlur={() =>
-                            setDurationError(validateDuration(durationValue))
-                          }
-                          fullWidth
-                          sx={{
-                            "& .MuiOutlinedInput-root": {
-                              height: "38px",
-                              border: "2px solid #D9E1E3",
-                              backgroundColor: "#ffffff",
-                              color: "#003543",
-                              borderRadius: "10px",
-
-                              "&.Mui-focused fieldset": {
-                                borderColor: "transparent",
-                              },
-                              "& fieldset": {
-                                border: "none",
-                              },
-                            },
-                            "& input::placeholder": {
-                              fontSize: "14px",
-                            },
-                          }}
-                        />
-                        <Popper
-                          open={open}
-                          anchorEl={anchorRef.current}
-                          placement="bottom-start"
-                          style={{ zIndex: 1300 }}
-                        >
-                          <Box
-                            sx={{
-                              bgcolor: "background.paper",
-                              border: "1px solid #ccc",
-
-                              p: 2,
-                              mt: 0.5,
-                              width: 300,
-                              boxShadow: 4,
-                              borderRadius: 2,
-                            }}
-                          >
-                            <Typography fontWeight="bold">Minutes</Typography>
-                            <Grid container spacing={1} mb={2}>
-                              {minutes.map((min) => (
-                                <Grid key={min}>
-                                  <Box
-                                    sx={boxStyle}
-                                    onClick={(e) => {
-                                      e.stopPropagation(); // prevent triggering events on other components
-                                      handleOptionClick(`${min} minutes`);
-                                    }}
-                                  >
-                                    {min}
-                                  </Box>
-                                </Grid>
-                              ))}
-                            </Grid>
-                            <Typography fontWeight="bold">Hours</Typography>
-                            <Grid container spacing={1} mb={2}>
-                              {hours.map((hr) => (
-                                <Grid key={hr}>
-                                  <Box
-                                    sx={boxStyle}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleOptionClick(
-                                        `${hr} ${hr === 1 ? "hour" : "hours"}`
-                                      );
-                                    }}
-                                  >
-                                    {hr}
-                                  </Box>
-                                </Grid>
-                              ))}
-                            </Grid>
-                            <Typography fontWeight="bold">Days</Typography>
-                            <Grid container spacing={1}>
-                              {days.map((day) => (
-                                <Grid size={2} key={day}>
-                                  <Box
-                                    sx={boxStyle}
-                                    onMouseDown={(e) => {
-                                      e.preventDefault(); // Prevent focus shift
-                                    }}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleOptionClick(
-                                        `${day} ${day === 1 ? "day" : "days"}`
-                                      );
-                                    }}
-                                  >
-                                    {day}
-                                  </Box>
-                                </Grid>
-                              ))}
-                            </Grid>
-                          </Box>
-                        </Popper>
-                      </Box>
-                    </ClickAwayListener>
-                  </FormControl>
-                </FormAddInputLabelWrapper>
-              </Grid>
-            </Grid>
-          </Form2AmountDurationWrapper>
-          <Form2AmountDurationWrapper>
-            <Grid container spacing={0.5}>
-              <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
-                {/** Form price component */}
-                <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
-                  <FormAddLabelWrapper>
-                    <FormAddLabel>Price</FormAddLabel>
-                    {priceError && (
-                      <FormErrorWrapper>
-                        <FormError>{priceError}</FormError>
-                      </FormErrorWrapper>
-                    )}
-                  </FormAddLabelWrapper>
-                  <FormControl fullWidth>
-                    <Autocomplete
-                      freeSolo
-                      disableClearable
-                      openOnFocus
-                      options={priceOptions}
-                      inputValue={inputValue}
-                      onInputChange={(event, newValue) =>
-                        handlePriceChange(event, newValue)
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          placeholder={dynamicPlaceholder}
-                          variant="outlined"
-                          onBlur={() => {
-                            const errorMsg = validatePrice(inputValue);
-                            setPriceError(errorMsg);
-                          }}
-                          sx={{
-                            "& .MuiOutlinedInput-root": {
-                              height: "38px",
-                              border: "2px solid #D9E1E3",
-                              backgroundColor: "#ffffff",
-                              color: "#003543",
-                              borderRadius: "10px",
-
-                              "&.Mui-focused fieldset": {
-                                borderColor: "transparent",
-                              },
-                              "& fieldset": {
-                                border: "none",
-                              },
-                            },
-                            "& input::placeholder": {
-                              fontSize: "14px",
-                            },
-                          }}
-                          InputProps={{
-                            ...params.InputProps,
-                            type: "text",
-                            endAdornment: (
-                              <div>
-                                <DropdownIconWithText />
-                              </div>
-                            ),
-                          }}
-                        />
-                      )}
-                    />
-                  </FormControl>
-                </FormAddInputLabelWrapper>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
-                <FormAddInputLabelWrapper>
-                  <FormAddLabelWrapper
-                    style={{
-                      justifyContent: "space-between",
-                      width: "100%",
-                    }}
+            {switchBtn === "energy" ? (
+              <InputMiniBtnWrapper style={{ paddingLeft: "0", height: "28px" }}>
+                {/** Form input mini btns component */}
+                <InputMiniBtnWrapper2>
+                  <InputMiniBtn
+                    type="button"
+                    onClick={() => amountHandleChange("64,350")}
+                    value="64,350"
+                    style={{ width: "67px", padding: "2px 0px" }}
                   >
-                    <FormAddLabel>Resource By Threshold</FormAddLabel>
-                    {walletAddError ? (
-                      <FormErrorWrapper>
-                        <FormError>{walletAddError}</FormError>
-                      </FormErrorWrapper>
-                    ) : (
-                      ""
-                    )}
-                  </FormAddLabelWrapper>
-                  <FormAddInputWrapper>
-                    <FormAddInputIconWrapper>
-                      <FormAddInputWrapper2 style={{ height: "24px" }}>
-                        <FormAddInput value="" />
-                      </FormAddInputWrapper2>
-                    </FormAddInputIconWrapper>
-                  </FormAddInputWrapper>
-                </FormAddInputLabelWrapper>
-              </Grid>
-            </Grid>
-          </Form2AmountDurationWrapper>
-          <OrderSubmitBtnWrapper>
+                    USDT Tsf
+                  </InputMiniBtn>
+                </InputMiniBtnWrapper2>
+                <InputMiniBtnWrapper2>
+                  <InputMiniBtn
+                    type="button"
+                    onClick={() => amountHandleChange("100,000")}
+                    value="100,000"
+                    style={{ padding: "2px 2px" }}
+                  >
+                    100k
+                  </InputMiniBtn>
+                </InputMiniBtnWrapper2>
+                <InputMiniBtnWrapper2>
+                  <InputMiniBtn
+                    type="button"
+                    onClick={() => amountHandleChange("1,000,000")}
+                    value="1,000,000"
+                    style={{ padding: "2px 2px" }}
+                    disabled={radioPrice !== "manual"}
+                  >
+                    1m
+                  </InputMiniBtn>
+                </InputMiniBtnWrapper2>
+                <InputMiniBtnWrapper2>
+                  <InputMiniBtn
+                    type="button"
+                    onClick={() => amountHandleChange("2,000,000")}
+                    value="2,000,000"
+                    style={{ padding: "2px 2px" }}
+                  >
+                    2m
+                  </InputMiniBtn>
+                </InputMiniBtnWrapper2>
+                <InputMiniBtnWrapper2>
+                  <InputMiniBtn
+                    type="button"
+                    onClick={() => amountHandleChange("10,000,000")}
+                    value="10,000,000"
+                    style={{ padding: "2px 2px" }}
+                  >
+                    10m
+                  </InputMiniBtn>
+                </InputMiniBtnWrapper2>
+              </InputMiniBtnWrapper>
+            ) : (
+              <InputMiniBtnWrapper style={{ paddingLeft: "0", height: "28px" }}>
+                <InputMiniBtnWrapper2>
+                  <InputMiniBtn
+                    type="button"
+                    onClick={() => amountHandleChange("1,000")}
+                    value="1,000"
+                  >
+                    1k
+                  </InputMiniBtn>
+                </InputMiniBtnWrapper2>
+                <InputMiniBtnWrapper2>
+                  <InputMiniBtn
+                    type="button"
+                    onClick={() => amountHandleChange("2,000")}
+                    value="2,000"
+                  >
+                    2k
+                  </InputMiniBtn>
+                </InputMiniBtnWrapper2>
+                <InputMiniBtnWrapper2>
+                  <InputMiniBtn
+                    type="button"
+                    onClick={() => amountHandleChange("5,000")}
+                    value="5,000"
+                  >
+                    5k
+                  </InputMiniBtn>
+                </InputMiniBtnWrapper2>
+                <InputMiniBtnWrapper2>
+                  <InputMiniBtn
+                    type="button"
+                    onClick={() => amountHandleChange("10,000")}
+                    value="10,000"
+                  >
+                    10k
+                  </InputMiniBtn>
+                </InputMiniBtnWrapper2>
+              </InputMiniBtnWrapper>
+            )}
+          </FormAddInputLabelWrapper>
+          {/** Form duration dropdown component */}
+          <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
+            <FormAddLabelWrapper>
+              <FormAddLabel>Duration</FormAddLabel>
+              {durationError && (
+                <FormErrorWrapper>
+                  <FormError>{durationError}</FormError>
+                </FormErrorWrapper>
+              )}
+            </FormAddLabelWrapper>
+            <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
+              <ClickAwayListener onClickAway={() => setOpen(false)}>
+                <Box>
+                  <TextField
+                    placeholder="Duration"
+                    value={durationValue}
+                    onChange={(e) => setDurationValue(e.target.value)}
+                    onFocus={() => setOpen(true)}
+                    inputRef={anchorRef}
+                    onBlur={() =>
+                      setDurationError(validateDuration(durationValue))
+                    }
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        height: "38px",
+                        border: "2px solid #D9E1E3",
+                        backgroundColor: "#ffffff",
+                        color: "#003543",
+                        borderRadius: "10px",
+
+                        "&.Mui-focused fieldset": {
+                          borderColor: "transparent",
+                        },
+                        "& fieldset": {
+                          border: "none",
+                        },
+                      },
+                      "& input::placeholder": {
+                        fontSize: "14px",
+                      },
+                    }}
+                  />
+                  <Popper
+                    open={open}
+                    anchorEl={anchorRef.current}
+                    placement="bottom-start"
+                    style={{ zIndex: 1300 }}
+                  >
+                    <Box
+                      sx={{
+                        bgcolor: "background.paper",
+                        border: "1px solid #ccc",
+
+                        p: 2,
+                        mt: 0.5,
+                        width: 300,
+                        boxShadow: 4,
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Typography fontWeight="bold">Minutes</Typography>
+                      <Grid container spacing={1} mb={2}>
+                        {minutes.map((min) => (
+                          <Grid key={min}>
+                            <Box
+                              sx={boxStyle}
+                              onClick={(e) => {
+                                e.stopPropagation(); // prevent triggering events on other components
+                                handleOptionClick(`${min} minutes`);
+                              }}
+                            >
+                              {min}
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+                      <Typography fontWeight="bold">Hours</Typography>
+                      <Grid container spacing={1} mb={2}>
+                        {hours.map((hr) => (
+                          <Grid key={hr}>
+                            <Box
+                              sx={boxStyle}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOptionClick(
+                                  `${hr} ${hr === 1 ? "hour" : "hours"}`
+                                );
+                              }}
+                            >
+                              {hr}
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+                      <Typography fontWeight="bold">Days</Typography>
+                      <Grid container spacing={1}>
+                        {days.map((day) => (
+                          <Grid size={2} key={day}>
+                            <Box
+                              sx={boxStyle}
+                              onMouseDown={(e) => {
+                                e.preventDefault(); // Prevent focus shift
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOptionClick(
+                                  `${day} ${day === 1 ? "day" : "days"}`
+                                );
+                              }}
+                            >
+                              {day}
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Box>
+                  </Popper>
+                </Box>
+              </ClickAwayListener>
+            </FormControl>
+          </FormAddInputLabelWrapper>
+          {/** Form partial fill component */}
+          <FormAddInputLabelWrapper>
+            <FormAddLabelWrapper
+              style={{
+                justifyContent: "space-between",
+                width: "100%",
+              }}
+            >
+              <FormAddLabel>Partial Field</FormAddLabel>
+              {walletAddError ? (
+                <FormErrorWrapper>
+                  <FormError>{walletAddError}</FormError>
+                </FormErrorWrapper>
+              ) : (
+                ""
+              )}
+            </FormAddLabelWrapper>
+            <FormAddInputWrapper>
+              <FormAddInputIconWrapper>
+                <FormAddInputWrapper2 style={{ height: "24px" }}>
+                  <FormAddInput
+                    value={
+                      switchBtn === "energy"
+                        ? partialFieldValue.energy.toString()
+                        : partialFieldValue.bandwidth.toString()
+                    }
+                    style={{ fontSize: "16px", marginLeft: "0.5rem" }}
+                   
+                    readOnly
+                  />
+                </FormAddInputWrapper2>
+              </FormAddInputIconWrapper>
+            </FormAddInputWrapper>
+          </FormAddInputLabelWrapper>
+          {/** Form price component */}
+          <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
+            <FormAddLabelWrapper>
+              <FormAddLabel>Price</FormAddLabel>
+              {priceError && (
+                <FormErrorWrapper>
+                  <FormError>{priceError}</FormError>
+                </FormErrorWrapper>
+              )}
+            </FormAddLabelWrapper>
+            <FormControl fullWidth>
+              <Autocomplete
+                disabled={radioPrice !== "manual"}
+                freeSolo
+                disableClearable
+                openOnFocus
+                options={priceOptions}
+                inputValue={inputValue}
+                onInputChange={(event, newValue) =>
+                  handlePriceChange(event, newValue)
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder={dynamicPlaceholder}
+                    variant="outlined"
+                    onBlur={() => {
+                      const errorMsg = validatePrice(inputValue);
+                      setPriceError(errorMsg);
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        height: "38px",
+                        border: "2px solid #D9E1E3",
+                        backgroundColor: "#ffffff",
+                        color: "#003543",
+                        borderRadius: "10px",
+
+                        "&.Mui-focused fieldset": {
+                          borderColor: "transparent",
+                        },
+                        "& fieldset": {
+                          border: "none",
+                        },
+                      },
+                      "& input::placeholder": {
+                        fontSize: "14px",
+                      },
+                    }}
+                    InputProps={{
+                      ...params.InputProps,
+                      type: "text",
+                      endAdornment: (
+                        <div>
+                          <DropdownIconWithText />
+                        </div>
+                      ),
+                    }}
+                  />
+                )}
+              />
+              <RadioGroup
+                aria-labelledby="demo-controlled-radio-buttons-group"
+                name="controlled-radio-buttons-group"
+                value={radioPrice}
+                onChange={handleRadioPriceChange}
+                row
+              >
+                <FormControlLabel
+                  value="fast"
+                  control={<Radio />}
+                  label="fast"
+                />
+                <FormControlLabel
+                  value="pull_fast_charge"
+                  control={<Radio />}
+                  label="pull_fast_charge"
+                />
+                <FormControlLabel
+                  value="manual"
+                  control={<Radio />}
+                  label="manual"
+                />
+              </RadioGroup>
+            </FormControl>
+          </FormAddInputLabelWrapper>
+          {/** Order info */}
+          <OrderInfoWrapper>
+            <OrderInfoHeaderWrapper style={{ marginBottom: "0.5rem" }}>
+              <AccountHeader
+                style={{
+                  color: "#003543",
+                  fontSize: "16px",
+                  fontWeight: "800",
+                }}
+              >
+                Order Info
+              </AccountHeader>
+            </OrderInfoHeaderWrapper>
+            <OrderInfoTextWrapper>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#003543" }}>
+                  Amount
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#003543" }}>
+                  {Number(amount).toLocaleString()}
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+            </OrderInfoTextWrapper>
+
+            <OrderInfoTextWrapper>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#003543" }}>
+                  Duration
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#003543" }}>
+                  {durationValue}
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+            </OrderInfoTextWrapper>
+
+            <OrderInfoTextWrapper>
+              <OrderInfoTextWrapper2>
+                <OrderInfoText style={{ color: "#003543" }}>
+                  Payout
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+
+              <OrderInfoTextWrapper2>
+                <OrderInfoText
+                  style={{
+                    color: "#430E00",
+                    fontSize: "20px",
+                    fontWeight: "800",
+                  }}
+                >
+                  {myPrice?.totalPrice.toLocaleString() ?? 0} TRX
+                </OrderInfoText>
+              </OrderInfoTextWrapper2>
+            </OrderInfoTextWrapper>
+          </OrderInfoWrapper>
+
+          <OrderSubmitBtnWrapper style={{ marginTop: "1.8rem" }}>
             <OrderSubmitBtn type="submit">Confirm Created Rule</OrderSubmitBtn>
           </OrderSubmitBtnWrapper>
         </Form>

@@ -502,9 +502,9 @@ const OrderFormComponent: React.FC = () => {
     const rate_bandwidth = matchedItem.rate.bandwidth;
 
     if (switchBtn === "energy") {
-      return numValue < rate_energy ? `Less than ${minAmount.energy}k ` : "";
+      return numValue < rate_energy ? `less than ${rate_energy}` : "";
     } else if (switchBtn === "bandwidth") {
-      return numValue < rate_bandwidth ? `Less than ${minAmount.bandwidth}k` : "";
+      return numValue < rate_bandwidth ? `less than ${rate_bandwidth}` : "";
     }
 
     return "";

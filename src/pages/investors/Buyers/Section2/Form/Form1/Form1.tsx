@@ -128,14 +128,15 @@ const Form1: React.FC = () => {
   //translation states :
   const { t } = useTranslation();
   const { resourceData, fetchData } = useFetchData();
-  const location = useLocation()
+  const location = useLocation();
   //redux dispatch :
   const dispatch = useDispatch();
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
   );
   //tron wallet context :
-  const { address, balance, availableBandwidth, isConnectedTrading } = useTronWallet();
+  const { address, balance, availableBandwidth, isConnectedTrading } =
+    useTronWallet();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
@@ -274,7 +275,6 @@ const Form1: React.FC = () => {
   }, [bulkOrder]);
 
   useEffect(() => {
-    
     if (address && isConnectedTrading === true) {
       setWalletAdd(address); // Set when address exists
     } else {
@@ -506,11 +506,9 @@ const Form1: React.FC = () => {
     const rate_bandwidth = matchedItem.rate.bandwidth;
 
     if (switchBtn === "energy") {
-      return numValue < rate_energy ? `Less than ${minAmount.energy}k ` : "";
+      return numValue < rate_energy ? `less than ${rate_energy}` : "";
     } else if (switchBtn === "bandwidth") {
-      return numValue < rate_bandwidth
-        ? `Less than ${minAmount.bandwidth}k`
-        : "";
+      return numValue < rate_bandwidth ? `less than ${rate_bandwidth}` : "";
     }
 
     return "";
@@ -837,7 +835,14 @@ const Form1: React.FC = () => {
   return (
     <>
       <Form1Container>
-        <Form onSubmit={handleSubmit} style={{ height: "100%", paddingLeft : "0.5rem", paddingRight : "0.5rem" }}>
+        <Form
+          onSubmit={handleSubmit}
+          style={{
+            height: "100%",
+            paddingLeft: "0.5rem",
+            paddingRight: "0.5rem",
+          }}
+        >
           {/** Form header and switch btn component */}
           <FormHeaderSwitchWrapper>
             <FormHeaderIconWrapper>
