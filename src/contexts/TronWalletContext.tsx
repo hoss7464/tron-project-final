@@ -18,6 +18,7 @@ import { ResourceResponse } from "../services/requestService";
 
 
 
+
 // Context interface
 interface TronWalletContextProps {
   address: string | null;
@@ -232,6 +233,7 @@ const fetchWalletData = async (walletAddress: string) => {
     const [accountResult, resourceResult] = await Promise.allSettled([
       // Get balance
       tronWeb.trx.getAccount(walletAddress),
+
       // Get resources
       tronWeb.trx.getAccountResources(walletAddress),
     ]);
