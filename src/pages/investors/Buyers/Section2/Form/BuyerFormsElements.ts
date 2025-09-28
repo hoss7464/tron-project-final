@@ -5,7 +5,8 @@ display: flex;
 justify-content: center;
 align-items: center;
 width: 100%;
-height: 700px;
+
+ 
 `
 
 export const BuyersForm = styled.div`

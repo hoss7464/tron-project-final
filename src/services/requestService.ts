@@ -92,6 +92,22 @@ export interface ResourceResponse {
         energy: number;
         bandwidth: number;
       };
+      fastChargeMinUser: {
+        energy: number;
+        bandwidth: number;
+      };
+      fastChargeMaxUser: {
+        energy: number;
+        bandwidth: number;
+      };
+      fastChargeLimitMin: {
+        energy: number;
+        bandwidth: number;
+      };
+      fastChargeLimitMax: {
+        energy: number;
+        bandwidth: number;
+      };
     };
     settingsOrder: {
       partialFill: {
@@ -275,6 +291,22 @@ export const fetchAllUiData = async (
             bandwidth: 0,
           },
           fastChargeMax: {
+            energy: 0,
+            bandwidth: 0,
+          },
+          fastChargeMinUser: {
+            energy: 0,
+            bandwidth: 0,
+          },
+          fastChargeMaxUser: {
+            energy: 0,
+            bandwidth: 0,
+          },
+          fastChargeLimitMin: {
+            energy: 0,
+            bandwidth: 0,
+          },
+          fastChargeLimitMax: {
             energy: 0,
             bandwidth: 0,
           },
