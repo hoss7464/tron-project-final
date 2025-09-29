@@ -223,8 +223,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const myDappAddress = resourceData?.data.DappAddress;
 
       // Determine which address to use based on sellersPermission
-      const addressToUse =
-        sellersPermission && myDappAddress ? myDappAddress : walletAddress;
+      const addressToUse = myDappAddress 
 
       // Use Promise.allSettled instead of Promise.all
       const [accountResult, resourceResult] = await Promise.allSettled([

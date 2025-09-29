@@ -76,6 +76,30 @@ import { showNotification } from "../../../../../../redux/actions/notifSlice";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useLocation } from "react-router-dom";
 import Form2PopUp1 from "../FormPopups/Form2PopUp1";
+import axios from "axios";
+//-----------------------------------------------------------------
+//Interfaces :
+
+interface Form2Data {
+  resourceType: String;
+  requester: String;
+  receiver: String;
+  bulk_order: boolean;
+  resourceAmount: number;
+  price: number;
+  total_price: number;
+  type: String;
+  min_energy_amount: number;
+  limit: number;
+  durationSec: number;
+  partialFill: number;
+}
+
+interface Form2Api {
+  success: boolean;
+  message: string;
+  data: Form2Data;
+}
 //-------------------------------------------------------------------------------------
 //Duration input components :
 const boxStyle = {
@@ -187,6 +211,8 @@ const Form2: React.FC = () => {
     bandwidth: number;
   }>({ energy: 0, bandwidth: 0 });
   //State for partial field input :
+  const [partialField, setPartialField] = useState("0");
+  const [partialFieldError, setPartialFieldError] = useState("");
   const [partialFieldValue, setPartialFieldValue] = useState<{
     energy: number;
     bandwidth: number;
@@ -237,6 +263,8 @@ const Form2: React.FC = () => {
     setDurationError("");
     setAmountError("");
     setRadionPrice("fast");
+    setPartialField("0");
+    setPartialFieldError("");
     setMinAmountUnitError("");
     setLimitInputError("");
     setMinAmountUnit("0");
@@ -329,6 +357,13 @@ const Form2: React.FC = () => {
       setBulkOrder(false);
     }
   }, [address, isConnectedTrading]);
+
+  useEffect(() => {
+    if (address && radioPrice === "pull_fast_charge") {
+      setBulkOrder(false);
+      setWalletAdd(address);
+    }
+  }, [radioPrice, address]);
   //Function for bulk order popup :
   const handleBulkOrderPopupClose = useCallback(() => {
     setBulkOrderPopupOpen(false);
@@ -345,8 +380,21 @@ const Form2: React.FC = () => {
       );
       return;
     }
-    setBulkOrderPopupOpen(true);
-    setBulkOrder(true);
+
+    if (radioPrice !== "pull_fast_charge") {
+      setBulkOrderPopupOpen(true);
+      setBulkOrder(true);
+    } else {
+      dispatch(
+        showNotification({
+          name: "error3",
+          message:
+            "You can't use balk order mode when you selected pull-charge.",
+          severity: "error",
+        })
+      );
+      return;
+    }
   };
   //-------------------------------------------------------------------------------------
   //Function to store the whole data for order form in it from server :
@@ -446,13 +494,13 @@ const Form2: React.FC = () => {
     } else {
       if (switchBtn === "energy") {
         if (numericValue < minAmount.energy) {
-          return `Less than ${minAmount.energy}k`;
+          return `Less than ${minAmount.energy}`;
         } else if (numericValue > 300000000) {
           return "Maximum limitation";
         }
       } else if (switchBtn === "bandwidth") {
         if (numericValue < minAmount.bandwidth) {
-          return `Less than ${minAmount.bandwidth}k`;
+          return `Less than ${minAmount.bandwidth}`;
         }
       } else {
       }
@@ -764,6 +812,9 @@ const Form2: React.FC = () => {
       if (radioPrice === "pull_fast_charge") {
         setDurationValue("0");
         setDurationInSec(0);
+        setPartialField("0");
+        setPartialFieldError("");
+        setBulkOrder(false);
       } else {
         setLimitInput("0");
         setMinAmountUnit("0");
@@ -784,7 +835,6 @@ const Form2: React.FC = () => {
       minAmountPrice.length > 0
     ) {
       //when radio price changes its state it resets the error :
-      setAmountError("");
 
       if (radioPrice === "fast") {
         if (switchBtn === "energy") {
@@ -829,27 +879,64 @@ const Form2: React.FC = () => {
   }, [inputValue, validatePrice]);
   //-------------------------------------------------------------------------------------
   //Function for partial field input :
-  const handlePartialFill = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = event.target.value;
+  const partialFillValidation = (
+    rawValue: string,
+    switchBtn: string | null,
+    minAmount: { energy: number; bandwidth: number }
+  ) => {
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+    const numericAmount = getNumericAmount(amount);
 
-    if (radioPrice === "pull_fast_charge") {
-      // Don't update the state, keep it at 0
-      return;
-    } else {
-      const numericValue = parseFloat(newValue) || 0;
+    if (rawValue.trim() === "") {
+      return "required";
+    } else if (isNaN(numericValue)) {
+      return "required";
+    }
 
-      if (switchBtn === "energy") {
-        setPartialFieldValue({
-          energy: numericValue,
-          bandwidth: partialFieldValue.bandwidth,
-        });
+    if (switchBtn === "energy") {
+      if (numericValue < partialFieldValue.energy) {
+        return `< ${partialFieldValue.energy}`;
+      } else if (numericValue > numericAmount) {
+        return `> ${numericAmount}`;
       } else {
-        setPartialFieldValue({
-          energy: partialFieldValue.energy,
-          bandwidth: numericValue,
-        });
+      }
+    } else {
+      if (numericValue < partialFieldValue.bandwidth) {
+        return `< ${partialFieldValue.bandwidth}`;
+      } else if (numericValue > numericAmount) {
+        return `> ${numericAmount}`;
+      } else {
       }
     }
+
+    return "";
+  };
+  const handlePartialFill = (
+    value: string | React.ChangeEvent<HTMLInputElement>
+  ) => {
+    let rawValue = "";
+
+    if (typeof value === "string") {
+      rawValue = value;
+    } else {
+      rawValue = value.target.value;
+    }
+
+    //Allow commas for display but store as numeric
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+
+    // You may also validate here if needed
+    if (!isNaN(numericValue)) {
+      setPartialField(numericValue.toString()); // just display it as a string
+    }
+
+    // Validate input
+    const errorMessage = partialFillValidation(
+      rawValue,
+      switchBtn,
+      partialFieldValue
+    );
+    setPartialFieldError(errorMessage);
   };
   //-------------------------------------------------------------------------------------
   //Function for minimum amount unit input :
@@ -979,48 +1066,55 @@ const Form2: React.FC = () => {
   const calculateTotalPrice = () => {
     const numericAmount = getNumericAmount(amount);
     const numericDuration = getDurationInSeconds(durationValue);
-    if (numericDuration === null) {
-      return { totalPrice: 0 };
-    }
     const pricePerUnit = getNumericSelectedPrice(inputValue);
     const SUN = 1000000;
     //To get minimum value of each selected duration based on server data :
     const matchedRate = getMatchedRate(numericDuration);
-    if (!matchedRate || !matchedRate.rate) {
-      return { totalPrice: 0 };
-    }
-    const minOption =
-      switchBtn === "energy"
-        ? matchedRate.rate.energy
-        : matchedRate.rate.bandwidth;
-
     if (pricePerUnit === null || numericAmount === null) {
       return { totalPrice: 0 };
-    }
-
-    if (pricePerUnit < minOption) {
-      return { totalPrice: 0 }; // Return 0 if price is too low
     }
 
     // Convert duration to seconds
     let totalSeconds = numericDuration;
     let totalPrice = 0;
 
-    if (totalSeconds === 900) {
-      // 15 minutes
+    if (radioPrice === "pull_fast_charge") {
       totalPrice = (numericAmount / SUN) * pricePerUnit;
-    } else if (totalSeconds === 3600) {
-      // 1 hour
-      totalPrice = (numericAmount / SUN) * pricePerUnit;
-    } else if (totalSeconds === 10800) {
-      // 3 hours
-      totalPrice = (numericAmount / SUN) * pricePerUnit;
-    } else if (totalSeconds % 86400 === 0) {
-      // whole days
-      const numberOfDays = totalSeconds / 86400;
-      totalPrice = (numericAmount / SUN) * pricePerUnit * numberOfDays;
     } else {
-      return null; // Invalid time
+      if (numericDuration === null) {
+        return { totalPrice: 0 };
+      }
+      const minOption =
+        switchBtn === "energy"
+          ? matchedRate.rate.energy
+          : matchedRate.rate.bandwidth;
+
+      if (!matchedRate || !matchedRate.rate) {
+        return { totalPrice: 0 };
+      }
+
+      if (pricePerUnit < minOption) {
+        return { totalPrice: 0 }; // Return 0 if price is too low
+      }
+
+      if (totalSeconds === null) return;
+
+      if (totalSeconds === 900) {
+        // 15 minutes
+        totalPrice = (numericAmount / SUN) * pricePerUnit;
+      } else if (totalSeconds === 3600) {
+        // 1 hour
+        totalPrice = (numericAmount / SUN) * pricePerUnit;
+      } else if (totalSeconds === 10800) {
+        // 3 hours
+        totalPrice = (numericAmount / SUN) * pricePerUnit;
+      } else if (totalSeconds % 86400 === 0) {
+        // whole days
+        const numberOfDays = totalSeconds / 86400;
+        totalPrice = (numericAmount / SUN) * pricePerUnit * numberOfDays;
+      } else {
+        return null; // Invalid time
+      }
     }
 
     return { totalPrice: Number(totalPrice.toFixed(3)) };
@@ -1028,7 +1122,7 @@ const Form2: React.FC = () => {
   let myPrice = calculateTotalPrice();
   //-------------------------------------------------------------------------------------
   //Function to submit data towards the server :
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!address && isConnectedTrading === false) {
@@ -1048,7 +1142,8 @@ const Form2: React.FC = () => {
       durationError ||
       priceError ||
       minAmountUnitError ||
-      limitInputError
+      limitInputError ||
+      partialFieldError
     ) {
       return;
     }
@@ -1089,44 +1184,91 @@ const Form2: React.FC = () => {
       return;
     }
 
-    //payload to send data :
-    let form2Payload = null;
-    if (radioPrice === "pull_fast_charge") {
-      form2Payload = {
-        resourceType: formBtn,
-        requester: address,
-        receiver: requeserAddress,
-        bulk_order: bulkOrder,
-        resourceAmount: numericAmount,
-        price: numericSelectedPrice,
-        total_price: totalPrice,
-        radio_price: radioPrice,
-        min_energy_amount: numericMinAmountUnit,
-        limit: numericLimit,
-      };
-    } else {
-      form2Payload = {
-        resourceType: formBtn,
-        requester: address,
-        receiver: requeserAddress,
-        bulk_order: bulkOrder,
-        resourceAmount: numericAmount,
-        durationSec: durationNumericValue,
-        price: numericSelectedPrice,
-        total_price: totalPrice,
-        radio_price: radioPrice,
-        partialFill: my_partial_field,
-      };
+    try {
+      //payload to send data :
+      let form2Payload = null;
+      if (radioPrice === "pull_fast_charge") {
+        form2Payload = {
+          resourceType: formBtn,
+          requester: address,
+          receiver: requeserAddress,
+          bulk_order: bulkOrder,
+          resourceAmount: numericAmount,
+          price: numericSelectedPrice,
+          total_price: totalPrice,
+          type: radioPrice,
+          min_energy_amount: numericMinAmountUnit,
+          limit: numericLimit,
+        };
+      } else {
+        form2Payload = {
+          resourceType: formBtn,
+          requester: address,
+          receiver: requeserAddress,
+          bulk_order: bulkOrder,
+          resourceAmount: numericAmount,
+          durationSec: durationNumericValue,
+          price: numericSelectedPrice,
+          total_price: totalPrice,
+          type: radioPrice,
+          partialFill: my_partial_field,
+        };
+      }
+      //base url :
+      const baseURL = process.env.REACT_APP_BASE_URL;
+      //to get axios timeout :
+      const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+
+      const form2Response = await axios.post<Form2Api>(``, form2Payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        timeout: axiosTimeOut,
+        validateStatus: (status: number) => status < 500,
+      });
+      
+      // in here we will add ----> if buyerCredit >= payout then send the data towards the server :
+      if (form2Response.data.success === true) {
+        dispatch(
+          showNotification({
+            name: "success1",
+            message: "Data has been sent successful.",
+            severity: "success",
+          })
+        );
+        if (address === null) return;
+
+        setWalletAdd(address);
+        setBulkOrder(false);
+        setAmount("");
+        setDurationValue("");
+        setDurationInSec(2592000);
+        setInputValue("");
+        setDynamicPlaceholder("Price");
+        setRadionPrice("fast");
+        setPartialField("0");
+        setMinAmountUnit("0");
+        setLimitInput("0");
+      } else {
+        dispatch(
+          showNotification({
+            name: "error3",
+            message: "Error in sending data.",
+            severity: "success",
+          })
+        );
+        return;
+      }
+    } catch (error) {
+      dispatch(
+        showNotification({
+          name: "error4",
+          message: `Something went wrong: ${error}`,
+          severity: "error",
+        })
+      );
+      return;
     }
-
-    console.log(form2Payload);
-
-    /*
-    //after sending data towards the server successfully :
-    
-    setWalletAdd(address);
-    setBulkOrder(false)
-    */
   };
   //-------------------------------------------------------------------------------------
 
@@ -1280,7 +1422,7 @@ const Form2: React.FC = () => {
                     onClick={() => amountHandleChange("64,350")}
                     value="64,350"
                     style={{ width: "67px", padding: "2px 0px" }}
-                    disabled={radioPrice !== "manual"}
+                    disabled={radioPrice === "pull_fast_charge"}
                   >
                     USDT Tsf
                   </InputMiniBtn>
@@ -1291,7 +1433,7 @@ const Form2: React.FC = () => {
                     onClick={() => amountHandleChange("100,000")}
                     value="100,000"
                     style={{ padding: "2px 2px" }}
-                    disabled={radioPrice !== "manual"}
+                    disabled={radioPrice === "pull_fast_charge"}
                   >
                     100k
                   </InputMiniBtn>
@@ -1302,7 +1444,7 @@ const Form2: React.FC = () => {
                     onClick={() => amountHandleChange("1,000,000")}
                     value="1,000,000"
                     style={{ padding: "2px 2px" }}
-                    disabled={radioPrice !== "manual"}
+                    disabled={radioPrice === "pull_fast_charge"}
                   >
                     1m
                   </InputMiniBtn>
@@ -1313,7 +1455,7 @@ const Form2: React.FC = () => {
                     onClick={() => amountHandleChange("2,000,000")}
                     value="2,000,000"
                     style={{ padding: "2px 2px" }}
-                    disabled={radioPrice !== "manual"}
+                    disabled={radioPrice === "pull_fast_charge"}
                   >
                     2m
                   </InputMiniBtn>
@@ -1324,7 +1466,7 @@ const Form2: React.FC = () => {
                     onClick={() => amountHandleChange("10,000,000")}
                     value="10,000,000"
                     style={{ padding: "2px 2px" }}
-                    disabled={radioPrice !== "manual"}
+                    disabled={radioPrice === "pull_fast_charge"}
                   >
                     10m
                   </InputMiniBtn>
@@ -1337,7 +1479,7 @@ const Form2: React.FC = () => {
                     type="button"
                     onClick={() => amountHandleChange("1,000")}
                     value="1,000"
-                    disabled={radioPrice !== "manual"}
+                    disabled={radioPrice === "pull_fast_charge"}
                   >
                     1k
                   </InputMiniBtn>
@@ -1347,7 +1489,7 @@ const Form2: React.FC = () => {
                     type="button"
                     onClick={() => amountHandleChange("2,000")}
                     value="2,000"
-                    disabled={radioPrice !== "manual"}
+                    disabled={radioPrice === "pull_fast_charge"}
                   >
                     2k
                   </InputMiniBtn>
@@ -1357,7 +1499,7 @@ const Form2: React.FC = () => {
                     type="button"
                     onClick={() => amountHandleChange("5,000")}
                     value="5,000"
-                    disabled={radioPrice !== "manual"}
+                    disabled={radioPrice === "pull_fast_charge"}
                   >
                     5k
                   </InputMiniBtn>
@@ -1367,7 +1509,7 @@ const Form2: React.FC = () => {
                     type="button"
                     onClick={() => amountHandleChange("10,000")}
                     value="10,000"
-                    disabled={radioPrice !== "manual"}
+                    disabled={radioPrice === "pull_fast_charge"}
                   >
                     10k
                   </InputMiniBtn>
@@ -1515,9 +1657,9 @@ const Form2: React.FC = () => {
                     }}
                   >
                     <FormAddLabel>Partial Field</FormAddLabel>
-                    {walletAddError ? (
+                    {partialFieldError ? (
                       <FormErrorWrapper>
-                        <FormError>{walletAddError}</FormError>
+                        <FormError>{partialFieldError}</FormError>
                       </FormErrorWrapper>
                     ) : (
                       ""
@@ -1533,16 +1675,9 @@ const Form2: React.FC = () => {
                     <FormAddInputIconWrapper>
                       <FormAddInputWrapper2 style={{ height: "24px" }}>
                         <FormAddInput
-                          value={
-                            radioPrice === "pull_fast_charge"
-                              ? "0"
-                              : switchBtn === "energy"
-                              ? partialFieldValue.energy.toString()
-                              : partialFieldValue.bandwidth.toString()
-                          }
+                          value={partialField}
                           onChange={handlePartialFill}
                           style={{ fontSize: "16px", marginLeft: "0.5rem" }}
-                          readOnly
                           disabled={radioPrice === "pull_fast_charge"}
                         />
                       </FormAddInputWrapper2>
