@@ -162,7 +162,7 @@ const Form2: React.FC = () => {
     (state: RootState) => state.refresh.refreshTrigger
   );
   //tron wallet context :
-  const { address, isConnectedTrading } = useTronWallet();
+  const { address, isConnectedTrading, accessToken } = useTronWallet();
   const { fetchData, resourceData } = useFetchData();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
@@ -1218,16 +1218,19 @@ const Form2: React.FC = () => {
       const baseURL = process.env.REACT_APP_BASE_URL;
       //to get axios timeout :
       const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
-
+      //to get access token :
+      
+      // in here we will add ----> if buyerCredit >= payout then send the data towards the server :
       const form2Response = await axios.post<Form2Api>(``, form2Payload, {
         headers: {
           "Content-Type": "application/json",
+          accesstoken : accessToken
         },
         timeout: axiosTimeOut,
         validateStatus: (status: number) => status < 500,
       });
       
-      // in here we will add ----> if buyerCredit >= payout then send the data towards the server :
+      
       if (form2Response.data.success === true) {
         dispatch(
           showNotification({
