@@ -149,7 +149,7 @@ const Section1: React.FC = () => {
             depositId: depositResponse.data.depositId,
           };
           const confirmDepostTrx = await axios.post<depositTrxConfirmation>(
-            ``,
+            `${baseUrl}/Buyer/ConfirmDeposit`,
             confirmDepostTrxPayload,
             {
               headers: {
@@ -206,7 +206,7 @@ const Section1: React.FC = () => {
         showNotification({
           name: "deposit-error-6",
           message:
-            "When you depist once you must wait 2 minutes for next deposit operation",
+            `${error}`,
           severity: "error",
         })
       );
