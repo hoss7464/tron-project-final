@@ -1,4 +1,6 @@
 import React from "react";
+import axios from "axios";
+import { useTronWallet } from "../../contexts/TronWalletContext";
 import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
 import {
   Popup2HeaderWrapper,
@@ -14,9 +16,70 @@ interface BuyerChangeApiProps {
   onClose: () => void;
 }
 
+interface BuyerChangeApiData {
+  success: boolean;
+  data: {
+    ApiKey: string;
+  };
+}
+
 const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
+  const dispatch = useDispatch();
+  const { accessToken } = useTronWallet();
+
   const changeApiReject = () => {
     onClose();
+  };
+
+  const handleChangeApi = async () => {
+    const baseUrl = process.env.REACT_APP_BASE_URL;
+    const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+    try {
+      const changeApiResponse = await axios.post<BuyerChangeApiData>(
+        `${baseUrl}/Buyer/reGenerate`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            accesstoken: accessToken,
+          },
+          timeout: axiosTimeOut,
+          validateStatus: (status: number) => status < 500,
+        }
+      );
+
+      if (changeApiResponse.data.success === true) {
+        dispatch(
+          showNotification({
+            name: "change-api-success",
+            message: `API has been change successfully`,
+            severity: "success",
+          })
+        );
+        onClose();
+        return;
+      } else {
+        dispatch(
+          showNotification({
+            name: "change-api-error1",
+            message: `Something went wrong in changing API operation`,
+            severity: "error",
+          })
+        );
+        onClose();
+        return;
+      }
+    } catch (error) {
+      dispatch(
+        showNotification({
+          name: "change-api-error2",
+          message: `Change API Error: ${error}`,
+          severity: "error",
+        })
+      );
+      onClose();
+      return;
+    }
   };
   return (
     <>
@@ -65,6 +128,7 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
             fullWidth
             color="primary"
             variant="contained"
+            onClick={handleChangeApi}
             sx={{
               backgroundColor: "#430E00",
               borderRadius: "10px",

@@ -13,6 +13,7 @@ import {
   MyOrdersResponse,
   ResourceResponse,
   AvailableResponse,
+  AccountInfoResponse,
 } from "../services/requestService";
 import { useTronWallet } from "./TronWalletContext";
 import { useLoading } from "./LoaderContext";
@@ -23,6 +24,7 @@ interface FetchDataContextType {
   myOrderData: MyOrdersResponse | null;
   resourceData: ResourceResponse | null;
   availableData: AvailableResponse | null;
+  tradingAccountInfo: AccountInfoResponse | null;
   loading: boolean;
   error: Error | null;
   fetchData: (isInitialLoad?: boolean) => Promise<void>;
@@ -42,12 +44,13 @@ interface FetchDataProviderProps {
 export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   children,
 }) => {
-  const { address, disconnectWallet2, accessToken } = useTronWallet();
+  const { address, disconnectWallet2, accessToken, isConnectedTrading } = useTronWallet();
   const { incrementLoading, decrementLoading } = useLoading(); // Get loader functions
   const [orderData, setOrderData] = useState<OrdersResponse | null>(null);
   const [myOrderData, setMyOrderData] = useState<MyOrdersResponse | null>(null);
   const [resourceData, setResourceData] = useState<ResourceResponse | null>(null);
   const [availableData, setAvailableData] = useState<AvailableResponse | null>(null)
+  const [tradingAccountInfo, setTradingAccountInfo] = useState<AccountInfoResponse | null>(null)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [authErrorCount, setAuthErrorCount] = useState(0);
@@ -83,12 +86,14 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
         incrementLoading();
       }
 
-      const allData = await fetchAllUiData(address, accessToken,path1,handleAuthFailure);
+      const allData = await fetchAllUiData(address, accessToken,path1,isConnectedTrading, handleAuthFailure );
+      
 
       setOrderData(allData.orders);
       setMyOrderData(allData.myOrders);
       setResourceData(allData.resources);
       setAvailableData(allData.availables);
+      setTradingAccountInfo(allData.tradingAccountInfo)
 
       if (authErrorCount > 0) {
         setAuthErrorCount(0);
@@ -142,6 +147,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
     myOrderData,
     resourceData,
     availableData,
+    tradingAccountInfo,
     fetchData: () => fetchData(false), // Default to not showing loader
     loading,
     error,

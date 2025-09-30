@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import "./Section1.css";
 import { useTronWallet } from "../../../../contexts/TronWalletContext";
+import { useFetchData } from "../../../../contexts/FetchDataContext";
 import {
   Sec1Contrainer,
   SecSummaryIcon,
@@ -36,12 +37,6 @@ import {
   SellersCardThingsNumber,
 } from "../../Sellers/SellersElement";
 import {
-  HeroGridCardNumberIconWrapper,
-  HeroGridCardNumberIconWrapper2,
-  HeroGridCardNumberIconWrapper3,
-  HeroGridCardNumberIcon,
-} from "../../../mainPage/HeroSection/HeroElements";
-import {
   FormAddInputWrapper,
   FormAddInputIconWrapper,
   FormAddInputWrapper2,
@@ -49,19 +44,25 @@ import {
 } from "../../../mainPage/mainPageElements";
 import { Grid } from "@mui/material";
 import balanceIcon from "../../../../assets/svg/BalanceIcon.svg";
-import energyIcon from "../../../../assets/svg/EnergyIcon.svg";
-import bandwidthIcon from "../../../../assets/svg/BandwidthIcon.svg";
 import PopUp8 from "../../../../components/Popup/PopUp8";
-import { useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../../../redux/actions/notifSlice";
 
 const Section1: React.FC = () => {
   const dispatch = useDispatch();
   const { address, isConnectedTrading } = useTronWallet();
+  const { tradingAccountInfo, fetchData } = useFetchData();
   const [deposit, setDeposit] = useState<string>("");
   const [depositError, setDepositError] = useState<string>("");
   const [changeApiOpen, setChangeApiOpen] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+
+
+  useEffect(() => {
+    if (tradingAccountInfo) {
+      setApiKey(tradingAccountInfo.data.apiKey);
+    }
+  }, [tradingAccountInfo]);
 
   const handleDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -96,6 +97,19 @@ const Section1: React.FC = () => {
   const handlePopup8Close = useCallback(() => {
     setChangeApiOpen(false);
   }, []);
+
+  const handleCopy = () => {
+    if (address) {
+      navigator.clipboard.writeText(apiKey);
+      dispatch(
+        showNotification({
+          name: "copy-notif",
+          message: "Copied to clipboard",
+          severity: "success",
+        })
+      );
+    }
+  };
 
   return (
     <>
@@ -170,13 +184,16 @@ const Section1: React.FC = () => {
                     <SellersCardThingsWrapper2 style={{ padding: "0" }}>
                       <SellersCardThingsNameIconWrapper>
                         <SellersCardThingsNameWrapper>
-                          <SellersCardThingsName>Amount</SellersCardThingsName>
+                          <SellersCardThingsName>Credit </SellersCardThingsName>
                         </SellersCardThingsNameWrapper>
                       </SellersCardThingsNameIconWrapper>
                       <SellersCardThingsNumberWrapper>
-                        <SellersCardThingsNumber>
-                          123456
-                        </SellersCardThingsNumber>
+                        {isConnectedTrading === true ? (<SellersCardThingsNumber>
+                          {(tradingAccountInfo?.data.buyerCredit)?.toLocaleString()}
+                        </SellersCardThingsNumber>) : (<SellersCardThingsNumber>
+                          _ _
+                        </SellersCardThingsNumber>)}
+                        
                       </SellersCardThingsNumberWrapper>
                     </SellersCardThingsWrapper2>
                   </Sec1CardThingsWrapper>
@@ -202,10 +219,10 @@ const Section1: React.FC = () => {
                     <FormAddInputWrapper style={{ marginBottom: "1rem" }}>
                       <FormAddInputIconWrapper>
                         <FormAddInputWrapper2>
-                          <FormAddInput value="" placeholder="API key" />
+                          <FormAddInput value={apiKey} placeholder="API key" />
                         </FormAddInputWrapper2>
 
-                        <Sec1CopyIcon />
+                        <Sec1CopyIcon onClick={handleCopy} />
                       </FormAddInputIconWrapper>
                     </FormAddInputWrapper>
                     <Sec1ButtonWrapper onClick={handlePopUp8Click}>

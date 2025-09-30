@@ -163,7 +163,7 @@ const Form2: React.FC = () => {
   );
   //tron wallet context :
   const { address, isConnectedTrading, accessToken } = useTronWallet();
-  const { fetchData, resourceData } = useFetchData();
+  const { fetchData, resourceData, tradingAccountInfo } = useFetchData();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
@@ -397,7 +397,7 @@ const Form2: React.FC = () => {
     }
   };
   //-------------------------------------------------------------------------------------
-  //Function to store the whole data for order form in it from server :
+  //Function to get updated data and show in ui automatically :
   useEffect(() => {
     const refreshData = async () => {
       try {
@@ -411,7 +411,7 @@ const Form2: React.FC = () => {
       refreshData();
     }
   }, [refreshTrigger, fetchData]);
-  //Function to get states from stored data :
+  //Function to get data from resourceData request :
   useEffect(() => {
     //Function to get minium amount and minimum price :
     if (!resourceData) return;
@@ -458,7 +458,7 @@ const Form2: React.FC = () => {
       setMaxLimitValue(resourceData.data.fastChargeSetting.fastChargeLimitMax);
     }
   }, [resourceData]);
-
+  //Function to get data from tradingAccountInfo request :
   //-------------------------------------------------------------------------------------
   //Functions for amount input :
   //Function for amount validation :
@@ -1218,46 +1218,59 @@ const Form2: React.FC = () => {
       const baseURL = process.env.REACT_APP_BASE_URL;
       //to get axios timeout :
       const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
-      //to get access token :
-      
-      // in here we will add ----> if buyerCredit >= payout then send the data towards the server :
-      const form2Response = await axios.post<Form2Api>(``, form2Payload, {
-        headers: {
-          "Content-Type": "application/json",
-          accesstoken : accessToken
-        },
-        timeout: axiosTimeOut,
-        validateStatus: (status: number) => status < 500,
-      });
-      
-      
-      if (form2Response.data.success === true) {
-        dispatch(
-          showNotification({
-            name: "success1",
-            message: "Data has been sent successful.",
-            severity: "success",
-          })
-        );
-        if (address === null) return;
 
-        setWalletAdd(address);
-        setBulkOrder(false);
-        setAmount("");
-        setDurationValue("");
-        setDurationInSec(2592000);
-        setInputValue("");
-        setDynamicPlaceholder("Price");
-        setRadionPrice("fast");
-        setPartialField("0");
-        setMinAmountUnit("0");
-        setLimitInput("0");
+      if (tradingAccountInfo === null) {
+        return;
+      }
+
+      // in here we will add ----> if buyerCredit >= payout then send the data towards the server :
+      if (tradingAccountInfo?.data.buyerCredit >= totalPrice) {
+        const form2Response = await axios.post<Form2Api>(``, form2Payload, {
+          headers: {
+            "Content-Type": "application/json",
+            accesstoken: accessToken,
+          },
+          timeout: axiosTimeOut,
+          validateStatus: (status: number) => status < 500,
+        });
+
+        if (form2Response.data.success === true) {
+          dispatch(
+            showNotification({
+              name: "success1",
+              message: "Data has been sent successful.",
+              severity: "success",
+            })
+          );
+          if (address === null) return;
+
+          setWalletAdd(address);
+          setBulkOrder(false);
+          setAmount("");
+          setDurationValue("");
+          setDurationInSec(2592000);
+          setInputValue("");
+          setDynamicPlaceholder("Price");
+          setRadionPrice("fast");
+          setPartialField("0");
+          setMinAmountUnit("0");
+          setLimitInput("0");
+        } else {
+          dispatch(
+            showNotification({
+              name: "error3",
+              message: "Error in sending data.",
+              severity: "success",
+            })
+          );
+          return;
+        }
       } else {
         dispatch(
           showNotification({
-            name: "error3",
-            message: "Error in sending data.",
-            severity: "success",
+            name: "error5",
+            message: `Your credit is not enough`,
+            severity: "error",
           })
         );
         return;

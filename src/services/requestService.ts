@@ -137,12 +137,6 @@ export interface RateByDuration {
     bandwidth: number;
   };
 }
-//interface for error response
-interface ApiErrorResponse {
-  success: boolean;
-  message?: string;
-  code?: string;
-}
 
 //interfaces for available response :
 export interface EnergyItem {
@@ -160,6 +154,15 @@ export interface AvailableResponse {
   energy: EnergyItem[];
   bandwidth: BandwidthItem[];
 }
+//Interface for aaccount info in /Buyers or /Sellers :
+export interface AccountInfoResponse {
+  success: boolean;
+  data: {
+    buyerCredit: number;
+    sellerCredit: number;
+    apiKey: string;
+  };
+}
 //-------------------------------------------------------------------------------------
 //to get data from .env :
 const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -169,7 +172,9 @@ export const fetchAllUiData = async (
   walletAddress: string | null,
   accessToken: string | null,
   pathname: string,
-  onAuthFailure?: () => void
+  isConnectedTrading : boolean,
+  onAuthFailure?: () => void,
+
 ) => {
   try {
     const hasConnectedWallet = !!walletAddress;
@@ -248,6 +253,61 @@ export const fetchAllUiData = async (
         success: true,
         message: "No wallet connected or not on /",
         data: [],
+      };
+    }
+
+  // Handle account info (ONLY make request when conditions are met)
+    let accountInfoResponse: AccountInfoResponse;
+    const shouldFetchAccountInfo = isConnectedTrading === true && (pathname === "/Buyers" || pathname === "/Sellers");
+    
+    if (shouldFetchAccountInfo) {
+      try {
+        const accountInfoRes = await axios.get<AccountInfoResponse>(
+          `${baseUrl}/Buyer/getAccountInfo`,
+          {
+            headers: { "Content-Type": "application/json", accesstoken: accessToken },
+            timeout: axiosTimeOut,
+            validateStatus: (status: number) => status < 500,
+          }
+        );
+        
+        if (accountInfoRes.data.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          accountInfoResponse = {
+            success: false,
+            data: {
+              buyerCredit: 0,
+              sellerCredit: 0,
+              apiKey: "",
+            },
+          };
+        } else {
+          accountInfoResponse = accountInfoRes.data;
+        }
+      } catch (error: any) {
+        if (error.response?.data?.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          accountInfoResponse = {
+            success: false,
+            data: {
+              buyerCredit: 0,
+              sellerCredit: 0,
+              apiKey: "",
+            },
+          };
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      // No request made, just return default empty data
+      accountInfoResponse = {
+        success: true,
+        data: {
+          buyerCredit: 0,
+          sellerCredit: 0,
+          apiKey: "",
+        },
       };
     }
 
@@ -346,7 +406,13 @@ export const fetchAllUiData = async (
       availables = handleSettledPromise(results[i++], defaultAvailableResponse);
     }
 
-    return { orders, myOrders: myOrdersResponse, resources, availables };
+    return {
+      orders,
+      myOrders: myOrdersResponse,
+      resources,
+      availables,
+      tradingAccountInfo: accountInfoResponse,
+    };
   } catch (error) {
     throw error;
   }
