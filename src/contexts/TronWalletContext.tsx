@@ -193,13 +193,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const clearAccessToken = useCallback(() => {
     setAccessToken(null);
   }, []);
-
+  
   //-------------------------------------------------------------------------------------
   //Function to get resourceData from fetchDataContext :
   const getResourceData = useCallback((): ResourceResponse | null => {
     return FetchDataResourceRef.current;
   }, []);
-
   //ali ezafe karde-------------------------------------------------------------------------------------
   function hasBothDelegateOps(opsHex?: string | null): boolean {
     if (!opsHex || typeof opsHex !== "string") return false;

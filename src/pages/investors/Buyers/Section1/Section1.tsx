@@ -145,8 +145,8 @@ const Section1: React.FC = () => {
         if (depositTransferTrx.success === true) {
           //send data towards the server :
           const confirmDepostTrxPayload = {
-            txId: depositTransferTrx.txId,
             depositId: depositResponse.data.depositId,
+            txId: depositTransferTrx.txId,
           };
           const confirmDepostTrx = await axios.post<depositTrxConfirmation>(
             `${baseUrl}/Buyer/ConfirmDeposit`,
@@ -205,8 +205,7 @@ const Section1: React.FC = () => {
       dispatch(
         showNotification({
           name: "deposit-error-6",
-          message:
-            `${error}`,
+          message: `${error}`,
           severity: "error",
         })
       );
@@ -244,7 +243,16 @@ const Section1: React.FC = () => {
       );
     }
   };
-
+  //Function to change sun to trx :
+  const sunToTrx = (value : number) => {
+    const trxValue = value / 1_000_000
+    return trxValue.toFixed(2)
+  }
+  
+  if (tradingAccountInfo?.data.buyerCredit === undefined) {
+    return 
+  }
+ 
   return (
     <>
       <Sec1Contrainer>
@@ -324,7 +332,7 @@ const Section1: React.FC = () => {
                       <SellersCardThingsNumberWrapper>
                         {isConnectedTrading === true ? (
                           <SellersCardThingsNumber>
-                            {tradingAccountInfo?.data.buyerCredit?.toLocaleString()}
+                            {sunToTrx(tradingAccountInfo?.data.buyerCredit).toLocaleString()}
                           </SellersCardThingsNumber>
                         ) : (
                           <SellersCardThingsNumber>_ _</SellersCardThingsNumber>

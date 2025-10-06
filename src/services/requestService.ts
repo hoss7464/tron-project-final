@@ -141,12 +141,12 @@ export interface RateByDuration {
 //interfaces for available response :
 export interface EnergyItem {
   rate: number;
-  avilable: number; // Note: This appears to be a typo - should probably be "available"
+  avilable: number;
 }
 
 export interface BandwidthItem {
   rate: number;
-  avilable: number; // Note: This appears to be a typo - should probably be "available"
+  avilable: number;
 }
 
 export interface AvailableResponse {
@@ -154,7 +154,7 @@ export interface AvailableResponse {
   energy: EnergyItem[];
   bandwidth: BandwidthItem[];
 }
-//Interface for aaccount info in /Buyers or /Sellers :
+//Interface for account info in /Buyers or /Sellers :
 export interface AccountInfoResponse {
   success: boolean;
   data: {
@@ -162,6 +162,22 @@ export interface AccountInfoResponse {
     sellerCredit: number;
     apiKey: string;
   };
+}
+
+//Interfaces for refund request in /Buyers and /Sellers :
+export interface RefundResponse {
+  success: boolean;
+  message: string;
+  data: RefundData[];
+}
+
+interface RefundData {
+  _id: string;
+  requester: string;
+  depositAmount: number;
+  status: string;
+  paidAt: any;
+  createdAt: string;
 }
 //-------------------------------------------------------------------------------------
 //to get data from .env :
@@ -172,14 +188,13 @@ export const fetchAllUiData = async (
   walletAddress: string | null,
   accessToken: string | null,
   pathname: string,
-  isConnectedTrading : boolean,
-  onAuthFailure?: () => void,
-
+  isConnectedTrading: boolean,
+  onAuthFailure?: () => void
 ) => {
   try {
     const hasConnectedWallet = !!walletAddress;
-
-    // Always fetch resources
+    //--------------------------------------------------------------------------------------------
+    //1.resourceData request :(Always fetch resources)
     const resourcesPromise = axios.get<ResourceResponse>(
       `${baseUrl}/Setting/UI`,
       {
@@ -188,8 +203,8 @@ export const fetchAllUiData = async (
         validateStatus: (status: number) => status < 500,
       }
     );
-
-    // Only fetch these on "/"
+    //--------------------------------------------------------------------------------------------
+    //2.orders request :(Only fetch these on "/")
     let ordersPromise: ReturnType<typeof axios.get<OrdersResponse>> | null =
       null;
     let availablePromise: ReturnType<
@@ -212,8 +227,8 @@ export const fetchAllUiData = async (
         }
       );
     }
-
-    // Handle myOrders (only on "/" + wallet connected)
+    //--------------------------------------------------------------------------------------------
+    // myOrders request : (only on "/" + wallet connected)
     let myOrdersResponse: MyOrdersResponse;
     if (hasConnectedWallet && pathname === "/") {
       try {
@@ -255,22 +270,27 @@ export const fetchAllUiData = async (
         data: [],
       };
     }
-
-  // Handle account info (ONLY make request when conditions are met)
+    //--------------------------------------------------------------------------------------------
+    //accountInfo request : (only for "/Buyers" & "/Sellers")
     let accountInfoResponse: AccountInfoResponse;
-    const shouldFetchAccountInfo = isConnectedTrading === true && (pathname === "/Buyers" || pathname === "/Sellers");
-    
+    const shouldFetchAccountInfo =
+      isConnectedTrading === true &&
+      (pathname === "/Buyers" || pathname === "/Sellers");
+
     if (shouldFetchAccountInfo) {
       try {
         const accountInfoRes = await axios.get<AccountInfoResponse>(
           `${baseUrl}/Buyer/getAccountInfo`,
           {
-            headers: { "Content-Type": "application/json", accesstoken: accessToken },
+            headers: {
+              "Content-Type": "application/json",
+              accesstoken: accessToken,
+            },
             timeout: axiosTimeOut,
             validateStatus: (status: number) => status < 500,
           }
         );
-        
+
         if (accountInfoRes.data.success === false) {
           if (onAuthFailure) onAuthFailure();
           accountInfoResponse = {
@@ -310,7 +330,65 @@ export const fetchAllUiData = async (
         },
       };
     }
+    //--------------------------------------------------------------------------------------------
+    //getRefund request (only for "/Buyers" & "/Sellers")
+    let getRefundResponse: RefundResponse;
+    const shouldFetchRefundInfo =
+      isConnectedTrading === true && pathname === "/Buyers";
 
+    if (shouldFetchRefundInfo) {
+      try {
+        const refundRes = await axios.get<RefundResponse>(
+          `${baseUrl}/Buyer/getRefund`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              accesstoken: accessToken,
+            },
+            timeout: axiosTimeOut,
+            validateStatus: (status: number) => status < 500,
+          }
+        );
+
+        if (refundRes.data.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          getRefundResponse = {
+            success: false,
+            message: refundRes.data.message,
+            data: [
+              {
+                _id: "",
+                requester: "",
+                depositAmount: 0,
+                status: "",
+                paidAt: null,
+                createdAt: "string",
+              },
+            ],
+          };
+        } else {
+          getRefundResponse = refundRes.data;
+        }
+      } catch (error: any) {
+        if (error.response?.data?.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          getRefundResponse = {
+            success: false,
+            message: error.response?.data?.message || "An error occurred",
+            data: [],
+          };
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      getRefundResponse = {
+        success: true,
+        message: "No refund data requested",
+        data: [],
+      };
+    }
+    //--------------------------------------------------------------------------------------------
     // Collect promises dynamically
     const results = await Promise.allSettled(
       [ordersPromise, resourcesPromise, availablePromise].filter(Boolean)
@@ -328,7 +406,7 @@ export const fetchAllUiData = async (
         return defaultValue;
       }
     };
-
+    //--------------------------------------------------------------------------------------------
     // Defaults
     const defaultOrdersResponse: OrdersResponse = { success: false, data: [] };
     const defaultResourceResponse: ResourceResponse = {
@@ -387,16 +465,16 @@ export const fetchAllUiData = async (
       energy: [],
       bandwidth: [],
     };
-
+    //--------------------------------------------------------------------------------------------
     // Map results back
     let orders = defaultOrdersResponse;
     let resources = defaultResourceResponse;
     let availables = defaultAvailableResponse;
-
+    //--------------------------------------------------------------------------------------------
     // results[0] = orders (if pathname === "/")
     // results[1] = resources
     // results[2] = available (if pathname === "/")
-
+    //--------------------------------------------------------------------------------------------
     let i = 0;
     if (pathname === "/") {
       orders = handleSettledPromise(results[i++], defaultOrdersResponse);
@@ -405,13 +483,14 @@ export const fetchAllUiData = async (
     if (pathname === "/") {
       availables = handleSettledPromise(results[i++], defaultAvailableResponse);
     }
-
+    //--------------------------------------------------------------------------------------------
     return {
       orders,
       myOrders: myOrdersResponse,
       resources,
       availables,
       tradingAccountInfo: accountInfoResponse,
+      tradingRefundInfo: getRefundResponse,
     };
   } catch (error) {
     throw error;

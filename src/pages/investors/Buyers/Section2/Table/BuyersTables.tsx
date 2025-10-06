@@ -80,7 +80,7 @@ const BuyersTables: React.FC = () => {
             </FullWidthToggleButtonGroup>
           </OrdersNavHeaderWrapper>
         </OrderMainWrapper>
-        <BuyersContentsWrapper >
+        <BuyersContentsWrapper style={{ justifyContent : "space-between"}} >
             {BuyersTableSitchBtn === "Orders" ? <BuyersTable1 /> :  <BuyersTable2 />}
         </BuyersContentsWrapper>
       </BuyersTableContainer1>

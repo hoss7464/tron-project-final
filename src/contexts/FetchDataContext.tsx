@@ -14,6 +14,7 @@ import {
   ResourceResponse,
   AvailableResponse,
   AccountInfoResponse,
+  RefundResponse,
 } from "../services/requestService";
 import { useTronWallet } from "./TronWalletContext";
 import { useLoading } from "./LoaderContext";
@@ -25,6 +26,7 @@ interface FetchDataContextType {
   resourceData: ResourceResponse | null;
   availableData: AvailableResponse | null;
   tradingAccountInfo: AccountInfoResponse | null;
+  tradingRefundInfo: RefundResponse | null;
   loading: boolean;
   error: Error | null;
   fetchData: (isInitialLoad?: boolean) => Promise<void>;
@@ -51,6 +53,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const [resourceData, setResourceData] = useState<ResourceResponse | null>(null);
   const [availableData, setAvailableData] = useState<AvailableResponse | null>(null)
   const [tradingAccountInfo, setTradingAccountInfo] = useState<AccountInfoResponse | null>(null)
+  const [tradingRefundInfo, setTradingRefundInfo] = useState<RefundResponse | null>(null)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [authErrorCount, setAuthErrorCount] = useState(0);
@@ -94,6 +97,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
       setResourceData(allData.resources);
       setAvailableData(allData.availables);
       setTradingAccountInfo(allData.tradingAccountInfo)
+      setTradingRefundInfo(allData.tradingRefundInfo)
 
       if (authErrorCount > 0) {
         setAuthErrorCount(0);
@@ -148,6 +152,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
     resourceData,
     availableData,
     tradingAccountInfo,
+    tradingRefundInfo,
     fetchData: () => fetchData(false), // Default to not showing loader
     loading,
     error,

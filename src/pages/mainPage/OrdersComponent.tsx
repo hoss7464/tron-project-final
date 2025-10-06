@@ -198,6 +198,7 @@ export const OrdersComponent: React.FC = () => {
     <>
       <OrdersWrapper className="order-bg">
         <OrderMainWrapper>
+          
           <OrdersNavHeaderWrapper>
             <LegacyCardName style={{ color: "#003543" }}>
               {t("orders")}
@@ -241,6 +242,7 @@ export const OrdersComponent: React.FC = () => {
 
                   return (
                     <OrdersDetail key={index}>
+                      
                       <OrdersCardTextWrap>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>{time}</OrdersCardText1>
@@ -364,6 +366,7 @@ export const OrdersComponent: React.FC = () => {
             </OrdersScroll>
           </OrdersCarouselWrapper>
         </OrderMainWrapper>
+
         <OedersPaginationWrapper>
           <Pagination
             count={totalPages}
@@ -381,6 +384,7 @@ export const OrdersComponent: React.FC = () => {
             }}
           />
         </OedersPaginationWrapper>
+
       </OrdersWrapper>
       {isModalOpen && (
         <PopUp3
