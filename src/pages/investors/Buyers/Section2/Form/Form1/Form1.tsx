@@ -66,8 +66,29 @@ import { useTronWallet } from "../../../../../../contexts/TronWalletContext";
 import { ResourceResponse } from "../../../../../../services/requestService";
 import { showNotification } from "../../../../../../redux/actions/notifSlice";
 import Autocomplete from "@mui/material/Autocomplete";
-import PopUp2 from "../../../../../../components/Popup/PopUp2";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
+
+//------------------------------------------------------------------------------------
+interface Form1ApiResponse {
+  success: boolean;
+  message: string;
+  data: Form1ApiData;
+}
+
+interface Form1ApiData {
+  durationSec: number;
+  options: {
+    allow_partial: boolean;
+    bulk_order: boolean;
+  };
+  price: number;
+  receiver: string;
+  requester: string;
+  resourceAmount: number;
+  resourceType: string;
+  totalPrice: number;
+}
 
 //-------------------------------------------------------------------------------------
 //Duration input components :
@@ -135,8 +156,13 @@ const Form1: React.FC = () => {
     (state: RootState) => state.refresh.refreshTrigger
   );
   //tron wallet context :
-  const { address, balance, availableBandwidth, isConnectedTrading } =
-    useTronWallet();
+  const {
+    address,
+    balance,
+    availableBandwidth,
+    isConnectedTrading,
+    accessToken,
+  } = useTronWallet();
   //Switch button states:
   const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
   //Wallet address states :
@@ -706,7 +732,7 @@ const Form1: React.FC = () => {
   const { totalPrice } = myPrice;
   const durationNumericValue = getDurationInSeconds(durationValue);
   let stringSelectedPrice = inputValue;
-  let numericSelectedPrice = getNumericSelectedPrice(stringSelectedPrice);
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -776,14 +802,62 @@ const Form1: React.FC = () => {
       return;
     }
 
+    //base url :
+      const baseURL = process.env.REACT_APP_BASE_URL;
+
     //Fetch data towards server :
+    const postData = {
+      resourceType: switchBtn,
+      requester: address,
+      receiver: walletAdd,
+      resourceAmount: numericAmount,
+      durationSec: durationNumericValue,
+      price: numericSelectedPrice,
+      totalPrice: totalPrice,
+      options: {
+        allow_partial: partialFill,
+        bulk_order: bulkOrder,
+      },
+    };
 
     try {
       if (balance) {
         const balanceNum = parseFloat(balance);
         //balance must be at least 0.4 more than total price :
         if (balanceNum >= totalPrice + 0.4) {
-          setPopupOpen2(true);
+   
+          const form1Response = await axios.post<Form1ApiResponse>(
+            `${baseURL}/`,
+            postData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                accesstoken: accessToken,
+              },
+              timeout: axiosTimeOut,
+              validateStatus: (status: number) => status < 500,
+            }
+          );
+
+          if (form1Response.data.success === false) {
+            dispatch(
+              showNotification({
+                name: "form1-error",
+                message: "Error in sending data.",
+                severity: "error",
+              })
+            );
+            return;
+          } else {
+            dispatch(
+              showNotification({
+                name: "form1-success",
+                message: "Data has been sent successfully.",
+                severity: "success",
+              })
+            );
+            return;
+          }
           //if balance = total price ----> bandwidth must be at lease 500 or more :
         } else if (balanceNum === totalPrice) {
           if (!availableBandwidth || availableBandwidth <= 500) {
@@ -796,7 +870,38 @@ const Form1: React.FC = () => {
             );
             return;
           } else {
-            setPopupOpen2(true);
+            const form1Response = await axios.post<Form1ApiResponse>(
+            `${baseURL}/`,
+            postData,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                accesstoken: accessToken,
+              },
+              timeout: axiosTimeOut,
+              validateStatus: (status: number) => status < 500,
+            }
+          );
+
+          if (form1Response.data.success === false) {
+            dispatch(
+              showNotification({
+                name: "form1-error",
+                message: "Error in sending data.",
+                severity: "error",
+              })
+            );
+            return;
+          } else {
+            dispatch(
+              showNotification({
+                name: "form1-success",
+                message: "Data has been sent successfully.",
+                severity: "success",
+              })
+            );
+            return;
+          }
           }
         } else {
           dispatch(
@@ -1422,36 +1527,6 @@ const Form1: React.FC = () => {
           </OrderSubmitBtnWrapper>
         </Form>
       </Form1Container>
-      {/**
-      {popupOpen2 && (
-        <PopUp2
-          open={popupOpen2}
-          onClose={handlePopup2Close}
-          mySwitchBtn={switchBtn}
-          myWalletAdd={walletAdd}
-          myWalletAddress={walletAdd || (address ?? "")}
-          myAmount={amount}
-          myDuration={durationNumericValue}
-          myNumericSelectedPrice={numericSelectedPrice}
-          myTotalPrice={totalPrice}
-          myPartialFill={partialFill}
-          myBulkOrder={bulkOrder}
-          myCurrentDate={currentDate}
-          myCurrentTime={currentTime}
-          resetForm={() => {
-            setAmount("");
-            setDurationValue("");
-            setInputValue("");
-            setAmountError("");
-            setDurationError("");
-            setPriceError("");
-            setPartialFill(true);
-            setBulkOrder(false);
-          }}
-        />
-        
-      )}
-       */}
     </>
   );
 };
