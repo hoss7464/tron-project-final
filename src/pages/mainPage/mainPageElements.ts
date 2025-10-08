@@ -595,10 +595,10 @@ export const FormError = styled.p`
 
 export const FormSettingWrapper = styled.div`
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  justify-content: space-between;
+  align-items: flex-end;
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 0.6rem;
 `;
 export const FormSettingIconWrapper1 = styled.div`
   display: flex;

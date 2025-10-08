@@ -764,9 +764,7 @@ const Form2: React.FC = () => {
     durationWasManuallyChanged.current = false;
     priceWasManuallyChanged.current = false;
   }, [switchBtn]);
-
-
-
+  
   // 2. This useEffect immediately updates duration and price when switchBtn changes
   useEffect(() => {
     // When switchBtn changes, immediately use the existing data if available
@@ -1243,8 +1241,10 @@ useEffect(() => {
         return;
       }
 
+      const buyerCreditToTrx = tradingAccountInfo?.data.buyerCredit / 1_000_000
+      console.log(buyerCreditToTrx)
       // in here we will add ----> if buyerCredit >= payout then send the data towards the server :
-      if (tradingAccountInfo?.data.buyerCredit >= totalPrice) {
+      if (buyerCreditToTrx >= totalPrice) {
         const form2Response = await axios.post<Form2Api>(``, form2Payload, {
           headers: {
             "Content-Type": "application/json",
@@ -1280,7 +1280,7 @@ useEffect(() => {
             showNotification({
               name: "error3",
               message: "Error in sending data.",
-              severity: "success",
+              severity: "error",
             })
           );
           return;

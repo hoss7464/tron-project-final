@@ -80,7 +80,6 @@ interface Form1ApiData {
   durationSec: number;
   options: {
     allow_partial: boolean;
-    bulk_order: boolean;
   };
   price: number;
   receiver: string;
@@ -88,6 +87,7 @@ interface Form1ApiData {
   resourceAmount: number;
   resourceType: string;
   totalPrice: number;
+  partialField: number;
 }
 
 //-------------------------------------------------------------------------------------
@@ -170,6 +170,12 @@ const Form1: React.FC = () => {
   const [walletAddError, setWalletAddError] = useState<string | null>("");
   //Setting button (Allow partial fill) states :
   const [partialFill, setPartialFill] = useState<boolean>(true);
+  const [partialField, setPartialField] = useState("");
+  const [partialFieldError, setPartialFieldError] = useState("");
+  const [partialFieldValue, setPartialFieldValue] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
   //Setting button (Bulk order) states :
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   //Store whole fetch data in one state :
@@ -197,7 +203,6 @@ const Form1: React.FC = () => {
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
   //Setting dropdown states :
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [popupOpen2, setPopupOpen2] = useState(false);
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
   //States for date and time :
@@ -206,6 +211,7 @@ const Form1: React.FC = () => {
 
   const durationWasManuallyChanged = useRef(false);
   const priceWasManuallyChanged = useRef(false);
+  const isUserInput = useRef(false);
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -226,13 +232,10 @@ const Form1: React.FC = () => {
     setPriceError("");
     setDurationError("");
     setAmountError("");
+    setPartialFieldError("");
   };
+
   //--------------------------------------------------------------------------------------
-  //Functions for setting button (Allow partial fill) :
-  const handlePartialFill = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let partialValue = event.target.checked;
-    setPartialFill(partialValue);
-  };
   //Functions for stting button (Bulk order) :
   const handleBulkOrder = (event: React.ChangeEvent<HTMLInputElement>) => {
     const bulkValue = event.target.checked;
@@ -332,6 +335,9 @@ const Form1: React.FC = () => {
     }
     if (resourceData?.data?.ratesByDuration) {
       setMinAmountPrice(resourceData.data.ratesByDuration);
+    }
+    if (resourceData?.data?.settingsOrder.partialFill) {
+      setPartialFieldValue(resourceData.data.settingsOrder.partialFill);
     }
   }, [resourceData]);
   //--------------------------------------------------------------------------------------
@@ -658,6 +664,84 @@ const Form1: React.FC = () => {
     }
   }, [inputValue, validatePrice]);
   //--------------------------------------------------------------------------------------
+  //Functions for setting button (Allow partial fill) :
+  //Function for partial field input :
+  useEffect(() => {
+    isUserInput.current = false;
+  }, [switchBtn]);
+
+  useEffect(() => {
+    // Only update from server if user hasn't started typing
+    if (!isUserInput.current) {
+      if (switchBtn === "energy") {
+        setPartialField(partialFieldValue.energy.toString());
+      } else {
+        setPartialField(partialFieldValue.bandwidth.toString());
+      }
+    }
+  }, [switchBtn, partialFieldValue]);
+
+  const partialFillValidation = (
+    rawValue: string,
+    switchBtn: string | null,
+    minAmount: { energy: number; bandwidth: number }
+  ) => {
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+    const numericAmount = getNumericAmount(amount);
+
+    if (rawValue.trim() === "") {
+      return "required";
+    } else if (isNaN(numericValue)) {
+      return "required";
+    }
+
+    if (switchBtn === "energy") {
+      if (numericValue < partialFieldValue.energy) {
+        return `< ${partialFieldValue.energy}`;
+      } else if (numericValue > numericAmount) {
+        return `> ${numericAmount}`;
+      } else {
+      }
+    } else {
+      if (numericValue < partialFieldValue.bandwidth) {
+        return `< ${partialFieldValue.bandwidth}`;
+      } else if (numericValue > numericAmount) {
+        return `> ${numericAmount}`;
+      } else {
+      }
+    }
+
+    return "";
+  };
+  const handlePartialField = (
+    value: string | React.ChangeEvent<HTMLInputElement>
+  ) => {
+    let rawValue = typeof value === "string" ? value : value.target.value;
+
+    // Mark as user input
+    isUserInput.current = true;
+
+    //Allow commas for display but store as numeric
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+
+    // You may also validate here if needed
+    if (!isNaN(numericValue)) {
+      setPartialField(rawValue); // just display it as a string
+    }
+
+    // Validate input
+    const errorMessage = partialFillValidation(
+      rawValue,
+      switchBtn,
+      partialFieldValue
+    );
+    setPartialFieldError(errorMessage);
+  };
+  const handlePartialFill = (event: React.ChangeEvent<HTMLInputElement>) => {
+    let partialValue = event.target.checked;
+    setPartialFill(partialValue);
+  };
+  //--------------------------------------------------------------------------------------
   //Functions for setting button :
   //checkbox click toggle function :
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -720,10 +804,6 @@ const Form1: React.FC = () => {
     return { totalPrice: Number(totalPrice.toFixed(3)) };
   };
   let myPrice = calculateTotalPrice();
-
-  const handlePopup2Close = useCallback(() => {
-    setPopupOpen2(false);
-  }, []);
   //--------------------------------------------------------------------------------------
   //Submit form function :
   if (!myPrice) {
@@ -732,7 +812,6 @@ const Form1: React.FC = () => {
   const { totalPrice } = myPrice;
   const durationNumericValue = getDurationInSeconds(durationValue);
   let stringSelectedPrice = inputValue;
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -769,7 +848,8 @@ const Form1: React.FC = () => {
     if (
       amountValidationError ||
       durationValidationError ||
-      priceValidationError
+      priceValidationError ||
+      partialFieldError
     ) {
       return;
     }
@@ -803,29 +883,44 @@ const Form1: React.FC = () => {
     }
 
     //base url :
-      const baseURL = process.env.REACT_APP_BASE_URL;
+    const baseURL = process.env.REACT_APP_BASE_URL;
 
     //Fetch data towards server :
-    const postData = {
-      resourceType: switchBtn,
-      requester: address,
-      receiver: walletAdd,
-      resourceAmount: numericAmount,
-      durationSec: durationNumericValue,
-      price: numericSelectedPrice,
-      totalPrice: totalPrice,
-      options: {
-        allow_partial: partialFill,
-        bulk_order: bulkOrder,
-      },
-    };
+    let postData = null;
+    if (partialFill === true) {
+      postData = {
+        resourceType: switchBtn,
+        requester: address,
+        receiver: walletAdd,
+        resourceAmount: numericAmount,
+        durationSec: durationNumericValue,
+        price: numericSelectedPrice,
+        totalPrice: totalPrice,
+        partialField: partialField,
+        options: {
+          allow_partial: partialFill,
+        },
+      };
+    } else {
+      postData = {
+        resourceType: switchBtn,
+        requester: address,
+        receiver: walletAdd,
+        resourceAmount: numericAmount,
+        durationSec: durationNumericValue,
+        price: numericSelectedPrice,
+        totalPrice: totalPrice,
+        options: {
+          allow_partial: partialFill,
+        },
+      };
+    }
 
     try {
       if (balance) {
         const balanceNum = parseFloat(balance);
         //balance must be at least 0.4 more than total price :
         if (balanceNum >= totalPrice + 0.4) {
-   
           const form1Response = await axios.post<Form1ApiResponse>(
             `${baseURL}/`,
             postData,
@@ -871,37 +966,37 @@ const Form1: React.FC = () => {
             return;
           } else {
             const form1Response = await axios.post<Form1ApiResponse>(
-            `${baseURL}/`,
-            postData,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                accesstoken: accessToken,
-              },
-              timeout: axiosTimeOut,
-              validateStatus: (status: number) => status < 500,
-            }
-          );
+              `${baseURL}/`,
+              postData,
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                  accesstoken: accessToken,
+                },
+                timeout: axiosTimeOut,
+                validateStatus: (status: number) => status < 500,
+              }
+            );
 
-          if (form1Response.data.success === false) {
-            dispatch(
-              showNotification({
-                name: "form1-error",
-                message: "Error in sending data.",
-                severity: "error",
-              })
-            );
-            return;
-          } else {
-            dispatch(
-              showNotification({
-                name: "form1-success",
-                message: "Data has been sent successfully.",
-                severity: "success",
-              })
-            );
-            return;
-          }
+            if (form1Response.data.success === false) {
+              dispatch(
+                showNotification({
+                  name: "form1-error",
+                  message: "Error in sending data.",
+                  severity: "error",
+                })
+              );
+              return;
+            } else {
+              dispatch(
+                showNotification({
+                  name: "form1-success",
+                  message: "Data has been sent successfully.",
+                  severity: "success",
+                })
+              );
+              return;
+            }
           }
         } else {
           dispatch(
@@ -1361,8 +1456,12 @@ const Form1: React.FC = () => {
             </FormControl>
           </FormAddInputLabelWrapper>
           {/** Setting button */}
+
           <FormSettingWrapper>
-            <FormSettingIconWrapper1 onClick={handleClick}>
+            <FormSettingIconWrapper1
+              onClick={handleClick}
+              style={{ marginRight: "1rem" }}
+            >
               <FormSettingIconWrapper2>
                 <FormSettingIcon />
               </FormSettingIconWrapper2>
@@ -1416,46 +1515,40 @@ const Form1: React.FC = () => {
                       }}
                     />
                   }
-                  label="Allow partial fill"
-                />
-              </MenuItem>
-
-              <MenuItem
-                disableRipple
-                sx={{
-                  minHeight: "auto",
-                  transition: "none",
-                  "&:hover": {
-                    backgroundColor: "transparent !important",
-                  },
-                  "&.Mui-focusVisible, &:focus, &:active": {
-                    backgroundColor: "transparent !important",
-                    outline: "none",
-                    boxShadow: "none",
-                    border: "none",
-                  },
-                }}
-              >
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={bulkOrder}
-                      onChange={handleBulkOrder}
-                      sx={{
-                        color: "#430E00", // border color when unchecked
-                        "&.Mui-checked": {
-                          color: "#430E00", // color when checked
-                        },
-                        "& .MuiSvgIcon-root": {
-                          fontSize: 26,
-                        },
-                      }}
-                    />
-                  }
-                  label="Bulk order"
+                  label="partial fill"
                 />
               </MenuItem>
             </Menu>
+            {partialFill && (
+              <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
+                <FormAddLabelWrapper
+                  style={{
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginBottom: "0",
+                  }}
+                >
+                  {partialFieldError ? (
+                    <FormErrorWrapper>
+                      <FormError>{partialFieldError}</FormError>
+                    </FormErrorWrapper>
+                  ) : (
+                    ""
+                  )}
+                </FormAddLabelWrapper>
+                <FormAddInputWrapper>
+                  <FormAddInputIconWrapper>
+                    <FormAddInputWrapper2 style={{ height: "27px" }}>
+                      <FormAddInput
+                        value={partialField}
+                        onChange={handlePartialField}
+                        style={{ fontSize: "16px", marginLeft: "0.5rem" }}
+                      />
+                    </FormAddInputWrapper2>
+                  </FormAddInputIconWrapper>
+                </FormAddInputWrapper>
+              </FormAddInputLabelWrapper>
+            )}
           </FormSettingWrapper>
           <Divider
             orientation="horizontal"

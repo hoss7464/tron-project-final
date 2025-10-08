@@ -46,6 +46,7 @@ interface OrderSuccessPopupProps {
   myNumericSelectedPrice: number | null;
   myTotalPrice: number;
   myPartialFill: boolean;
+  myPartialField: string;
   myBulkOrder: boolean;
   myCurrentDate: string;
   myCurrentTime: string;
@@ -85,6 +86,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   myNumericSelectedPrice,
   myTotalPrice,
   myPartialFill,
+  myPartialField,
   myBulkOrder,
   myCurrentDate,
   myCurrentTime,
@@ -110,19 +112,35 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
 
     try {
       //step1 ----> to send data towards server :
-      const postData = {
-        resourceType: mySwitchBtn,
-        requester: address,
-        receiver: myWalletAdd,
-        resourceAmount: myAmount,
-        durationSec: myDuration,
-        price: myNumericSelectedPrice,
-        totalPrice: myTotalPrice,
-        options: {
-          allow_partial: myPartialFill,
-          bulk_order: myBulkOrder,
-        },
-      };
+      let postData = null;
+      if (myPartialFill === true) {
+        postData = {
+          resourceType: mySwitchBtn,
+          requester: address,
+          receiver: myWalletAdd,
+          resourceAmount: myAmount,
+          durationSec: myDuration,
+          price: myNumericSelectedPrice,
+          totalPrice: myTotalPrice,
+          partialField: myPartialField,
+          options: {
+            allow_partial: myPartialFill,
+          },
+        };
+      } else {
+        postData = {
+          resourceType: mySwitchBtn,
+          requester: address,
+          receiver: myWalletAdd,
+          resourceAmount: myAmount,
+          durationSec: myDuration,
+          price: myNumericSelectedPrice,
+          totalPrice: myTotalPrice,
+          options: {
+            allow_partial: myPartialFill,
+          },
+        };
+      }
 
       const orderResponse = await axios.post<ApiResponse>(
         `${baseURL}/order/CreateOrder`,
@@ -172,7 +190,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 severity: "success",
               })
             );
-            resetForm()
+            resetForm();
             onClose(); // Close popup automatically on success
 
             return;
@@ -199,7 +217,6 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
       );
     } finally {
       setIsProcessing(false);
-      
     }
   };
 
@@ -421,4 +438,4 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   );
 };
 
-export default React.memo(PopUp2) ;
+export default React.memo(PopUp2);
