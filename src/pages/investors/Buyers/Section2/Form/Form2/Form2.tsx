@@ -1275,6 +1275,8 @@ useEffect(() => {
           setPartialField("0");
           setMinAmountUnit("0");
           setLimitInput("0");
+          isUserInput.current = false;
+          return 
         } else {
           dispatch(
             showNotification({

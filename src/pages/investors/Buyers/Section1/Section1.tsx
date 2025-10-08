@@ -3,6 +3,8 @@ import "./Section1.css";
 import axios from "axios";
 import { useTronWallet } from "../../../../contexts/TronWalletContext";
 import { useFetchData } from "../../../../contexts/FetchDataContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../redux/store/store";
 import {
   Sec1Contrainer,
   SecSummaryIcon,
@@ -66,13 +68,31 @@ const Section1: React.FC = () => {
   const dispatch = useDispatch();
   const { address, isConnectedTrading, accessToken, transferTrx } =
     useTronWallet();
-  const { tradingAccountInfo, resourceData } = useFetchData();
+  const { tradingAccountInfo, resourceData, fetchData } = useFetchData();
   const [deposit, setDeposit] = useState<string>("");
   const [depositError, setDepositError] = useState<string>("");
   const [changeApiOpen, setChangeApiOpen] = useState(false);
   const [apiKey, setApiKey] = useState("");
 
+  const refreshTrigger = useSelector(
+    (state: RootState) => state.refresh.refreshTrigger
+  );
+
   //to get data from server :
+  useEffect(() => {
+    const refreshData = async () => {
+      try {
+        await fetchData();
+      } catch (error) {
+        console.error("Error refreshing data:", error);
+      }
+    };
+
+    if (refreshTrigger) {
+      refreshData();
+    }
+  }, [refreshTrigger, fetchData]);
+
   useEffect(() => {
     if (tradingAccountInfo) {
       setApiKey(tradingAccountInfo.data.apiKey);
@@ -244,15 +264,15 @@ const Section1: React.FC = () => {
     }
   };
   //Function to change sun to trx :
-  const sunToTrx = (value : number) => {
-    const trxValue = value / 1_000_000
-    return trxValue.toFixed(2)
-  }
-  
+  const sunToTrx = (value: number) => {
+    const trxValue = value / 1_000_000;
+    return trxValue.toFixed(2);
+  };
+
   if (tradingAccountInfo?.data.buyerCredit === undefined) {
-    return 
+    return;
   }
- 
+
   return (
     <>
       <Sec1Contrainer>
@@ -332,7 +352,9 @@ const Section1: React.FC = () => {
                       <SellersCardThingsNumberWrapper>
                         {isConnectedTrading === true ? (
                           <SellersCardThingsNumber>
-                            {sunToTrx(tradingAccountInfo?.data.buyerCredit).toLocaleString()}
+                            {sunToTrx(
+                              tradingAccountInfo?.data.buyerCredit
+                            ).toLocaleString()}
                           </SellersCardThingsNumber>
                         ) : (
                           <SellersCardThingsNumber>_ _</SellersCardThingsNumber>

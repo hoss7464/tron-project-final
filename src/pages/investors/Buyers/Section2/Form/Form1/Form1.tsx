@@ -951,6 +951,19 @@ const Form1: React.FC = () => {
                 severity: "success",
               })
             );
+            setSwitchBtn("energy");
+            setAmount("100000");
+            setDurationValue("");
+            setDurationInSec(null);
+            setInputValue("");
+            setPriceOptions([]);
+            setDynamicPlaceholder("Price");
+            setPriceError("");
+            setDurationError("");
+            setAmountError("");
+            setPartialFieldError("");
+            isUserInput.current = false;
+
             return;
           }
           //if balance = total price ----> bandwidth must be at lease 500 or more :
@@ -995,6 +1008,18 @@ const Form1: React.FC = () => {
                   severity: "success",
                 })
               );
+              setSwitchBtn("energy");
+              setAmount("100000");
+              setDurationValue("");
+              setDurationInSec(null);
+              setInputValue("");
+              setPriceOptions([]);
+              setDynamicPlaceholder("Price");
+              setPriceError("");
+              setDurationError("");
+              setAmountError("");
+              setPartialFieldError("");
+              isUserInput.current = false;
               return;
             }
           }
