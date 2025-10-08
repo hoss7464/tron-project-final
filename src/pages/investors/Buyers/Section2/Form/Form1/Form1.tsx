@@ -896,9 +896,9 @@ const Form1: React.FC = () => {
         durationSec: durationNumericValue,
         price: numericSelectedPrice,
         totalPrice: totalPrice,
-        partialField: partialField,
         options: {
           allow_partial: partialFill,
+          partialField: partialField,
         },
       };
     } else {

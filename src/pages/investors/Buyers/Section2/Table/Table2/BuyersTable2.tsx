@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "../BuyersTable.css";
 import { useFetchData } from "../../../../../../contexts/FetchDataContext";
-import { BuyerstCardTextWrap1, BuyerSignWrapper,CheckedSign, CanceledSign, ProcessSign  } from "../BuyersTableElements";
+import {
+  BuyerstCardTextWrap1,
+  BuyerSignWrapper,
+  CheckedSign,
+  CanceledSign,
+  ProcessSign,
+  BuyersAvailableNavbar,
+} from "../BuyersTableElements";
+import { Link } from "@mui/material";
 import {
   OrderMainWrapper,
   OrdersCarouselWrapper,
@@ -15,7 +23,6 @@ import {
   OrdersCardTextWrapper2,
   OrdersCardText1,
   OrdersCardText2,
-
 } from "../../../../../mainPage/mainPageElements";
 import { RefundResponse } from "../../../../../../services/requestService";
 import Pagination from "@mui/material/Pagination";
@@ -31,6 +38,7 @@ const BuyersTable2: React.FC = () => {
   const [wholeRefundInfo, setWholeRefundInfo] = useState<RefundResponse | null>(
     null
   );
+  const tronscanUrl = process.env.REACT_APP_TRONSCAN_TXID_URL;
 
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 9;
@@ -70,43 +78,44 @@ const BuyersTable2: React.FC = () => {
       <OrderMainWrapper>
         <OrdersCarouselWrapper>
           <MyOrdersScroll style={{ height: "575px" }}>
-            <AvailableNavWrapper  >
-              <AvailableNavTextWrapper  >
-                <OrderNavText>Date/Time</OrderNavText>
-              </AvailableNavTextWrapper>
+            <AvailableNavWrapper >
+              <BuyersAvailableNavbar>
+                <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}} >
+                  <OrderNavText>Date/Time</OrderNavText>
+                </AvailableNavTextWrapper>
 
-              <AvailableNavTextWrapper>
-                <OrderNavText>ID</OrderNavText>
-              </AvailableNavTextWrapper>
+                <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}}>
+                  <OrderNavText>Requester</OrderNavText>
+                </AvailableNavTextWrapper>
 
-              <AvailableNavTextWrapper >
-                <OrderNavText>Requester</OrderNavText>
-              </AvailableNavTextWrapper>
+                <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}}>
+                  <OrderNavText>Amount</OrderNavText>
+                </AvailableNavTextWrapper>
 
-              <AvailableNavTextWrapper>
-                <OrderNavText>Amount</OrderNavText>
-              </AvailableNavTextWrapper>
+                <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}}>
+                  <OrderNavText>TxId</OrderNavText>
+                </AvailableNavTextWrapper>
 
-              <AvailableNavTextWrapper>
-                <OrderNavText>Paid-At</OrderNavText>
-              </AvailableNavTextWrapper>
+                <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}}>
+                  <OrderNavText>Paid-At</OrderNavText>
+                </AvailableNavTextWrapper>
 
-              <AvailableNavTextWrapper>
-                <OrderNavText>Status</OrderNavText>
-              </AvailableNavTextWrapper>
+               
+              </BuyersAvailableNavbar>
             </AvailableNavWrapper>
 
             <OrdersCard>
               {paginatedData.map((myData, index) => {
                 const { date, time } = formatDateTime(myData.createdAt);
                 const { myDate, myTime } = formatDateTime2(myData.paidAt);
+                const transactionUrl = `${tronscanUrl}/#/transaction/${myData.depositTxId}`;
 
                 return (
                   <OrdersDetail
                     key={index}
                     style={{ justifyContent: "space-between" }}
                   >
-                    <BuyerstCardTextWrap1 >
+                    <BuyerstCardTextWrap1>
                       <OrdersCardTextWrapper2>
                         <OrdersCardText1>{time}</OrdersCardText1>
                       </OrdersCardTextWrapper2>
@@ -115,24 +124,46 @@ const BuyersTable2: React.FC = () => {
                       </OrdersCardTextWrapper2>
                     </BuyerstCardTextWrap1>
 
-                    <BuyerstCardTextWrap1 >
-                      <OrdersCardText1>
-                        {truncateTxid2(myData._id)}
-                      </OrdersCardText1>
-                    </BuyerstCardTextWrap1>
-                    <BuyerstCardTextWrap1 >
+                    <BuyerstCardTextWrap1>
                       <OrdersCardText2>
                         {truncateTxid2(myData.requester)}
                       </OrdersCardText2>
                     </BuyerstCardTextWrap1>
-                    <BuyerstCardTextWrap1 >
+                    <BuyerstCardTextWrap1>
                       <OrdersCardText1>
                         {sunToTrx(myData.depositAmount)} TRX
                       </OrdersCardText1>
                     </BuyerstCardTextWrap1>
 
+                    {myData.depositTxId === undefined ? (
+                      <BuyerstCardTextWrap1>
+                        <OrdersCardText1>_ _</OrdersCardText1>
+                      </BuyerstCardTextWrap1>
+                    ) : (
+                      <BuyerstCardTextWrap1>
+                        <Link
+                          href={transactionUrl}
+                          target="_blank" // Opens in new tab
+                          rel="noopener noreferrer" // Security best practice
+                          sx={{
+                            fontFamily: "monospace",
+                            fontSize: "15px",
+                            textDecoration: "none",
+                            color: "#430E00",
+                            "&:hover": {
+                              textDecoration: "underline",
+                              color: "#430E00",
+                            },
+                            cursor: "pointer",
+                          }}
+                        >
+                          {truncateTxid2(myData.depositTxId)}
+                        </Link>
+                      </BuyerstCardTextWrap1>
+                    )}
+
                     {myData.paidAt === null ? (
-                      <BuyerstCardTextWrap1 style={{marginRight : "1rem"}}>
+                      <BuyerstCardTextWrap1 style={{ marginRight: "2.5rem" }}>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>_ _ </OrdersCardText1>
                         </OrdersCardTextWrapper2>
@@ -142,7 +173,7 @@ const BuyersTable2: React.FC = () => {
                         </OrdersCardTextWrapper2>
                       </BuyerstCardTextWrap1>
                     ) : (
-                      <BuyerstCardTextWrap1 style={{marginRight : "1rem"}}>
+                      <BuyerstCardTextWrap1 style={{ marginRight: "2.5rem" }}>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>{myDate}</OrdersCardText1>
                         </OrdersCardTextWrapper2>
@@ -151,10 +182,17 @@ const BuyersTable2: React.FC = () => {
                         </OrdersCardTextWrapper2>
                       </BuyerstCardTextWrap1>
                     )}
-                    
+
                     {myData.status === "SUCCESS" && (
                       <Tooltip title="success">
-                        <BuyerSignWrapper style={{backgroundColor : "#003543", padding : "0.4rem", borderRadius : "6px"}} >
+                        <BuyerSignWrapper
+                          style={{
+                            backgroundColor: "#003543",
+                            padding: "0.4rem",
+                            borderRadius: "6px",
+                           
+                          }}
+                        >
                           <CheckedSign />
                         </BuyerSignWrapper>
                       </Tooltip>
@@ -162,7 +200,13 @@ const BuyersTable2: React.FC = () => {
 
                     {myData.status === "CANCELED" && (
                       <Tooltip title="canceled">
-                        <BuyerSignWrapper style={{backgroundColor : "#430E00", padding : "0.4rem", borderRadius : "6px"}}>
+                        <BuyerSignWrapper
+                          style={{
+                            backgroundColor: "#430E00",
+                            padding: "0.4rem",
+                            borderRadius: "6px",
+                          }}
+                        >
                           <CanceledSign />
                         </BuyerSignWrapper>
                       </Tooltip>
@@ -170,7 +214,13 @@ const BuyersTable2: React.FC = () => {
 
                     {myData.status === "AWAITING_PAYMENT" && (
                       <Tooltip title="awaiting">
-                        <BuyerSignWrapper style={{backgroundColor : "#430E00", padding : "0.4rem", borderRadius : "6px"}}>
+                        <BuyerSignWrapper
+                          style={{
+                            backgroundColor: "#430E00",
+                            padding: "0.4rem",
+                            borderRadius: "6px",
+                          }}
+                        >
                           <ProcessSign />
                         </BuyerSignWrapper>
                       </Tooltip>

@@ -4,6 +4,7 @@ import { FaCheck } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { FaExclamation } from "react-icons/fa";
 
+
 export const BuyersTableContainer1 = styled.div`
   display: flex;
   justify-content: flex-start;
@@ -57,7 +58,7 @@ export const BuyerstCardTextWrap1 = styled.div`
   justify-content: flex-start;
   align-items: flex-start;
   flex-direction: column;
-  width: 20%;
+  width: 18%;
 `;
 
 export const BuyerSignWrapper = styled.div`
@@ -81,3 +82,13 @@ width: 16px;
 height: 16px;
 color: ${ThemeColor.text2};
 `
+
+export const BuyersAvailableNavbar = styled.div`
+display: flex;
+justify-content: space-between;
+align-items: center;
+
+width: 92%;
+`
+
+

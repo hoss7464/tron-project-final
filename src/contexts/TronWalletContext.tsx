@@ -193,7 +193,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const clearAccessToken = useCallback(() => {
     setAccessToken(null);
   }, []);
-  
   //-------------------------------------------------------------------------------------
   //Function to get resourceData from fetchDataContext :
   const getResourceData = useCallback((): ResourceResponse | null => {

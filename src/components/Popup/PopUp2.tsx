@@ -122,9 +122,9 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           durationSec: myDuration,
           price: myNumericSelectedPrice,
           totalPrice: myTotalPrice,
-          partialField: myPartialField,
           options: {
             allow_partial: myPartialFill,
+            partialField: myPartialField,
           },
         };
       } else {

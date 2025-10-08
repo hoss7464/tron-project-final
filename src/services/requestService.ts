@@ -178,6 +178,7 @@ interface RefundData {
   status: string;
   paidAt: any;
   createdAt: string;
+  depositTxId:string;
 }
 //-------------------------------------------------------------------------------------
 //to get data from .env :
@@ -363,6 +364,7 @@ export const fetchAllUiData = async (
                 status: "",
                 paidAt: null,
                 createdAt: "string",
+                depositTxId: "string"
               },
             ],
           };
