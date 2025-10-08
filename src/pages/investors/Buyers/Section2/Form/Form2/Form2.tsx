@@ -172,7 +172,7 @@ const Form2: React.FC = () => {
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   const [bulkOrderPopupOpen, setBulkOrderPopupOpen] = useState<boolean>(false);
   //Amount input states:
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState("100000");
   const [minAmount, setMinAmount] = useState<{
     energy: number;
     bandwidth: number;
@@ -211,7 +211,7 @@ const Form2: React.FC = () => {
     bandwidth: number;
   }>({ energy: 0, bandwidth: 0 });
   //State for partial field input :
-  const [partialField, setPartialField] = useState("0");
+  const [partialField, setPartialField] = useState("");
   const [partialFieldError, setPartialFieldError] = useState("");
   const [partialFieldValue, setPartialFieldValue] = useState<{
     energy: number;
@@ -242,6 +242,8 @@ const Form2: React.FC = () => {
 
   const durationWasManuallyChanged = useRef(false);
   const priceWasManuallyChanged = useRef(false);
+
+  const isUserInput = useRef(false);
   //--------------------------------------------------------------------------------------
   //Switch button handleChange function :
   const handleChange = (
@@ -263,7 +265,6 @@ const Form2: React.FC = () => {
     setDurationError("");
     setAmountError("");
     setRadionPrice("fast");
-    setPartialField("0");
     setPartialFieldError("");
     setMinAmountUnitError("");
     setLimitInputError("");
@@ -440,6 +441,7 @@ const Form2: React.FC = () => {
     }
     if (resourceData?.data?.settingsOrder.partialFill) {
       setPartialFieldValue(resourceData.data.settingsOrder.partialFill);
+     
     }
     if (resourceData?.data?.fastChargeSetting.fastChargeMinUser) {
       setMinAmountUnitValue(
@@ -458,7 +460,6 @@ const Form2: React.FC = () => {
       setMaxLimitValue(resourceData.data.fastChargeSetting.fastChargeLimitMax);
     }
   }, [resourceData]);
-  //Function to get data from tradingAccountInfo request :
   //-------------------------------------------------------------------------------------
   //Functions for amount input :
   //Function for amount validation :
@@ -764,6 +765,8 @@ const Form2: React.FC = () => {
     priceWasManuallyChanged.current = false;
   }, [switchBtn]);
 
+
+
   // 2. This useEffect immediately updates duration and price when switchBtn changes
   useEffect(() => {
     // When switchBtn changes, immediately use the existing data if available
@@ -812,7 +815,6 @@ const Form2: React.FC = () => {
       if (radioPrice === "pull_fast_charge") {
         setDurationValue("0");
         setDurationInSec(0);
-        setPartialField("0");
         setPartialFieldError("");
         setBulkOrder(false);
       } else {
@@ -879,6 +881,27 @@ const Form2: React.FC = () => {
   }, [inputValue, validatePrice]);
   //-------------------------------------------------------------------------------------
   //Function for partial field input :
+  useEffect(() => {
+  isUserInput.current = false;
+}, [switchBtn]);
+
+useEffect(() => {
+  if (radioPrice === "pull_fast_charge") {
+    setPartialField("0");
+    // Reset the user input flag when mode changes
+    isUserInput.current = false;
+  } else {
+    // Only update from server if user hasn't started typing
+    if (!isUserInput.current) {
+      if (switchBtn === "energy") {
+        setPartialField(partialFieldValue.energy.toString());
+      } else {
+        setPartialField(partialFieldValue.bandwidth.toString());
+      }
+    }
+  }
+}, [switchBtn, radioPrice, partialFieldValue]);
+
   const partialFillValidation = (
     rawValue: string,
     switchBtn: string | null,
@@ -914,20 +937,17 @@ const Form2: React.FC = () => {
   const handlePartialFill = (
     value: string | React.ChangeEvent<HTMLInputElement>
   ) => {
-    let rawValue = "";
+    let rawValue = typeof value === 'string' ? value : value.target.value;
 
-    if (typeof value === "string") {
-      rawValue = value;
-    } else {
-      rawValue = value.target.value;
-    }
+    // Mark as user input
+  isUserInput.current = true;
 
     //Allow commas for display but store as numeric
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     // You may also validate here if needed
     if (!isNaN(numericValue)) {
-      setPartialField(numericValue.toString()); // just display it as a string
+      setPartialField(rawValue); // just display it as a string
     }
 
     // Validate input
