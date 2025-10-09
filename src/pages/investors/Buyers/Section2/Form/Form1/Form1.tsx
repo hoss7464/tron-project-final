@@ -889,6 +889,7 @@ const Form1: React.FC = () => {
     let postData = null;
     if (partialFill === true) {
       postData = {
+        type: "Manual",
         resourceType: switchBtn,
         requester: address,
         receiver: walletAdd,
@@ -898,11 +899,12 @@ const Form1: React.FC = () => {
         totalPrice: totalPrice,
         options: {
           allow_partial: partialFill,
-          partialField: partialField,
+          partial_min: partialField,
         },
       };
     } else {
       postData = {
+        type: "Manual",
         resourceType: switchBtn,
         requester: address,
         receiver: walletAdd,
@@ -922,7 +924,7 @@ const Form1: React.FC = () => {
         //balance must be at least 0.4 more than total price :
         if (balanceNum >= totalPrice + 0.4) {
           const form1Response = await axios.post<Form1ApiResponse>(
-            `${baseURL}/`,
+            `${baseURL}/Buyer/CreateOrder`,
             postData,
             {
               headers: {

@@ -192,7 +192,7 @@ const Form2: React.FC = () => {
   const [minAmountPrice, setMinAmountPrice] = useState<any[]>([]);
   const [priceError, setPriceError] = useState("");
   const [dynamicPlaceholder, setDynamicPlaceholder] = useState("Price");
-  const [radioPrice, setRadionPrice] = useState("fast");
+  const [radioPrice, setRadionPrice] = useState("Fast");
   const [fastSellRate, setFastSellRate] = useState<{
     energy: number;
     bandwidth: number;
@@ -264,7 +264,7 @@ const Form2: React.FC = () => {
     setPriceError("");
     setDurationError("");
     setAmountError("");
-    setRadionPrice("fast");
+    setRadionPrice("Fast");
     setPartialFieldError("");
     setMinAmountUnitError("");
     setLimitInputError("");
@@ -346,6 +346,16 @@ const Form2: React.FC = () => {
       .join(",");
   };
 
+  //Function to push clearAddresses into an array :
+  const convertAddressesToArray = (addresses: string): string[][] => {
+    const cleaned = cleanAddressesForSending(addresses);
+
+    if (!cleaned) return [];
+
+    // Then, split and wrap each address into its own array
+    return cleaned.split(",").map((addr) => [addr]);
+  };
+
   //Function for input address when the page renders or rerenders :
   useEffect(() => {
     //if address does exists and we are connected in Buyers page:
@@ -360,7 +370,7 @@ const Form2: React.FC = () => {
   }, [address, isConnectedTrading]);
 
   useEffect(() => {
-    if (address && radioPrice === "pull_fast_charge") {
+    if (address && radioPrice === "FastCharge") {
       setBulkOrder(false);
       setWalletAdd(address);
     }
@@ -382,7 +392,7 @@ const Form2: React.FC = () => {
       return;
     }
 
-    if (radioPrice !== "pull_fast_charge") {
+    if (radioPrice !== "FastCharge") {
       setBulkOrderPopupOpen(true);
       setBulkOrder(true);
     } else {
@@ -441,7 +451,6 @@ const Form2: React.FC = () => {
     }
     if (resourceData?.data?.settingsOrder.partialFill) {
       setPartialFieldValue(resourceData.data.settingsOrder.partialFill);
-     
     }
     if (resourceData?.data?.fastChargeSetting.fastChargeMinUser) {
       setMinAmountUnitValue(
@@ -476,7 +485,7 @@ const Form2: React.FC = () => {
       return "required";
     }
 
-    if (radioPrice === "pull_fast_charge") {
+    if (radioPrice === "FastCharge") {
       if (switchBtn === "energy") {
         if (numericValue < pullFastChargeMinAmount.energy) {
           return `Less than ${pullFastChargeMinAmount.energy}`;
@@ -651,7 +660,7 @@ const Form2: React.FC = () => {
       return "";
     }
 
-    if (radioPrice === "manual") {
+    if (radioPrice === "Manual") {
       // Match the item based on exact or range duration
       const matchedItem = minAmountPrice.find((item) => {
         const { exactDurationSeconds, minDurationSeconds, maxDurationSeconds } =
@@ -738,7 +747,7 @@ const Form2: React.FC = () => {
     const newValue = (event.target as HTMLInputElement).value;
     setRadionPrice(newValue);
 
-    if (newValue === "fast") {
+    if (newValue === "Fast") {
       if (switchBtn === "energy") {
         const energyFastSellRateString = fastSellRate.energy;
         setInputValue(energyFastSellRateString.toString());
@@ -746,7 +755,7 @@ const Form2: React.FC = () => {
         const bandwidthFastSellRateString = fastSellRate.bandwidth;
         setInputValue(bandwidthFastSellRateString.toString());
       }
-    } else if (newValue === "pull_fast_charge") {
+    } else if (newValue === "FastCharge") {
       if (switchBtn === "energy") {
         const energyPullFastCharge = pullFastCharge.energy;
         setInputValue(energyPullFastCharge.toString());
@@ -764,7 +773,7 @@ const Form2: React.FC = () => {
     durationWasManuallyChanged.current = false;
     priceWasManuallyChanged.current = false;
   }, [switchBtn]);
-  
+
   // 2. This useEffect immediately updates duration and price when switchBtn changes
   useEffect(() => {
     // When switchBtn changes, immediately use the existing data if available
@@ -777,7 +786,7 @@ const Form2: React.FC = () => {
       setDurationInSec(durationInSeconds);
 
       // Set price immediately if we have the data
-      if (radioPrice === "fast") {
+      if (radioPrice === "Fast") {
         if (switchBtn === "energy") {
           const energyFastSellRateString = fastSellRate.energy;
           setInputValue(energyFastSellRateString.toString());
@@ -785,7 +794,7 @@ const Form2: React.FC = () => {
           const bandwidthFastSellRateString = fastSellRate.bandwidth;
           setInputValue(bandwidthFastSellRateString.toString());
         }
-      } else if (radioPrice === "pull_fast_charge") {
+      } else if (radioPrice === "FastCharge") {
         if (switchBtn === "energy") {
           const energyPullFastCharge = pullFastCharge.energy;
           setInputValue(energyPullFastCharge.toString());
@@ -810,7 +819,7 @@ const Form2: React.FC = () => {
   //To render dynamic options in price dropdown :
   useEffect(() => {
     if (!durationWasManuallyChanged.current && minAmountPrice.length > 0) {
-      if (radioPrice === "pull_fast_charge") {
+      if (radioPrice === "FastCharge") {
         setDurationValue("0");
         setDurationInSec(0);
         setPartialFieldError("");
@@ -836,7 +845,7 @@ const Form2: React.FC = () => {
     ) {
       //when radio price changes its state it resets the error :
 
-      if (radioPrice === "fast") {
+      if (radioPrice === "Fast") {
         if (switchBtn === "energy") {
           const energyFastSellRateString = fastSellRate.energy;
           setInputValue(energyFastSellRateString.toString());
@@ -844,7 +853,7 @@ const Form2: React.FC = () => {
           const bandwidthFastSellRateString = fastSellRate.bandwidth;
           setInputValue(bandwidthFastSellRateString.toString());
         }
-      } else if (radioPrice === "pull_fast_charge") {
+      } else if (radioPrice === "FastCharge") {
         if (switchBtn === "energy") {
           const energyPullFastCharge = pullFastCharge.energy;
           setInputValue(energyPullFastCharge.toString());
@@ -880,25 +889,25 @@ const Form2: React.FC = () => {
   //-------------------------------------------------------------------------------------
   //Function for partial field input :
   useEffect(() => {
-  isUserInput.current = false;
-}, [switchBtn]);
-
-useEffect(() => {
-  if (radioPrice === "pull_fast_charge") {
-    setPartialField("0");
-    // Reset the user input flag when mode changes
     isUserInput.current = false;
-  } else {
-    // Only update from server if user hasn't started typing
-    if (!isUserInput.current) {
-      if (switchBtn === "energy") {
-        setPartialField(partialFieldValue.energy.toString());
-      } else {
-        setPartialField(partialFieldValue.bandwidth.toString());
+  }, [switchBtn]);
+
+  useEffect(() => {
+    if (radioPrice === "FastCharge") {
+      setPartialField("0");
+      // Reset the user input flag when mode changes
+      isUserInput.current = false;
+    } else {
+      // Only update from server if user hasn't started typing
+      if (!isUserInput.current) {
+        if (switchBtn === "energy") {
+          setPartialField(partialFieldValue.energy.toString());
+        } else {
+          setPartialField(partialFieldValue.bandwidth.toString());
+        }
       }
     }
-  }
-}, [switchBtn, radioPrice, partialFieldValue]);
+  }, [switchBtn, radioPrice, partialFieldValue]);
 
   const partialFillValidation = (
     rawValue: string,
@@ -935,10 +944,10 @@ useEffect(() => {
   const handlePartialFill = (
     value: string | React.ChangeEvent<HTMLInputElement>
   ) => {
-    let rawValue = typeof value === 'string' ? value : value.target.value;
+    let rawValue = typeof value === "string" ? value : value.target.value;
 
     // Mark as user input
-  isUserInput.current = true;
+    isUserInput.current = true;
 
     //Allow commas for display but store as numeric
     const numericValue = Number(rawValue.replace(/,/g, ""));
@@ -971,7 +980,7 @@ useEffect(() => {
       return "required";
     }
 
-    if (radioPrice === "pull_fast_charge") {
+    if (radioPrice === "FastCharge") {
       if (switchBtn === "energy") {
         if (numericValue < minAmountUnitValue.energy) {
           return `< ${minAmountUnitValue.energy}`;
@@ -1035,7 +1044,7 @@ useEffect(() => {
       return "required";
     }
 
-    if (radioPrice === "pull_fast_charge") {
+    if (radioPrice === "FastCharge") {
       if (switchBtn === "energy") {
         if (numericValue < minLimitValue.energy) {
           return `< ${minLimitValue.energy}`;
@@ -1096,7 +1105,7 @@ useEffect(() => {
     let totalSeconds = numericDuration;
     let totalPrice = 0;
 
-    if (radioPrice === "pull_fast_charge") {
+    if (radioPrice === "FastCharge") {
       totalPrice = (numericAmount / SUN) * pricePerUnit;
     } else {
       if (numericDuration === null) {
@@ -1138,6 +1147,7 @@ useEffect(() => {
     return { totalPrice: Number(totalPrice.toFixed(3)) };
   };
   let myPrice = calculateTotalPrice();
+  const totalPriceLength = convertAddressesToArray(walletAdd);
   //-------------------------------------------------------------------------------------
   //Function to submit data towards the server :
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -1168,7 +1178,8 @@ useEffect(() => {
     //switch btn value :
     let formBtn = switchBtn;
     //to get requester address :
-    const requeserAddress = cleanAddressesForSending(walletAdd);
+    const requeserAddress = convertAddressesToArray(walletAdd);
+    const requeserAddress2 = cleanAddressesForSending(walletAdd);
     //numeric value of amount input
     const numericAmount = getNumericAmount(amount);
     //to get partial fill state
@@ -1192,7 +1203,19 @@ useEffect(() => {
     }
     const { totalPrice } = myPrice;
 
-    if (
+    if (radioPrice === "FastCharge") {
+      if (
+      formBtn === null ||
+      numericAmount === null ||
+      numericMinAmountUnit === null ||
+      numericSelectedPrice === null ||
+      numericLimit === null ||
+      !myPrice
+    ) {
+      return;
+    }
+    } else {
+      if (
       formBtn === null ||
       numericAmount === null ||
       durationNumericValue === null ||
@@ -1201,37 +1224,100 @@ useEffect(() => {
     ) {
       return;
     }
-
+    }
+    
+     
     try {
       //payload to send data :
       let form2Payload = null;
-      if (radioPrice === "pull_fast_charge") {
-        form2Payload = {
-          resourceType: formBtn,
-          requester: address,
-          receiver: requeserAddress,
-          bulk_order: bulkOrder,
-          resourceAmount: numericAmount,
-          price: numericSelectedPrice,
-          total_price: totalPrice,
-          type: radioPrice,
-          min_energy_amount: numericMinAmountUnit,
-          limit: numericLimit,
-        };
+     
+      if (radioPrice === "FastCharge") {
+          form2Payload = {
+            resourceType: formBtn,
+            requester: address,
+            receiver: requeserAddress2, // string of address es
+            resourceAmount: numericAmount,
+            min_energy_amount: numericMinAmountUnit,
+            price: numericSelectedPrice,
+            total_price: totalPrice,
+            type: radioPrice,
+            limit: numericLimit,
+            options: {
+              bulk_order: bulkOrder,
+            }
+          };
+      } else if (radioPrice === "Fast") {
+        if (bulkOrder === true) {
+          form2Payload = {
+            resourceType: formBtn,
+            requester: address,
+            receiver: requeserAddress, // Array of addresses
+            resourceAmount: numericAmount,
+            durationSec: durationNumericValue,
+            price: numericSelectedPrice,
+            totalPrice: totalPrice,
+            type: radioPrice,
+            options: {
+              bulk_order: bulkOrder,
+              allow_partial: true,
+              partial_min: my_partial_field,
+            },
+          };
+        } else {
+          form2Payload = {
+            resourceType: formBtn,
+            requester: address,
+            receiver: requeserAddress2, // String of addresses
+            resourceAmount: numericAmount,
+            durationSec: durationNumericValue,
+            price: numericSelectedPrice,
+            totalPrice: totalPrice,
+            type: radioPrice,
+            options: {
+              bulk_order: bulkOrder,
+              allow_partial: true,
+              partial_min: my_partial_field,
+            },
+          };
+        }
+      } else if (radioPrice === "Manual") {
+        if (bulkOrder === true) {
+          form2Payload = {
+            resourceType: formBtn,
+            requester: address,
+            receiver: requeserAddress, // Array of addresses
+            resourceAmount: numericAmount,
+            durationSec: durationNumericValue,
+            price: numericSelectedPrice,
+            totalPrice: totalPrice,
+            type: radioPrice,
+            options: {
+              bulk_order: bulkOrder,
+              allow_partial: true,
+              partial_min: my_partial_field,
+            },
+          };
+        } else {
+          form2Payload = {
+            resourceType: formBtn,
+            requester: address,
+            receiver: requeserAddress2, // String of addresses
+            resourceAmount: numericAmount,
+            durationSec: durationNumericValue,
+            price: numericSelectedPrice,
+            totalPrice: totalPrice,
+            type: radioPrice,
+            options: {
+              bulk_order: bulkOrder,
+              allow_partial: true,
+              partial_min: my_partial_field,
+            },
+          };
+        }
       } else {
-        form2Payload = {
-          resourceType: formBtn,
-          requester: address,
-          receiver: requeserAddress,
-          bulk_order: bulkOrder,
-          resourceAmount: numericAmount,
-          durationSec: durationNumericValue,
-          price: numericSelectedPrice,
-          total_price: totalPrice,
-          type: radioPrice,
-          partialFill: my_partial_field,
-        };
+        return;
       }
+      console.log(form2Payload);
       //base url :
       const baseURL = process.env.REACT_APP_BASE_URL;
       //to get axios timeout :
@@ -1241,18 +1327,21 @@ useEffect(() => {
         return;
       }
 
-      const buyerCreditToTrx = tradingAccountInfo?.data.buyerCredit / 1_000_000
-      console.log(buyerCreditToTrx)
+      const buyerCreditToTrx = tradingAccountInfo?.data.buyerCredit / 1_000_000;
       // in here we will add ----> if buyerCredit >= payout then send the data towards the server :
       if (buyerCreditToTrx >= totalPrice) {
-        const form2Response = await axios.post<Form2Api>(``, form2Payload, {
-          headers: {
-            "Content-Type": "application/json",
-            accesstoken: accessToken,
-          },
-          timeout: axiosTimeOut,
-          validateStatus: (status: number) => status < 500,
-        });
+        const form2Response = await axios.post<Form2Api>(
+          `${baseURL}/Buyer/CreateOrder`,
+          form2Payload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              accesstoken: accessToken,
+            },
+            timeout: axiosTimeOut,
+            validateStatus: (status: number) => status < 500,
+          }
+        );
 
         if (form2Response.data.success === true) {
           dispatch(
@@ -1271,12 +1360,12 @@ useEffect(() => {
           setDurationInSec(2592000);
           setInputValue("");
           setDynamicPlaceholder("Price");
-          setRadionPrice("fast");
+          setRadionPrice("Fast");
           setPartialField("0");
           setMinAmountUnit("0");
           setLimitInput("0");
           isUserInput.current = false;
-          return 
+          return;
         } else {
           dispatch(
             showNotification({
@@ -1309,6 +1398,9 @@ useEffect(() => {
     }
   };
   //-------------------------------------------------------------------------------------
+  if (myPrice?.totalPrice === undefined) {
+    return;
+  }
 
   return (
     <>
@@ -1460,7 +1552,7 @@ useEffect(() => {
                     onClick={() => amountHandleChange("64,350")}
                     value="64,350"
                     style={{ width: "67px", padding: "2px 0px" }}
-                    disabled={radioPrice === "pull_fast_charge"}
+                    disabled={radioPrice === "FastCharge"}
                   >
                     USDT Tsf
                   </InputMiniBtn>
@@ -1471,7 +1563,7 @@ useEffect(() => {
                     onClick={() => amountHandleChange("100,000")}
                     value="100,000"
                     style={{ padding: "2px 2px" }}
-                    disabled={radioPrice === "pull_fast_charge"}
+                    disabled={radioPrice === "FastCharge"}
                   >
                     100k
                   </InputMiniBtn>
@@ -1482,7 +1574,7 @@ useEffect(() => {
                     onClick={() => amountHandleChange("1,000,000")}
                     value="1,000,000"
                     style={{ padding: "2px 2px" }}
-                    disabled={radioPrice === "pull_fast_charge"}
+                    disabled={radioPrice === "FastCharge"}
                   >
                     1m
                   </InputMiniBtn>
@@ -1493,7 +1585,7 @@ useEffect(() => {
                     onClick={() => amountHandleChange("2,000,000")}
                     value="2,000,000"
                     style={{ padding: "2px 2px" }}
-                    disabled={radioPrice === "pull_fast_charge"}
+                    disabled={radioPrice === "FastCharge"}
                   >
                     2m
                   </InputMiniBtn>
@@ -1504,7 +1596,7 @@ useEffect(() => {
                     onClick={() => amountHandleChange("10,000,000")}
                     value="10,000,000"
                     style={{ padding: "2px 2px" }}
-                    disabled={radioPrice === "pull_fast_charge"}
+                    disabled={radioPrice === "FastCharge"}
                   >
                     10m
                   </InputMiniBtn>
@@ -1517,7 +1609,7 @@ useEffect(() => {
                     type="button"
                     onClick={() => amountHandleChange("1,000")}
                     value="1,000"
-                    disabled={radioPrice === "pull_fast_charge"}
+                    disabled={radioPrice === "FastCharge"}
                   >
                     1k
                   </InputMiniBtn>
@@ -1527,7 +1619,7 @@ useEffect(() => {
                     type="button"
                     onClick={() => amountHandleChange("2,000")}
                     value="2,000"
-                    disabled={radioPrice === "pull_fast_charge"}
+                    disabled={radioPrice === "FastCharge"}
                   >
                     2k
                   </InputMiniBtn>
@@ -1537,7 +1629,7 @@ useEffect(() => {
                     type="button"
                     onClick={() => amountHandleChange("5,000")}
                     value="5,000"
-                    disabled={radioPrice === "pull_fast_charge"}
+                    disabled={radioPrice === "FastCharge"}
                   >
                     5k
                   </InputMiniBtn>
@@ -1547,7 +1639,7 @@ useEffect(() => {
                     type="button"
                     onClick={() => amountHandleChange("10,000")}
                     value="10,000"
-                    disabled={radioPrice === "pull_fast_charge"}
+                    disabled={radioPrice === "FastCharge"}
                   >
                     10k
                   </InputMiniBtn>
@@ -1580,14 +1672,14 @@ useEffect(() => {
                           onBlur={() =>
                             setDurationError(validateDuration(durationValue))
                           }
-                          disabled={radioPrice === "pull_fast_charge"}
+                          disabled={radioPrice === "FastCharge"}
                           fullWidth
                           sx={{
                             "& .MuiOutlinedInput-root": {
                               height: "38px",
                               border: "2px solid #D9E1E3",
                               backgroundColor:
-                                radioPrice === "pull_fast_charge"
+                                radioPrice === "FastCharge"
                                   ? "#CBD5D8"
                                   : "#ffffff",
                               color: "#003543",
@@ -1705,7 +1797,7 @@ useEffect(() => {
                   </FormAddLabelWrapper>
                   <FormAddInputWrapper
                     style={
-                      radioPrice === "pull_fast_charge"
+                      radioPrice === "FastCharge"
                         ? { backgroundColor: "#CBD5D8" }
                         : { backgroundColor: "" }
                     }
@@ -1716,7 +1808,7 @@ useEffect(() => {
                           value={partialField}
                           onChange={handlePartialFill}
                           style={{ fontSize: "16px", marginLeft: "0.5rem" }}
-                          disabled={radioPrice === "pull_fast_charge"}
+                          disabled={radioPrice === "FastCharge"}
                         />
                       </FormAddInputWrapper2>
                     </FormAddInputIconWrapper>
@@ -1749,7 +1841,7 @@ useEffect(() => {
                   </FormAddLabelWrapper>
                   <FormAddInputWrapper
                     style={
-                      radioPrice !== "pull_fast_charge"
+                      radioPrice !== "FastCharge"
                         ? { backgroundColor: "#CBD5D8" }
                         : { backgroundColor: "" }
                     }
@@ -1760,7 +1852,7 @@ useEffect(() => {
                           value={minAmountUnit}
                           onChange={handleMinAmountUnitChange}
                           style={{ fontSize: "16px", marginLeft: "0.5rem" }}
-                          disabled={radioPrice !== "pull_fast_charge"}
+                          disabled={radioPrice !== "FastCharge"}
                         />
                       </FormAddInputWrapper2>
                     </FormAddInputIconWrapper>
@@ -1787,7 +1879,7 @@ useEffect(() => {
                   </FormAddLabelWrapper>
                   <FormAddInputWrapper
                     style={
-                      radioPrice !== "pull_fast_charge"
+                      radioPrice !== "FastCharge"
                         ? { backgroundColor: "#CBD5D8" }
                         : { backgroundColor: "" }
                     }
@@ -1798,7 +1890,7 @@ useEffect(() => {
                           value={limitInput}
                           style={{ fontSize: "16px", marginLeft: "0.5rem" }}
                           onChange={handlelimitChange}
-                          disabled={radioPrice !== "pull_fast_charge"}
+                          disabled={radioPrice !== "FastCharge"}
                         />
                       </FormAddInputWrapper2>
                     </FormAddInputIconWrapper>
@@ -1820,7 +1912,7 @@ useEffect(() => {
             </FormAddLabelWrapper>
             <FormControl fullWidth>
               <Autocomplete
-                disabled={radioPrice !== "manual"}
+                disabled={radioPrice !== "Manual"}
                 freeSolo
                 disableClearable
                 openOnFocus
@@ -1877,7 +1969,7 @@ useEffect(() => {
                 row
               >
                 <FormControlLabel
-                  value="fast"
+                  value="Fast"
                   control={
                     <Radio
                       size="small"
@@ -1889,10 +1981,10 @@ useEffect(() => {
                       }}
                     />
                   }
-                  label="fast"
+                  label="Fast"
                 />
                 <FormControlLabel
-                  value="pull_fast_charge"
+                  value="FastCharge"
                   control={
                     <Radio
                       size="small"
@@ -1904,10 +1996,10 @@ useEffect(() => {
                       }}
                     />
                   }
-                  label="pull-charge"
+                  label="Fast charge"
                 />
                 <FormControlLabel
-                  value="manual"
+                  value="Manual"
                   control={
                     <Radio
                       size="small"
@@ -1919,7 +2011,7 @@ useEffect(() => {
                       }}
                     />
                   }
-                  label="manual"
+                  label="Manual"
                 />
               </RadioGroup>
             </FormControl>
@@ -1978,7 +2070,10 @@ useEffect(() => {
                     fontWeight: "800",
                   }}
                 >
-                  {myPrice?.totalPrice.toLocaleString() ?? 0} TRX
+                  {(
+                    myPrice?.totalPrice * totalPriceLength.length
+                  ).toLocaleString() ?? 0}{" "}
+                  TRX
                 </OrderInfoText>
               </OrderInfoTextWrapper2>
             </OrderInfoTextWrapper>
