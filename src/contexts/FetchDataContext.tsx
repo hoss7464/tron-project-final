@@ -8,6 +8,7 @@ import React, {
   useRef,
 } from "react";
 import { fetchAllUiData } from "../services/requestService";
+
 import {
   OrdersResponse,
   MyOrdersResponse,
@@ -38,6 +39,8 @@ const FetchDataContext = createContext<FetchDataContextType | undefined>(
 
 // Create a ref to expose resourceData
 export const FetchDataResourceRef = React.createRef<ResourceResponse | null>();
+
+
 
 interface FetchDataProviderProps {
   children: ReactNode;
@@ -122,25 +125,23 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
     initialLoadRef.current = true; // Reset initial load flag when address changes
   }, [address]);
 
-  useEffect(() => {
-    // For initial load, pass true to show loader
-    if (initialLoadRef.current) {
-      fetchData(true);
-      initialLoadRef.current = false; // Mark initial load as done
-    }
 
-    if (shouldStopPolling) {
-      return;
-    }
+useEffect(() => {
+  // Fetch immediately when route changes
+  fetchData(false);
+  
+  if (shouldStopPolling) {
+    return;
+  }
 
-    const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME)
-    const intervalId = setInterval(() => {
-      // Subsequent calls don't show loader
-      fetchData(false);
-    }, globalReqTime);
+  const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME);
+  const intervalId = setInterval(() => {
+    fetchData(false);
+  }, globalReqTime);
 
-    return () => clearInterval(intervalId);
-  }, [fetchData, shouldStopPolling]);
+  return () => clearInterval(intervalId);
+}, [fetchData, shouldStopPolling, path1]); // Add path1 as dependency
+
 
     useEffect(() => {
     FetchDataResourceRef.current = resourceData;
