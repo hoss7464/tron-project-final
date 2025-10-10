@@ -16,6 +16,7 @@ import {
   AvailableResponse,
   AccountInfoResponse,
   RefundResponse,
+  GetOrderResoponse,
 } from "../services/requestService";
 import { useTronWallet } from "./TronWalletContext";
 import { useLoading } from "./LoaderContext";
@@ -28,6 +29,7 @@ interface FetchDataContextType {
   availableData: AvailableResponse | null;
   tradingAccountInfo: AccountInfoResponse | null;
   tradingRefundInfo: RefundResponse | null;
+  tradingOrderInfo: GetOrderResoponse | null;
   loading: boolean;
   error: Error | null;
   fetchData: (isInitialLoad?: boolean) => Promise<void>;
@@ -57,6 +59,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const [availableData, setAvailableData] = useState<AvailableResponse | null>(null)
   const [tradingAccountInfo, setTradingAccountInfo] = useState<AccountInfoResponse | null>(null)
   const [tradingRefundInfo, setTradingRefundInfo] = useState<RefundResponse | null>(null)
+  const [tradingOrderInfo, setTradingOrderInfo] = useState<GetOrderResoponse | null>(null)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [authErrorCount, setAuthErrorCount] = useState(0);
@@ -101,6 +104,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
       setAvailableData(allData.availables);
       setTradingAccountInfo(allData.tradingAccountInfo)
       setTradingRefundInfo(allData.tradingRefundInfo)
+      setTradingOrderInfo(allData.tradingOrderInfo)
 
       if (authErrorCount > 0) {
         setAuthErrorCount(0);
@@ -125,6 +129,32 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
     initialLoadRef.current = true; // Reset initial load flag when address changes
   }, [address]);
 
+
+/*
+old useEffect :
+
+
+  useEffect(() => {
+    // For initial load, pass true to show loader
+    if (initialLoadRef.current) {
+      fetchData(true);
+      initialLoadRef.current = false; // Mark initial load as done
+    }
+
+    if (shouldStopPolling) {
+      return;
+    }
+
+    const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME)
+    const intervalId = setInterval(() => {
+      // Subsequent calls don't show loader
+      fetchData(false);
+    }, globalReqTime);
+
+    return () => clearInterval(intervalId);
+  }, [fetchData, shouldStopPolling]);
+  
+*/
 
 useEffect(() => {
   // Fetch immediately when route changes
@@ -154,6 +184,7 @@ useEffect(() => {
     availableData,
     tradingAccountInfo,
     tradingRefundInfo,
+    tradingOrderInfo,
     fetchData: () => fetchData(false), // Default to not showing loader
     loading,
     error,

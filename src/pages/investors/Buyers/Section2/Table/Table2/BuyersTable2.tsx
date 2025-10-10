@@ -75,7 +75,7 @@ const BuyersTable2: React.FC = () => {
   //------------------------------------------------------------------------------------------------------------
   return (
     <>
-      <OrderMainWrapper>
+      <OrderMainWrapper style={{ padding: "0" }}>
         <OrdersCarouselWrapper>
           <MyOrdersScroll style={{ height: "575px" }}>
             <AvailableNavWrapper >

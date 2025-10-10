@@ -189,6 +189,7 @@ const Section1: React.FC = () => {
                 severity: "success",
               })
             );
+            setDeposit("")
             return;
           } else {
             dispatch(

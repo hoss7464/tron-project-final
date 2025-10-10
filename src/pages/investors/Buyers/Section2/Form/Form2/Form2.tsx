@@ -172,7 +172,7 @@ const Form2: React.FC = () => {
   const [bulkOrder, setBulkOrder] = useState<boolean>(false);
   const [bulkOrderPopupOpen, setBulkOrderPopupOpen] = useState<boolean>(false);
   //Amount input states:
-  const [amount, setAmount] = useState("100000");
+  const [amount, setAmount] = useState("1000000");
   const [minAmount, setMinAmount] = useState<{
     energy: number;
     bandwidth: number;

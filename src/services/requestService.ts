@@ -154,7 +154,7 @@ export interface AvailableResponse {
   energy: EnergyItem[];
   bandwidth: BandwidthItem[];
 }
-//Interface for account info in /Buyers or /Sellers :
+//Interface for account info in /Buyers :
 export interface AccountInfoResponse {
   success: boolean;
   data: {
@@ -164,7 +164,7 @@ export interface AccountInfoResponse {
   };
 }
 
-//Interfaces for refund request in /Buyers and /Sellers :
+//Interfaces for refund request in /Buyers :
 export interface RefundResponse {
   success: boolean;
   message: string;
@@ -178,7 +178,44 @@ interface RefundData {
   status: string;
   paidAt: any;
   createdAt: string;
-  depositTxId:string;
+  depositTxId: string;
+}
+
+//Interface for getOrder request in /Buyers :
+export interface GetOrderResoponse {
+  success: boolean;
+  message: string;
+  data: GetOrderData[];
+}
+
+export interface GetOrderData {
+  _id: string;
+  type: string;
+  receiver: string;
+  resourceType: string;
+  resourceAmount: number;
+  price: number;
+  totalPrice: number;
+  energyPairTrx: number;
+  durationSec: number;
+  options: {
+    allow_partial: boolean;
+    partial_min: number;
+    partial_min_trx: number;
+    bulk_order: boolean;
+  };
+  freeze: number;
+  frozen: number;
+  lock: boolean;
+  status: string;
+  createdAt: string;
+  holds: GetHold[];
+}
+
+interface GetHold {
+  qty: number;
+  txid: string;
+  settledAt: string;
 }
 //-------------------------------------------------------------------------------------
 //to get data from .env :
@@ -332,7 +369,7 @@ export const fetchAllUiData = async (
       };
     }
     //--------------------------------------------------------------------------------------------
-    //getRefund request (only for "/Buyers" & "/Sellers")
+    //getRefund request (only for "/Buyers")
     let getRefundResponse: RefundResponse;
     const shouldFetchRefundInfo =
       isConnectedTrading === true && pathname === "/Buyers";
@@ -364,7 +401,7 @@ export const fetchAllUiData = async (
                 status: "",
                 paidAt: null,
                 createdAt: "string",
-                depositTxId: "string"
+                depositTxId: "string",
               },
             ],
           };
@@ -387,6 +424,79 @@ export const fetchAllUiData = async (
       getRefundResponse = {
         success: true,
         message: "No refund data requested",
+        data: [],
+      };
+    }
+    //--------------------------------------------------------------------------------------------
+    //getOrder request : (only for "/Buyers"):
+    let getOrderResponse: GetOrderResoponse;
+    const shouldFetchOrderInfo =
+      isConnectedTrading === true && pathname === "/Buyers";
+
+    if (shouldFetchOrderInfo) {
+      try {
+        const getOrderRes = await axios.get<GetOrderResoponse>(
+          `${baseUrl}/Buyer/getOrder`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              accesstoken: accessToken,
+            },
+            timeout: axiosTimeOut,
+            validateStatus: (status: number) => status < 500,
+          }
+        );
+
+        if (getOrderRes.data.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          getOrderResponse = {
+            success: false,
+            message: getOrderRes.data.message,
+            data: [
+              {
+                _id: "",
+                type: "",
+                receiver: "",
+                resourceType: "",
+                resourceAmount: 0,
+                price: 0,
+                totalPrice: 0,
+                energyPairTrx: 0,
+                durationSec: 0,
+                options: {
+                  allow_partial: false,
+                  partial_min: 0,
+                  partial_min_trx: 0,
+                  bulk_order: false,
+                },
+                freeze: 0,
+                frozen: 0,
+                lock: false,
+                status: "",
+                createdAt: "",
+                holds: [],
+              },
+            ],
+          };
+        } else {
+          getOrderResponse = getOrderRes.data;
+        }
+      } catch (error: any) {
+        if (error.response?.data?.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          getOrderResponse = {
+            success: false,
+            message: error.response?.data?.message || "An error occurred",
+            data: [],
+          };
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      getOrderResponse = {
+        success: true,
+        message: "No order data requested",
         data: [],
       };
     }
@@ -493,6 +603,7 @@ export const fetchAllUiData = async (
       availables,
       tradingAccountInfo: accountInfoResponse,
       tradingRefundInfo: getRefundResponse,
+      tradingOrderInfo: getOrderResponse,
     };
   } catch (error) {
     throw error;

@@ -171,7 +171,7 @@ const OrderFormComponent: React.FC = () => {
   //Store whole fetch data in one state :
   const [wholeData, setWholeData] = useState<ResourceResponse | null>(null);
   //Amount input states:
-  const [amount, setAmount] = useState("100000");
+  const [amount, setAmount] = useState("1000000");
   const [minAmount, setMinAmount] = useState<{
     energy: number;
     bandwidth: number;
