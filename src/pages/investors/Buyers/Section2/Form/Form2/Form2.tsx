@@ -1179,7 +1179,6 @@ const Form2: React.FC = () => {
     let formBtn = switchBtn;
     //to get requester address :
     const requeserAddress = convertAddressesToArray(walletAdd);
-    const requeserAddress2 = cleanAddressesForSending(walletAdd);
     //numeric value of amount input
     const numericAmount = getNumericAmount(amount);
     //to get partial fill state
@@ -1205,119 +1204,81 @@ const Form2: React.FC = () => {
 
     if (radioPrice === "FastCharge") {
       if (
-      formBtn === null ||
-      numericAmount === null ||
-      numericMinAmountUnit === null ||
-      numericSelectedPrice === null ||
-      numericLimit === null ||
-      !myPrice
-    ) {
-      return;
-    }
+        formBtn === null ||
+        numericAmount === null ||
+        numericMinAmountUnit === null ||
+        numericSelectedPrice === null ||
+        numericLimit === null ||
+        !myPrice
+      ) {
+        return;
+      }
     } else {
       if (
-      formBtn === null ||
-      numericAmount === null ||
-      durationNumericValue === null ||
-      numericSelectedPrice === null ||
-      !myPrice
-    ) {
-      return;
+        formBtn === null ||
+        numericAmount === null ||
+        durationNumericValue === null ||
+        numericSelectedPrice === null ||
+        !myPrice
+      ) {
+        return;
+      }
     }
-    }
-    
-     
+
     try {
       //payload to send data :
       let form2Payload = null;
-     
+
       if (radioPrice === "FastCharge") {
-          form2Payload = {
-            resourceType: formBtn,
-            requester: address,
-            receiver: requeserAddress2, // string of address es
-            resourceAmount: numericAmount,
-            min_energy_amount: numericMinAmountUnit,
-            price: numericSelectedPrice,
-            total_price: totalPrice,
-            type: radioPrice,
-            limit: numericLimit,
-            options: {
-              bulk_order: bulkOrder,
-            }
-          };
+        form2Payload = {
+          resourceType: formBtn,
+          requester: address,
+          receiver: requeserAddress, // array of address
+          resourceAmount: numericAmount,
+          min_energy_amount: numericMinAmountUnit,
+          price: numericSelectedPrice,
+          total_price: totalPrice,
+          type: radioPrice,
+          limit: numericLimit,
+          options: {
+            bulk_order: bulkOrder,
+          },
+        };
       } else if (radioPrice === "Fast") {
-        if (bulkOrder === true) {
-          form2Payload = {
-            resourceType: formBtn,
-            requester: address,
-            receiver: requeserAddress, // Array of addresses
-            resourceAmount: numericAmount,
-            durationSec: durationNumericValue,
-            price: numericSelectedPrice,
-            totalPrice: totalPrice,
-            type: radioPrice,
-            options: {
-              bulk_order: bulkOrder,
-              allow_partial: true,
-              partial_min: my_partial_field,
-            },
-          };
-        } else {
-          form2Payload = {
-            resourceType: formBtn,
-            requester: address,
-            receiver: requeserAddress2, // String of addresses
-            resourceAmount: numericAmount,
-            durationSec: durationNumericValue,
-            price: numericSelectedPrice,
-            totalPrice: totalPrice,
-            type: radioPrice,
-            options: {
-              bulk_order: bulkOrder,
-              allow_partial: true,
-              partial_min: my_partial_field,
-            },
-          };
-        }
+        form2Payload = {
+          resourceType: formBtn,
+          requester: address,
+          receiver: requeserAddress, // Array of addresses
+          resourceAmount: numericAmount,
+          durationSec: durationNumericValue,
+          price: numericSelectedPrice,
+          totalPrice: totalPrice,
+          type: radioPrice,
+          options: {
+            bulk_order: bulkOrder,
+            allow_partial: true,
+            partial_min: my_partial_field,
+          },
+        };
       } else if (radioPrice === "Manual") {
-        if (bulkOrder === true) {
-          form2Payload = {
-            resourceType: formBtn,
-            requester: address,
-            receiver: requeserAddress, // Array of addresses
-            resourceAmount: numericAmount,
-            durationSec: durationNumericValue,
-            price: numericSelectedPrice,
-            totalPrice: totalPrice,
-            type: radioPrice,
-            options: {
-              bulk_order: bulkOrder,
-              allow_partial: true,
-              partial_min: my_partial_field,
-            },
-          };
-        } else {
-          form2Payload = {
-            resourceType: formBtn,
-            requester: address,
-            receiver: requeserAddress2, // String of addresses
-            resourceAmount: numericAmount,
-            durationSec: durationNumericValue,
-            price: numericSelectedPrice,
-            totalPrice: totalPrice,
-            type: radioPrice,
-            options: {
-              bulk_order: bulkOrder,
-              allow_partial: true,
-              partial_min: my_partial_field,
-            },
-          };
-        }
+        form2Payload = {
+          resourceType: formBtn,
+          requester: address,
+          receiver: requeserAddress, // Array of addresses
+          resourceAmount: numericAmount,
+          durationSec: durationNumericValue,
+          price: numericSelectedPrice,
+          totalPrice: totalPrice,
+          type: radioPrice,
+          options: {
+            bulk_order: bulkOrder,
+            allow_partial: true,
+            partial_min: my_partial_field,
+          },
+        };
       } else {
         return;
       }
-      console.log(form2Payload);
       //base url :
       const baseURL = process.env.REACT_APP_BASE_URL;
       //to get axios timeout :

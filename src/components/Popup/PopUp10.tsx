@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
+
 import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
 import {
   Popup2HeaderWrapper,
@@ -35,7 +35,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
   onClose,
   orderData,
 }) => {
-  const { address, adapter } = useTronWallet();
+  const { address, adapter, accessToken } = useTronWallet();
   const dispatch = useDispatch();
 
   const MyCancelReject = () => {
@@ -46,48 +46,22 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
 
   const handleConfirmClick = async () => {
     try {
-      const window_tronweb = (window as any).tronWeb;
-      const baseURL = process.env.REACT_APP_BASE_URL;
       const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
-
-      // Check if adapter is available
-      if (!adapter) {
-        throw new Error("Wallet adapter not available");
-      }
-
-      // Get nonce from server
-      const message = orderData?._id + "";
-      //To convert message into hex :
-      window_tronweb.toHex(message);
-      //To sign the message :
-      const signature = await adapter.signMessage(message);
-
-      if (!signature) {
-        dispatch(
-          showNotification({
-            name: "tron-error3",
-            message: "Tron Error : User rejected signing message.",
-            severity: "error",
-          })
-        );
-        return;
-      }
 
       const confirmPayload = {
         orderId: orderData?._id,
-        requester: address,
-        signature: signature,
       };
-
+      
       const confirmResponse = await axios.post<GetOrderResoponse>(
         `${baseUrl}/Buyer/CancleOrder`,
         confirmPayload,
         {
           headers: {
             "Content-Type": "application/json",
+            accesstoken: accessToken,
           },
           timeout: axiosTimeOut,
-          withCredentials: true,
+
           validateStatus: (status: number) => status < 500,
         }
       );

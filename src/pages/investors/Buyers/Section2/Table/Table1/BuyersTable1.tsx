@@ -118,7 +118,7 @@ const BuyersTable1: React.FC = () => {
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>amount</OrderNavText>
+                  <OrderNavText>Amount</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>

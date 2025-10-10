@@ -81,7 +81,7 @@ const BuyersTable2: React.FC = () => {
             <AvailableNavWrapper >
               <BuyersAvailableNavbar>
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}} >
-                  <OrderNavText>Date/Time</OrderNavText>
+                  <OrderNavText>Date</OrderNavText>
                 </AvailableNavTextWrapper>
 
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}}>
