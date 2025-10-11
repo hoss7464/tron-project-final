@@ -77,6 +77,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { useLocation } from "react-router-dom";
 import Form2PopUp1 from "../FormPopups/Form2PopUp1";
 import axios from "axios";
+import LoadingButtonContent from "../../../../../../components/LoadingBtnContent/LoadingBtnContent";
 //-----------------------------------------------------------------
 //Interfaces :
 
@@ -239,6 +240,8 @@ const Form2: React.FC = () => {
     energy: number;
     bandwidth: number;
   }>({ energy: 0, bandwidth: 0 });
+  //State for disabling the button after submitting for 300 ms :
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const durationWasManuallyChanged = useRef(false);
   const priceWasManuallyChanged = useRef(false);
@@ -1225,6 +1228,9 @@ const Form2: React.FC = () => {
       }
     }
 
+    // Disable the button immediately
+    setIsSubmitting(true);
+
     try {
       //payload to send data :
       let form2Payload = null;
@@ -1356,6 +1362,11 @@ const Form2: React.FC = () => {
         })
       );
       return;
+    } finally {
+      // Re-enable the button after 300ms
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 300);
     }
   };
   //-------------------------------------------------------------------------------------
@@ -2041,7 +2052,13 @@ const Form2: React.FC = () => {
           </OrderInfoWrapper>
 
           <OrderSubmitBtnWrapper style={{ marginTop: "1.5rem" }}>
-            <OrderSubmitBtn type="submit">Confirm Created Rule</OrderSubmitBtn>
+            <OrderSubmitBtn type="submit" disabled={isSubmitting}>
+              <LoadingButtonContent
+                loading={isSubmitting}
+                loadingText="Confirming..."
+                normalText="Confirm Created Rule"
+              />
+            </OrderSubmitBtn>
           </OrderSubmitBtnWrapper>
         </Form>
       </Form2Container>

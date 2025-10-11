@@ -68,6 +68,7 @@ import { showNotification } from "../../../../../../redux/actions/notifSlice";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import LoadingButtonContent from "../../../../../../components/LoadingBtnContent/LoadingBtnContent";
 
 //------------------------------------------------------------------------------------
 interface Form1ApiResponse {
@@ -208,6 +209,8 @@ const Form1: React.FC = () => {
   //States for date and time :
   const [currentDate, setCurrentDate] = useState<string>("");
   const [currentTime, setCurrentTime] = useState<string>("");
+  //State for disabling the button after submitting for 300 ms :
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const durationWasManuallyChanged = useRef(false);
   const priceWasManuallyChanged = useRef(false);
@@ -882,6 +885,8 @@ const Form1: React.FC = () => {
       return;
     }
 
+    // Disable the button immediately
+    setIsSubmitting(true);
     //base url :
     const baseURL = process.env.REACT_APP_BASE_URL;
 
@@ -1055,6 +1060,11 @@ const Form1: React.FC = () => {
           severity: "error",
         })
       );
+    } finally {
+      // Re-enable the button after 300ms
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 300);
     }
   };
   //--------------------------------------------------------------------------------------
@@ -1643,7 +1653,13 @@ const Form1: React.FC = () => {
           </OrderInfoWrapper>
 
           <OrderSubmitBtnWrapper>
-            <OrderSubmitBtn type="submit">Create Order</OrderSubmitBtn>
+            <OrderSubmitBtn type="submit" disabled={isSubmitting}>
+              <LoadingButtonContent
+                loading={isSubmitting}
+                loadingText="Creating..."
+                normalText="Create Order"
+              />
+            </OrderSubmitBtn>
           </OrderSubmitBtnWrapper>
         </Form>
       </Form1Container>

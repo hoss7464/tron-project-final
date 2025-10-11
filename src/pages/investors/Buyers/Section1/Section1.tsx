@@ -17,6 +17,8 @@ import {
 import {
   FormErrorWrapper,
   FormError,
+  OrderSubmitBtnWrapper,
+  OrderSubmitBtn,
 } from "../../../mainPage/mainPageElements";
 import {
   LegacyCardWrapper,
@@ -50,6 +52,7 @@ import balanceIcon from "../../../../assets/svg/BalanceIcon.svg";
 import PopUp8 from "../../../../components/Popup/PopUp8";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../../../redux/actions/notifSlice";
+import LoadingButtonContent from "../../../../components/LoadingBtnContent/LoadingBtnContent";
 
 interface depositTrxData {
   success: boolean;
@@ -73,6 +76,8 @@ const Section1: React.FC = () => {
   const [depositError, setDepositError] = useState<string>("");
   const [changeApiOpen, setChangeApiOpen] = useState(false);
   const [apiKey, setApiKey] = useState("");
+  //State for disabling the button after submitting for 300 ms :
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
@@ -130,7 +135,7 @@ const Section1: React.FC = () => {
     const baseUrl = process.env.REACT_APP_BASE_URL;
     const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
     const numericDepositAmount = Number(deposit);
-
+    setIsSubmitting(true);
     try {
       //payload for checking data towards the server :
       const depositPayload = {
@@ -189,7 +194,7 @@ const Section1: React.FC = () => {
                 severity: "success",
               })
             );
-            setDeposit("")
+            setDeposit("");
             return;
           } else {
             dispatch(
@@ -231,6 +236,11 @@ const Section1: React.FC = () => {
         })
       );
       return;
+    } finally {
+      // Re-enable the button after 300ms
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 300);
     }
   };
   //Function for showing the popup for API key:
@@ -319,9 +329,19 @@ const Section1: React.FC = () => {
                           </FormAddInputWrapper2>
                         </FormAddInputIconWrapper>
                       </FormAddInputWrapper>
-                      <Sec1ButtonWrapper onClick={handleDepositClick}>
-                        <Sec1ButtonText>Deposit</Sec1ButtonText>
-                      </Sec1ButtonWrapper>
+                      <OrderSubmitBtnWrapper style={{marginTop : "0"}}>
+                        <OrderSubmitBtn
+                          onClick={handleDepositClick}
+                          disabled={isSubmitting}
+                          style={{fontWeight : "600"}}
+                        >
+                          <LoadingButtonContent
+                            loading={isSubmitting}
+                            loadingText="Depositing..."
+                            normalText="Deposit"
+                          />
+                        </OrderSubmitBtn>
+                      </OrderSubmitBtnWrapper>
                     </Sec1CardThingsWrapper>
                     {/*put botton here */}
                   </SellersCardThingsWrapper>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
@@ -10,6 +10,7 @@ import {
 } from "./PopUpElements";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
+import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 
 interface BuyerChangeApiProps {
   open: boolean;
@@ -27,6 +28,9 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const { accessToken } = useTronWallet();
 
+  //State for disabling the button after submitting for 300 ms :
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const changeApiReject = () => {
     onClose();
   };
@@ -35,6 +39,7 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
     const baseUrl = process.env.REACT_APP_BASE_URL;
     const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
     try {
+      setIsSubmitting(true);
       const changeApiResponse = await axios.post<BuyerChangeApiData>(
         `${baseUrl}/Buyer/reGenerate`,
         {},
@@ -79,6 +84,11 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
       );
       onClose();
       return;
+    } finally {
+      // Re-enable the button after 300ms
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 300);
     }
   };
   return (
@@ -129,13 +139,22 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
             color="primary"
             variant="contained"
             onClick={handleChangeApi}
+            disabled={isSubmitting}
             sx={{
               backgroundColor: "#430E00",
               borderRadius: "10px",
+              "&.Mui-disabled": {
+                backgroundColor: "#430E00", // Keep the same background color when disabled
+                color: "white"
+              },
             }}
           >
             {" "}
-            Yes
+            <LoadingButtonContent
+              loading={isSubmitting}
+              loadingText="Changing..."
+              normalText="Yes"
+            />
           </Button>
           <Button
             fullWidth

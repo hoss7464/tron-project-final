@@ -34,6 +34,7 @@ import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import { Divider } from "@mui/material";
 import { formatStrictDuration } from "../../utils/fromSec";
+import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 
 interface OrderSuccessPopupProps {
   open: boolean;
@@ -96,6 +97,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const { transferTrx, isTransferring, address } = useTronWallet();
   const baseUrl = process.env.REACT_APP_BASE_URL;
   const [isProcessing, setIsProcessing] = useState(false);
+
   //create order states :
 
   //base url :
@@ -216,7 +218,10 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
         })
       );
     } finally {
-      setIsProcessing(false);
+      // Re-enable the button after 300ms
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 300);
     }
   };
 
@@ -408,10 +413,19 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             sx={{
               backgroundColor: "#430E00",
               borderRadius: "10px",
+              "&.Mui-disabled": {
+                backgroundColor: "#430E00", // Keep the same background color when disabled
+                color: "white",
+              },
             }}
           >
             {" "}
-            {mySwitchBtn === "energy" ? "Sell energy" : "Sell bandwidth"}
+            
+            <LoadingButtonContent
+              loading={isProcessing}
+              loadingText="Confirming..."
+              normalText={mySwitchBtn === "energy" ? "Sell energy" : "Sell bandwidth"}
+            />
           </Button>
 
           <Button

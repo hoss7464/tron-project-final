@@ -56,7 +56,7 @@ import { TronWeb } from "tronweb";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-import { toggleRefresh } from "../../redux/actions/refreshSlice";
+import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 
 interface Popup3Types {
   open: boolean;
@@ -107,7 +107,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   pairTrx,
 }) => {
   const dispatch = useDispatch();
-    //to get address from useTronWallet :
+  //to get address from useTronWallet :
   const { address, fillOrder } = useTronWallet();
   //States :
   //states for requester input :
@@ -132,6 +132,9 @@ const PopUp3: React.FC<Popup3Types> = ({
 
   // NEW: Function to track already delegated amounts
   const [alreadyDelegatedAmount, setAlreadyDelegatedAmount] = useState(0);
+
+  //State for disabling the button after submitting for 300 ms :
+  const [isSubmitting, setIsSubmitting] = useState(false);
   //-------------------------------------------------------------------------------------------
   //Functions for Payout target address input :
   //Wallet address validation :
@@ -409,6 +412,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       );
       return;
     }
+    setIsSubmitting(true);
     //After checking all the validations data must ply between front ,server and tronlink :
     try {
       //step1 ----> order._id and amount must send towards the server so that server checks if another client is filling the order or not :
@@ -425,7 +429,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             "Content-Type": "application/json",
           },
           timeout: axiosTimeOut,
-          validateStatus : (status : number) => status < 500
+          validateStatus: (status: number) => status < 500,
         }
       );
       //step2 ----> send data towards tronlink after checking data is successfull :
@@ -469,7 +473,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             order.resourceType,
             multiSignature, // requesterAddress
             order.lock,
-            (order.durationSec / 3) - 3,
+            order.durationSec / 3 - 3,
             true, // isMultiSignature
             options
           );
@@ -481,7 +485,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             order.resourceType,
             address, // requesterAddress
             order.lock,
-            (order.durationSec / 3) - 3
+            order.durationSec / 3 - 3
           );
         }
         //step3 ----> if the result of sending data towards tronlink was successfull then send txid, orderId and checkResponse.res_id towards the server:
@@ -514,7 +518,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                 "Content-Type": "application/json",
               },
               timeout: axiosTimeOut,
-              validateStatus : (status : number) => status < 500
+              validateStatus: (status: number) => status < 500,
             }
           );
         }
@@ -551,6 +555,11 @@ const PopUp3: React.FC<Popup3Types> = ({
           severity: "error",
         })
       );
+    } finally {
+      // Re-enable the button after 300ms
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 300);
     }
   };
 
@@ -1044,8 +1053,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                     color: "#430E00",
                   }}
                 >
-                  {Number((handlePayout * 1e6).toFixed(3))}{" "}
-                  TRX
+                  {Number((handlePayout * 1e6).toFixed(3))} TRX
                 </Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
@@ -1071,10 +1079,18 @@ const PopUp3: React.FC<Popup3Types> = ({
             sx={{
               backgroundColor: "#430E00",
               borderRadius: "10px",
+              "&.Mui-disabled": {
+                backgroundColor: "#430E00", // Keep the same background color when disabled
+                color: "white",
+              },
             }}
             onClick={handleFill}
           >
-            Fill
+            <LoadingButtonContent
+              loading={isSubmitting}
+              loadingText="Filling..."
+              normalText="Fill"
+            />
           </Button>
 
           <Button

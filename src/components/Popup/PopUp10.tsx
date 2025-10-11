@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
@@ -23,6 +23,7 @@ import {
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
+import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 
 interface MyOrderCancelPopupProps {
   open: boolean;
@@ -37,6 +38,8 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
 }) => {
   const { address, adapter, accessToken } = useTronWallet();
   const dispatch = useDispatch();
+  //State for disabling the button after submitting for 300 ms :
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const MyCancelReject = () => {
     onClose();
@@ -45,13 +48,14 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
   const baseUrl = process.env.REACT_APP_BASE_URL;
 
   const handleConfirmClick = async () => {
+    setIsSubmitting(true);
     try {
       const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
       const confirmPayload = {
         orderId: orderData?._id,
       };
-      
+
       const confirmResponse = await axios.post<GetOrderResoponse>(
         `${baseUrl}/Buyer/CancleOrder`,
         confirmPayload,
@@ -97,6 +101,11 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
       );
       onClose();
       return;
+    } finally {
+      // Re-enable the button after 300ms
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 300);
     }
   };
 
@@ -190,15 +199,24 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
           <Button
             fullWidth
             onClick={handleConfirmClick}
+            disabled={isSubmitting}
             color="primary"
             variant="contained"
             sx={{
               backgroundColor: "#430E00",
               borderRadius: "10px",
+             "&.Mui-disabled": {
+                backgroundColor: "#430E00", // Keep the same background color when disabled
+                color: "white"
+              },
             }}
           >
             {" "}
-            confirm
+            <LoadingButtonContent
+              loading={isSubmitting}
+              loadingText="Confirming..."
+              normalText="Confirm"
+            />
           </Button>
           <Button
             fullWidth

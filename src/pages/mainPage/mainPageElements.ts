@@ -579,6 +579,7 @@ export const OrderSubmitBtn = styled.button`
   background-color: ${ThemeColor.secondary1};
   color: ${ThemeColor.text2};
   cursor: pointer;
+
 `;
 
 export const FormErrorWrapper = styled.div`
