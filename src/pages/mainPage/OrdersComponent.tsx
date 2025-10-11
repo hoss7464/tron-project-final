@@ -64,6 +64,8 @@ export interface MarketOrder {
   options: {
     allow_partial: boolean;
     bulk_order: boolean;
+    partial_min: number;
+    partial_min_trx: number;
   };
   price: number;
   receiver: string;

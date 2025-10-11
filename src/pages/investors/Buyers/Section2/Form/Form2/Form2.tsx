@@ -1960,6 +1960,7 @@ const Form2: React.FC = () => {
                   control={
                     <Radio
                       size="small"
+                      disabled={true}
                       sx={{
                         color: "#430E00",
                         "&.Mui-checked": {

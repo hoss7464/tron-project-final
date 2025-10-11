@@ -284,6 +284,30 @@ const PopUp3: React.FC<Popup3Types> = ({
       );
     }
   };
+
+    //-------------------------------------------------------------------------------------------
+  //Function to calculate payout :
+  const handlePayout = useMemo(() => {
+    if (pairTrx === null || delegatedAmount === "" || delegatedAmount === "0") {
+      return 0;
+    }
+    const numericDelegateAmount = Number(delegatedAmount);
+    return pairTrx * numericDelegateAmount;
+  }, [delegatedAmount, pairTrx]);
+  //-------------------------------------------------------------------------------------------
+  //To get minimum delegate amount :
+  const minimum_delegate_amount = (value: number) => {
+    const valueInTrx = value / 1_000_000;
+    return valueInTrx;
+  };
+
+  if (order?.options.partial_min_trx === undefined) {
+    return 
+  }
+
+  const minimum_amount_validation = minimum_delegate_amount(order?.options.partial_min_trx)
+
+  
   //-------------------------------------------------------------------------------------------
   // Function for delegated input validation
   const handleDelegateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -312,8 +336,8 @@ const PopUp3: React.FC<Popup3Types> = ({
     if (!isNaN(numericValue)) {
       if (roundedMax !== null && numericValue > roundedMax) {
         setDelegateInputError(`Cannot exceed ${roundedMax}`);
-      } else if (numericValue < MIN_DELEGATE_AMOUNT) {
-        setDelegateInputError(`Min amount is ${MIN_DELEGATE_AMOUNT}`);
+      } else if (numericValue < minimum_amount_validation) {
+        setDelegateInputError(`Min amount is ${minimum_amount_validation}`);
       } else if (numericValue <= 0) {
         setDelegateInputError("Amount must be positive");
       } else {
@@ -341,8 +365,8 @@ const PopUp3: React.FC<Popup3Types> = ({
       if (numericValue > roundedMax) {
         setDelegateInputError(`Cannot exceed ${roundedMax}`);
         return;
-      } else if (numericValue < MIN_DELEGATE_AMOUNT) {
-        setDelegateInputError(`Min amount is ${MIN_DELEGATE_AMOUNT}`);
+      } else if (numericValue < minimum_amount_validation) {
+        setDelegateInputError(`Min amount is ${minimum_amount_validation}`);
         return;
       } else if (numericValue <= 0) {
         setDelegateInputError("Amount must be positive");
@@ -387,8 +411,8 @@ const PopUp3: React.FC<Popup3Types> = ({
       return;
     }
     //if amount was lower than minimum delegated amount return an error:
-    if (numericDelegatedAmount < MIN_DELEGATE_AMOUNT) {
-      setDelegateInputError(`Min amount is ${MIN_DELEGATE_AMOUNT}`);
+    if (numericDelegatedAmount < minimum_amount_validation) {
+      setDelegateInputError(`Min amount is ${minimum_amount_validation}`);
       return;
     }
     //if amount was negative number return an error :
@@ -756,16 +780,10 @@ const PopUp3: React.FC<Popup3Types> = ({
       return false;
     }
   };
-  //-------------------------------------------------------------------------------------------
-  //Function to calculate payout :
-  const handlePayout = useMemo(() => {
-    if (pairTrx === null || delegatedAmount === "" || delegatedAmount === "0") {
-      return 0;
-    }
-    const numericDelegateAmount = Number(delegatedAmount);
-    return pairTrx * numericDelegateAmount;
-  }, [delegatedAmount, pairTrx]);
 
+  if (myDelegate === null) {
+    return 
+  }
   //-------------------------------------------------------------------------------------------
   if (!order) return null;
   const { date, time } = formatDateTime(order.createdAt);
@@ -994,7 +1012,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                 <Popup2Name>Max-Delegate:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{Number(myDelegate?.toFixed(2))} TRX</Popup2Item>
+                <Popup2Item>{Number(myDelegate / 1_000_000).toFixed(2) } TRX</Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
             {/*<Popup2NameItemWrapper>
