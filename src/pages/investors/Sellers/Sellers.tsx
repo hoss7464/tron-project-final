@@ -88,7 +88,8 @@ const Sellers: React.FC = () => {
     isConnectedTrading,
   } = useTronWallet();
   const { resourceData } = useFetchData();
-  const [popup6Open, setPopup6Open] = useState(!sellersPermission);
+ const [popup6Open, setPopup6Open] = useState(!sellersPermission);
+  
   //----------------------------------------------------------------------------------------
   //Functions for circular progress bars :
   const bandwidthPercentage =
@@ -105,11 +106,9 @@ const Sellers: React.FC = () => {
   const minimumPrice = resourceData?.data.ratesByDuration.find(
     (minRate) => minRate.maxDurationSeconds === 2592000
   );
+
   //----------------------------------------------------------------------------------------
-  const handleClose = () => {
-    setPopup6Open(false);
-  };
-  //----------------------------------------------------------------------------------------
+  
     useEffect(() => {
     // Disconnected → popup open
     if (!isConnectedTrading) {
@@ -132,9 +131,9 @@ const Sellers: React.FC = () => {
   return (
     <>
        
-      {!isConnectedTrading ?  <PopUp7 /> : ""}
+      {!isConnectedTrading ?  <PopUp7 /> : null}
       
-      {isConnectedTrading && <PopUp6 open={popup6Open} onClose={handleClose} />}
+      {isConnectedTrading ? <PopUp6 open={popup6Open} /> : null}
       
 
       <SellersContainer>

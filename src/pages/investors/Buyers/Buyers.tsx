@@ -1,5 +1,6 @@
 import React from "react";
 import "./Buyers.css";
+import { useTronWallet } from "../../../contexts/TronWalletContext";
 import {
   BuyersContainer,
   BuyerssMainWrapper,
@@ -10,10 +11,14 @@ import Section1 from "./Section1/Section1";
 import { Grid } from "@mui/material";
 import BuyerForms from "./Section2/Form/BuyerForms";
 import BuyersTables from "./Section2/Table/BuyersTables";
+import PopUp7 from "../../../components/Popup/PopUp7";
 
 const Buyers: React.FC = () => {
+  const {isConnectedTrading} = useTronWallet()
   return (
     <>
+      {!isConnectedTrading ?  <PopUp7 /> : ""}
+
       <BuyersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>
         <BuyerssMainWrapper>

@@ -29,10 +29,9 @@ import {
 
 interface SellersPermissionPopUp {
   open: boolean;
-  onClose: () => void;
 }
 
-const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
+const PopUp6: React.FC<SellersPermissionPopUp> = ({ open }) => {
   const dispatch = useDispatch();
   const { resourceData } = useFetchData();
 
