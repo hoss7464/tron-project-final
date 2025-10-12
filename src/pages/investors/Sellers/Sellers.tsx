@@ -76,6 +76,7 @@ import MyFilterComponent from "../../../components/FilterComponent/MyFilterCompo
 import PopUp6 from "../../../components/Popup/PopUp6";
 import PopUp7 from "../../../components/Popup/PopUp7";
 
+
 const Sellers: React.FC = () => {
   const {
     address,
@@ -126,19 +127,18 @@ const Sellers: React.FC = () => {
     if (isConnectedTrading && sellersPermission) {
       setPopup6Open(false);
     }
-  }, [isConnectedTrading, sellersPermission, address]);
+  }, [isConnectedTrading, sellersPermission]);
   
   const handleClose = () => {
     setPopup6Open(false)
   }
-  console.log(sellersPermission) 
-  console.log(isConnectedTrading) 
 
+ 
   return (
     <>
       {!isConnectedTrading ? <PopUp7 /> : null}
 
-      {isConnectedTrading ? <PopUp6 open={popup6Open} onClose={handleClose} /> : null}
+      {isConnectedTrading && <PopUp6 open={popup6Open} onClose={handleClose} /> }
 
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>

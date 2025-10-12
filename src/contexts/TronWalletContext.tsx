@@ -705,10 +705,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     // If we already have an address in state when the app loads
-    if (address || isConnectedTrading) {
-      if (address === null) {
-        return 
-      }
+    if (address ) {
+     
       setIsConnected(true);
       startRefreshInterval(address);
     } else {
@@ -734,7 +732,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
-            // Start refresh interval
+      // Start refresh interval
       startRefreshInterval(addr);
 
       //To get data from any network

@@ -35,6 +35,7 @@ interface SellersPermissionPopUp {
 const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const { resourceData } = useFetchData();
+  console.log(open)
 
   const handleCopy = (text?: string) => {
     if (text) {
@@ -49,30 +50,18 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
     }
   };
 
-  useEffect(() => {
-  // Store the original value
-  const originalOverflow = document.body.style.overflow;
-  
-  // Apply the style when the popup is open
-  if (open) {
-    document.body.style.overflow = 'hidden';
-  }
-  
-  // Cleanup function: Revert to the original style when the popup closes or unmounts
-  return () => {
-    document.body.style.overflow = originalOverflow;
-  };
-}, [open]);
 
   return (
     <>
       <Dialog
         open={open}
+        disableScrollLock={true}
         sx={{
           "& .MuiDialog-container": {
             backdropFilter: "blur(9px)",
             background: "rgba(255, 255, 255, 0.5)",
           },
+          
           "& .MuiPaper-root": {
             padding: "0.5rem 0.5rem",
             borderRadius: "16px !important",
@@ -81,6 +70,7 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
             minHeight: "200px",
             zIndex: "90",
             marginTop: "4rem",
+            overflowY: "auto",
           },
         }}
       >
