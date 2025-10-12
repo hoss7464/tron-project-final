@@ -87,6 +87,7 @@ const Sellers: React.FC = () => {
     sellersPermission,
     isConnectedTrading,
   } = useTronWallet();
+  console.log(sellersPermission)
   const { resourceData } = useFetchData();
  const [popup6Open, setPopup6Open] = useState(!sellersPermission);
   
@@ -133,7 +134,7 @@ const Sellers: React.FC = () => {
        
       {!isConnectedTrading ?  <PopUp7 /> : null}
       
-      {isConnectedTrading ? <PopUp6 open={popup6Open} /> : null}
+      {isConnectedTrading && <PopUp6 open={popup6Open} /> }
       
 
       <SellersContainer>

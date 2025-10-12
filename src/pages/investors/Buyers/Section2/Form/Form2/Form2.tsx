@@ -350,13 +350,13 @@ const Form2: React.FC = () => {
   };
 
   //Function to push clearAddresses into an array :
-  const convertAddressesToArray = (addresses: string): string[][] => {
+  const convertAddressesToArray = (addresses: string): string[] => {
     const cleaned = cleanAddressesForSending(addresses);
 
     if (!cleaned) return [];
 
     // Then, split and wrap each address into its own array
-    return cleaned.split(",").map((addr) => [addr]);
+    return cleaned.split(",").map((addr) => addr);
   };
 
   //Function for input address when the page renders or rerenders :
@@ -1285,6 +1285,7 @@ const Form2: React.FC = () => {
       } else {
         return;
       }
+
       //base url :
       const baseURL = process.env.REACT_APP_BASE_URL;
       //to get axios timeout :

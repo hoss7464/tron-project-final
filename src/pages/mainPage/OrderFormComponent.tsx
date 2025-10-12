@@ -214,7 +214,14 @@ const OrderFormComponent: React.FC = () => {
       return;
     }
     setSwitchBtn(newSwitchBtn);
-    setAmount("");
+    if (newSwitchBtn === "energy") {
+      setAmount("1000000");
+    } else if (newSwitchBtn === "bandwidth") {
+      setAmount("5000");
+    } else {
+      return;
+    }
+
     setDurationValue("");
     setDurationInSec(null);
     setInputValue("");
@@ -1537,15 +1544,15 @@ const OrderFormComponent: React.FC = () => {
           myCurrentTime={currentTime}
           resetForm={() => {
             setAmount("");
-            setDurationValue("");
+            
             setInputValue("");
             setAmountError("");
             setDurationError("");
             setPriceError("");
             setPartialFill(true);
             setBulkOrder(false);
-            setPartialFieldError("")
-            setPartialFill(true)
+            setPartialFieldError("");
+            setPartialFill(true);
           }}
         />
       )}

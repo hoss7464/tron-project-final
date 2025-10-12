@@ -204,7 +204,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           showNotification({
             name: "error10",
             message: "There is something wrong with server.",
-            severity: "success",
+            severity: "error",
           })
         );
         return;
