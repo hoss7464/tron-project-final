@@ -11,6 +11,8 @@ import { useTronWallet } from "../../contexts/TronWalletContext";
 
 export const PopUp7: React.FC = () => {
     const {connectWallet} = useTronWallet()
+
+    
   return (
     <>
       <PopUp>

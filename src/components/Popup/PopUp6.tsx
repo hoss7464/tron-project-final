@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { useFetchData } from "../../contexts/FetchDataContext";
@@ -29,9 +29,10 @@ import {
 
 interface SellersPermissionPopUp {
   open: boolean;
+  onClose: () => void;
 }
 
-const PopUp6: React.FC<SellersPermissionPopUp> = ({ open }) => {
+const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const { resourceData } = useFetchData();
 
@@ -47,6 +48,21 @@ const PopUp6: React.FC<SellersPermissionPopUp> = ({ open }) => {
       );
     }
   };
+
+  useEffect(() => {
+  // Store the original value
+  const originalOverflow = document.body.style.overflow;
+  
+  // Apply the style when the popup is open
+  if (open) {
+    document.body.style.overflow = 'hidden';
+  }
+  
+  // Cleanup function: Revert to the original style when the popup closes or unmounts
+  return () => {
+    document.body.style.overflow = originalOverflow;
+  };
+}, [open]);
 
   return (
     <>

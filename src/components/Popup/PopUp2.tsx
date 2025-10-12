@@ -126,7 +126,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           totalPrice: myTotalPrice,
           options: {
             allow_partial: myPartialFill,
-            partialField: Number(myPartialField),
+            partial_min: Number(myPartialField),
           },
         };
       } else {

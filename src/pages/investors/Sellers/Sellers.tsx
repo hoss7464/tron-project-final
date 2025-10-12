@@ -88,7 +88,7 @@ const Sellers: React.FC = () => {
     isConnectedTrading,
   } = useTronWallet();
   const { resourceData } = useFetchData();
-  const [popup6Open, setPopup6Open] = useState(!sellersPermission);
+  const [popup6Open, setPopup6Open] = useState(false);
 
   //----------------------------------------------------------------------------------------
   //Functions for circular progress bars :
@@ -127,12 +127,18 @@ const Sellers: React.FC = () => {
       setPopup6Open(false);
     }
   }, [isConnectedTrading, sellersPermission, address]);
+  
+  const handleClose = () => {
+    setPopup6Open(false)
+  }
+  console.log(sellersPermission) 
+  console.log(isConnectedTrading) 
 
   return (
     <>
       {!isConnectedTrading ? <PopUp7 /> : null}
 
-      {isConnectedTrading && <PopUp6 open={popup6Open} />}
+      {isConnectedTrading ? <PopUp6 open={popup6Open} onClose={handleClose} /> : null}
 
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>
