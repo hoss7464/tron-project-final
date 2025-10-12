@@ -229,6 +229,7 @@ export const fetchAllUiData = async (
   accessToken: string | null,
   pathname: string,
   isConnectedTrading: boolean,
+  disConnectWallet: () => void,
   onAuthFailure?: () => void
 ) => {
   try {
@@ -341,6 +342,7 @@ export const fetchAllUiData = async (
               apiKey: "",
             },
           };
+          disConnectWallet()
         } else {
           accountInfoResponse = accountInfoRes.data;
         }
@@ -355,6 +357,7 @@ export const fetchAllUiData = async (
               apiKey: "",
             },
           };
+           disConnectWallet()
         } else {
           throw error;
         }
@@ -407,6 +410,7 @@ export const fetchAllUiData = async (
               },
             ],
           };
+           disConnectWallet()
         } else {
           getRefundResponse = refundRes.data;
         }
@@ -418,6 +422,7 @@ export const fetchAllUiData = async (
             message: error.response?.data?.message || "An error occurred",
             data: [],
           };
+           disConnectWallet()
         } else {
           throw error;
         }
@@ -480,6 +485,7 @@ export const fetchAllUiData = async (
               },
             ],
           };
+           disConnectWallet()
         } else {
           getOrderResponse = getOrderRes.data;
         }
@@ -491,6 +497,7 @@ export const fetchAllUiData = async (
             message: error.response?.data?.message || "An error occurred",
             data: [],
           };
+           disConnectWallet()
         } else {
           throw error;
         }

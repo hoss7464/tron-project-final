@@ -758,6 +758,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             severity: "error",
           })
         );
+        disconnectWallet2()
         return;
       }
 
@@ -810,7 +811,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       //To get access token :
       const access_Token = server_data_json.data.access_token;
+      if (access_Token === null) {
+        disconnectWallet2()
+      }
       setAccessToken(access_Token);
+      
 
       //To save refressh_token, access_token, wallet address into a json
       const localStorageSavedData = {
@@ -1338,6 +1343,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
   //-------------------------------------------------------------------------------------
+ 
 
   return (
     <TronWalletContext.Provider

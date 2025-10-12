@@ -35,8 +35,6 @@ interface SellersPermissionPopUp {
 const PopUp6: React.FC<SellersPermissionPopUp> = ({ open, onClose }) => {
   const dispatch = useDispatch();
   const { resourceData } = useFetchData();
-  console.log(open)
-
   const handleCopy = (text?: string) => {
     if (text) {
       navigator.clipboard.writeText(text);
