@@ -193,7 +193,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const clearAccessToken = useCallback(() => {
     setAccessToken(null);
   }, []);
-  console.log(accessToken)
   //-------------------------------------------------------------------------------------
   //Function to get resourceData from fetchDataContext :
   const getResourceData = useCallback((): ResourceResponse | null => {
@@ -434,6 +433,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsConnected(false);
       stopRefreshInterval();
       setIsConnectedTrading(false);
+      setSellersPermission(false)
+      if (address === null) {
+        return 
+      }
+      startRefreshInterval(address)
 
       dispatch(
         showNotification({
@@ -532,11 +536,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           await disconnectWallet2();
           return;
         }
-
+        
+       
         if (address !== nextAddress) {
           setSellersPermission(false);
         }
-
+       
         if (address && address !== nextAddress) {
           // Reset current state
           setAddress(null);
@@ -700,14 +705,17 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     // If we already have an address in state when the app loads
-    if (address) {
+    if (address || isConnectedTrading) {
+      if (address === null) {
+        return 
+      }
       setIsConnected(true);
       startRefreshInterval(address);
     } else {
       setIsConnected(false);
       stopRefreshInterval();
     }
-  }, [address, startRefreshInterval, stopRefreshInterval]);
+  }, [address, startRefreshInterval, stopRefreshInterval, isConnectedTrading]);
 
   //Funtion to connect wallet :
   const connectWallet = async () => {
@@ -725,6 +733,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         return;
       }
+
+            // Start refresh interval
+      startRefreshInterval(addr);
 
       //To get data from any network
       const window_tronweb = (window as any).tronWeb;
@@ -807,15 +818,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const localStorageSavedData = {
         wallet_address: addr,
       };
-      //To save localStorageSavedData in localStorage :
-      setSellersPermission(false);
+      
+      //setSellersPermission(false);
       //wallet address state :
       setAddress(addr);
 
       setIsConnectedTrading(true);
 
-      // Start refresh interval
-      startRefreshInterval(addr);
+
 
       dispatch(
         showNotification({
@@ -888,7 +898,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
-      setSellersPermission(false);
+      //setSellersPermission(false);
       // Update state
       setAddress(addr);
 

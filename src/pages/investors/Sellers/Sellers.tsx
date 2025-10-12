@@ -87,10 +87,9 @@ const Sellers: React.FC = () => {
     sellersPermission,
     isConnectedTrading,
   } = useTronWallet();
-  console.log(sellersPermission)
   const { resourceData } = useFetchData();
- const [popup6Open, setPopup6Open] = useState(!sellersPermission);
-  
+  const [popup6Open, setPopup6Open] = useState(!sellersPermission);
+
   //----------------------------------------------------------------------------------------
   //Functions for circular progress bars :
   const bandwidthPercentage =
@@ -109,8 +108,8 @@ const Sellers: React.FC = () => {
   );
 
   //----------------------------------------------------------------------------------------
-  
-    useEffect(() => {
+
+  useEffect(() => {
     // Disconnected → popup open
     if (!isConnectedTrading) {
       setPopup6Open(true);
@@ -131,11 +130,9 @@ const Sellers: React.FC = () => {
 
   return (
     <>
-       
-      {!isConnectedTrading ?  <PopUp7 /> : null}
-      
-      {isConnectedTrading && <PopUp6 open={popup6Open} /> }
-      
+      {!isConnectedTrading ? <PopUp7 /> : null}
+
+      {isConnectedTrading && <PopUp6 open={popup6Open} />}
 
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>
