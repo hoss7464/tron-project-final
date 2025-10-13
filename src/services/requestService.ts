@@ -125,6 +125,18 @@ export interface ResourceResponse {
       energy: number;
       bandwidth: number;
     };
+    minSellersPrice: {
+      energy: number;
+      bandwidth: number;
+    };
+    profitSellers: {
+      min: number;
+      max: number;
+    };
+    maxSellers: {
+      bandwidth: number;
+      energy: number;
+    };
     ratesByDuration: RateByDuration[];
   };
 }
@@ -163,6 +175,15 @@ export interface AccountInfoResponse {
     buyerCredit: number;
     sellerCredit: number;
     apiKey: string;
+    settings: {
+      duration: number;
+      isActive: boolean;
+      minPriceBandwidth: number;
+      minPriceEnergy: number;
+      minUnitBandwidth: number;
+      minUnitEnergy: number;
+      profit: number;
+    };
   };
 }
 
@@ -340,9 +361,18 @@ export const fetchAllUiData = async (
               buyerCredit: 0,
               sellerCredit: 0,
               apiKey: "",
+              settings: {
+                duration: 0,
+                isActive: false,
+                minPriceBandwidth: 0,
+                minPriceEnergy: 0,
+                minUnitBandwidth: 0,
+                minUnitEnergy: 0,
+                profit: 0,
+              },
             },
           };
-          disConnectWallet()
+          disConnectWallet();
         } else {
           accountInfoResponse = accountInfoRes.data;
         }
@@ -355,9 +385,18 @@ export const fetchAllUiData = async (
               buyerCredit: 0,
               sellerCredit: 0,
               apiKey: "",
+              settings: {
+                duration: 0,
+                isActive: false,
+                minPriceBandwidth: 0,
+                minPriceEnergy: 0,
+                minUnitBandwidth: 0,
+                minUnitEnergy: 0,
+                profit: 0,
+              },
             },
           };
-           disConnectWallet()
+          disConnectWallet();
         } else {
           throw error;
         }
@@ -370,6 +409,15 @@ export const fetchAllUiData = async (
           buyerCredit: 0,
           sellerCredit: 0,
           apiKey: "",
+          settings: {
+            duration: 0,
+            isActive: false,
+            minPriceBandwidth: 0,
+            minPriceEnergy: 0,
+            minUnitBandwidth: 0,
+            minUnitEnergy: 0,
+            profit: 0,
+          },
         },
       };
     }
@@ -410,7 +458,7 @@ export const fetchAllUiData = async (
               },
             ],
           };
-           disConnectWallet()
+          disConnectWallet();
         } else {
           getRefundResponse = refundRes.data;
         }
@@ -422,7 +470,7 @@ export const fetchAllUiData = async (
             message: error.response?.data?.message || "An error occurred",
             data: [],
           };
-           disConnectWallet()
+          disConnectWallet();
         } else {
           throw error;
         }
@@ -485,7 +533,7 @@ export const fetchAllUiData = async (
               },
             ],
           };
-           disConnectWallet()
+          disConnectWallet();
         } else {
           getOrderResponse = getOrderRes.data;
         }
@@ -497,7 +545,7 @@ export const fetchAllUiData = async (
             message: error.response?.data?.message || "An error occurred",
             data: [],
           };
-           disConnectWallet()
+          disConnectWallet();
         } else {
           throw error;
         }
@@ -578,6 +626,18 @@ export const fetchAllUiData = async (
         },
         apy: { energy: 0, bandwidth: 0 },
         minAmount: { energy: 0, bandwidth: 0 },
+        minSellersPrice: {
+          energy: 0,
+          bandwidth: 0,
+        },
+        profitSellers: {
+          min: 0,
+          max: 0,
+        },
+        maxSellers: {
+          bandwidth: 0,
+          energy: 0,
+        },
         ratesByDuration: [],
       },
     };

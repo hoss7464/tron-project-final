@@ -90,6 +90,7 @@ export const SellersBtnWrapper = styled.div`
   border-radius: 10px;
   cursor: pointer;
   background-color: ${ThemeColor.secondary1};
+  
 `;
 
 export const SelersSettingIconWrapper = styled.div`
@@ -97,11 +98,13 @@ export const SelersSettingIconWrapper = styled.div`
   justify-content: center;
   align-items: center;
   margin-right: 0.2rem;
+  cursor: pointer;
 `
 export const SelersSettingIcon = styled(IoMdSettings)`
 color: ${ThemeColor.text2};
 width: 22px;
 height: 22px;
+cursor: pointer;
 `
 
 export const SellersBtnText = styled.p`
@@ -232,3 +235,5 @@ export const SellersNavTextWrapper = styled.div`
   align-items: center;
   width: 10%;
 `;
+
+

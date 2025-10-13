@@ -1493,7 +1493,6 @@ const Form1: React.FC = () => {
             </FormControl>
           </FormAddInputLabelWrapper>
           {/** Setting button */}
-
           <FormSettingWrapper>
             <FormSettingIconWrapper1
               onClick={handleClick}

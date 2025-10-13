@@ -3,6 +3,7 @@ import { ThemeColor } from "../../core-UI/Theme";
 import { IoSettingsSharp } from "react-icons/io5";
 import { FaLock } from "react-icons/fa";
 import { IoCopy } from "react-icons/io5";
+import { IoMdSettings } from "react-icons/io";
 
 
 export const PopUpContainer = styled.div`
@@ -165,6 +166,33 @@ font-weight: 500;
 text-align: center;
 `
 
+export const Popup6Container = styled.div`
+display: flex;
+justify-content: flex-start;
+align-items: center;
+flex-direction: column;
+min-width: 30%;
+background-color: ${ThemeColor.text2};
+padding: 0.8rem;
+border-radius: 15px;
+border: solid 2px #D9E1E3;
+`
+
+export const Popup6HeaderWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+width: 100%;
+`
+export const Popup6ContentWrapper = styled.div`
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+width: 100%;
+`
+
 export const Popup6Icon = styled(FaLock)`
 width: 24px;
 height: 24px;
@@ -210,5 +238,10 @@ font-weight: 600;
 color: ${ThemeColor.text2};
 `
 
+export const Popup11Icon = styled(IoMdSettings)`
+width: 28px;
+height: 28px;
+color: ${ThemeColor.text2};
+`
 
 

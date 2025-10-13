@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import "./Sellers.css";
 import {
   SellersContainer,
@@ -75,7 +75,7 @@ import { useFetchData } from "../../../contexts/FetchDataContext";
 import MyFilterComponent from "../../../components/FilterComponent/MyFilterComponent";
 import PopUp6 from "../../../components/Popup/PopUp6";
 import PopUp7 from "../../../components/Popup/PopUp7";
-
+import PopUp11 from "../../../components/Popup/PopUp11";
 
 const Sellers: React.FC = () => {
   const {
@@ -89,7 +89,7 @@ const Sellers: React.FC = () => {
     isConnectedTrading,
   } = useTronWallet();
   const { resourceData } = useFetchData();
-  const [popup6Open, setPopup6Open] = useState(false);
+  const [settingBtn, setSettingBtn] = useState(false);
 
   //----------------------------------------------------------------------------------------
   //Functions for circular progress bars :
@@ -109,37 +109,21 @@ const Sellers: React.FC = () => {
   );
 
   //----------------------------------------------------------------------------------------
+  //Function for setting button :
+  const handleSettingPopupOpen = () => {
+    setSettingBtn(true);
+  };
 
-  useEffect(() => {
-    // Disconnected → popup open
-    if (!isConnectedTrading) {
-      setPopup6Open(true);
-      return;
-    }
+  const handleSettingPopupClose = useCallback(() => {
+    setSettingBtn(false);
+  }, []);
 
-    // Connected but no seller permission → popup open
-    if (isConnectedTrading && !sellersPermission) {
-      setPopup6Open(true);
-      return;
-    }
-
-    // Connected AND has seller permission → popup closed
-    if (isConnectedTrading && sellersPermission) {
-      setPopup6Open(false);
-    }
-  }, [isConnectedTrading, sellersPermission]);
-  
-  const handleClose = () => {
-    setPopup6Open(false)
-  }
-
- 
   return (
     <>
+      {isConnectedTrading === true && sellersPermission === true ? null : (
+        <PopUp6 />
+      )}
       {!isConnectedTrading ? <PopUp7 /> : null}
-
-      {isConnectedTrading && <PopUp6 open={popup6Open} onClose={handleClose} /> }
-
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>
         <SellersMainWrapper>
@@ -147,7 +131,8 @@ const Sellers: React.FC = () => {
             <SellersMainHeaderWrapper>
               <SellersMainHeader>Dashboard</SellersMainHeader>
             </SellersMainHeaderWrapper>
-            <SellersBtnWrapper>
+
+            <SellersBtnWrapper onClick={handleSettingPopupOpen}>
               <SelersSettingIconWrapper>
                 <SelersSettingIcon />
               </SelersSettingIconWrapper>
@@ -157,6 +142,7 @@ const Sellers: React.FC = () => {
           <SellersTopWrapper>
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
+                {/*energy component */}
                 <LegacyCardWrapper2>
                   <LegacyCardWrapper3 className="card-bg">
                     <LegacyCardIconNameWrapper>
@@ -250,6 +236,7 @@ const Sellers: React.FC = () => {
                 </LegacyCardWrapper2>
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
+                {/*bandwidth component */}
                 <LegacyCardWrapper2>
                   <LegacyCardWrapper3 className="card-bg">
                     <LegacyCardIconNameWrapper>
@@ -342,6 +329,7 @@ const Sellers: React.FC = () => {
           <SellersBottomWrapper>
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
+                {/*delegated count component */}
                 <LegacyCardWrapper2>
                   <LegacyCardWrapper3 className="card-bg">
                     <SellersCardIconHeaderWrapper>
@@ -424,6 +412,7 @@ const Sellers: React.FC = () => {
                 </LegacyCardWrapper2>
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
+                {/* total delegated component */}
                 <LegacyCardWrapper2>
                   <LegacyCardWrapper3 className="card-bg">
                     <SellersCardIconHeaderWrapper>
@@ -506,6 +495,7 @@ const Sellers: React.FC = () => {
                 </LegacyCardWrapper2>
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
+                {/* total earned component */}
                 <LegacyCardWrapper2>
                   <LegacyCardWrapper3 className="card-bg">
                     <SellersCardIconHeaderWrapper>
@@ -589,6 +579,7 @@ const Sellers: React.FC = () => {
               </Grid>
             </Grid>
           </SellersBottomWrapper>
+          {/* history table component */}
           <SellersHistoryWrapper>
             <OrdersWrapper className="history-bg" style={{ width: "100%" }}>
               <OrderMainWrapper>
@@ -648,6 +639,7 @@ const Sellers: React.FC = () => {
           </SellersHistoryWrapper>
         </SellersMainWrapper>
       </SellersContainer>
+      <PopUp11 open={settingBtn} onClose={handleSettingPopupClose} />
     </>
   );
 };

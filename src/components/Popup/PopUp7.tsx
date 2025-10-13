@@ -15,7 +15,7 @@ export const PopUp7: React.FC = () => {
     
   return (
     <>
-      <PopUp>
+      <PopUp >
         <ConnectWrapper onClick={connectWallet}>
           <ConnectIconWrapper>
             <ConnectIcon />
