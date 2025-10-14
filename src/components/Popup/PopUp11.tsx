@@ -15,15 +15,11 @@ import {
   ClickAwayListener,
   Divider,
   Slider,
-  ToggleButton,
-  ToggleButtonGroup,
+
   Checkbox,
   FormControlLabel,
-  Menu,
-  MenuItem,
+
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { Popup2HeaderWrapper, Popup2Header } from "./PopUpElements";
 import {
   Form,
   FormHeaderSwitchWrapper,
@@ -57,15 +53,10 @@ import {
   OrderSubmitBtnWrapper,
   OrderSubmitBtn,
 } from "../../pages/mainPage/mainPageElements";
-import { Popup11Icon } from "./PopUpElements";
 import { AccountInfoResponse } from "../../services/requestService";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
-import {
-  LegacyCardIconWrapper1,
-  LegacyCardIconWrapper2,
-  LegacyCardIconWrapper3,
-} from "../../pages/mainPage/LegacySection/LegacyElements";
+
 import {
   HeroGridCardNumberIconWrapper2,
   HeroGridCardNumberIconWrapper3,
@@ -77,8 +68,6 @@ import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
 import { showNotification } from "../../redux/actions/notifSlice";
-import Autocomplete from "@mui/material/Autocomplete";
-import { useLocation } from "react-router-dom";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 
 interface SettingPopupProps {
@@ -98,45 +87,6 @@ const boxStyle = {
     backgroundColor: "#ddd",
   },
 };
-
-//-------------------------------------------------------------------------------------
-//Custom switch btn 1:
-const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
-  textTransform: "none",
-  fontWeight: "bold",
-  fontSize: "13px",
-  border: "2px solid #430E00",
-  borderRadius: 8,
-  padding: "0px 6px",
-  "&.Mui-selected": {
-    backgroundColor: "#430E00",
-    color: "#ffffff",
-    "&:hover": {
-      backgroundColor: "#430E00",
-    },
-  },
-  "&:not(.Mui-selected)": {
-    color: "#430E00",
-  },
-}));
-
-//-------------------------------------------------------------------------------------
-//Price input components:
-const DropdownIconWithText: React.FC = () => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "4px",
-        marginRight: "0.5rem",
-        fontWeight: "500",
-      }}
-    >
-      <span style={{ fontSize: "14px", color: "#003543" }}>SUN</span>
-    </div>
-  );
-};
 //-------------------------------------------------------------------------------------
 
 const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
@@ -146,18 +96,8 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
   );
-  //Switch button states:
-  const [switchBtn, setSwitchBtn] = useState<string | null>("energy");
-  //Amount input states:
-  const [amount, setAmount] = useState("");
-  const [minAmount, setMinAmount] = useState<{
-    energy: number;
-    bandwidth: number;
-  }>({ energy: 0, bandwidth: 0 });
-  const [maxAmount, setMaxAmount] = useState<{
-    energy: number;
-    bandwidth: number;
-  }>({ energy: 0, bandwidth: 0 });
+  //------------------------------------------------
+  //satate to store account info data :
   const [info, setInfo] = useState<{
     duration: number;
     isActive: boolean;
@@ -175,49 +115,70 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     minUnitEnergy: 0,
     profit: 0,
   });
-  const [amountError, setAmountError] = useState("");
-  //Duration dropdown states :
-  const [durationValue, setDurationValue] = useState("");
-  const [durationInSec, setDurationInSec] = useState<number | null>(2592000);
-  const [myOpen, setMyOpen] = useState(false);
-  const anchorRef = useRef<HTMLInputElement | null>(null); //to get a refrence to the actual dom node
-  const [durationError, setDurationError] = useState("");
-  //price states :
-  const [price, setPrice] = useState("");
-  const [priceError, setPriceError] = useState("");
-  const [priceValue, setPriceValue] = useState<{
+  //------------------------------------------------
+  //States for energy amount :
+  const [energymount, setEnergyAmount] = useState("");
+  const [energyAmountError, setEnergyAmountError] = useState("");
+  //States for bandwidth amount :
+  const [bandwidthmount, setBandwidthAmount] = useState("");
+  const [bandwidthAmountError, setBandwidthAmountError] = useState("");
+  //States for min max amount :
+  const [minAmount, setMinAmount] = useState<{
     energy: number;
     bandwidth: number;
   }>({ energy: 0, bandwidth: 0 });
+  const [maxAmount, setMaxAmount] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
+  //------------------------------------------------
+  //energy min-duration states :
+  const [energyDurationValue, setEnergyDurationValue] = useState("");
+  const [energyDurationInSec, setEnergyDurationInSec] = useState<number | null>(
+    2592000
+  );
+  const [energyOpen, setEnergyOpen] = useState(false);
+  const anchorRef1 = useRef<HTMLInputElement | null>(null);
+  const [energyDurationError, setEnergyDurationError] = useState("");
+  //bandwidth min-duration states :
+  const [bandwidthDurationValue, setBandwidthDurationValue] = useState("");
+  const [bandwidthDurationInSec, setBandwidthDurationInSec] = useState<
+    number | null
+  >(2592000);
+  const [bandwidthOpen, setBandwidthOpen] = useState(false);
+  const anchorRef2 = useRef<HTMLInputElement | null>(null);
+  const [bandwidthDurationError, setBandwidthDurationError] = useState("");
+  //------------------------------------------------
+  // states for energy price :
+  const [energyPrice, setEnergyPrice] = useState("");
+  const [energyPriceError, setEnergyPriceError] = useState("");
+  // states for bandwidth price :
+  const [bandwidthPrice, setBandwidthPrice] = useState("");
+  const [bandwidthPriceError, setBandwidthPriceError] = useState("");
+  //States for min max price :
+  const [minPrice, setMinPrice] = useState<{
+    energy: number;
+    bandwidth: number;
+  }>({ energy: 0, bandwidth: 0 });
+  //------------------------------------------------
   //Profit states :
   const [profit, setProfit] = useState<number>(0);
   const [profitValue, setProfitValue] = useState<number>(0);
+  //------------------------------------------------
   //states for active sell :
   const [activeSell, setActiveSell] = useState<boolean>(false);
   const [activeSellValue, setActiveSellValue] = useState<boolean>(false);
+  //------------------------------------------------
   //State for disabling the button after submitting for 300 ms :
   const [isSubmitting, setIsSubmitting] = useState(false);
+  //------------------------------------------------
   //to get axios timeout :
   const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
-
+  //------------------------------------------------
   const durationWasManuallyChanged = useRef(false);
   const isUserInput = useRef(false);
   const userEditedRef = useRef(false);
   const initialSetRef = useRef(false);
-  //--------------------------------------------------------------------------------------
-  //Switch button handleChange function :
-  const handleChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newSwitchBtn: string | null
-  ) => {
-    // If the same switchBtn is clicked again, do nothing
-    if (newSwitchBtn === switchBtn || newSwitchBtn === null) {
-      return;
-    }
-    setSwitchBtn(newSwitchBtn);
-    setAmountError("");
-    setDurationError("");
-  };
   //----------------------------------------------------------------------------
   //Function to refresh the data when data changes on database:
   useEffect(() => {
@@ -246,7 +207,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     }
 
     if (resourceData?.data?.minSellersPrice) {
-      setPriceValue(resourceData.data.minSellersPrice);
+      setMinPrice(resourceData.data.minSellersPrice);
     }
   }, [resourceData]);
   //Function to get data from accountInfo request :
@@ -272,91 +233,15 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
 
     const percentageProfit = settings.profit * 100;
     setProfitValue(percentageProfit);
-
     if (!initialSetRef.current || profit === 0) {
       setProfit(percentageProfit);
     }
 
-    setActiveSellValue(settings.isActive)
-    if (userEditedRef.current) {
-      setActiveSell(activeSellValue)
+    setActiveSellValue(settings.isActive);
+    if (!userEditedRef.current) {
+      setActiveSell(activeSellValue);
     }
-    
   }, [tradingAccountInfo]);
-  //--------------------------------------------------------------------------------------
-  //Amount input functions :
-  useEffect(() => {
-    isUserInput.current = false;
-  }, [switchBtn]);
-
-  useEffect(() => {
-    // Only update from server if user hasn't started typing
-    if (!isUserInput.current) {
-      if (switchBtn === "energy") {
-        setAmount(info.minUnitEnergy.toString());
-      } else {
-        setAmount(info.minUnitBandwidth.toString());
-      }
-    }
-  }, [switchBtn, info]);
-  //Function for amount validation :
-  const validateAmount = (
-    rawValue: string,
-    switchBtn: string | null,
-    minAmount: { energy: number; bandwidth: number },
-    maxAmount: { energy: number; bandwidth: number }
-  ) => {
-    const numericValue = Number(rawValue.replace(/,/g, ""));
-
-    if (rawValue.trim() === "") {
-      return "required";
-    } else if (isNaN(numericValue)) {
-      return "required";
-    }
-
-    if (switchBtn === "energy") {
-      if (numericValue < minAmount.energy) {
-        return `Less than ${minAmount.energy}`;
-      } else if (numericValue > maxAmount.energy) {
-        return `More than ${maxAmount.energy}`;
-      }
-    } else if (switchBtn === "bandwidth") {
-      if (numericValue < minAmount.bandwidth) {
-        return `Less than ${minAmount.bandwidth}`;
-      } else if (numericValue > maxAmount.bandwidth) {
-        return `More than ${maxAmount.bandwidth}`;
-      }
-    } else {
-    }
-
-    return "";
-  };
-  const amountHandleChange = (
-    value: string | React.ChangeEvent<HTMLInputElement>
-  ) => {
-    let rawValue = typeof value === "string" ? value : value.target.value;
-
-    // Mark as user input
-    isUserInput.current = true;
-
-    //Allow commas for display but store as numeric
-    const numericValue = Number(rawValue.replace(/,/g, ""));
-
-    // You may also validate here if needed
-    if (!isNaN(numericValue)) {
-      setAmount(numericValue.toString()); // just display it as a string
-    }
-
-    // Validate input
-    const errorMessage = validateAmount(
-      rawValue,
-      switchBtn,
-      minAmount,
-      maxAmount
-    );
-    setAmountError(errorMessage);
-  };
-
   //----------------------------------------------------------------------------
   //Functions for duration :
   //To create an array of 30 days
@@ -414,23 +299,38 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   };
   //funtion to post duration data towards the server :
 
-  //handleOption function on click :
-  const handleOptionClick = (value: string) => {
+  //Function for click on energy min-duration:
+  const handleOptionClick1 = (value: string) => {
     const durationInSeconds = getDurationInSeconds(value);
 
-    setDurationValue(value);
-    setDurationInSec(durationInSeconds);
+    setEnergyDurationValue(value);
+    setEnergyDurationInSec(durationInSeconds);
 
-    setMyOpen(false);
-    anchorRef.current?.blur();
+    setEnergyOpen(false);
+    anchorRef1.current?.blur();
 
     const errorMessage = validateDuration(value);
-    setDurationError(errorMessage);
+    setEnergyDurationError(errorMessage);
 
     durationWasManuallyChanged.current = true;
   };
-  //----------------------------------------------------------------------------
-  //Functions for price :
+
+  //Function for click on energy min-duration:
+  const handleOptionClick2 = (value: string) => {
+    const durationInSeconds = getDurationInSeconds(value);
+
+    setBandwidthDurationValue(value);
+    setBandwidthDurationInSec(durationInSeconds);
+
+    setBandwidthOpen(false);
+    anchorRef2.current?.blur();
+
+    const errorMessage = validateDuration(value);
+    setBandwidthDurationError(errorMessage);
+
+    durationWasManuallyChanged.current = true;
+  };
+
   useEffect(() => {
     isUserInput.current = false;
 
@@ -438,26 +338,30 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const durationInSeconds = getDurationInSeconds(defaultDuration);
 
     // Set duration immediately
-    setDurationValue(defaultDuration);
-    setDurationInSec(durationInSeconds);
-  }, [switchBtn]);
+    setEnergyDurationValue(defaultDuration);
+    setEnergyDurationInSec(durationInSeconds);
 
+    setBandwidthDurationValue(defaultDuration);
+    setBandwidthDurationInSec(durationInSeconds);
+  }, []);
+
+  //--------------------------------------------------------------------------------------
+  //useEffect for showing data in initial rendering :
   useEffect(() => {
     // Only update from server if user hasn't started typing
     if (!isUserInput.current) {
-      if (switchBtn === "energy") {
-        setPrice(priceValue.energy.toString());
-      } else {
-        setPrice(priceValue.bandwidth.toString());
-      }
+      setEnergyAmount(info.minUnitEnergy.toString());
+      setBandwidthAmount(info.minUnitBandwidth.toString());
+      setEnergyPrice(info.minPriceEnergy.toString());
+      setBandwidthPrice(info.minPriceBandwidth.toString());
     }
-  }, [switchBtn, priceValue]);
-
-  const maxPriceValue = Number(process.env.REACT_APP_SELLERS_SETTING_MAX_PRICE);
-  const priceValidation = (
+  }, [info]);
+  //--------------------------------------------------------------------------------------
+  //Function for energy amount validation :
+  const validateEnergyAmount = (
     rawValue: string,
-    switchBtn: string | null,
-    minAmount: { energy: number; bandwidth: number }
+    minAmount: { energy: number; bandwidth: number },
+    maxAmount: { energy: number; bandwidth: number }
   ) => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
@@ -467,26 +371,15 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       return "required";
     }
 
-    console.log(maxPriceValue);
-    if (switchBtn === "energy") {
-      if (numericValue < priceValue.energy) {
-        return `< ${priceValue.energy}`;
-      } else if (numericValue > maxPriceValue) {
-        return `> ${maxPriceValue}`;
-      } else {
-      }
-    } else {
-      if (numericValue < priceValue.bandwidth) {
-        return `< ${priceValue.bandwidth}`;
-      } else if (numericValue > maxPriceValue) {
-        return `> ${maxPriceValue}`;
-      } else {
-      }
+    if (numericValue < minAmount.energy) {
+      return `> ${minAmount.energy}`;
+    } else if (numericValue > maxAmount.energy) {
+      return `< ${maxAmount.energy}`;
     }
-
     return "";
   };
-  const handlePriceChange = (
+  //Function for energy change :
+  const amountHandleChange1 = (
     value: string | React.ChangeEvent<HTMLInputElement>
   ) => {
     let rawValue = typeof value === "string" ? value : value.target.value;
@@ -499,19 +392,145 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
 
     // You may also validate here if needed
     if (!isNaN(numericValue)) {
-      setPrice(rawValue); // just display it as a string
+      setEnergyAmount(numericValue.toString()); // just display it as a string
     }
 
     // Validate input
-    const errorMessage = priceValidation(rawValue, switchBtn, priceValue);
-    setPriceError(errorMessage);
+    const errorMessage = validateEnergyAmount(rawValue, minAmount, maxAmount);
+    setEnergyAmountError(errorMessage);
+  };
+  //Function for bandwidth amount validation :
+  const validateBandwidthAmount = (
+    rawValue: string,
+    minAmount: { energy: number; bandwidth: number },
+    maxAmount: { energy: number; bandwidth: number }
+  ) => {
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+
+    if (rawValue.trim() === "") {
+      return "required";
+    } else if (isNaN(numericValue)) {
+      return "required";
+    }
+
+    if (numericValue < minAmount.bandwidth) {
+      return `> ${minAmount.bandwidth}`;
+    } else if (numericValue > maxAmount.bandwidth) {
+      return `< ${maxAmount.bandwidth}`;
+    }
+    return "";
+  };
+  //Function for bandwidth change :
+  const amountHandleChange2 = (
+    value: string | React.ChangeEvent<HTMLInputElement>
+  ) => {
+    let rawValue = typeof value === "string" ? value : value.target.value;
+
+    // Mark as user input
+    isUserInput.current = true;
+
+    //Allow commas for display but store as numeric
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+
+    // You may also validate here if needed
+    if (!isNaN(numericValue)) {
+      setBandwidthAmount(numericValue.toString()); // just display it as a string
+    }
+
+    // Validate input
+    const errorMessage = validateBandwidthAmount(
+      rawValue,
+      minAmount,
+      maxAmount
+    );
+    setBandwidthAmountError(errorMessage);
   };
   //----------------------------------------------------------------------------
-  //Function for profit component:
-  useEffect(() => {
-    initialSetRef.current = false;
-  }, [switchBtn]);
-  // Slider change handler
+  //Function for energy price validation :
+  const maxPriceValue = Number(process.env.REACT_APP_SELLERS_SETTING_MAX_PRICE);
+  const validateEnergyPrice = (
+    rawValue: string,
+    minAmount: { energy: number; bandwidth: number }
+  ) => {
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+
+    if (rawValue.trim() === "") {
+      return "required";
+    } else if (isNaN(numericValue)) {
+      return "required";
+    }
+
+    if (numericValue < minPrice.energy) {
+      return `> ${minPrice.energy}`;
+    } else if (numericValue > maxPriceValue) {
+      return `< ${maxPriceValue}`;
+    }
+    return "";
+  };
+  //Function for energy change :
+  const priceHandleChange1 = (
+    value: string | React.ChangeEvent<HTMLInputElement>
+  ) => {
+    let rawValue = typeof value === "string" ? value : value.target.value;
+
+    // Mark as user input
+    isUserInput.current = true;
+
+    //Allow commas for display but store as numeric
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+
+    // You may also validate here if needed
+    if (!isNaN(numericValue)) {
+      setEnergyPrice(numericValue.toString()); // just display it as a string
+    }
+
+    // Validate input
+    const errorMessage = validateEnergyPrice(rawValue, minPrice);
+    setEnergyPriceError(errorMessage);
+  };
+  //Function for bandwidth price validation :
+  const validateBandwidthPrice = (
+    rawValue: string,
+    minAmount: { energy: number; bandwidth: number }
+  ) => {
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+
+    if (rawValue.trim() === "") {
+      return "required";
+    } else if (isNaN(numericValue)) {
+      return "required";
+    }
+
+    if (numericValue < minPrice.bandwidth) {
+      return `> ${minPrice.bandwidth}`;
+    } else if (numericValue > maxPriceValue) {
+      return `< ${maxPriceValue}`;
+    }
+    return "";
+  };
+  //Function for bandwidth change :
+  const priceHandleChange2 = (
+    value: string | React.ChangeEvent<HTMLInputElement>
+  ) => {
+    let rawValue = typeof value === "string" ? value : value.target.value;
+
+    // Mark as user input
+    isUserInput.current = true;
+
+    //Allow commas for display but store as numeric
+    const numericValue = Number(rawValue.replace(/,/g, ""));
+
+    // You may also validate here if needed
+    if (!isNaN(numericValue)) {
+      setBandwidthPrice(numericValue.toString()); // just display it as a string
+    }
+
+    // Validate input
+    const errorMessage = validateBandwidthPrice(rawValue, minPrice);
+    setBandwidthPriceError(errorMessage);
+  };
+  //----------------------------------------------------------------------------
+  //Function for profit :
   const handleProfitChange = (_event: Event, newValue: number) => {
     const value = newValue;
 
@@ -528,39 +547,45 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   const handleActiveSellChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    initialSetRef.current = true;
+    userEditedRef.current = true;
     let activeValue = event.target.checked;
     setActiveSell(activeValue);
   };
   //----------------------------------------------------------------------------
-
   //Function to close the popup :
   const handleCloseSetting = () => {
-    onClose();
-    setSwitchBtn("energy");
-    if (switchBtn === "energy") {
-      setAmount(info.minUnitEnergy.toString());
-      setPrice(priceValue.energy.toString());
-    } else {
-      setAmount(info.minUnitBandwidth.toString());
-      setPrice(priceValue.bandwidth.toString());
+    setEnergyDurationValue("30 days")
+    setEnergyDurationInSec(2592000)
+    setEnergyDurationError("")
+    setBandwidthDurationValue("30 days")
+    setBandwidthDurationInSec(2592000)
+    setBandwidthDurationError("")
+    setEnergyAmount(info.minUnitEnergy.toString())
+    setEnergyAmountError("")
+    setBandwidthAmount(info.minUnitBandwidth.toString())
+    setBandwidthAmountError("")
+    setEnergyPrice(info.minPriceEnergy.toString());
+    setEnergyPriceError("")
+    setBandwidthPrice(info.minPriceBandwidth.toString());
+    setBandwidthPriceError("")
+    if (tradingAccountInfo?.data.settings.profit === undefined) {
+      return 
     }
-
-    isUserInput.current = false;
-
-    const defaultDuration = "30 days";
-    const durationInSeconds = getDurationInSeconds(defaultDuration);
-
-    // Set duration immediately
-    setDurationValue(defaultDuration);
-    setDurationInSec(durationInSeconds);
-    setProfit(0);
-    setActiveSell(info.isActive)
+    setProfit(tradingAccountInfo?.data.settings.profit * 100)
+    setActiveSell(tradingAccountInfo?.data.settings.isActive)
+    onClose();
   };
   //----------------------------------------------------------------------------
   //Function for submit data :
   const handleSettingSubmit = async () => {
-    if (amountError || durationError || priceError) {
+    if (
+      energyDurationError ||
+      bandwidthDurationError ||
+      energyAmountError ||
+      bandwidthAmountError || 
+      energyPriceError || 
+      bandwidthPriceError
+    ) {
       return;
     }
 
@@ -571,14 +596,16 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const baseURL = process.env.REACT_APP_BASE_URL;
 
     const settingPayload = {
-      resourceType: switchBtn,
-      requester: address,
-      resourceAmount: Number(amount),
-      durationSec: Number(durationInSec),
-      price: Number(price),
-      isActive: activeSell,
+      energyDuration: energyDurationInSec,
+      bandwidthDuration: bandwidthDurationInSec,
+      energyAmount: Number(energymount),
+      bandwidthAmount: Number(bandwidthmount),
+      energyPrice: Number(energyPrice),
+      bandwidthPrice: Number(bandwidthPrice),
+      profit: profit,
+      isActive: activeSell
     };
-    console.log(settingPayload)
+    console.log(settingPayload);
 
     try {
       const settingResponse = await axios.post<AccountInfoResponse>(
@@ -656,334 +683,508 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
             border: "solid 2px #D9E1E3",
             minWidth: "30%",
             zIndex: 2000,
+            marginTop: "5rem"
           },
         }}
       >
-        {/** Form header and switch btn component */}
-        <FormHeaderSwitchWrapper>
-          <FormHeaderIconWrapper>
-            <FormIconWrapper>
-              {switchBtn === "energy" ? (
-                <HeroGridCardNumberIconWrapper2
-                  style={{ border: "solid 1px #003543" }}
-                >
-                  <HeroGridCardNumberIconWrapper3
-                    style={{ backgroundColor: "#003543" }}
+        <DialogContent sx={{ p: 1 }}>
+          <Box>
+            {/** energy header */}
+            <FormHeaderSwitchWrapper>
+              <FormHeaderIconWrapper>
+                <FormIconWrapper>
+                  <HeroGridCardNumberIconWrapper2
+                    style={{ border: "solid 1px #003543" }}
                   >
-                    <HeroGridCardNumberIcon
-                      alt="energy icon"
-                      src={energyIcon}
-                      style={{ width: "18px", height: "18px" }}
-                    />
-                  </HeroGridCardNumberIconWrapper3>
-                </HeroGridCardNumberIconWrapper2>
-              ) : (
-                <HeroGridCardNumberIconWrapper2
-                  style={{ border: "solid 1px #430E00" }}
-                >
-                  <HeroGridCardNumberIconWrapper3
-                    style={{ backgroundColor: "#430E00" }}
-                  >
-                    <HeroGridCardNumberIcon
-                      alt="bandwidth icon"
-                      src={bandwidthIcon}
-                      style={{ width: "18px", height: "18px" }}
-                    />
-                  </HeroGridCardNumberIconWrapper3>
-                </HeroGridCardNumberIconWrapper2>
-              )}
-            </FormIconWrapper>
-            <FormHeaderWrapper>
-              {switchBtn === "energy" ? (
-                <HeroGridCardHeader style={{ color: "#003543" }}>
-                  Energy
-                </HeroGridCardHeader>
-              ) : (
-                <HeroGridCardHeader style={{ color: "#003543" }}>
-                  Bandwidth
-                </HeroGridCardHeader>
-              )}
-            </FormHeaderWrapper>
-          </FormHeaderIconWrapper>
-          <FormSwitchWrapper>
-            <ToggleButtonGroup
-              value={switchBtn}
-              exclusive
-              onChange={handleChange}
-            >
-              <CustomToggleButton value="energy">Energy</CustomToggleButton>
-              <CustomToggleButton value="bandwidth">
-                Bandwidth
-              </CustomToggleButton>
-            </ToggleButtonGroup>
-          </FormSwitchWrapper>
-        </FormHeaderSwitchWrapper>
-        <DialogContent>
-          {/*min-amount component */}
-          <FormAddInputLabelWrapper>
-            <FormAddLabelWrapper>
-              <FormAddLabel>Min-Amount</FormAddLabel>
-              {amountError && (
-                <FormErrorWrapper>
-                  <FormError>{amountError}</FormError>
-                </FormErrorWrapper>
-              )}
-            </FormAddLabelWrapper>
-            <FormAddInputWrapper>
-              <FormAddInputIconWrapper>
-                {switchBtn === "energy" ? (
-                  <HeroGridCardNumberIconWrapper3
-                    style={{ backgroundColor: "#003543" }}
-                  >
-                    <HeroGridCardNumberIcon
-                      alt="energy icon"
-                      src={energyIcon}
-                      style={{ width: "18px", height: "18px" }}
-                    />
-                  </HeroGridCardNumberIconWrapper3>
-                ) : (
-                  <HeroGridCardNumberIconWrapper3
-                    style={{ backgroundColor: "#430E00" }}
-                  >
-                    <HeroGridCardNumberIcon
-                      alt="bandwidth icon"
-                      src={bandwidthIcon}
-                      style={{ width: "18px", height: "18px" }}
-                    />
-                  </HeroGridCardNumberIconWrapper3>
-                )}
-                <FormAddInputWrapper2>
-                  <FormAddInput
-                    style={{ fontSize: "16px", marginLeft: "0.5rem" }}
-                    value={Number(amount).toLocaleString()}
-                    onChange={amountHandleChange}
-                    placeholder={`Amount of ${
-                      switchBtn === "energy"
-                        ? `energy (${minAmount.energy} - 100,000,000)`
-                        : `bandwidth (${minAmount.bandwidth} - ...)`
-                    }`}
-                  />
-                </FormAddInputWrapper2>
-              </FormAddInputIconWrapper>
-            </FormAddInputWrapper>
-          </FormAddInputLabelWrapper>
-          {/*min-duration component */}
-          <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
-            <FormAddLabelWrapper>
-              <FormAddLabel>Min-Duration</FormAddLabel>
-              {durationError && (
-                <FormErrorWrapper>
-                  <FormError>{durationError}</FormError>
-                </FormErrorWrapper>
-              )}
-            </FormAddLabelWrapper>
-            <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
-              <ClickAwayListener onClickAway={() => setMyOpen(false)}>
-                <Box>
-                  <TextField
-                    placeholder="Duration"
-                    value={durationValue}
-                    onChange={(e) => setDurationValue(e.target.value)}
-                    onFocus={() => setMyOpen(true)}
-                    inputRef={anchorRef}
-                    onBlur={() =>
-                      setDurationError(validateDuration(durationValue))
-                    }
-                    fullWidth
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        height: "40px",
-                        border: "2px solid #D9E1E3",
-                        backgroundColor: "#ffffff",
-                        color: "#003543",
-                        borderRadius: "10px",
-
-                        "&.Mui-focused fieldset": {
-                          borderColor: "transparent",
-                        },
-                        "& fieldset": {
-                          border: "none",
-                        },
-                      },
-                      "& input::placeholder": {
-                        fontSize: "14px",
-                      },
-                    }}
-                  />
-                  <Popper
-                    open={myOpen}
-                    anchorEl={anchorRef.current}
-                    placement="bottom-start"
-                    style={{ zIndex: 1300 }}
-                  >
-                    <Box
-                      sx={{
-                        bgcolor: "background.paper",
-                        border: "1px solid #ccc",
-
-                        p: 2,
-                        mt: 0.5,
-                        width: 300,
-                        boxShadow: 4,
-                        borderRadius: 2,
-                      }}
+                    <HeroGridCardNumberIconWrapper3
+                      style={{ backgroundColor: "#003543" }}
                     >
-                      <Typography fontWeight="bold">Minutes</Typography>
-                      <Grid container spacing={1} mb={2}>
-                        {minutes.map((min) => (
-                          <Grid key={min}>
-                            <Box
-                              sx={boxStyle}
-                              onClick={(e) => {
-                                e.stopPropagation(); // prevent triggering events on other components
-                                handleOptionClick(`${min} minutes`);
-                              }}
-                            >
-                              {min}
-                            </Box>
+                      <HeroGridCardNumberIcon
+                        alt="energy icon"
+                        src={energyIcon}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                    </HeroGridCardNumberIconWrapper3>
+                  </HeroGridCardNumberIconWrapper2>
+                </FormIconWrapper>
+                <FormHeaderWrapper>
+                  <HeroGridCardHeader style={{ color: "#003543" }}>
+                    Energy
+                  </HeroGridCardHeader>
+                </FormHeaderWrapper>
+              </FormHeaderIconWrapper>
+            </FormHeaderSwitchWrapper>
+            <Box>
+              {/** energy min-duration */}
+              <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
+                <FormAddLabelWrapper>
+                  <FormAddLabel>Min-Duration</FormAddLabel>
+                  {energyDurationError && (
+                    <FormErrorWrapper>
+                      <FormError>{energyDurationError}</FormError>
+                    </FormErrorWrapper>
+                  )}
+                </FormAddLabelWrapper>
+                <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
+                  <ClickAwayListener onClickAway={() => setEnergyOpen(false)}>
+                    <Box>
+                      <TextField
+                        placeholder="Duration"
+                        value={energyDurationValue}
+                        onChange={(e) => setEnergyDurationValue(e.target.value)}
+                        onFocus={() => setEnergyOpen(true)}
+                        inputRef={anchorRef1}
+                        onBlur={() =>
+                          setEnergyDurationError(
+                            validateDuration(energyDurationValue)
+                          )
+                        }
+                        fullWidth
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            height: "33px",
+                            border: "2px solid #D9E1E3",
+                            backgroundColor: "#ffffff",
+                            color: "#003543",
+                            borderRadius: "8px",
+
+                            "&.Mui-focused fieldset": {
+                              borderColor: "transparent",
+                            },
+                            "& fieldset": {
+                              border: "none",
+                            },
+                          },
+                          "& input::placeholder": {
+                            fontSize: "14px",
+                          },
+                        }}
+                      />
+                      <Popper
+                        open={energyOpen}
+                        anchorEl={anchorRef1.current}
+                        placement="bottom-start"
+                        style={{ zIndex: 1300 }}
+                      >
+                        <Box
+                          sx={{
+                            bgcolor: "background.paper",
+                            border: "1px solid #ccc",
+
+                            p: 2,
+                            mt: 0.5,
+                            width: 300,
+                            boxShadow: 4,
+                            borderRadius: 2,
+                          }}
+                        >
+                          <Typography fontWeight="bold">Minutes</Typography>
+                          <Grid container spacing={1} mb={2}>
+                            {minutes.map((min) => (
+                              <Grid key={min}>
+                                <Box
+                                  sx={boxStyle}
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // prevent triggering events on other components
+                                    handleOptionClick1(`${min} minutes`);
+                                  }}
+                                >
+                                  {min}
+                                </Box>
+                              </Grid>
+                            ))}
                           </Grid>
-                        ))}
-                      </Grid>
-                      <Typography fontWeight="bold">Hours</Typography>
-                      <Grid container spacing={1} mb={2}>
-                        {hours.map((hr) => (
-                          <Grid key={hr}>
-                            <Box
-                              sx={boxStyle}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOptionClick(
-                                  `${hr} ${hr === 1 ? "hour" : "hours"}`
-                                );
-                              }}
-                            >
-                              {hr}
-                            </Box>
+                          <Typography fontWeight="bold">Hours</Typography>
+                          <Grid container spacing={1} mb={2}>
+                            {hours.map((hr) => (
+                              <Grid key={hr}>
+                                <Box
+                                  sx={boxStyle}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOptionClick1(
+                                      `${hr} ${hr === 1 ? "hour" : "hours"}`
+                                    );
+                                  }}
+                                >
+                                  {hr}
+                                </Box>
+                              </Grid>
+                            ))}
                           </Grid>
-                        ))}
-                      </Grid>
-                      <Typography fontWeight="bold">Days</Typography>
-                      <Grid container spacing={1}>
-                        {days.map((day) => (
-                          <Grid size={2} key={day}>
-                            <Box
-                              sx={boxStyle}
-                              onMouseDown={(e) => {
-                                e.preventDefault(); // Prevent focus shift
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOptionClick(
-                                  `${day} ${day === 1 ? "day" : "days"}`
-                                );
-                              }}
-                            >
-                              {day}
-                            </Box>
+                          <Typography fontWeight="bold">Days</Typography>
+                          <Grid container spacing={1}>
+                            {days.map((day) => (
+                              <Grid size={2} key={day}>
+                                <Box
+                                  sx={boxStyle}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault(); // Prevent focus shift
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOptionClick1(
+                                      `${day} ${day === 1 ? "day" : "days"}`
+                                    );
+                                  }}
+                                >
+                                  {day}
+                                </Box>
+                              </Grid>
+                            ))}
                           </Grid>
-                        ))}
-                      </Grid>
+                        </Box>
+                      </Popper>
                     </Box>
-                  </Popper>
-                </Box>
-              </ClickAwayListener>
-            </FormControl>
-          </FormAddInputLabelWrapper>
-          {/*min-price component */}
-          <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
-            <FormAddLabelWrapper>
-              <FormAddLabel>Min-Price</FormAddLabel>
-              {priceError && (
-                <FormErrorWrapper>
-                  <FormError>{priceError}</FormError>
-                </FormErrorWrapper>
-              )}
-            </FormAddLabelWrapper>
-            <FormAddInputWrapper>
-              <FormAddInputIconWrapper>
-                <FormAddInputWrapper2 style={{ height: "27px" }}>
-                  <FormAddInput
-                    value={price}
-                    onChange={handlePriceChange}
-                    style={{ fontSize: "16px", marginLeft: "0.5rem" }}
-                  />
-                </FormAddInputWrapper2>
-              </FormAddInputIconWrapper>
-            </FormAddInputWrapper>
-          </FormAddInputLabelWrapper>
-          {/*profit component */}
-          <FormAddInputLabelWrapper
-            style={{ marginBottom: "0", marginTop: "0.6rem" }}
-          >
-            <FormAddLabelWrapper
-              style={{ width: "100%", justifyContent: "space-between" }}
-            >
-              <FormAddLabel>Profit</FormAddLabel>
-              <FormAddLabel>{profit} %</FormAddLabel>
-            </FormAddLabelWrapper>
-            <Slider
-              size="small"
-              value={profit}
-              onChange={handleProfitChange}
-              aria-label="Small"
-              valueLabelDisplay="auto"
-              min={0}
-              max={100}
-              sx={{
-                "& .MuiSlider-valueLabel": {
-                  backgroundColor: "#430E00",
-                },
+                  </ClickAwayListener>
+                </FormControl>
+              </FormAddInputLabelWrapper>
 
-                "& .MuiSlider-track": {
-                  backgroundColor: "#003543",
-                },
+              <Grid container spacing={1}>
+                {/** energy min-amount */}
+                <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
+                  <FormAddInputLabelWrapper>
+                    <FormAddLabelWrapper>
+                      <FormAddLabel>Min-Amount</FormAddLabel>
+                      {energyAmountError && (
+                        <FormErrorWrapper>
+                          <FormError>{energyAmountError}</FormError>
+                        </FormErrorWrapper>
+                      )}
+                    </FormAddLabelWrapper>
+                    <FormAddInputWrapper style={{ borderRadius: "8px" }}>
+                      <FormAddInputIconWrapper>
+                        <FormAddInputWrapper2 style={{ height: "20px" }}>
+                          <FormAddInput
+                            style={{ fontSize: "16px", marginLeft: "0.5rem" }}
+                            value={Number(energymount).toLocaleString()}
+                            onChange={amountHandleChange1}
+                          />
+                        </FormAddInputWrapper2>
+                      </FormAddInputIconWrapper>
+                    </FormAddInputWrapper>
+                  </FormAddInputLabelWrapper>
+                </Grid>
+                {/** energy min-price */}
+                <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
+                  <FormAddInputLabelWrapper>
+                    <FormAddLabelWrapper>
+                      <FormAddLabel>Min-Price</FormAddLabel>
+                      {energyPriceError && (
+                        <FormErrorWrapper>
+                          <FormError>{energyPriceError}</FormError>
+                        </FormErrorWrapper>
+                      )}
+                    </FormAddLabelWrapper>
+                    <FormAddInputWrapper style={{ borderRadius: "8px" }}>
+                      <FormAddInputIconWrapper>
+                        <FormAddInputWrapper2 style={{ height: "20px" }}>
+                          <FormAddInput
+                            style={{ fontSize: "16px", marginLeft: "0.5rem" }}
+                            value={Number(energyPrice).toLocaleString()}
+                            onChange={priceHandleChange1}
+                          />
+                        </FormAddInputWrapper2>
+                      </FormAddInputIconWrapper>
+                    </FormAddInputWrapper>
+                  </FormAddInputLabelWrapper>
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
 
-                "& .MuiSlider-rail": {
-                  backgroundColor: "#003543",
-                },
+          <Box>
+            {/**bandwith energy header */}
+            <FormHeaderSwitchWrapper>
+              <FormHeaderIconWrapper>
+                <FormIconWrapper>
+                  <HeroGridCardNumberIconWrapper2
+                    style={{ border: "solid 1px #430E00" }}
+                  >
+                    <HeroGridCardNumberIconWrapper3
+                      style={{ backgroundColor: "#430E00" }}
+                    >
+                      <HeroGridCardNumberIcon
+                        alt="bandwidth icon"
+                        src={bandwidthIcon}
+                        style={{ width: "18px", height: "18px" }}
+                      />
+                    </HeroGridCardNumberIconWrapper3>
+                  </HeroGridCardNumberIconWrapper2>
+                </FormIconWrapper>
+                <FormHeaderWrapper>
+                  <HeroGridCardHeader style={{ color: "#430E00" }}>
+                    Bandwidth
+                  </HeroGridCardHeader>
+                </FormHeaderWrapper>
+              </FormHeaderIconWrapper>
+            </FormHeaderSwitchWrapper>
+            <Box>
+              {/** bandwidth min-duration */}
+              <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
+                <FormAddLabelWrapper>
+                  <FormAddLabel>Min-Duration</FormAddLabel>
+                  {bandwidthDurationError && (
+                    <FormErrorWrapper>
+                      <FormError>{bandwidthDurationError}</FormError>
+                    </FormErrorWrapper>
+                  )}
+                </FormAddLabelWrapper>
+                <FormControl fullWidth style={{ marginBottom: "0.5rem" }}>
+                  <ClickAwayListener
+                    onClickAway={() => setBandwidthOpen(false)}
+                  >
+                    <Box>
+                      <TextField
+                        placeholder="Duration"
+                        value={bandwidthDurationValue}
+                        onChange={(e) =>
+                          setBandwidthDurationValue(e.target.value)
+                        }
+                        onFocus={() => setBandwidthOpen(true)}
+                        inputRef={anchorRef2}
+                        onBlur={() =>
+                          setBandwidthDurationError(
+                            validateDuration(bandwidthDurationValue)
+                          )
+                        }
+                        fullWidth
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            height: "33px",
+                            border: "2px solid #D9E1E3",
+                            backgroundColor: "#ffffff",
+                            color: "#003543",
+                            borderRadius: "8px",
 
-                "& .MuiSlider-thumb": {
-                  backgroundColor: "#430E00",
+                            "&.Mui-focused fieldset": {
+                              borderColor: "transparent",
+                            },
+                            "& fieldset": {
+                              border: "none",
+                            },
+                          },
+                          "& input::placeholder": {
+                            fontSize: "14px",
+                          },
+                        }}
+                      />
+                      <Popper
+                        open={bandwidthOpen}
+                        anchorEl={anchorRef2.current}
+                        placement="bottom-start"
+                        style={{ zIndex: 1300 }}
+                      >
+                        <Box
+                          sx={{
+                            bgcolor: "background.paper",
+                            border: "1px solid #ccc",
 
-                  width: 16,
-                  height: 16,
-                  "&:hover, &.Mui-focusVisible, &.Mui-active": {
-                    boxShadow: "none",
-                  },
-                },
-              }}
-            />
-          </FormAddInputLabelWrapper>
-          {/*active sell component */}
-          <FormAddInputLabelWrapper>
-            <FormAddLabelWrapper style={{ marginTop: "0" }}>
-              <FormAddLabel>Active-Sell</FormAddLabel>
-            </FormAddLabelWrapper>
+                            p: 2,
+                            mt: 0.5,
+                            width: 300,
+                            boxShadow: 4,
+                            borderRadius: 2,
+                          }}
+                        >
+                          <Typography fontWeight="bold">Minutes</Typography>
+                          <Grid container spacing={1} mb={2}>
+                            {minutes.map((min) => (
+                              <Grid key={min}>
+                                <Box
+                                  sx={boxStyle}
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // prevent triggering events on other components
+                                    handleOptionClick2(`${min} minutes`);
+                                  }}
+                                >
+                                  {min}
+                                </Box>
+                              </Grid>
+                            ))}
+                          </Grid>
+                          <Typography fontWeight="bold">Hours</Typography>
+                          <Grid container spacing={1} mb={2}>
+                            {hours.map((hr) => (
+                              <Grid key={hr}>
+                                <Box
+                                  sx={boxStyle}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOptionClick2(
+                                      `${hr} ${hr === 1 ? "hour" : "hours"}`
+                                    );
+                                  }}
+                                >
+                                  {hr}
+                                </Box>
+                              </Grid>
+                            ))}
+                          </Grid>
+                          <Typography fontWeight="bold">Days</Typography>
+                          <Grid container spacing={1}>
+                            {days.map((day) => (
+                              <Grid size={2} key={day}>
+                                <Box
+                                  sx={boxStyle}
+                                  onMouseDown={(e) => {
+                                    e.preventDefault(); // Prevent focus shift
+                                  }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOptionClick2(
+                                      `${day} ${day === 1 ? "day" : "days"}`
+                                    );
+                                  }}
+                                >
+                                  {day}
+                                </Box>
+                              </Grid>
+                            ))}
+                          </Grid>
+                        </Box>
+                      </Popper>
+                    </Box>
+                  </ClickAwayListener>
+                </FormControl>
+              </FormAddInputLabelWrapper>
 
-            <FormControlLabel
-              sx={{
-                alignItems: "flex-start",
-                marginTop: "4px",
-              }}
-              control={
-                <Checkbox
-                  checked={activeSell}
-                  onChange={handleActiveSellChange}
-                  sx={{
-                    color: "#430E00",
-                    "&.Mui-checked": {
-                      color: "#430E00",
-                    },
-                    "& .MuiSvgIcon-root": {
-                      fontSize: 26,
-                    },
-                    marginTop: "-8px",
-                  }}
-                />
-              }
-              label={activeSell === false ? "deactive" : "active"}
-            />
-          </FormAddInputLabelWrapper>
+              <Grid container spacing={1}>
+                {/** bandwidth min-amount */}
+                <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
+                  <FormAddInputLabelWrapper>
+                    <FormAddLabelWrapper>
+                      <FormAddLabel>Min-Amount</FormAddLabel>
+                      {bandwidthAmountError && (
+                        <FormErrorWrapper>
+                          <FormError>{bandwidthAmountError}</FormError>
+                        </FormErrorWrapper>
+                      )}
+                    </FormAddLabelWrapper>
+                    <FormAddInputWrapper style={{ borderRadius: "8px" }}>
+                      <FormAddInputIconWrapper>
+                        <FormAddInputWrapper2 style={{ height: "20px" }}>
+                          <FormAddInput
+                            style={{ fontSize: "16px", marginLeft: "0.5rem" }}
+                            value={Number(bandwidthmount).toLocaleString()}
+                            onChange={amountHandleChange2}
+                          />
+                        </FormAddInputWrapper2>
+                      </FormAddInputIconWrapper>
+                    </FormAddInputWrapper>
+                  </FormAddInputLabelWrapper>
+                </Grid>
+                {/** bandwidth min-price */}
+                <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
+                  <FormAddInputLabelWrapper>
+                    <FormAddLabelWrapper>
+                      <FormAddLabel>Min-Price</FormAddLabel>
+                      {bandwidthPriceError && (
+                        <FormErrorWrapper>
+                          <FormError>{bandwidthPriceError}</FormError>
+                        </FormErrorWrapper>
+                      )}
+                    </FormAddLabelWrapper>
+                    <FormAddInputWrapper style={{ borderRadius: "8px" }}>
+                      <FormAddInputIconWrapper>
+                        <FormAddInputWrapper2 style={{ height: "20px" }}>
+                          <FormAddInput
+                            style={{ fontSize: "16px", marginLeft: "0.5rem" }}
+                            value={Number(bandwidthPrice).toLocaleString()}
+                            onChange={priceHandleChange2}
+                          />
+                        </FormAddInputWrapper2>
+                      </FormAddInputIconWrapper>
+                    </FormAddInputWrapper>
+                  </FormAddInputLabelWrapper>
+                </Grid>
+              </Grid>
+              <Divider
+                orientation="horizontal"
+                flexItem
+                sx={{ my: 1, backgroundColor: "#D9E1E3" }}
+              />
+              <Grid container spacing={1}>
+                {/** profit */}
+                <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
+                  <FormAddInputLabelWrapper
+                    style={{ marginBottom: "0", marginTop: "0.6rem" }}
+                  >
+                    <FormAddLabelWrapper
+                      style={{ width: "100%", justifyContent: "space-between" }}
+                    >
+                      <FormAddLabel>Profit</FormAddLabel>
+                      <FormAddLabel>{profit} %</FormAddLabel>
+                    </FormAddLabelWrapper>
+                    <Slider
+                      size="small"
+                      value={profit}
+                      onChange={handleProfitChange}
+                      aria-label="Small"
+                      valueLabelDisplay="auto"
+                      min={0}
+                      max={100}
+                      sx={{
+                        "& .MuiSlider-valueLabel": {
+                          backgroundColor: "#430E00",
+                        },
+
+                        "& .MuiSlider-track": {
+                          backgroundColor: "#003543",
+                        },
+
+                        "& .MuiSlider-rail": {
+                          backgroundColor: "#003543",
+                        },
+
+                        "& .MuiSlider-thumb": {
+                          backgroundColor: "#430E00",
+
+                          width: 16,
+                          height: 16,
+                          "&:hover, &.Mui-focusVisible, &.Mui-active": {
+                            boxShadow: "none",
+                          },
+                        },
+                      }}
+                    />
+                  </FormAddInputLabelWrapper>
+                </Grid>
+                {/** active sell */}
+                <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
+                  <FormAddInputLabelWrapper style={{alignItems: "flex-end"}} >
+                    
+
+                    <FormControlLabel
+                      sx={{
+                        
+                        marginTop: "1.2rem",
+                        marginLeft: "1rem"
+                      }}
+                      control={
+                        <Checkbox
+                          checked={activeSell}
+                          onChange={handleActiveSellChange}
+                          sx={{
+                            color: "#430E00",
+                            "&.Mui-checked": {
+                              color: "#430E00",
+                              
+                            },
+                            "& .MuiSvgIcon-root": {
+                              fontSize: 26,
+                            },
+                            marginTop: "-2px",
+                          }}
+                        />
+                      }
+                      label="Active-Sell"
+                    />
+                  </FormAddInputLabelWrapper>
+                </Grid>
+              </Grid>
+            </Box>
+          </Box>
         </DialogContent>
 
         <DialogActions
@@ -1002,8 +1203,8 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
           <Button
             fullWidth
             color="primary"
-            variant="contained"
             onClick={handleSettingSubmit}
+            variant="contained"
             sx={{
               backgroundColor: "#430E00",
               borderRadius: "10px",
