@@ -176,13 +176,15 @@ export interface AccountInfoResponse {
     sellerCredit: number;
     apiKey: string;
     settings: {
-      duration: number;
+      minDurationBandwidth: number;
+      minDurationEnergy: number;
       isActive: boolean;
       minPriceBandwidth: number;
       minPriceEnergy: number;
       minUnitBandwidth: number;
       minUnitEnergy: number;
       profit: number;
+      
     };
   };
 }
@@ -362,8 +364,9 @@ export const fetchAllUiData = async (
               sellerCredit: 0,
               apiKey: "",
               settings: {
-                duration: 0,
                 isActive: false,
+                minDurationBandwidth: 0,
+                minDurationEnergy: 0,
                 minPriceBandwidth: 0,
                 minPriceEnergy: 0,
                 minUnitBandwidth: 0,
@@ -386,8 +389,9 @@ export const fetchAllUiData = async (
               sellerCredit: 0,
               apiKey: "",
               settings: {
-                duration: 0,
                 isActive: false,
+                minDurationBandwidth: 0,
+                minDurationEnergy: 0,
                 minPriceBandwidth: 0,
                 minPriceEnergy: 0,
                 minUnitBandwidth: 0,
@@ -410,8 +414,9 @@ export const fetchAllUiData = async (
           sellerCredit: 0,
           apiKey: "",
           settings: {
-            duration: 0,
             isActive: false,
+            minDurationBandwidth: 0,
+            minDurationEnergy: 0,
             minPriceBandwidth: 0,
             minPriceEnergy: 0,
             minUnitBandwidth: 0,

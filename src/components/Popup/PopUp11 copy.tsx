@@ -159,7 +159,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     bandwidth: number;
   }>({ energy: 0, bandwidth: 0 });
   const [info, setInfo] = useState<{
-    duration: number;
+   
     isActive: boolean;
     minPriceBandwidth: number;
     minPriceEnergy: number;
@@ -167,7 +167,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     minUnitEnergy: number;
     profit: number;
   }>({
-    duration: 0,
+    
     isActive: false,
     minPriceBandwidth: 0,
     minPriceEnergy: 0,
@@ -253,7 +253,6 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     if (!settings || settings.profit == null) return;
 
     const newInfo = {
-      duration: settings.duration ?? info.duration,
       isActive: settings.isActive ?? info.isActive,
       minPriceBandwidth:
         settings.minPriceBandwidth ?? settings.minPriceBandwidth,

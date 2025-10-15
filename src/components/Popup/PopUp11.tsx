@@ -15,10 +15,8 @@ import {
   ClickAwayListener,
   Divider,
   Slider,
-
   Checkbox,
   FormControlLabel,
-
 } from "@mui/material";
 import {
   Form,
@@ -99,7 +97,8 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   //------------------------------------------------
   //satate to store account info data :
   const [info, setInfo] = useState<{
-    duration: number;
+    minDurationBandwidth: number;
+    minDurationEnergy: number;
     isActive: boolean;
     minPriceBandwidth: number;
     minPriceEnergy: number;
@@ -107,7 +106,8 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     minUnitEnergy: number;
     profit: number;
   }>({
-    duration: 0,
+    minDurationBandwidth: 0,
+    minDurationEnergy: 0,
     isActive: false,
     minPriceBandwidth: 0,
     minPriceEnergy: 0,
@@ -135,7 +135,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   //energy min-duration states :
   const [energyDurationValue, setEnergyDurationValue] = useState("");
   const [energyDurationInSec, setEnergyDurationInSec] = useState<number | null>(
-    2592000
+    null
   );
   const [energyOpen, setEnergyOpen] = useState(false);
   const anchorRef1 = useRef<HTMLInputElement | null>(null);
@@ -144,7 +144,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   const [bandwidthDurationValue, setBandwidthDurationValue] = useState("");
   const [bandwidthDurationInSec, setBandwidthDurationInSec] = useState<
     number | null
-  >(2592000);
+  >(null);
   const [bandwidthOpen, setBandwidthOpen] = useState(false);
   const anchorRef2 = useRef<HTMLInputElement | null>(null);
   const [bandwidthDurationError, setBandwidthDurationError] = useState("");
@@ -218,25 +218,41 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     if (!settings || settings.profit == null) return;
 
     const newInfo = {
-      duration: settings.duration ?? info.duration,
+      minDurationBandwidth: settings.minDurationBandwidth ?? info.minDurationBandwidth,
+      minDurationEnergy: settings.minDurationEnergy ?? info.minDurationEnergy,
       isActive: settings.isActive ?? info.isActive,
-      minPriceBandwidth:
-        settings.minPriceBandwidth ?? settings.minPriceBandwidth,
+      minPriceBandwidth: settings.minPriceBandwidth ?? settings.minPriceBandwidth,
       minPriceEnergy: settings.minPriceEnergy ?? settings.minPriceEnergy,
       minUnitBandwidth: settings.minUnitBandwidth ?? settings.minUnitBandwidth,
       minUnitEnergy: settings.minUnitEnergy ?? settings.minUnitEnergy,
       profit: settings.profit ?? info.profit,
     };
 
-    // set info from server
+    //to store data from server in info state :
     setInfo(newInfo);
-
+    //duration
+    setEnergyDurationInSec(settings.minDurationEnergy);
+    if (!durationWasManuallyChanged.current && energyDurationInSec !== null) {
+      const energyDurationFromSec = getDurationFromSeconds(energyDurationInSec);
+      setEnergyDurationValue(energyDurationFromSec);
+    }
+    setBandwidthDurationInSec(settings.minDurationBandwidth);
+    if (
+      !durationWasManuallyChanged.current &&
+      bandwidthDurationInSec !== null
+    ) {
+      const bandwidthDurationFromSec = getDurationFromSeconds(
+        bandwidthDurationInSec
+      );
+      setBandwidthDurationValue(bandwidthDurationFromSec);
+    }
+    //profit
     const percentageProfit = settings.profit * 100;
     setProfitValue(percentageProfit);
     if (!initialSetRef.current || profit === 0) {
       setProfit(percentageProfit);
     }
-
+    //active sell
     setActiveSellValue(settings.isActive);
     if (!userEditedRef.current) {
       setActiveSell(activeSellValue);
@@ -297,14 +313,60 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
         return null;
     }
   };
-  //funtion to post duration data towards the server :
+  //funtion to get duration from seconds :
+  // Function to convert seconds to duration string (reverse of getDurationInSeconds)
+  const getDurationFromSeconds = (seconds: number): string => {
+    if (!seconds || seconds <= 0) return "";
 
+    const minutes = seconds / 60;
+    const hours = seconds / 3600;
+    const days = seconds / 86400;
+
+    // Check for exact matches with your available options
+    if (seconds === 15 * 60) return "15 minutes";
+    if (seconds === 1 * 3600) return "1 hour";
+    if (seconds === 3 * 3600) return "3 hours";
+
+    // Check for days (1-30)
+    if (days >= 1 && days <= 30 && Number.isInteger(days)) {
+      return `${days} ${days === 1 ? "day" : "days"}`;
+    }
+
+    // If it doesn't match any of the predefined options, return the closest representation
+    // This handles edge cases where you might get unexpected values
+    if (days >= 1) {
+      const roundedDays = Math.round(days);
+      if (roundedDays >= 1 && roundedDays <= 30) {
+        return `${roundedDays} ${roundedDays === 1 ? "day" : "days"}`;
+      }
+    }
+
+    if (hours >= 1) {
+      const roundedHours = Math.round(hours);
+      if (roundedHours === 1 || roundedHours === 3) {
+        return `${roundedHours} ${roundedHours === 1 ? "hour" : "hours"}`;
+      }
+    }
+
+    if (minutes === 15) {
+      return "15 minutes";
+    }
+
+    // Fallback: return the value in the most appropriate unit
+    if (seconds >= 86400) {
+      const dayCount = Math.round(seconds / 86400);
+      return `${dayCount} ${dayCount === 1 ? "day" : "days"}`;
+    } else if (seconds >= 3600) {
+      const hourCount = Math.round(seconds / 3600);
+      return `${hourCount} ${hourCount === 1 ? "hour" : "hours"}`;
+    } else {
+      const minuteCount = Math.round(seconds / 60);
+      return `${minuteCount} ${minuteCount === 1 ? "minute" : "minutes"}`;
+    }
+  };
   //Function for click on energy min-duration:
   const handleOptionClick1 = (value: string) => {
-    const durationInSeconds = getDurationInSeconds(value);
-
     setEnergyDurationValue(value);
-    setEnergyDurationInSec(durationInSeconds);
 
     setEnergyOpen(false);
     anchorRef1.current?.blur();
@@ -317,10 +379,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
 
   //Function for click on energy min-duration:
   const handleOptionClick2 = (value: string) => {
-    const durationInSeconds = getDurationInSeconds(value);
-
     setBandwidthDurationValue(value);
-    setBandwidthDurationInSec(durationInSeconds);
 
     setBandwidthOpen(false);
     anchorRef2.current?.blur();
@@ -333,16 +392,6 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
 
   useEffect(() => {
     isUserInput.current = false;
-
-    const defaultDuration = "30 days";
-    const durationInSeconds = getDurationInSeconds(defaultDuration);
-
-    // Set duration immediately
-    setEnergyDurationValue(defaultDuration);
-    setEnergyDurationInSec(durationInSeconds);
-
-    setBandwidthDurationValue(defaultDuration);
-    setBandwidthDurationInSec(durationInSeconds);
   }, []);
 
   //--------------------------------------------------------------------------------------
@@ -554,25 +603,26 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   //----------------------------------------------------------------------------
   //Function to close the popup :
   const handleCloseSetting = () => {
-    setEnergyDurationValue("30 days")
-    setEnergyDurationInSec(2592000)
-    setEnergyDurationError("")
-    setBandwidthDurationValue("30 days")
-    setBandwidthDurationInSec(2592000)
-    setBandwidthDurationError("")
-    setEnergyAmount(info.minUnitEnergy.toString())
-    setEnergyAmountError("")
-    setBandwidthAmount(info.minUnitBandwidth.toString())
-    setBandwidthAmountError("")
-    setEnergyPrice(info.minPriceEnergy.toString());
-    setEnergyPriceError("")
-    setBandwidthPrice(info.minPriceBandwidth.toString());
-    setBandwidthPriceError("")
-    if (tradingAccountInfo?.data.settings.profit === undefined) {
+    if (tradingAccountInfo?.data === undefined) {
       return 
     }
-    setProfit(tradingAccountInfo?.data.settings.profit * 100)
-    setActiveSell(tradingAccountInfo?.data.settings.isActive)
+    setEnergyDurationValue(getDurationFromSeconds(tradingAccountInfo.data.settings.minDurationEnergy));
+    setEnergyDurationError("");
+    setBandwidthDurationValue(
+      getDurationFromSeconds(tradingAccountInfo.data.settings.minDurationBandwidth)
+    );
+    setBandwidthDurationError("");
+    setEnergyAmount(tradingAccountInfo.data.settings.minUnitEnergy.toString());
+    setEnergyAmountError("");
+    setBandwidthAmount(tradingAccountInfo.data.settings.minUnitBandwidth.toString());
+    setBandwidthAmountError("");
+    setEnergyPrice(tradingAccountInfo.data.settings.minPriceEnergy.toString());
+    setEnergyPriceError("");
+    setBandwidthPrice(tradingAccountInfo.data.settings.minPriceBandwidth.toString());
+    setBandwidthPriceError("");
+
+    setProfit(tradingAccountInfo?.data.settings.profit * 100);
+    setActiveSell(tradingAccountInfo?.data.settings.isActive);
     onClose();
   };
   //----------------------------------------------------------------------------
@@ -582,13 +632,14 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       energyDurationError ||
       bandwidthDurationError ||
       energyAmountError ||
-      bandwidthAmountError || 
-      energyPriceError || 
+      bandwidthAmountError ||
+      energyPriceError ||
       bandwidthPriceError
     ) {
       return;
     }
-
+    const energyDurationSec = getDurationInSeconds(energyDurationValue);
+    const bandWidthDurationSec = getDurationInSeconds(bandwidthDurationValue);
     // Disable the button immediately
     setIsSubmitting(true);
 
@@ -596,20 +647,19 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const baseURL = process.env.REACT_APP_BASE_URL;
 
     const settingPayload = {
-      energyDuration: energyDurationInSec,
-      bandwidthDuration: bandwidthDurationInSec,
+      energyDurationSec: energyDurationSec,
+      bandwidthDurationSec: bandWidthDurationSec,
       energyAmount: Number(energymount),
       bandwidthAmount: Number(bandwidthmount),
       energyPrice: Number(energyPrice),
       bandwidthPrice: Number(bandwidthPrice),
-      profit: profit,
-      isActive: activeSell
+      profit: profit / 100,
+      isActive: activeSell,
     };
-    console.log(settingPayload);
-
+    console.log(settingPayload)
     try {
       const settingResponse = await axios.post<AccountInfoResponse>(
-        ``,
+        `${baseURL}/Buyer/updateAccountInfo`,
         settingPayload,
         {
           headers: {
@@ -637,7 +687,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
             severity: "success",
           })
         );
-        handleCloseSetting();
+        onClose()
         return;
       }
     } catch (error) {
@@ -683,7 +733,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
             border: "solid 2px #D9E1E3",
             minWidth: "30%",
             zIndex: 2000,
-            marginTop: "5rem"
+            marginTop: "5rem",
           },
         }}
       >
@@ -1152,14 +1202,11 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                 </Grid>
                 {/** active sell */}
                 <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
-                  <FormAddInputLabelWrapper style={{alignItems: "flex-end"}} >
-                    
-
+                  <FormAddInputLabelWrapper style={{ alignItems: "flex-end" }}>
                     <FormControlLabel
                       sx={{
-                        
                         marginTop: "1.2rem",
-                        marginLeft: "1rem"
+                        marginLeft: "1rem",
                       }}
                       control={
                         <Checkbox
@@ -1169,7 +1216,6 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                             color: "#430E00",
                             "&.Mui-checked": {
                               color: "#430E00",
-                              
                             },
                             "& .MuiSvgIcon-root": {
                               fontSize: 26,
