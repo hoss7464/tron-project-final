@@ -144,10 +144,6 @@ const Sellers: React.FC = () => {
   if (accountInfoData?.data.seller.delegationedTotal === undefined) {
     return;
   }
-  const energyTotalDelegatedTrx =
-    accountInfoData?.data.seller.delegationedTotal.energy / 1_000_000;
-  const bandwidthTotalDelegatedTrx =
-    accountInfoData?.data.seller.delegationedTotal.bandwidth / 1_000_000;
 
   return (
     <>
@@ -494,7 +490,7 @@ const Sellers: React.FC = () => {
                             <SellersCardThingsNumber>
                               {sunToTrx(
                                 accountInfoData.data.sellerCredit
-                              ).toLocaleString()}
+                              ).toLocaleString()} TRX
                             </SellersCardThingsNumber>
                           ) : (
                             <SellersCardThingsNumber>
@@ -555,7 +551,7 @@ const Sellers: React.FC = () => {
                         {isConnectedTrading ? (
                           <SellersCardThingsNumberWrapper>
                             <SellersCardThingsNumber>
-                              {energyTotalDelegatedTrx.toLocaleString()}
+                              {accountInfoData?.data.seller.delegationedTotal.energy.toLocaleString()}
                             </SellersCardThingsNumber>
                           </SellersCardThingsNumberWrapper>
                         ) : (
@@ -591,7 +587,7 @@ const Sellers: React.FC = () => {
                         {isConnectedTrading ? (
                           <SellersCardThingsNumberWrapper>
                             <SellersCardThingsNumber>
-                              {bandwidthTotalDelegatedTrx.toLocaleString()}
+                              {accountInfoData?.data.seller.delegationedTotal.bandwidth.toLocaleString()}
                             </SellersCardThingsNumber>
                           </SellersCardThingsNumberWrapper>
                         ) : (

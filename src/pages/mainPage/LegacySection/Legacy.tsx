@@ -202,10 +202,10 @@ const Legacy: React.FC = () => {
                           {address ? (
                             <>
                               <span style={{ color: "#003543" }}>
-                                {availableEnergy} /{" "}
+                                {availableEnergy?.toLocaleString()} /{" "}
                               </span>
                               <span style={{ color: "#B0C0C5" }}>
-                                {allEnergy}
+                                {allEnergy?.toLocaleString()}
                               </span>
                             </>
                           ) : (
@@ -225,7 +225,7 @@ const Legacy: React.FC = () => {
                         <LegacyPropertyNumberWrapper>
                           {address ? (
                             <LegacyPropertyNumber>
-                              {availableEnergy}
+                              {availableEnergy?.toLocaleString()}
                             </LegacyPropertyNumber>
                           ) : (
                             <LegacyPropertyNumber>_ _</LegacyPropertyNumber>
@@ -267,10 +267,10 @@ const Legacy: React.FC = () => {
                           {address ? (
                             <>
                               <span style={{ color: "#430E00" }}>
-                                {allBandwidth} /
+                                {allBandwidth?.toLocaleString()} /
                               </span>{" "}
                               <span style={{ color: "#C5B4B0" }}>
-                                {availableBandwidth}
+                                {availableBandwidth?.toLocaleString()}
                               </span>
                             </>
                           ) : (
@@ -290,7 +290,7 @@ const Legacy: React.FC = () => {
                         <LegacyPropertyNumberWrapper>
                           {address ? (
                             <LegacyPropertyNumber>
-                              {allBandwidth}
+                              {allBandwidth?.toLocaleString()}
                             </LegacyPropertyNumber>
                           ) : (
                             <LegacyPropertyNumber>_ _</LegacyPropertyNumber>

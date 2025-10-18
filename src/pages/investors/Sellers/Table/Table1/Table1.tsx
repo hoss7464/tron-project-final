@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useFetchData } from "../../../../../contexts/FetchDataContext";
 import { SellersOrdersResponse } from "../../../../../services/requestService";
-import {CanceledSign, CheckedSign, BuyerSignWrapper} from "../../../Buyers/Section2/Table/BuyersTableElements"
+import {
+  CanceledSign,
+  CheckedSign,
+  BuyerSignWrapper,
+} from "../../../Buyers/Section2/Table/BuyersTableElements";
 import {
   OrderMainWrapper,
   OrdersCarouselWrapper,
@@ -9,8 +13,6 @@ import {
   MyOrdersNavWrapper,
   MyOrdersNavTextWrapper,
   MyOrdersTextWrapper,
-  MyOrdersInfoWrapper,
-  MyOrdersInfoIcon,
   OrderNavText,
   OrdersCard,
   OrdersDetail,
@@ -19,17 +21,10 @@ import {
   OrdersCardText2,
   OrderCardIconWrapper2,
   OrderCardIcon,
-  OrderCardLinearWrapper2,
-  OrderCardLineraPercentWrapper,
-  OrderCardLineraPercent,
-  OrderCardLinearWrapper,
-  CheckedSignWrapper,
-  MyOrdersSellBtnWrapper,
-  MyOrdersSell,
-  CanceledSignWrapper,
   MyOrderCardTextWrap,
   OedersPaginationWrapper,
 } from "../../../../mainPage/mainPageElements";
+import { BuyerstCardTextWrap1 } from "../../../Buyers/Section2/Table/BuyersTableElements";
 import { LoopSign } from "../SellersTablesElements";
 import { Tooltip } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
@@ -37,11 +32,14 @@ import { formatDateTime, formatDateTime2 } from "../../../../../utils/dateTime";
 import { formatStrictDuration } from "../../../../../utils/fromSec";
 import energyIcon from "../../../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../../../assets/svg/BandwidthIcon.svg";
+import { truncateTxid2 } from "../../../../../utils/truncate";
+import { Link } from "@mui/material";
 
 const SellersTable1: React.FC = () => {
   const { sellersOrderInfo } = useFetchData();
   const [wholeSellersOrderInfo, setWholeSellersOrderInfo] =
     useState<SellersOrdersResponse | null>(null);
+  const tronscanUrl = process.env.REACT_APP_TRONSCAN_TXID_URL;
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 8;
 
@@ -74,10 +72,14 @@ const SellersTable1: React.FC = () => {
           <MyOrdersScroll style={{ height: "575px" }}>
             <MyOrdersNavWrapper>
               <MyOrdersNavTextWrapper
-                style={{ justifyContent: "space-between", width: "88%" }}
+                style={{ justifyContent: "space-between", width: "97%" }}
               >
                 <MyOrdersTextWrapper>
                   <OrderNavText>Date</OrderNavText>
+                </MyOrdersTextWrapper>
+
+                <MyOrdersTextWrapper>
+                  <OrderNavText>Receiver</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
@@ -86,6 +88,10 @@ const SellersTable1: React.FC = () => {
 
                 <MyOrdersTextWrapper>
                   <OrderNavText>Profit</OrderNavText>
+                </MyOrdersTextWrapper>
+
+                <MyOrdersTextWrapper>
+                  <OrderNavText>TxId</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
@@ -98,6 +104,7 @@ const SellersTable1: React.FC = () => {
               {paginatedData.map((myData, index) => {
                 const { date, time } = formatDateTime(myData.createdAt);
                 const { myDate, myTime } = formatDateTime2(myData.expiredAt);
+                const transactionUrl = `${tronscanUrl}/#/transaction/${myData.delegatedTxId}`;
 
                 return (
                   <OrdersDetail
@@ -110,6 +117,14 @@ const SellersTable1: React.FC = () => {
                       </OrdersCardTextWrapper2>
                       <OrdersCardTextWrapper2>
                         <OrdersCardText2>{time}</OrdersCardText2>
+                      </OrdersCardTextWrapper2>
+                    </MyOrderCardTextWrap>
+
+                    <MyOrderCardTextWrap>
+                      <OrdersCardTextWrapper2>
+                        <OrdersCardText1>
+                          {truncateTxid2(myData.receiver)}
+                        </OrdersCardText1>
                       </OrdersCardTextWrapper2>
                     </MyOrderCardTextWrap>
 
@@ -150,6 +165,33 @@ const SellersTable1: React.FC = () => {
                       </OrdersCardTextWrapper2>
                     </MyOrderCardTextWrap>
 
+                    {myData.delegatedTxId === undefined ? (
+                      <BuyerstCardTextWrap1>
+                        <OrdersCardText1>_ _</OrdersCardText1>
+                      </BuyerstCardTextWrap1>
+                    ) : (
+                      <BuyerstCardTextWrap1>
+                        <Link
+                          href={transactionUrl}
+                          target="_blank" // Opens in new tab
+                          rel="noopener noreferrer" // Security best practice
+                          sx={{
+                            fontFamily: "monospace",
+                            fontSize: "15px",
+                            textDecoration: "none",
+                            color: "#430E00",
+                            "&:hover": {
+                              textDecoration: "underline",
+                              color: "#430E00",
+                            },
+                            cursor: "pointer",
+                          }}
+                        >
+                          {truncateTxid2(myData.delegatedTxId)}
+                        </Link>
+                      </BuyerstCardTextWrap1>
+                    )}
+
                     <MyOrderCardTextWrap>
                       <OrdersCardTextWrapper2>
                         <OrdersCardText1>{myDate}</OrdersCardText1>
@@ -161,11 +203,13 @@ const SellersTable1: React.FC = () => {
 
                     {myData.status === "recycled" && (
                       <Tooltip title="recycled">
-                        <BuyerSignWrapper  style={{
+                        <BuyerSignWrapper
+                          style={{
                             backgroundColor: "#003543",
                             padding: "0.4rem",
                             borderRadius: "6px",
-                          }} >
+                          }}
+                        >
                           <CheckedSign />
                         </BuyerSignWrapper>
                       </Tooltip>
@@ -180,9 +224,7 @@ const SellersTable1: React.FC = () => {
                             borderRadius: "6px",
                           }}
                         >
-                          <CanceledSign
-                            
-                          />
+                          <CanceledSign />
                         </BuyerSignWrapper>
                       </Tooltip>
                     )}

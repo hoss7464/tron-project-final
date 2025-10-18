@@ -379,7 +379,7 @@ const Section1: React.FC = () => {
                           <SellersCardThingsNumber>
                             {sunToTrx(
                               tradingAccountInfo?.data.buyerCredit
-                            ).toLocaleString()}
+                            ).toLocaleString()} TRX
                           </SellersCardThingsNumber>
                         ) : (
                           <SellersCardThingsNumber>_ _</SellersCardThingsNumber>
