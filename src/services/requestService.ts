@@ -184,7 +184,16 @@ export interface AccountInfoResponse {
       minUnitBandwidth: number;
       minUnitEnergy: number;
       profit: number;
-      
+    };
+    seller: {
+      delegationedCount: {
+        energy: number;
+        bandwidth: number;
+      };
+      delegationedTotal: {
+        energy: number;
+        bandwidth: number;
+      };
     };
   };
 }
@@ -241,6 +250,56 @@ interface GetHold {
   qty: number;
   txid: string;
   settledAt: string;
+}
+
+//Interface for order request in /Sellers :
+export interface SellersOrdersResponse {
+  success: boolean;
+  message: string;
+  data: SellersOrderData[];
+}
+
+interface SellersOrderData {
+  _id: string;
+  orderId: string;
+  userId: string;
+  seller: string;
+  buyer: string;
+  receiver: string;
+  resourceType: string;
+  amount: number;
+  durationSec: number;
+  price: number;
+  profitSun: number;
+  orderType: string;
+  snapshot: {
+    energyPairUnit: number;
+    freeze: number;
+  };
+  delegatedTxId: string;
+  status: string;
+  createdAt: string;
+  expiredAt: string;
+  __v: number;
+}
+
+//Interface for withdraw request in /Sellers :
+export interface SellersWithdrawResponse {
+  success: boolean;
+  message: string;
+  data: SellersWithdrawData[];
+}
+
+interface SellersWithdrawData {
+  _id: string;
+  parentUserId: string;
+  receiver: string;
+  withdrawAmount: number;
+  withdrawTxId: string;
+  status: string;
+  paidAt: string;
+  createdAt: string;
+  __v: number;
 }
 //-------------------------------------------------------------------------------------
 //to get data from .env :
@@ -373,6 +432,16 @@ export const fetchAllUiData = async (
                 minUnitEnergy: 0,
                 profit: 0,
               },
+              seller: {
+                delegationedCount: {
+                  energy: 0,
+                  bandwidth: 0,
+                },
+                delegationedTotal: {
+                  energy: 0,
+                  bandwidth: 0,
+                },
+              },
             },
           };
           disConnectWallet();
@@ -398,6 +467,16 @@ export const fetchAllUiData = async (
                 minUnitEnergy: 0,
                 profit: 0,
               },
+              seller: {
+                delegationedCount: {
+                  energy: 0,
+                  bandwidth: 0,
+                },
+                delegationedTotal: {
+                  energy: 0,
+                  bandwidth: 0,
+                },
+              },
             },
           };
           disConnectWallet();
@@ -422,6 +501,16 @@ export const fetchAllUiData = async (
             minUnitBandwidth: 0,
             minUnitEnergy: 0,
             profit: 0,
+          },
+          seller: {
+            delegationedCount: {
+              energy: 0,
+              bandwidth: 0,
+            },
+            delegationedTotal: {
+              energy: 0,
+              bandwidth: 0,
+            },
           },
         },
       };
@@ -563,6 +652,144 @@ export const fetchAllUiData = async (
       };
     }
     //--------------------------------------------------------------------------------------------
+    //sellersOrderRequest : (only for /Sellers):
+    let sellersOrderResponse: SellersOrdersResponse;
+    const shouldFetchSellersOrderInfo =
+      isConnectedTrading === true && pathname === "/Sellers";
+
+    if (shouldFetchSellersOrderInfo) {
+      try {
+        const getSellersOrderRes = await axios.get<SellersOrdersResponse>(
+          `${baseUrl}/Buyer/sellerOrders`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              accesstoken: accessToken,
+            },
+            timeout: axiosTimeOut,
+            validateStatus: (status: number) => status < 500,
+          }
+        );
+
+        if (getSellersOrderRes.data.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          sellersOrderResponse = {
+            success: false,
+            message: getSellersOrderRes.data.message,
+            data: [
+              {
+                _id: "",
+                orderId: "",
+                userId: "",
+                seller: "",
+                buyer: "",
+                receiver: "",
+                resourceType: "",
+                amount: 0,
+                durationSec: 0,
+                price: 0,
+                profitSun: 0,
+                orderType: "",
+                snapshot: {
+                  energyPairUnit: 0,
+                  freeze: 0,
+                },
+                delegatedTxId: "",
+                status: "",
+                createdAt: "",
+                expiredAt: "",
+                __v: 0,
+              },
+            ],
+          };
+          disConnectWallet();
+        } else {
+          sellersOrderResponse = getSellersOrderRes.data;
+        }
+      } catch (error: any) {
+        if (error.response?.data?.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          sellersOrderResponse = {
+            success: false,
+            message: error.response?.data?.message || "An error occurred",
+            data: [],
+          };
+          disConnectWallet();
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      sellersOrderResponse = {
+        success: true,
+        message: "No order data requested",
+        data: [],
+      };
+    }
+    //--------------------------------------------------------------------------------------------
+    //sellersWithdrawRequest : (only for /Sellers):
+    let sellersWithdrawResponse: SellersWithdrawResponse;
+    const shouldFetchSellersWithdrawInfo =
+      isConnectedTrading === true && pathname === "/Sellers";
+
+    if (shouldFetchSellersWithdrawInfo) {
+      try {
+        const getSellersWithdrawRes = await axios.get<SellersWithdrawResponse>(
+          `${baseUrl}/Buyer/sellerWithdraws`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              accesstoken: accessToken,
+            },
+            timeout: axiosTimeOut,
+            validateStatus: (status: number) => status < 500,
+          }
+        );
+
+        if (getSellersWithdrawRes.data.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          sellersWithdrawResponse = {
+            success: false,
+            message: getSellersWithdrawRes.data.message,
+            data: [
+              {
+                _id: "",
+                parentUserId: "",
+                receiver: "",
+                withdrawAmount: 0,
+                withdrawTxId: "",
+                status: "",
+                paidAt: "",
+                createdAt: "",
+                __v: 0,
+              },
+            ],
+          };
+          disConnectWallet();
+        } else {
+          sellersWithdrawResponse = getSellersWithdrawRes.data;
+        }
+      } catch (error: any) {
+        if (error.response?.data?.success === false) {
+          if (onAuthFailure) onAuthFailure();
+          sellersWithdrawResponse = {
+            success: false,
+            message: error.response?.data?.message || "An error occurred",
+            data: [],
+          };
+          disConnectWallet();
+        } else {
+          throw error;
+        }
+      }
+    } else {
+      sellersWithdrawResponse = {
+        success: true,
+        message: "No order data requested",
+        data: [],
+      };
+    }
+    //--------------------------------------------------------------------------------------------
     // Collect promises dynamically
     const results = await Promise.allSettled(
       [ordersPromise, resourcesPromise, availablePromise].filter(Boolean)
@@ -678,6 +905,8 @@ export const fetchAllUiData = async (
       tradingAccountInfo: accountInfoResponse,
       tradingRefundInfo: getRefundResponse,
       tradingOrderInfo: getOrderResponse,
+      sellersOrderInfo: sellersOrderResponse,
+      sellersWithdrawInfo: sellersWithdrawResponse,
     };
   } catch (error) {
     throw error;

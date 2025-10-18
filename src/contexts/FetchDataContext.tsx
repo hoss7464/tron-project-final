@@ -17,6 +17,8 @@ import {
   AccountInfoResponse,
   RefundResponse,
   GetOrderResoponse,
+  SellersOrdersResponse,
+  SellersWithdrawResponse,
 } from "../services/requestService";
 import { useTronWallet } from "./TronWalletContext";
 import { useLoading } from "./LoaderContext";
@@ -30,6 +32,8 @@ interface FetchDataContextType {
   tradingAccountInfo: AccountInfoResponse | null;
   tradingRefundInfo: RefundResponse | null;
   tradingOrderInfo: GetOrderResoponse | null;
+  sellersOrderInfo: SellersOrdersResponse | null;
+  sellersWithdrawInfo: SellersWithdrawResponse | null
   loading: boolean;
   error: Error | null;
   fetchData: (isInitialLoad?: boolean) => Promise<void>;
@@ -60,6 +64,8 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const [tradingAccountInfo, setTradingAccountInfo] = useState<AccountInfoResponse | null>(null)
   const [tradingRefundInfo, setTradingRefundInfo] = useState<RefundResponse | null>(null)
   const [tradingOrderInfo, setTradingOrderInfo] = useState<GetOrderResoponse | null>(null)
+  const [sellersOrderInfo, setSellersOrderInfo] = useState<SellersOrdersResponse | null>(null)
+   const [sellersWithdrawInfo, setSellersWithdrawInfo] = useState<SellersWithdrawResponse | null>(null)
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [authErrorCount, setAuthErrorCount] = useState(0);
@@ -105,6 +111,8 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
       setTradingAccountInfo(allData.tradingAccountInfo)
       setTradingRefundInfo(allData.tradingRefundInfo)
       setTradingOrderInfo(allData.tradingOrderInfo)
+      setSellersOrderInfo(allData.sellersOrderInfo)
+      setSellersWithdrawInfo(allData.sellersWithdrawInfo)
 
       if (authErrorCount > 0) {
         setAuthErrorCount(0);
@@ -185,6 +193,8 @@ useEffect(() => {
     tradingAccountInfo,
     tradingRefundInfo,
     tradingOrderInfo,
+    sellersOrderInfo,
+    sellersWithdrawInfo,
     fetchData: () => fetchData(false), // Default to not showing loader
     loading,
     error,

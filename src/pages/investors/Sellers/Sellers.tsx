@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import "./Sellers.css";
 import {
   SellersContainer,
@@ -28,7 +28,6 @@ import {
   SellersBtnWrapper,
   SellersBtnText,
   SellersHistoryWrapper,
-  SellersNavTextWrapper,
 } from "./SellersElement";
 import { HeroMainbgPhotoWrapper } from "../../mainPage/HeroSection/HeroElements";
 import {
@@ -54,25 +53,17 @@ import {
   HeroGridCardNumberIconWrapper3,
   HeroGridCardNumberIcon,
 } from "../../mainPage/HeroSection/HeroElements";
-import {
-  OrdersWrapper,
-  OrderMainWrapper,
-  OrdersNavHeaderWrapper,
-  OrdersCarouselWrapper,
-  OrdersScroll,
-  OrderNavWrapper,
-  OrderNavTextWrapper1,
-  OrderNavTextWrapper,
-  OrderNavText,
-  OrdersCard,
-} from "../../mainPage/mainPageElements";
+import SellersTables from "./Table/SellersTables";
+import { Sec1CardThingsWrapper } from "../Buyers/Section1/Section1Elements";
+import { AccountInfoResponse } from "../../../services/requestService";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../redux/store/store";
 import { Grid } from "@mui/material";
 import energyIcon from "../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useTronWallet } from "../../../contexts/TronWalletContext";
 import { useFetchData } from "../../../contexts/FetchDataContext";
-import MyFilterComponent from "../../../components/FilterComponent/MyFilterComponent";
 import PopUp6 from "../../../components/Popup/PopUp6";
 import PopUp7 from "../../../components/Popup/PopUp7";
 import PopUp11 from "../../../components/Popup/PopUp11";
@@ -80,7 +71,6 @@ import PopUp11 from "../../../components/Popup/PopUp11";
 const Sellers: React.FC = () => {
   const {
     address,
-    balance,
     allBandwidth,
     availableBandwidth,
     availableEnergy,
@@ -88,8 +78,36 @@ const Sellers: React.FC = () => {
     sellersPermission,
     isConnectedTrading,
   } = useTronWallet();
-  const { resourceData } = useFetchData();
+  const { resourceData, tradingAccountInfo, fetchData } = useFetchData();
   const [settingBtn, setSettingBtn] = useState(false);
+  const [accountInfoData, setAccountInfoData] =
+    useState<AccountInfoResponse | null>(null);
+
+  const refreshTrigger = useSelector(
+    (state: RootState) => state.refresh.refreshTrigger
+  );
+
+  //----------------------------------------------------------------------------------------
+  //To get refresh data from server :
+  useEffect(() => {
+    const refreshData = async () => {
+      try {
+        await fetchData();
+      } catch (error) {
+        console.error("Error refreshing data:", error);
+      }
+    };
+
+    if (refreshTrigger) {
+      refreshData();
+    }
+  }, [refreshTrigger, fetchData]);
+
+  useEffect(() => {
+    if (tradingAccountInfo) {
+      setAccountInfoData(tradingAccountInfo);
+    }
+  }, [tradingAccountInfo]);
 
   //----------------------------------------------------------------------------------------
   //Functions for circular progress bars :
@@ -117,6 +135,19 @@ const Sellers: React.FC = () => {
   const handleSettingPopupClose = useCallback(() => {
     setSettingBtn(false);
   }, []);
+  //Function to change sun to trx :
+  const sunToTrx = (value: number) => {
+    const trxValue = value / 1_000_000;
+    return trxValue.toFixed(2);
+  };
+  //----------------------------------------------------------------------------------------
+  if (accountInfoData?.data.seller.delegationedTotal === undefined) {
+    return;
+  }
+  const energyTotalDelegatedTrx =
+    accountInfoData?.data.seller.delegationedTotal.energy / 1_000_000;
+  const bandwidthTotalDelegatedTrx =
+    accountInfoData?.data.seller.delegationedTotal.bandwidth / 1_000_000;
 
   return (
     <>
@@ -127,6 +158,7 @@ const Sellers: React.FC = () => {
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>
         <SellersMainWrapper>
+          {/*Sellers header */}
           <SellersMainHeaderBtnWrapper>
             <SellersMainHeaderWrapper>
               <SellersMainHeader>Dashboard</SellersMainHeader>
@@ -165,10 +197,10 @@ const Sellers: React.FC = () => {
                           {address ? (
                             <>
                               <span style={{ color: "#003543" }}>
-                                {availableEnergy} /{" "}
+                                {availableEnergy?.toLocaleString()} /{" "}
                               </span>
                               <span style={{ color: "#B0C0C5" }}>
-                                {allEnergy}
+                                {allEnergy?.toLocaleString()}
                               </span>
                             </>
                           ) : (
@@ -193,7 +225,7 @@ const Sellers: React.FC = () => {
                               <LegacyPropertyNumber
                                 style={{ fontSize: "18px" }}
                               >
-                                {availableEnergy}
+                                {availableEnergy?.toLocaleString()}
                               </LegacyPropertyNumber>
                             ) : (
                               <LegacyPropertyNumber>_ _</LegacyPropertyNumber>
@@ -255,10 +287,10 @@ const Sellers: React.FC = () => {
                           {address ? (
                             <>
                               <span style={{ color: "#430E00" }}>
-                                {allBandwidth} /
+                                {allBandwidth?.toLocaleString()} /
                               </span>{" "}
                               <span style={{ color: "#C5B4B0" }}>
-                                {availableBandwidth}
+                                {availableBandwidth?.toLocaleString()}
                               </span>
                             </>
                           ) : (
@@ -283,7 +315,7 @@ const Sellers: React.FC = () => {
                               <LegacyPropertyNumber
                                 style={{ fontSize: "18px" }}
                               >
-                                {allBandwidth}
+                                {allBandwidth?.toLocaleString()}
                               </LegacyPropertyNumber>
                             ) : (
                               <LegacyPropertyNumber>_ _</LegacyPropertyNumber>
@@ -373,11 +405,19 @@ const Sellers: React.FC = () => {
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>
 
-                        <SellersCardThingsNumberWrapper>
-                          <SellersCardThingsNumber>
-                            123456
-                          </SellersCardThingsNumber>
-                        </SellersCardThingsNumberWrapper>
+                        {isConnectedTrading ? (
+                          <SellersCardThingsNumberWrapper>
+                            <SellersCardThingsNumber>
+                              {accountInfoData?.data.seller.delegationedCount.energy.toLocaleString()}
+                            </SellersCardThingsNumber>
+                          </SellersCardThingsNumberWrapper>
+                        ) : (
+                          <SellersCardThingsNumberWrapper>
+                            <SellersCardThingsNumber>
+                              _ _
+                            </SellersCardThingsNumber>
+                          </SellersCardThingsNumberWrapper>
+                        )}
                       </SellersCardThingsWrapper2>
                       <SellersCardThingsWrapper2>
                         <SellersCardThingsNameIconWrapper>
@@ -401,13 +441,69 @@ const Sellers: React.FC = () => {
                             </SellersCardThingsName>
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>
-                        <SellersCardThingsNumberWrapper>
-                          <SellersCardThingsNumber>
-                            123456
-                          </SellersCardThingsNumber>
-                        </SellersCardThingsNumberWrapper>
+                        {isConnectedTrading ? (
+                          <SellersCardThingsNumberWrapper>
+                            <SellersCardThingsNumber>
+                              {accountInfoData?.data.seller.delegationedCount.bandwidth.toLocaleString()}
+                            </SellersCardThingsNumber>
+                          </SellersCardThingsNumberWrapper>
+                        ) : (
+                          <SellersCardThingsNumberWrapper>
+                            <SellersCardThingsNumber>
+                              _ _
+                            </SellersCardThingsNumber>
+                          </SellersCardThingsNumberWrapper>
+                        )}
                       </SellersCardThingsWrapper2>
                     </SellersCardThingsWrapper>
+                  </LegacyCardWrapper3>
+                </LegacyCardWrapper2>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
+                {/* credit component */}
+                <LegacyCardWrapper2>
+                  <LegacyCardWrapper3 className="card-bg">
+                    <SellersCardIconHeaderWrapper>
+                      <LegacyCardIconWrapper1>
+                        <LegacyCardIconWrapper2
+                          style={{ border: "solid 2px #003543" }}
+                        >
+                          <LegacyCardIconWrapper3
+                            style={{ backgroundColor: "#003543" }}
+                          >
+                            <SellersEarnIcon />
+                          </LegacyCardIconWrapper3>
+                        </LegacyCardIconWrapper2>
+                      </LegacyCardIconWrapper1>
+                      <SellersCardHeaderWrapper>
+                        <SellersCardHeader>Daily Profit</SellersCardHeader>
+                      </SellersCardHeaderWrapper>
+                    </SellersCardIconHeaderWrapper>
+
+                    <Sec1CardThingsWrapper style={{ marginBottom: "0.3rem"}} >
+                      <SellersCardThingsWrapper2 style={{ padding: "0" }}>
+                        <SellersCardThingsNameIconWrapper>
+                          <SellersCardThingsNameWrapper>
+                            <SellersCardThingsName>
+                              Credit{" "}
+                            </SellersCardThingsName>
+                          </SellersCardThingsNameWrapper>
+                        </SellersCardThingsNameIconWrapper>
+                        <SellersCardThingsNumberWrapper>
+                          {isConnectedTrading === true ? (
+                            <SellersCardThingsNumber>
+                              {sunToTrx(
+                                accountInfoData.data.sellerCredit
+                              ).toLocaleString()}
+                            </SellersCardThingsNumber>
+                          ) : (
+                            <SellersCardThingsNumber>
+                              _ _
+                            </SellersCardThingsNumber>
+                          )}
+                        </SellersCardThingsNumberWrapper>
+                      </SellersCardThingsWrapper2>
+                    </Sec1CardThingsWrapper>
                   </LegacyCardWrapper3>
                 </LegacyCardWrapper2>
               </Grid>
@@ -456,11 +552,19 @@ const Sellers: React.FC = () => {
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>
 
-                        <SellersCardThingsNumberWrapper>
-                          <SellersCardThingsNumber>
-                            123456
-                          </SellersCardThingsNumber>
-                        </SellersCardThingsNumberWrapper>
+                        {isConnectedTrading ? (
+                          <SellersCardThingsNumberWrapper>
+                            <SellersCardThingsNumber>
+                              {energyTotalDelegatedTrx.toLocaleString()}
+                            </SellersCardThingsNumber>
+                          </SellersCardThingsNumberWrapper>
+                        ) : (
+                          <SellersCardThingsNumberWrapper>
+                            <SellersCardThingsNumber>
+                              _ _
+                            </SellersCardThingsNumber>
+                          </SellersCardThingsNumberWrapper>
+                        )}
                       </SellersCardThingsWrapper2>
                       <SellersCardThingsWrapper2>
                         <SellersCardThingsNameIconWrapper>
@@ -484,94 +588,19 @@ const Sellers: React.FC = () => {
                             </SellersCardThingsName>
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>
-                        <SellersCardThingsNumberWrapper>
-                          <SellersCardThingsNumber>
-                            123456
-                          </SellersCardThingsNumber>
-                        </SellersCardThingsNumberWrapper>
-                      </SellersCardThingsWrapper2>
-                    </SellersCardThingsWrapper>
-                  </LegacyCardWrapper3>
-                </LegacyCardWrapper2>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
-                {/* total earned component */}
-                <LegacyCardWrapper2>
-                  <LegacyCardWrapper3 className="card-bg">
-                    <SellersCardIconHeaderWrapper>
-                      <LegacyCardIconWrapper1>
-                        <LegacyCardIconWrapper2
-                          style={{ border: "solid 2px #003543" }}
-                        >
-                          <LegacyCardIconWrapper3
-                            style={{ backgroundColor: "#003543" }}
-                          >
-                            <SellersEarnIcon />
-                          </LegacyCardIconWrapper3>
-                        </LegacyCardIconWrapper2>
-                      </LegacyCardIconWrapper1>
-                      <SellersCardHeaderWrapper>
-                        <SellersCardHeader>Total Earned</SellersCardHeader>
-                      </SellersCardHeaderWrapper>
-                    </SellersCardIconHeaderWrapper>
-
-                    <SellersCardThingsWrapper>
-                      <SellersCardThingsWrapper2>
-                        <SellersCardThingsNameIconWrapper>
-                          <HeroGridCardNumberIconWrapper>
-                            <HeroGridCardNumberIconWrapper2
-                              style={{ border: "solid 1px #003543" }}
-                            >
-                              <HeroGridCardNumberIconWrapper3
-                                style={{ backgroundColor: "#003543" }}
-                              >
-                                <HeroGridCardNumberIcon
-                                  alt="energy icon"
-                                  src={energyIcon}
-                                />
-                              </HeroGridCardNumberIconWrapper3>
-                            </HeroGridCardNumberIconWrapper2>
-                          </HeroGridCardNumberIconWrapper>
-                          <SellersCardThingsNameWrapper>
-                            <SellersCardThingsName>
-                              Energy
-                            </SellersCardThingsName>
-                          </SellersCardThingsNameWrapper>
-                        </SellersCardThingsNameIconWrapper>
-
-                        <SellersCardThingsNumberWrapper>
-                          <SellersCardThingsNumber>
-                            123456
-                          </SellersCardThingsNumber>
-                        </SellersCardThingsNumberWrapper>
-                      </SellersCardThingsWrapper2>
-                      <SellersCardThingsWrapper2>
-                        <SellersCardThingsNameIconWrapper>
-                          <HeroGridCardNumberIconWrapper>
-                            <HeroGridCardNumberIconWrapper2
-                              style={{ border: "solid 1px #430E00" }}
-                            >
-                              <HeroGridCardNumberIconWrapper3
-                                style={{ backgroundColor: "#430E00" }}
-                              >
-                                <HeroGridCardNumberIcon
-                                  alt="energy icon"
-                                  src={bandwidthIcon}
-                                />
-                              </HeroGridCardNumberIconWrapper3>
-                            </HeroGridCardNumberIconWrapper2>
-                          </HeroGridCardNumberIconWrapper>
-                          <SellersCardThingsNameWrapper>
-                            <SellersCardThingsName>
-                              Bandwidth
-                            </SellersCardThingsName>
-                          </SellersCardThingsNameWrapper>
-                        </SellersCardThingsNameIconWrapper>
-                        <SellersCardThingsNumberWrapper>
-                          <SellersCardThingsNumber>
-                            123456
-                          </SellersCardThingsNumber>
-                        </SellersCardThingsNumberWrapper>
+                        {isConnectedTrading ? (
+                          <SellersCardThingsNumberWrapper>
+                            <SellersCardThingsNumber>
+                              {bandwidthTotalDelegatedTrx.toLocaleString()}
+                            </SellersCardThingsNumber>
+                          </SellersCardThingsNumberWrapper>
+                        ) : (
+                          <SellersCardThingsNumberWrapper>
+                            <SellersCardThingsNumber>
+                              _ _
+                            </SellersCardThingsNumber>
+                          </SellersCardThingsNumberWrapper>
+                        )}
                       </SellersCardThingsWrapper2>
                     </SellersCardThingsWrapper>
                   </LegacyCardWrapper3>
@@ -581,61 +610,7 @@ const Sellers: React.FC = () => {
           </SellersBottomWrapper>
           {/* history table component */}
           <SellersHistoryWrapper>
-            <OrdersWrapper className="history-bg" style={{ width: "100%" }}>
-              <OrderMainWrapper>
-                <OrdersNavHeaderWrapper>
-                  <LegacyCardName style={{ color: "#003543" }}>
-                    History
-                  </LegacyCardName>
-                  <MyFilterComponent
-                    listKey="seller-history"
-                    options={[
-                      "price",
-                      "energy",
-                      "bandwidth",
-                      "latest",
-                      "oldest",
-                    ]}
-                    label="Product"
-                  />
-                </OrdersNavHeaderWrapper>
-                <OrdersCarouselWrapper>
-                  <OrdersScroll>
-                    <OrderNavWrapper>
-                      <OrderNavTextWrapper1
-                        style={{ justifyContent: "space-between" }}
-                      >
-                        <SellersNavTextWrapper>
-                          <OrderNavText>Date</OrderNavText>
-                        </SellersNavTextWrapper>
-                        <SellersNavTextWrapper>
-                          <OrderNavText>Type</OrderNavText>
-                        </SellersNavTextWrapper>
-                        <SellersNavTextWrapper>
-                          <OrderNavText>Receiver</OrderNavText>
-                        </SellersNavTextWrapper>
-                        <SellersNavTextWrapper>
-                          <OrderNavText>Resource</OrderNavText>
-                        </SellersNavTextWrapper>
-                        <SellersNavTextWrapper>
-                          <OrderNavText>Price</OrderNavText>
-                        </SellersNavTextWrapper>
-                        <SellersNavTextWrapper>
-                          <OrderNavText>Duration</OrderNavText>
-                        </SellersNavTextWrapper>
-                        <SellersNavTextWrapper>
-                          <OrderNavText>Paid-Amount</OrderNavText>
-                        </SellersNavTextWrapper>
-                        <SellersNavTextWrapper>
-                          <OrderNavText>Paid</OrderNavText>
-                        </SellersNavTextWrapper>
-                      </OrderNavTextWrapper1>
-                    </OrderNavWrapper>
-                    <OrdersCard></OrdersCard>
-                  </OrdersScroll>
-                </OrdersCarouselWrapper>
-              </OrderMainWrapper>
-            </OrdersWrapper>
+            <SellersTables />
           </SellersHistoryWrapper>
         </SellersMainWrapper>
       </SellersContainer>

@@ -1,18 +1,17 @@
 import React, { useState } from "react";
-import "./BuyersTable.css";
+import "./SellersTable.css"
 import {
   BuyersTableContainer1,
   BuyersContentsWrapper,
-} from "./BuyersTableElements";
+} from "../../Buyers/Section2/Table/BuyersTableElements";
 import {
   OrderMainWrapper,
   OrdersNavHeaderWrapper,
-
-} from "../../../../mainPage/mainPageElements";
+} from "../../../mainPage/mainPageElements";
 import { styled } from "@mui/material/styles";
 import { ToggleButtonGroup, ToggleButton } from "@mui/material";
-import BuyersTable1 from "./Table1/BuyersTable1";
-import BuyersTable2 from "./Table2/BuyersTable2";
+import SellersTable1 from "./Table1/Table1";
+import SellersTable2 from "./Table2/Table2";
 
 // Custom ToggleButtonGroup with full width
 const FullWidthToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
@@ -43,44 +42,46 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   },
 }));
 
-const BuyersTables: React.FC = () => {
-  const [BuyersTableSitchBtn, setBuyersTableSwitchBtn] = useState<
+const SellersTables: React.FC = () => {
+  const [sellersTableSwitchBtn, setSelersTableSwitchBtn] = useState<
     string | null
   >("Orders");
 
-  //--------------------------------------------------------------------------------------
-  //Function for switch Btn 1 to change the form :
-  const buyerBuyersTableSwitchBtnChange = (
+  const sellersTableSwitchBtnChange = (
     event: React.MouseEvent<HTMLElement>,
     newSwitchBtn: string | null
   ) => {
     // If the same switchBtn is clicked again, do nothing
-    if (newSwitchBtn === BuyersTableSitchBtn || newSwitchBtn === null) {
+    if (newSwitchBtn === sellersTableSwitchBtn || newSwitchBtn === null) {
       return;
     }
-    setBuyersTableSwitchBtn(newSwitchBtn);
+    setSelersTableSwitchBtn(newSwitchBtn);
   };
   return (
     <>
-      <BuyersTableContainer1 className="buyers-table-bg">
-        <OrderMainWrapper style={{ padding : "0" }}>
+      <BuyersTableContainer1 className="sellerss-table-bg">
+        <OrderMainWrapper style={{ padding: "0" }}>
           <OrdersNavHeaderWrapper>
             <FullWidthToggleButtonGroup
-              value={BuyersTableSitchBtn}
+              value={sellersTableSwitchBtn}
               exclusive
-              onChange={buyerBuyersTableSwitchBtnChange}
+              onChange={sellersTableSwitchBtnChange}
             >
               <CustomToggleButton value="Orders">Orders</CustomToggleButton>
-              <CustomToggleButton value="Funds">Funds</CustomToggleButton>
+              <CustomToggleButton value="Withdraw">Withdraw</CustomToggleButton>
             </FullWidthToggleButtonGroup>
           </OrdersNavHeaderWrapper>
         </OrderMainWrapper>
-        <BuyersContentsWrapper style={{ justifyContent : "space-between"}} >
-            {BuyersTableSitchBtn === "Orders" ? <BuyersTable1 /> :  <BuyersTable2 />}
+        <BuyersContentsWrapper style={{ justifyContent: "space-between" }}>
+          {sellersTableSwitchBtn === "Orders" ? (
+            <SellersTable1 />
+          ) : (
+            <SellersTable2 />
+          )}
         </BuyersContentsWrapper>
       </BuyersTableContainer1>
     </>
   );
 };
 
-export default React.memo(BuyersTables);
+export default SellersTables;

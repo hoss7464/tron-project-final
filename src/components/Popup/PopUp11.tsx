@@ -608,14 +608,14 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     }
     setEnergyDurationValue(getDurationFromSeconds(tradingAccountInfo.data.settings.minDurationEnergy));
     setEnergyDurationError("");
-    setBandwidthDurationValue(
-      getDurationFromSeconds(tradingAccountInfo.data.settings.minDurationBandwidth)
-    );
+    setBandwidthDurationValue(getDurationFromSeconds(tradingAccountInfo.data.settings.minDurationBandwidth));
     setBandwidthDurationError("");
+
     setEnergyAmount(tradingAccountInfo.data.settings.minUnitEnergy.toString());
     setEnergyAmountError("");
     setBandwidthAmount(tradingAccountInfo.data.settings.minUnitBandwidth.toString());
     setBandwidthAmountError("");
+
     setEnergyPrice(tradingAccountInfo.data.settings.minPriceEnergy.toString());
     setEnergyPriceError("");
     setBandwidthPrice(tradingAccountInfo.data.settings.minPriceBandwidth.toString());
@@ -623,6 +623,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
 
     setProfit(tradingAccountInfo?.data.settings.profit * 100);
     setActiveSell(tradingAccountInfo?.data.settings.isActive);
+    
     onClose();
   };
   //----------------------------------------------------------------------------
