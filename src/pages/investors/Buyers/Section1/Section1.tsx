@@ -132,6 +132,10 @@ const Section1: React.FC = () => {
       return;
     }
 
+    if (depositError) {
+      return 
+    }
+
     const baseUrl = process.env.REACT_APP_BASE_URL;
     const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
     const numericDepositAmount = Number(deposit);
