@@ -69,7 +69,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import LoadingButtonContent from "../../../../../../components/LoadingBtnContent/LoadingBtnContent";
-
+import Info from "../../../../../../components/Info-Icon-component/Info";
 //------------------------------------------------------------------------------------
 interface Form1ApiResponse {
   success: boolean;
@@ -1145,6 +1145,10 @@ const Form1: React.FC = () => {
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
               <FormAddLabel>Wallet Address</FormAddLabel>
+              <Info
+                tooltipText="The target address obtained.It can't be a contract address or any other invalid address."
+                placement="top"
+              />
               {walletAddError ? (
                 <FormErrorWrapper>
                   <FormError>{walletAddError}</FormError>
@@ -1174,6 +1178,12 @@ const Form1: React.FC = () => {
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
               <FormAddLabel>Amount</FormAddLabel>
+              <Info
+                tooltipText={`the amount expected for ${
+                  switchBtn === "energy" ? "energy" : "bandwidth"
+                }.`}
+                placement="top"
+              />
               {amountError && (
                 <FormErrorWrapper>
                   <FormError>{amountError}</FormError>
@@ -1312,6 +1322,10 @@ const Form1: React.FC = () => {
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>Duration</FormAddLabel>
+              <Info
+                tooltipText="The duration of the bought resource."
+                placement="top"
+              />
               {durationError && (
                 <FormErrorWrapper>
                   <FormError>{durationError}</FormError>
@@ -1434,6 +1448,10 @@ const Form1: React.FC = () => {
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>Price</FormAddLabel>
+              <Info
+                tooltipText="The price in sun for the expected resource."
+                placement="right"
+              />
               {priceError && (
                 <FormErrorWrapper>
                   <FormError>{priceError}</FormError>
@@ -1552,6 +1570,10 @@ const Form1: React.FC = () => {
                     />
                   }
                   label="partial fill"
+                />
+                <Info
+                  tooltipText="Minimum amount for the resource to buy."
+                  placement="top"
                 />
               </MenuItem>
             </Menu>

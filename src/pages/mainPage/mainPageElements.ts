@@ -91,14 +91,14 @@ export const MainTopSection = styled.div`
   @media only screen and (min-width: 993px) and (max-width: 1200px) {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     flex-direction: row;
     width: 100%;
   }
   @media only screen and (min-width: 1201px) {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     flex-direction: row;
     width: 100%;
   }
@@ -407,8 +407,8 @@ export const FormAddInputLabelWrapper = styled.div`
 `;
 export const FormAddLabelWrapper = styled.div`
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 0.5rem;
 `;
 export const FormAddLabel = styled.label`

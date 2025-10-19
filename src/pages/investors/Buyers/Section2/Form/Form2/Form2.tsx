@@ -77,6 +77,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { useLocation } from "react-router-dom";
 import Form2PopUp1 from "../FormPopups/Form2PopUp1";
 import axios from "axios";
+import Info from "../../../../../../components/Info-Icon-component/Info";
 import LoadingButtonContent from "../../../../../../components/LoadingBtnContent/LoadingBtnContent";
 //-----------------------------------------------------------------
 //Interfaces :
@@ -1457,6 +1458,10 @@ const Form2: React.FC = () => {
             >
               <Form2LableErrorWrapper>
                 <FormAddLabel>Wallet Address</FormAddLabel>
+                <Info
+                  tooltipText="The target address obtained.It can't be a contract address or any other invalid address."
+                  placement="top"
+                />
                 {walletAddError ? (
                   <FormErrorWrapper>
                     <FormError>{walletAddError}</FormError>
@@ -1493,6 +1498,12 @@ const Form2: React.FC = () => {
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
               <FormAddLabel>Amount</FormAddLabel>
+              <Info
+                tooltipText={`the amount expected for ${
+                  switchBtn === "energy" ? "energy" : "bandwidth"
+                }.`}
+                placement="top"
+              />
               {amountError && (
                 <FormErrorWrapper>
                   <FormError>{amountError}</FormError>
@@ -1627,6 +1638,10 @@ const Form2: React.FC = () => {
                 <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
                   <FormAddLabelWrapper>
                     <FormAddLabel>Duration</FormAddLabel>
+                    <Info
+                      tooltipText="The duration of the bought resource."
+                      placement="top"
+                    />
                     {durationError && (
                       <FormErrorWrapper>
                         <FormError>{durationError}</FormError>
@@ -1756,10 +1771,13 @@ const Form2: React.FC = () => {
                   <FormAddLabelWrapper
                     style={{
                       justifyContent: "space-between",
-                      width: "100%",
                     }}
                   >
-                    <FormAddLabel>Partial Field</FormAddLabel>
+                    <FormAddLabel>Partial</FormAddLabel>
+                    <Info
+                      tooltipText="Minimum amount for the resource to buy."
+                      placement="top"
+                    />
                     {partialFieldError ? (
                       <FormErrorWrapper>
                         <FormError>{partialFieldError}</FormError>
@@ -1798,12 +1816,16 @@ const Form2: React.FC = () => {
                   <FormAddLabelWrapper
                     style={{
                       justifyContent: "space-between",
-                      width: "100%",
+                     
                     }}
                   >
                     <FormAddLabel>
                       Min {switchBtn === "energy" ? "Energy" : "Bandwidth"}
                     </FormAddLabel>
+                    <Info
+                      tooltipText={`If the amount of your ${switchBtn === 'energy' ? 'energy' : 'bandwidth'} was under this amount ,you will be charged automatically. `}
+                      placement="top"
+                    />
                     {minAmountUnitError ? (
                       <FormErrorWrapper>
                         <FormError>{minAmountUnitError}</FormError>
@@ -1838,10 +1860,13 @@ const Form2: React.FC = () => {
                   <FormAddLabelWrapper
                     style={{
                       justifyContent: "space-between",
-                      width: "100%",
                     }}
                   >
                     <FormAddLabel>Limit</FormAddLabel>
+                    <Info
+                      tooltipText="The maximum amount of TRX to spend on auto buying or max number of orders."
+                      placement="top"
+                    />
                     {limitInputError ? (
                       <FormErrorWrapper>
                         <FormError>{limitInputError}</FormError>
@@ -1877,6 +1902,10 @@ const Form2: React.FC = () => {
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>Price</FormAddLabel>
+              <Info
+                tooltipText="The price in sun for the expected resource."
+                placement="right"
+              />
               {priceError && (
                 <FormErrorWrapper>
                   <FormError>{priceError}</FormError>

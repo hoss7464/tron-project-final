@@ -67,9 +67,9 @@ import Autocomplete from "@mui/material/Autocomplete";
 import { styled } from "@mui/material/styles";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
-import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import PopUp2 from "../../components/Popup/PopUp2";
+import Info from "../../components/Info-Icon-component/Info";
 //------------------------------------------------------------------------------------
 interface Form1ApiResponse {
   success: boolean;
@@ -110,8 +110,8 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
   fontWeight: "bold",
   fontSize: "12px",
   border: "2px solid #430E00",
-  borderRadius: 8,
-  padding: "4px 6px",
+  borderRadius: 6,
+  padding: "0px 6px",
   "&.Mui-selected": {
     backgroundColor: "#430E00",
     color: "#ffffff",
@@ -1012,6 +1012,10 @@ const OrderFormComponent: React.FC = () => {
             <FormAddInputLabelWrapper>
               <FormAddLabelWrapper>
                 <FormAddLabel>Wallet Address</FormAddLabel>
+                <Info
+                  tooltipText="The target address obtained.It can't be a contract address or any other invalid address."
+                  placement="top"
+                />
                 {walletAddError ? (
                   <FormErrorWrapper>
                     <FormError>{walletAddError}</FormError>
@@ -1044,6 +1048,10 @@ const OrderFormComponent: React.FC = () => {
             <FormAddInputLabelWrapper>
               <FormAddLabelWrapper>
                 <FormAddLabel>Amount</FormAddLabel>
+                <Info
+                  tooltipText={`the amount expected for ${switchBtn === 'energy' ? 'energy' : 'bandwidth'}.`}
+                  placement="top"
+                />
                 {amountError && (
                   <FormErrorWrapper>
                     <FormError>{amountError}</FormError>
@@ -1182,6 +1190,10 @@ const OrderFormComponent: React.FC = () => {
             <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
               <FormAddLabelWrapper>
                 <FormAddLabel>Duration</FormAddLabel>
+                <Info
+                  tooltipText="The duration of the bought resource."
+                  placement="top"
+                />
                 {durationError && (
                   <FormErrorWrapper>
                     <FormError>{durationError}</FormError>
@@ -1304,6 +1316,10 @@ const OrderFormComponent: React.FC = () => {
             <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
               <FormAddLabelWrapper>
                 <FormAddLabel>Price</FormAddLabel>
+                <Info
+                  tooltipText="The price in sun for the expected resource."
+                  placement="right"
+                />
                 {priceError && (
                   <FormErrorWrapper>
                     <FormError>{priceError}</FormError>
@@ -1423,6 +1439,10 @@ const OrderFormComponent: React.FC = () => {
                     }
                     label="partial fill"
                   />
+                  <Info
+                  tooltipText="Minimum amount for the resource to buy."
+                  placement="top"
+                />
                 </MenuItem>
               </Menu>
               {partialFill && (
@@ -1544,7 +1564,7 @@ const OrderFormComponent: React.FC = () => {
           myCurrentTime={currentTime}
           resetForm={() => {
             setAmount("");
-            
+
             setInputValue("");
             setAmountError("");
             setDurationError("");
