@@ -221,11 +221,7 @@ const OrderFormComponent: React.FC = () => {
     } else {
       return;
     }
-
-    setDurationValue("");
-    setDurationInSec(null);
     setInputValue("");
-    setPriceOptions([]);
     setDynamicPlaceholder("Price");
     setPriceError("");
     setDurationError("");
@@ -1049,7 +1045,9 @@ const OrderFormComponent: React.FC = () => {
               <FormAddLabelWrapper>
                 <FormAddLabel>Amount</FormAddLabel>
                 <Info
-                  tooltipText={`the amount expected for ${switchBtn === 'energy' ? 'energy' : 'bandwidth'}.`}
+                  tooltipText={`the amount expected for ${
+                    switchBtn === "energy" ? "energy" : "bandwidth"
+                  }.`}
                   placement="top"
                 />
                 {amountError && (
@@ -1440,9 +1438,9 @@ const OrderFormComponent: React.FC = () => {
                     label="partial fill"
                   />
                   <Info
-                  tooltipText="Minimum amount for the resource to buy."
-                  placement="top"
-                />
+                    tooltipText="Minimum amount for the resource to buy."
+                    placement="top"
+                  />
                 </MenuItem>
               </Menu>
               {partialFill && (
@@ -1563,8 +1561,16 @@ const OrderFormComponent: React.FC = () => {
           myCurrentDate={currentDate}
           myCurrentTime={currentTime}
           resetForm={() => {
-            setAmount("");
-
+            if (switchBtn === "energy") {
+              setAmount("1000000");
+            } else if (switchBtn === "bandwidth") {
+              setAmount("5000");
+            }
+            if (switchBtn === "energy") {
+              setPartialField(partialFieldValue.energy.toString());
+            } else {
+              setPartialField(partialFieldValue.bandwidth.toString());
+            }
             setInputValue("");
             setAmountError("");
             setDurationError("");

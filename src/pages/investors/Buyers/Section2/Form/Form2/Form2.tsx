@@ -16,13 +16,9 @@ import {
   Typography,
   Grid,
   ClickAwayListener,
-  Divider,
   ToggleButton,
   ToggleButtonGroup,
-  Checkbox,
   FormControlLabel,
-  Menu,
-  MenuItem,
   RadioGroup,
   Radio,
 } from "@mui/material";
@@ -45,10 +41,6 @@ import {
   InputMiniBtnWrapper,
   InputMiniBtnWrapper2,
   InputMiniBtn,
-  FormSettingWrapper,
-  FormSettingIconWrapper1,
-  FormSettingIconWrapper2,
-  FormSettingIcon,
   OrderInfoWrapper,
   OrderInfoHeaderWrapper,
   AccountHeader,
@@ -74,7 +66,6 @@ import { RootState } from "../../../../../../redux/store/store";
 import { useTronWallet } from "../../../../../../contexts/TronWalletContext";
 import { showNotification } from "../../../../../../redux/actions/notifSlice";
 import Autocomplete from "@mui/material/Autocomplete";
-import { useLocation } from "react-router-dom";
 import Form2PopUp1 from "../FormPopups/Form2PopUp1";
 import axios from "axios";
 import Info from "../../../../../../components/Info-Icon-component/Info";
@@ -259,11 +250,15 @@ const Form2: React.FC = () => {
       return;
     }
     setSwitchBtn(newSwitchBtn);
-    setAmount("");
-    setDurationValue("");
-    setDurationInSec(null);
+
+    if (newSwitchBtn === "energy") {
+      setAmount("1000000");
+    } else if (newSwitchBtn === "bandwidth") {
+      setAmount("5000");
+    } else {
+      return;
+    }
     setInputValue("");
-    setPriceOptions([]);
     setDynamicPlaceholder("Price");
     setPriceError("");
     setDurationError("");
@@ -1324,13 +1319,22 @@ const Form2: React.FC = () => {
 
           setWalletAdd(address);
           setBulkOrder(false);
-          setAmount("");
-          setDurationValue("");
-          setDurationInSec(2592000);
+
+          if (switchBtn === "energy") {
+            setAmount("1000000");
+          } else if (switchBtn === "bandwidth") {
+            setAmount("5000");
+          } else {
+            return;
+          }
           setInputValue("");
           setDynamicPlaceholder("Price");
           setRadionPrice("Fast");
-          setPartialField("0");
+          if (switchBtn === "energy") {
+            setPartialField(partialFieldValue.energy.toString());
+          } else {
+            setPartialField(partialFieldValue.bandwidth.toString());
+          }
           setMinAmountUnit("0");
           setLimitInput("0");
           isUserInput.current = false;
@@ -1816,14 +1820,15 @@ const Form2: React.FC = () => {
                   <FormAddLabelWrapper
                     style={{
                       justifyContent: "space-between",
-                     
                     }}
                   >
                     <FormAddLabel>
                       Min {switchBtn === "energy" ? "Energy" : "Bandwidth"}
                     </FormAddLabel>
                     <Info
-                      tooltipText={`If the amount of your ${switchBtn === 'energy' ? 'energy' : 'bandwidth'} was under this amount ,you will be charged automatically. `}
+                      tooltipText={`If the amount of your ${
+                        switchBtn === "energy" ? "energy" : "bandwidth"
+                      } was under this amount ,you will be charged automatically. `}
                       placement="top"
                     />
                     {minAmountUnitError ? (

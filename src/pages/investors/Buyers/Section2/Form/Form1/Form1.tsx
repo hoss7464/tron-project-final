@@ -226,11 +226,14 @@ const Form1: React.FC = () => {
       return;
     }
     setSwitchBtn(newSwitchBtn);
-    setAmount("");
-    setDurationValue("");
-    setDurationInSec(null);
+    if (newSwitchBtn === "energy") {
+      setAmount("1000000");
+    } else if (newSwitchBtn === "bandwidth") {
+      setAmount("5000");
+    } else {
+      return;
+    }
     setInputValue("");
-    setPriceOptions([]);
     setDynamicPlaceholder("Price");
     setPriceError("");
     setDurationError("");
@@ -958,19 +961,24 @@ const Form1: React.FC = () => {
                 severity: "success",
               })
             );
-            setSwitchBtn("energy");
-            setAmount("100000");
-            setDurationValue("");
-            setDurationInSec(null);
+            if (switchBtn === "energy") {
+              setAmount("1000000");
+            } else if (switchBtn === "bandwidth") {
+              setAmount("5000");
+            }
             setInputValue("");
-            setPriceOptions([]);
+
             setDynamicPlaceholder("Price");
             setPriceError("");
             setDurationError("");
             setAmountError("");
+            if (switchBtn === "energy") {
+              setPartialField(partialFieldValue.energy.toString());
+            } else {
+              setPartialField(partialFieldValue.bandwidth.toString());
+            }
             setPartialFieldError("");
             isUserInput.current = false;
-
             return;
           }
           //if balance = total price ----> bandwidth must be at lease 500 or more :
@@ -1015,16 +1023,23 @@ const Form1: React.FC = () => {
                   severity: "success",
                 })
               );
-              setSwitchBtn("energy");
-              setAmount("100000");
-              setDurationValue("");
-              setDurationInSec(null);
+
+              if (switchBtn === "energy") {
+                setAmount("1000000");
+              } else if (switchBtn === "bandwidth") {
+                setAmount("5000");
+              }
               setInputValue("");
-              setPriceOptions([]);
+
               setDynamicPlaceholder("Price");
               setPriceError("");
               setDurationError("");
               setAmountError("");
+              if (switchBtn === "energy") {
+                setPartialField(partialFieldValue.energy.toString());
+              } else {
+                setPartialField(partialFieldValue.bandwidth.toString());
+              }
               setPartialFieldError("");
               isUserInput.current = false;
               return;
