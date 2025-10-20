@@ -36,7 +36,7 @@ const MyFilterComponent: React.FC<Props> = ({
         onChange={handleChange}
         inputProps={{ "aria-label": "Without label" }}
         sx={{
-          height: 32,
+          height: 28,
           color: "#ffffff",
           backgroundColor: "#430E00",
           borderRadius : "6px",

@@ -82,7 +82,7 @@ export const OrdersComponent: React.FC = () => {
   //States :
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 7;
+  const rowsPerPage = 9;
   const { address } = useTronWallet();
   
   const [selectedOrder, setSelectedOrder] = useState<MarketOrder | null>(null);
@@ -215,7 +215,7 @@ export const OrdersComponent: React.FC = () => {
           </OrdersNavHeaderWrapper>
 
           <OrdersCarouselWrapper>
-            <OrdersScroll style={{height: "580px"}} >
+            <OrdersScroll style={{height: "607px"}} >
               <OrderNavWrapper>
                 <OrderNavTextWrapper1>
                   <OrderNavTextWrapper>
@@ -371,16 +371,18 @@ export const OrdersComponent: React.FC = () => {
           </OrdersCarouselWrapper>
         </OrderMainWrapper>
 
-        <OedersPaginationWrapper>
+        <OedersPaginationWrapper >
           <Pagination
             count={totalPages}
             page={currentPage}
             onChange={handlePageChange}
             color="primary"
+            size="small"
             sx={{
               "& .MuiPaginationItem-root.Mui-selected": {
                 backgroundColor: "#430E00",
                 color: "white",
+                
                 "&:hover": {
                   backgroundColor: "#430E00",
                 },

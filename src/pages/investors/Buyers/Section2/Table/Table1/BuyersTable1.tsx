@@ -55,7 +55,7 @@ const BuyersTable1: React.FC = () => {
 
   const [selectedOrder, setSelectedOrder] = useState<GetOrderData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 8;
+  const rowsPerPage = 10;
 
   //to get data from server :
   useEffect(() => {
@@ -101,9 +101,9 @@ const BuyersTable1: React.FC = () => {
   return (
     <>
       <OrderMainWrapper style={{ padding: "0" }}>
-        <OrdersCarouselWrapper>
-          <MyOrdersScroll style={{ height: "575px" }}>
-            <MyOrdersNavWrapper>
+        <OrdersCarouselWrapper  >
+          <MyOrdersScroll style={{ height: "647px" }}>
+            <MyOrdersNavWrapper >
               <MyOrdersNavTextWrapper>
                 <MyOrdersTextWrapper style={{ marginLeft: "3rem" }}>
                   <OrderNavText>Date</OrderNavText>
@@ -136,7 +136,7 @@ const BuyersTable1: React.FC = () => {
                 );
                 const isDisabled = progressValue === 0;
                 return (
-                  <OrdersDetail key={index}>
+                  <OrdersDetail key={index} style={{padding: "5px 14px"}}>
                     <MyOrdersInfoWrapper
                       onClick={isDisabled ? undefined : () => handleInfoClick()}
                       style={{
@@ -266,11 +266,12 @@ const BuyersTable1: React.FC = () => {
         </OrdersCarouselWrapper>
       </OrderMainWrapper>
 
-      <OedersPaginationWrapper>
+      <OedersPaginationWrapper >
         <Pagination
           count={totalPages}
           page={currentPage}
           onChange={handlePageChange}
+          size="small"
           color="primary"
           sx={{
             "& .MuiPaginationItem-root.Mui-selected": {

@@ -71,7 +71,7 @@ const BuyersTables: React.FC = () => {
               onChange={buyerBuyersTableSwitchBtnChange}
             >
               <CustomToggleButton value="Orders">Orders</CustomToggleButton>
-              <CustomToggleButton value="Funds">Funds</CustomToggleButton>
+              <CustomToggleButton value="Deposit">Deposit</CustomToggleButton>
             </FullWidthToggleButtonGroup>
           </OrdersNavHeaderWrapper>
         </OrderMainWrapper>

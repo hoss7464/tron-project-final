@@ -667,7 +667,7 @@ export const OrderMainWrapper = styled.div`
   align-items: flex-start;
   flex-direction: column;
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.5rem 0.5rem 0 0.5rem;
 `;
 
 export const OrdersCarouselWrapper = styled.div`
@@ -700,7 +700,7 @@ export const OrdersDetail = styled.div`
   align-items: center;
   width: 100%;
   border-radius: 8px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   padding: 6px 14px;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(6px);
@@ -875,7 +875,6 @@ export const OedersPaginationWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-top: 0.5rem;
 `;
 
 //-------------------------------------------------------------------------

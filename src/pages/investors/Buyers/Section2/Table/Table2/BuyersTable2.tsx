@@ -41,7 +41,7 @@ const BuyersTable2: React.FC = () => {
   const tronscanUrl = process.env.REACT_APP_TRONSCAN_TXID_URL;
 
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 9;
+  const rowsPerPage = 12;
 
   //to get data from server :
   useEffect(() => {
@@ -76,9 +76,9 @@ const BuyersTable2: React.FC = () => {
   return (
     <>
       <OrderMainWrapper style={{ padding: "0" }}>
-        <OrdersCarouselWrapper>
-          <MyOrdersScroll style={{ height: "575px" }}>
-            <AvailableNavWrapper >
+        <OrdersCarouselWrapper >
+          <MyOrdersScroll style={{ height: "647px" }}  >
+            <AvailableNavWrapper style={{padding: "0.4rem 0.5rem 0.4rem 0.5rem"}}>
               <BuyersAvailableNavbar>
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}} >
                   <OrderNavText>Date</OrderNavText>
@@ -113,7 +113,7 @@ const BuyersTable2: React.FC = () => {
                 return (
                   <OrdersDetail
                     key={index}
-                    style={{ justifyContent: "space-between" }}
+                    style={{ justifyContent: "space-between", padding: "5px 14px" }}
                   >
                     <BuyerstCardTextWrap1>
                       <OrdersCardTextWrapper2>
@@ -239,6 +239,7 @@ const BuyersTable2: React.FC = () => {
           page={currentPage}
           onChange={handlePageChange}
           color="primary"
+          size="small"
           sx={{
             "& .MuiPaginationItem-root.Mui-selected": {
               backgroundColor: "#430E00",
