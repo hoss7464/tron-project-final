@@ -13,7 +13,6 @@ import {
   TableRow,
   Link,
 } from "@mui/material";
-
 import {
   Popup2HeaderWrapper,
   Popup2Header,
@@ -32,6 +31,7 @@ import {
 import { MyMarketOrder} from "../../services/requestService";
 import { formatDateTime } from "../../utils/dateTime";
 import { truncateTxid } from "../../utils/truncate";
+import { useTranslation } from "react-i18next";
 
 
 interface MyOrderSuccessPopupProps {
@@ -45,6 +45,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
   onClose,
   orderData,
 }) => {
+  const { t } = useTranslation();
   const tronscanUrl = process.env.REACT_APP_TRONSCAN_TXID_URL
   const MyHandleReject = () => {
     onClose();
@@ -73,7 +74,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
         }}
       >
         <Popup2HeaderWrapper>
-          <Popup2Header>Fill summary</Popup2Header>
+          <Popup2Header>{t("Text105")}</Popup2Header>
         </Popup2HeaderWrapper>
         <Popup2ImgWrapper style={{ marginBottom: "1rem" }}>
           <LegacyCardIconWrapper1>
@@ -110,7 +111,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
                   : { color: "#430E00" }
               }
             >
-              {orderData.resourceType === "energy" ? "Energy" : "Bandwidth"}
+              {orderData.resourceType === "energy" ? `${t("Text6")}` : `${t("Text9")}`}
             </Popup2ItemName>
           </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>
@@ -132,7 +133,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
                         color: "#003543",
                       }}
                     >
-                      Delegated
+                      {t("Text106")}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -141,7 +142,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
                         color: "#003543",
                       }}
                     >
-                      Transaction ID (TXID)
+                      {t("Text107")} (TXID)
                     </TableCell>
                     <TableCell
                       sx={{
@@ -150,7 +151,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
                         color: "#003543",
                       }}
                     >
-                      Date
+                      {t("Text80")}
                     </TableCell>
                     <TableCell
                       sx={{
@@ -159,7 +160,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
                         color: "#003543",
                       }}
                     >
-                      Time
+                      {t("Text108")}
                     </TableCell>
                   </TableRow>
                 </TableHead>
@@ -221,7 +222,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
             }}
           >
             {" "}
-            close
+            {t("Text109")}
           </Button>
         </DialogActions>
       </Dialog>

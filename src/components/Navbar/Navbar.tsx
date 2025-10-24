@@ -2,13 +2,6 @@ import React, { useRef } from "react";
 import "./Navbar.css";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  hoverEnableToggle,
-  hoverDisableToggle,
-} from "../../redux/actions/toggleSlice";
-import { RootState } from "../../redux/store/store";
-import { clickToggle } from "../../redux/actions/toggleSlice";
 import {
   NavContainer,
   NavbarActiveArea,
@@ -30,19 +23,16 @@ import {
   ConnectIconWrapper,
   ConnectIcon,
 } from "./NavElements";
-import { Menu, Box } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import Logo from "../../assets/svg/Logo/Logo3.svg";
-import { toggleRefresh } from "../../redux/actions/refreshSlice";
 
 const Navbar: React.FC = () => {
   const Location = useLocation();
   const [age, setAge] = React.useState("EN");
   const { t, i18n } = useTranslation();
-  const dispatch = useDispatch();
   const avatarRef = useRef<HTMLButtonElement | null>(null);
   const {
     address,
@@ -57,22 +47,11 @@ const Navbar: React.FC = () => {
   const isHighZ =
     Location.pathname === "/Sellers" || Location.pathname === "/Buyers";
 
-  const avatarOpen = useSelector(
-    (state: RootState) => state.toggle.toggles["avatarToggle"]
-  );
-
   const isMarketPage = Location.pathname === "/";
-  const isBuyersOrSellers = Location.pathname === "/Buyers" || Location.pathname === "/Sellers";
+  //const isBuyersOrSellers = Location.pathname === "/Buyers" || Location.pathname === "/Sellers";
 
   const handleChange = (event: SelectChangeEvent) => {
     setAge(event.target.value);
-  };
-
-  const handleAvatarEnter = () => {
-    dispatch(hoverEnableToggle("avatarToggle"));
-  };
-  const handleAvatarLeave = () => {
-    dispatch(hoverDisableToggle("avatarToggle"));
   };
 
   const shortenAddress = (address: string) => {
@@ -83,8 +62,6 @@ const Navbar: React.FC = () => {
   const isConnected = isMarketPage ? isConnectedMarket : isConnectedTrading;
   const handleConnect = isMarketPage ? connectWalletMarket : connectWallet;
   const handleDisconnect = isMarketPage ? disconnectWallet2 : disconnectWallet
-
-
 
   return (
     <>
@@ -115,7 +92,7 @@ const Navbar: React.FC = () => {
                     }
                   />
                 </NavLinkIconWrapper>{" "}
-                Market
+                {t("Text2")}
               </NavLink>
               <NavLink
                 className="navlink-margin"
@@ -135,7 +112,7 @@ const Navbar: React.FC = () => {
                     }
                   />
                 </NavLinkIconWrapper>{" "}
-                Buyers
+                {t("Text3")}
               </NavLink>
               <NavLink
                 to="/Sellers"
@@ -154,7 +131,7 @@ const Navbar: React.FC = () => {
                     }
                   />
                 </NavLinkIconWrapper>{" "}
-                Sellers
+                {t("Text4")}
               </NavLink>
             </NavbarLinkWrapper>
           <NavbarRightSection>
@@ -171,16 +148,16 @@ const Navbar: React.FC = () => {
                       borderRadius: "10px",
                       color: "#003543",
                       "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#003543", // default border color
+                        borderColor: "#003543", 
                       },
                       "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#003543", // Border color on hover
+                        borderColor: "#003543", 
                       },
                       "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#003543", // border on focus
+                        borderColor: "#003543",
                       },
                       "& .MuiSelect-icon": {
-                        color: "#003543", // arrow icon color
+                        color: "#003543", 
                       },
                     }}
                     MenuProps={{
@@ -246,7 +223,7 @@ const Navbar: React.FC = () => {
                     <ConnectIcon />
                   </ConnectIconWrapper>
                   <ConnectBtn>
-                    <ConnectText>{t("Wallet")}</ConnectText>
+                    <ConnectText>{t("Text1")}</ConnectText>
                   </ConnectBtn>
                 </ConnectWrapper>
               )}

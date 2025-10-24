@@ -175,6 +175,7 @@ export const ConnectWrapper = styled.div`
   border-radius: 10px;
   cursor: pointer;
   padding: 8px 12px;
+  min-width: 120px;
 `;
 
 export const ConnectIconWrapper = styled.div`

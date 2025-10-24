@@ -53,6 +53,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { useTronWallet } from "../../../contexts/TronWalletContext";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../../redux/actions/notifSlice";
+import { useTranslation } from "react-i18next";
 
 const Legacy: React.FC = () => {
   const {
@@ -64,6 +65,7 @@ const Legacy: React.FC = () => {
     allEnergy,
   } = useTronWallet();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const bandwidthPercentage =
     allBandwidth && availableBandwidth
@@ -81,7 +83,7 @@ const Legacy: React.FC = () => {
       dispatch(
         showNotification({
           name: "copy-notif",
-          message: "Copied to clipboard",
+          message: `${t("Text19")}`,
           severity: "success",
         })
       );
@@ -93,7 +95,7 @@ const Legacy: React.FC = () => {
       <LegacyContainer>
         <LegacyWrapper>
           <LegacyHeaderWrapper>
-            <LegacyHeader>My Resource</LegacyHeader>
+            <LegacyHeader>{t("Text20")}</LegacyHeader>
           </LegacyHeaderWrapper>
 
           <LegacyCardWrapper>
@@ -106,14 +108,14 @@ const Legacy: React.FC = () => {
                         <LegacyCardIconWrapper2>
                           <LegacyCardIconWrapper3>
                             <LegacyCardIcon
-                              alt="account icon"
+                              alt={t("Text21")}
                               src={accountIcon}
                             />
                           </LegacyCardIconWrapper3>
                         </LegacyCardIconWrapper2>
                       </LegacyCardIconWrapper1>
                       <LegacyCardNameWrapper>
-                        <LegacyCardName>Account</LegacyCardName>
+                        <LegacyCardName>{t("Text22")}</LegacyCardName>
                       </LegacyCardNameWrapper>
                     </LegacyCardIconNameWrapper>
 
@@ -124,7 +126,7 @@ const Legacy: React.FC = () => {
                             <LegacyIconWrapper2>
                               <LegacyIconWrapper3>
                                 <LegacyAddIcon
-                                  alt="address icon"
+                                  alt={t("Text23")}
                                   src={addressIcon}
                                 />
                               </LegacyIconWrapper3>
@@ -149,7 +151,7 @@ const Legacy: React.FC = () => {
                             <LegacyIconWrapper2>
                               <LegacyIconWrapper3>
                                 <LegacyAddIcon
-                                  alt="balance icon"
+                                  alt={t("Text24")}
                                   src={balanceIcon}
                                 />
                               </LegacyIconWrapper3>
@@ -157,11 +159,11 @@ const Legacy: React.FC = () => {
                           </LegacyIconWrapper>
                           <LegacyBalanceWrapper>
                             <LegacyBalance>
-                              Balance{" "}
+                              {t("Text25")}{" "}
                               <span
                                 style={{ fontSize: "13px", color: "#003543" }}
                               >
-                                {"(TRX)"}
+                                {t("Text26")}
                               </span>
                             </LegacyBalance>
                           </LegacyBalanceWrapper>
@@ -191,7 +193,7 @@ const Legacy: React.FC = () => {
                             style={{ backgroundColor: "#003543" }}
                           >
                             <LegacyCardIcon
-                              alt="energy icon"
+                              alt={t("Text27")}
                               src={energyIcon}
                             />
                           </LegacyCardIconWrapper3>
@@ -220,7 +222,7 @@ const Legacy: React.FC = () => {
                     <LegacyCardPropertyWrapper>
                       <LegacyPropertyWrapper>
                         <LegacyPropertyHeaderWrapper>
-                          <LegacyCardName>Energy</LegacyCardName>
+                          <LegacyCardName>{t("Text6")}</LegacyCardName>
                         </LegacyPropertyHeaderWrapper>
                         <LegacyPropertyNumberWrapper>
                           {address ? (
@@ -256,7 +258,7 @@ const Legacy: React.FC = () => {
                         <LegacyCardIconWrapper2>
                           <LegacyCardIconWrapper3>
                             <LegacyCardIcon
-                              alt="bandwidth icon"
+                              alt={t("Text28")}
                               src={bandwidthIcon}
                             />
                           </LegacyCardIconWrapper3>
@@ -285,7 +287,7 @@ const Legacy: React.FC = () => {
                     <LegacyCardPropertyWrapper>
                       <LegacyPropertyWrapper>
                         <LegacyPropertyHeaderWrapper>
-                          <LegacyCardName>Bandwidth</LegacyCardName>
+                          <LegacyCardName>{t("Text9")}</LegacyCardName>
                         </LegacyPropertyHeaderWrapper>
                         <LegacyPropertyNumberWrapper>
                           {address ? (

@@ -3,22 +3,16 @@ import "./mainPage.css";
 import {
   AvailableWrapper,
   MyOrdersScroll,
-  MyOrdersNavWrapper,
-  MyOrdersNavTextWrapper,
-  MyOrdersTextWrapper,
   MyOrderDetails,
-  MyOrderCardTextWrap,
   OrderMainWrapper,
   OrdersNavHeaderWrapper,
   OrdersCarouselWrapper,
   OrderNavText,
-  OrdersCard,
   OrdersCardTextWrapper2,
   OrdersCardText1,
   AvailableNavWrapper,
   AvailableNavTextWrapper,
   AvailableCard,
-  AvailableDetails,
   AvailableCardTextWrap,
   OrderCardIconWrapper2,
   OrderCardIcon,
@@ -26,13 +20,14 @@ import {
 } from "./mainPageElements";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
-
 import { LegacyCardName } from "./LegacySection/LegacyElements";
 import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
 import { useFetchData } from "../../contexts/FetchDataContext";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import { filterByResourceType } from "../../utils/sortByDateAndTime3";
+import { useTranslation } from "react-i18next";
+
 
 interface RateItem {
   rate: number;
@@ -42,6 +37,7 @@ interface RateItem {
 }
 
 const AvailableResource: React.FC = () => {
+  const { t } = useTranslation();
   const { availableData } = useFetchData();
     const selectedFilter = useSelector(
     (state: RootState) => state.filters.availableResource|| "All"
@@ -115,7 +111,7 @@ const AvailableResource: React.FC = () => {
       <AvailableWrapper className="resource-available-bg2">
         <OrderMainWrapper>
           <OrdersNavHeaderWrapper>
-            <LegacyCardName>Fast Sell</LegacyCardName>
+            <LegacyCardName>{t("Text101")}</LegacyCardName>
             <MyFilterComponent
               listKey="availableResource"
               options={["All","energy", "bandwidth"]}
@@ -126,10 +122,10 @@ const AvailableResource: React.FC = () => {
             <MyOrdersScroll>
               <AvailableNavWrapper>
                 <AvailableNavTextWrapper style={{marginLeft : "2.2rem"}}>
-                  <OrderNavText>rate</OrderNavText>
+                  <OrderNavText>{t("Text102")}</OrderNavText>
                 </AvailableNavTextWrapper>
                 <AvailableNavTextWrapper style={{ marginRight: "2.5rem" }}>
-                  <OrderNavText>available</OrderNavText>
+                  <OrderNavText>{t("Text103")}</OrderNavText>
                 </AvailableNavTextWrapper>
               </AvailableNavWrapper>
 

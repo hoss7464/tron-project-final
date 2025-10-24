@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import axios from "axios";
 import {
@@ -35,6 +35,7 @@ import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
 import { Divider } from "@mui/material";
 import { formatStrictDuration } from "../../utils/fromSec";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
+import { useTranslation } from "react-i18next";
 
 interface OrderSuccessPopupProps {
   open: boolean;
@@ -93,6 +94,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   myCurrentTime,
   resetForm,
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { transferTrx, isTransferring, address } = useTronWallet();
   const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -249,7 +251,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
         }}
       >
         <Popup2HeaderWrapper>
-          <Popup2Header>Order Summary</Popup2Header>
+          <Popup2Header>{t("Text67")}</Popup2Header>
         </Popup2HeaderWrapper>
 
         <Popup2ImgWrapper>
@@ -283,18 +285,18 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                   : { color: "#430E00" }
               }
             >
-              {mySwitchBtn === "energy" ? "Energy" : "Bandwidth"}
+              {mySwitchBtn === "energy" ? `${t("Text6")}` : `${t("Text9")}`}
             </Popup2ItemName>
           </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>
         <DialogContent>
           <Box mb={2}>
             <Popup2SubheaderWrapper>
-              <Popup2Subheader>Details</Popup2Subheader>
+              <Popup2Subheader>{t("Text68")}</Popup2Subheader>
             </Popup2SubheaderWrapper>
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
-                <Popup2Name>Amount:</Popup2Name>
+                <Popup2Name>{t("Text48")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{Number(myAmount).toLocaleString()}</Popup2Item>
@@ -303,7 +305,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
 
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
-                <Popup2Name>Duration:</Popup2Name>
+                <Popup2Name>{t("Text50")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>
@@ -320,13 +322,13 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
 
           <Box mb={2}>
             <Popup2SubheaderWrapper>
-              <Popup2Subheader>Parties</Popup2Subheader>
+              <Popup2Subheader>{t("Text69")}</Popup2Subheader>
             </Popup2SubheaderWrapper>
             <Popup2NameItemWrapper
               style={{ flexDirection: "column", alignItems: "flex-start" }}
             >
               <Popup2NameWrapper>
-                <Popup2Name>Requester:</Popup2Name>
+                <Popup2Name>{t("Text70")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{address}</Popup2Item>
@@ -337,7 +339,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
               style={{ flexDirection: "column", alignItems: "flex-start" }}
             >
               <Popup2NameWrapper>
-                <Popup2Name>Receiver:</Popup2Name>
+                <Popup2Name>{t("Text71")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{myWalletAdd}</Popup2Item>
@@ -352,11 +354,11 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
 
           <Box mb={2}>
             <Popup2SubheaderWrapper>
-              <Popup2Subheader>Status</Popup2Subheader>
+              <Popup2Subheader>{t("Text72")}</Popup2Subheader>
             </Popup2SubheaderWrapper>
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
-                <Popup2Name>Created at:</Popup2Name>
+                <Popup2Name>{t("Text73")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>
@@ -374,7 +376,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
                 <Popup2Name style={{ fontSize: "20px", fontWeight: "800" }}>
-                  Payout:
+                  {t("Text65")}:
                 </Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
@@ -423,8 +425,8 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             
             <LoadingButtonContent
               loading={isProcessing}
-              loadingText="Confirming..."
-              normalText={mySwitchBtn === "energy" ? "Sell energy" : "Sell bandwidth"}
+              loadingText={`${t("Text74")}...`}
+              normalText={mySwitchBtn === "energy" ? `${t("Text75")}` : `${t("Text76")}`}
             />
           </Button>
 
@@ -444,7 +446,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
               },
             }}
           >
-            Reject
+            {t("Text77")}
           </Button>
         </DialogActions>
       </Dialog>

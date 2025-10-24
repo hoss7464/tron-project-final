@@ -26,7 +26,6 @@ import {
   Popup2Item,
   PopupFormInputWrapper,
   FormMaxBtn,
-  FormMaxBtnText,
   FormMaxCandleBtn,
   SettingIcon,
 } from "./PopUpElements";
@@ -57,6 +56,7 @@ import { showNotification } from "../../redux/actions/notifSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
+import { useTranslation } from "react-i18next";
 
 interface Popup3Types {
   open: boolean;
@@ -106,6 +106,7 @@ const PopUp3: React.FC<Popup3Types> = ({
   myDelegate,
   pairTrx,
 }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   //to get address from useTronWallet :
   const { address, fillOrder } = useTronWallet();
@@ -156,7 +157,7 @@ const PopUp3: React.FC<Popup3Types> = ({
     const value = event.target.value;
     setRequesterInput(value);
     if (!validationRequesterAdd(value)) {
-      setRequesterError("Invalid wallet address.");
+      setRequesterError(`${t("Text86")}`);
     } else {
       setRequesterError(null);
     }
@@ -183,7 +184,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       dispatch(
         showNotification({
           name: "Order-popup-error1",
-          message: "Missing required data.",
+          message: `${t("Text87")}`,
           severity: "error",
         })
       );
@@ -312,9 +313,6 @@ const PopUp3: React.FC<Popup3Types> = ({
   // Function for delegated input validation
   const handleDelegateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    const MIN_DELEGATE_AMOUNT = Number(
-      process.env.REACT_APP_MIN_DELEGATE_AMOUNT
-    );
     const roundedMax = maxCandle !== null ? Math.floor(maxCandle) : null;
 
     // 1. Allow empty input (for deletion)
@@ -335,11 +333,11 @@ const PopUp3: React.FC<Popup3Types> = ({
     const numericValue = parseFloat(value);
     if (!isNaN(numericValue)) {
       if (roundedMax !== null && numericValue > roundedMax) {
-        setDelegateInputError(`Cannot exceed ${roundedMax}`);
+        setDelegateInputError(`${t("Text88")} ${roundedMax}`);
       } else if (numericValue < minimum_amount_validation) {
-        setDelegateInputError(`Min amount is ${minimum_amount_validation}`);
+        setDelegateInputError(`${t("Text89")} ${minimum_amount_validation}`);
       } else if (numericValue <= 0) {
-        setDelegateInputError("Amount must be positive");
+        setDelegateInputError(`${t("Text90")}`);
       } else {
         setDelegateInputError(""); // Clear error if valid
       }
@@ -347,9 +345,6 @@ const PopUp3: React.FC<Popup3Types> = ({
   };
   // Function to validate blur :
   const handleDelegateBlur = () => {
-    const MIN_DELEGATE_AMOUNT = Number(
-      process.env.REACT_APP_MIN_DELEGATE_AMOUNT
-    );
 
     if (delegatedAmount === "") return;
 
@@ -357,19 +352,19 @@ const PopUp3: React.FC<Popup3Types> = ({
     const roundedMax = maxCandle !== null ? Math.floor(maxCandle) : null;
 
     if (isNaN(numericValue)) {
-      setDelegateInputError("Enter a valid number");
+      setDelegateInputError(`${t("Text91")}`);
       return;
     }
 
     if (roundedMax !== null) {
       if (numericValue > roundedMax) {
-        setDelegateInputError(`Cannot exceed ${roundedMax}`);
+        setDelegateInputError(`${t("Text88")} ${roundedMax}`);
         return;
       } else if (numericValue < minimum_amount_validation) {
-        setDelegateInputError(`Min amount is ${minimum_amount_validation}`);
+        setDelegateInputError(`${t("Text89")} ${minimum_amount_validation}`);
         return;
       } else if (numericValue <= 0) {
-        setDelegateInputError("Amount must be positive");
+        setDelegateInputError(`${t("Text90")}`);
         return;
       }
     }
@@ -402,27 +397,27 @@ const PopUp3: React.FC<Popup3Types> = ({
 
     //if data is NaN return an error :
     if (isNaN(numericDelegatedAmount)) {
-      setDelegateInputError("Enter a valid number");
+      setDelegateInputError(`${t("Text91")}`);
       return;
     }
     //if amount is not rounded and amount was more than max value return an error :
     if (roundedMax !== null && numericDelegatedAmount > roundedMax) {
-      setDelegateInputError(`Cannot exceed ${roundedMax}`);
+      setDelegateInputError(`${t("Text88")} ${roundedMax}`);
       return;
     }
     //if amount was lower than minimum delegated amount return an error:
     if (numericDelegatedAmount < minimum_amount_validation) {
-      setDelegateInputError(`Min amount is ${minimum_amount_validation}`);
+      setDelegateInputError(`${t("Text89")} ${minimum_amount_validation}`);
       return;
     }
     //if amount was negative number return an error :
     if (numericDelegatedAmount <= 0) {
-      setDelegateInputError("Amount must be positive");
+      setDelegateInputError(`${t("Text90")}`);
       return;
     }
     //if requester input didn't meet the validation return an error :
     if (!validationRequesterAdd(requesterInput)) {
-      setRequesterError("Invalid wallet address");
+      setRequesterError(`${t("Text86")}`);
       return;
     }
     //if receiver address doesn't exist or the wallet is not connected return an error :
@@ -430,7 +425,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       dispatch(
         showNotification({
           name: "Order-popuo-error3",
-          message: "Missing required data",
+          message: `${t("Text87")}`,
           severity: "error",
         })
       );
@@ -700,7 +695,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       setSignatureError(null);
       setPermissionValid(null);
     } else if (!validationSignatureAdd(value)) {
-      setSignatureError("Invalid wallet address.");
+      setSignatureError(`${t("Text86")}`);
       setPermissionValid(false);
     } else {
       setSignatureError(null);
@@ -845,14 +840,14 @@ const PopUp3: React.FC<Popup3Types> = ({
                   : { color: "#430E00" }
               }
             >
-              {order.resourceType === "energy" ? "Energy" : "Bandwidth"}
+              {order.resourceType === "energy" ? `${t("Text6")}` : `${t("Text9")}`}
             </Popup2ItemName>
           </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>
         {/* pop up delegate amount input */}
         <FormAddInputLabelWrapper>
           <FormAddLabelWrapper>
-            <FormAddLabel>To delegated amount (TRX)</FormAddLabel>
+            <FormAddLabel>{t("Text92")} (TRX)</FormAddLabel>
             {delegateInputError ? (
               <FormErrorWrapper>
                 <FormError>{delegateInputError}</FormError>
@@ -875,14 +870,14 @@ const PopUp3: React.FC<Popup3Types> = ({
               </FormAddInputWrapper2>
             </FormAddInputWrapper>
             <FormMaxCandleBtn onClick={handleMaxClick} value={maxCandle ?? 0}>
-              Max
+              {t("Text93")}
             </FormMaxCandleBtn>
           </PopupFormInputWrapper>
         </FormAddInputLabelWrapper>
         {/* pop up address input */}
         <FormAddInputLabelWrapper>
           <FormAddLabelWrapper>
-            <FormAddLabel>Payout target address</FormAddLabel>
+            <FormAddLabel>{t("Text94")}</FormAddLabel>
             {requesterError ? (
               <FormErrorWrapper>
                 <FormError>{requesterError}</FormError>
@@ -950,7 +945,7 @@ const PopUp3: React.FC<Popup3Types> = ({
                       }}
                     />
                   }
-                  label="Multi-Signature"
+                  label={`${t("Text95")}`}
                 />
               </MenuItem>
             </Menu>
@@ -960,7 +955,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         {settingBtn && (
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
-              <FormAddLabel>Multi-Signature</FormAddLabel>
+              <FormAddLabel>{t("Text95")}</FormAddLabel>
               {signatureError ? (
                 <FormErrorWrapper>
                   <FormError>{signatureError}</FormError>
@@ -984,12 +979,12 @@ const PopUp3: React.FC<Popup3Types> = ({
         <DialogContent>
           <Box mb={2}>
             <Popup2SubheaderWrapper>
-              <Popup2Subheader>Details</Popup2Subheader>
+              <Popup2Subheader>{t("Text96")}</Popup2Subheader>
             </Popup2SubheaderWrapper>
 
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
-                <Popup2Name>Amount:</Popup2Name>
+                <Popup2Name>{t("Text81")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{order.resourceAmount.toLocaleString()}</Popup2Item>
@@ -998,7 +993,7 @@ const PopUp3: React.FC<Popup3Types> = ({
 
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
-                <Popup2Name>Duration:</Popup2Name>
+                <Popup2Name>{t("Text50")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>
@@ -1009,7 +1004,7 @@ const PopUp3: React.FC<Popup3Types> = ({
 
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
-                <Popup2Name>Max-Delegate:</Popup2Name>
+                <Popup2Name>{t("Text97")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{Number(myDelegate / 1_000_000).toFixed(2) } TRX</Popup2Item>
@@ -1044,7 +1039,7 @@ const PopUp3: React.FC<Popup3Types> = ({
               style={{ flexDirection: "column", alignItems: "flex-start" }}
             >
               <Popup2NameWrapper>
-                <Popup2Name>Receiver:</Popup2Name>
+                <Popup2Name>{t("Text71")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
                 <Popup2Item>{order.receiver}</Popup2Item>
@@ -1060,7 +1055,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             <Popup2NameItemWrapper>
               <Popup2NameWrapper>
                 <Popup2Name style={{ fontSize: "20px", fontWeight: "800" }}>
-                  Payout:
+                  {t("Text65")}:
                 </Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
@@ -1106,8 +1101,8 @@ const PopUp3: React.FC<Popup3Types> = ({
           >
             <LoadingButtonContent
               loading={isSubmitting}
-              loadingText="Filling..."
-              normalText="Fill"
+              loadingText={`${t("Text98")}...`}
+              normalText={`${t("Text99")}`}
             />
           </Button>
 
@@ -1126,7 +1121,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             }}
             onClick={handleClose}
           >
-            Cancel
+            {t("Text100")}
           </Button>
         </DialogActions>
       </Dialog>

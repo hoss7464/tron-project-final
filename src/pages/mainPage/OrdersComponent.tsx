@@ -49,10 +49,7 @@ import { durationToNumber } from "../../utils/durationToNum";
 import PopUp3 from "../../components/Popup/PopUp3";
 import { useFetchData } from "../../contexts/FetchDataContext";
 
-interface ServerResponse {
-  success: boolean;
-  data: MarketOrder[];
-}
+
 export interface MarketOrder {
   _id: string;
   createdAt: string;
@@ -80,9 +77,9 @@ export const OrdersComponent: React.FC = () => {
   const dispatch = useDispatch();
   const { orderData, fetchData } = useFetchData();
   //States :
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 9;
+  const rowsPerPage = i18n.language === "en" ? 9 : 8;
   const { address } = useTronWallet();
   
   const [selectedOrder, setSelectedOrder] = useState<MarketOrder | null>(null);
@@ -112,9 +109,6 @@ export const OrdersComponent: React.FC = () => {
       refreshData();
     }
   }, [refreshTrigger, fetchData]);
-
-
-
   //------------------------------------------------------------------------------------------------------------
   //Function for pagination :
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
@@ -171,7 +165,7 @@ export const OrdersComponent: React.FC = () => {
       dispatch(
         showNotification({
           name: "error6",
-          message: "Connect your wallet.",
+          message: `${t("Text39")}`,
           severity: "error",
         })
       );
@@ -205,7 +199,7 @@ export const OrdersComponent: React.FC = () => {
           
           <OrdersNavHeaderWrapper>
             <LegacyCardName style={{ color: "#003543" }}>
-              {t("orders")}
+              {t("Text79")}
             </LegacyCardName>
             <MyFilterComponent
               listKey="orders"
@@ -219,23 +213,23 @@ export const OrdersComponent: React.FC = () => {
               <OrderNavWrapper>
                 <OrderNavTextWrapper1>
                   <OrderNavTextWrapper>
-                    <OrderNavText>{t("date")}</OrderNavText>
+                    <OrderNavText>{t("Text80")}</OrderNavText>
                   </OrderNavTextWrapper>
 
                   <OrderNavTextWrapper>
-                    <OrderNavText>amount</OrderNavText>
+                    <OrderNavText>{t("Text81")}</OrderNavText>
                   </OrderNavTextWrapper>
 
                   <OrderNavTextWrapper>
-                    <OrderNavText>{t("price")}</OrderNavText>
+                    <OrderNavText>{t("Text82")}</OrderNavText>
                   </OrderNavTextWrapper>
 
                   <OrderNavTextWrapper>
-                    <OrderNavText>{t("payment")}</OrderNavText>
+                    <OrderNavText>{t("Text83")}</OrderNavText>
                   </OrderNavTextWrapper>
 
                   <OrderNavTextWrapper>
-                    <OrderNavText>{t("fulfilled")}</OrderNavText>
+                    <OrderNavText>{t("Text84")}</OrderNavText>
                   </OrderNavTextWrapper>
                 </OrderNavTextWrapper1>
               </OrderNavWrapper>
@@ -360,7 +354,7 @@ export const OrdersComponent: React.FC = () => {
                         <OrdersSellBtnWrapper
                           onClick={() => handleSellClick(myData)}
                         >
-                          <OrdersSell>Sell</OrdersSell>
+                          <OrdersSell>{t("Text85")}</OrdersSell>
                         </OrdersSellBtnWrapper>
                       )}
                     </OrdersDetail>

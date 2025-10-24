@@ -34,8 +34,10 @@ import {
 } from "./FooterElements";
 import { Divider } from "@mui/material";
 import Logo from "../../assets/svg/Logo/Logo3.svg"
+import { useTranslation } from "react-i18next";
 
 const Footer: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <>
       <FooterContainer>
@@ -49,14 +51,13 @@ const Footer: React.FC = () => {
                 </FooterIconWrapper>
                 <FooterHeaderWrapper>
                   <FooterHeader>
-                    Optimizing Bandwidth, Energy, and Innovation.
+                    {t("Text115")}
                   </FooterHeader>
                 </FooterHeaderWrapper>
               </FooterIconHeaderWrapper>
               <FooterSubheaderWrapper>
                 <FooterSubheader>
-                  Powered by TRON — where bandwidth and energy drive smart,
-                  seamless transactions.
+                 {t("Text116")}
                 </FooterSubheader>
               </FooterSubheaderWrapper>
               <FooterSocialMediaWrapper1>
@@ -87,39 +88,39 @@ const Footer: React.FC = () => {
             <FooterContentRightSection>
               <FooterFeatureWrapper>
                 <FooterFeatureHeaderWrapper>
-                  <FooterFeatureHeader>Company</FooterFeatureHeader>
+                  <FooterFeatureHeader>{t("Text117")}</FooterFeatureHeader>
                 </FooterFeatureHeaderWrapper>
                 <FooterFeatureTextWrapper1>
                   <FooterFeatureTextWrapper2>
-                    <FooterFeatureText>About Us</FooterFeatureText>
+                    <FooterFeatureText>{t("Text118")}</FooterFeatureText>
                   </FooterFeatureTextWrapper2>
                   <FooterFeatureTextWrapper2>
-                    <FooterFeatureText>Careers</FooterFeatureText>
+                    <FooterFeatureText>{t("Text119")}</FooterFeatureText>
                   </FooterFeatureTextWrapper2>
                   <FooterFeatureTextWrapper2>
-                    <FooterFeatureText>News</FooterFeatureText>
+                    <FooterFeatureText>{t("Text120")}</FooterFeatureText>
                   </FooterFeatureTextWrapper2>
                   <FooterFeatureTextWrapper2>
-                    <FooterFeatureText>Contract</FooterFeatureText>
+                    <FooterFeatureText>{t("Text121")}</FooterFeatureText>
                   </FooterFeatureTextWrapper2>
                 </FooterFeatureTextWrapper1>
               </FooterFeatureWrapper>
               <FooterFeatureWrapper>
                 <FooterFeatureHeaderWrapper>
-                  <FooterFeatureHeader>Business</FooterFeatureHeader>
+                  <FooterFeatureHeader>{t("Text122")}</FooterFeatureHeader>
                 </FooterFeatureHeaderWrapper>
                 <FooterFeatureTextWrapper1>
                   <FooterFeatureTextWrapper2>
-                    <FooterFeatureText>Telebot</FooterFeatureText>
+                    <FooterFeatureText>{t("Text123")}</FooterFeatureText>
                   </FooterFeatureTextWrapper2>
                   <FooterFeatureTextWrapper2>
-                    <FooterFeatureText>Buy API</FooterFeatureText>
+                    <FooterFeatureText>{t("Text124")}</FooterFeatureText>
                   </FooterFeatureTextWrapper2>
                   <FooterFeatureTextWrapper2>
-                    <FooterFeatureText>API Example</FooterFeatureText>
+                    <FooterFeatureText>{t("Text125")}</FooterFeatureText>
                   </FooterFeatureTextWrapper2>
                   <FooterFeatureTextWrapper2>
-                    <FooterFeatureText>System Status</FooterFeatureText>
+                    <FooterFeatureText>{t("Text126")}</FooterFeatureText>
                   </FooterFeatureTextWrapper2>
                 </FooterFeatureTextWrapper1>
               </FooterFeatureWrapper>
@@ -137,10 +138,10 @@ const Footer: React.FC = () => {
           />
           <PrivacyTermsWrapper>
             <PrivacyWrapper>
-              <PrivacyTermsText>Privacy Policy</PrivacyTermsText>
+              <PrivacyTermsText>{t("Text127")}</PrivacyTermsText>
             </PrivacyWrapper>
             <TermsWrapper>
-              <PrivacyTermsText>Terms of Services</PrivacyTermsText>
+              <PrivacyTermsText>{t("Text128")}</PrivacyTermsText>
             </TermsWrapper>
           </PrivacyTermsWrapper>
         </FooterWrapper>

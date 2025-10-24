@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
-import { useSelector, useDispatch } from "react-redux";
-import { showNotification } from "../../redux/actions/notifSlice";
+import { useSelector} from "react-redux";
 import { RootState } from "../../redux/store/store";
-import { toggleRefresh } from "../../redux/actions/refreshSlice";
 import {
   MyOrdersWrapper,
   OrderMainWrapper,
@@ -35,7 +33,6 @@ import {
   MyOrdersInfoWrapper,
   MyOrdersInfoIcon,
 } from "./mainPageElements";
-
 import LinearProgress from "@mui/material/LinearProgress";
 import { OrderCardIconWrapper2 } from "./mainPageElements";
 import { LegacyCardName } from "./LegacySection/LegacyElements";
@@ -46,7 +43,6 @@ import {
 import MyFilterComponent from "../../components/FilterComponent/MyFilterComponent";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
-import { useTronWallet } from "../../contexts/TronWalletContext";
 import { formatDateTime } from "../../utils/dateTime";
 import { formatStrictDuration } from "../../utils/fromSec";
 import { useFetchData } from "../../contexts/FetchDataContext";
@@ -55,15 +51,10 @@ import PopUp4 from "../../components/Popup/PoUp4";
 import PopUp5 from "../../components/Popup/PopUp5";
 import { Tooltip } from "@mui/material";
 
-interface ServerResponse {
-  success: boolean;
-  data: MyInfoOrder[];
-}
-
 interface Hold {
   qty: number;
   txid: string;
-  settledAt: string; // or Date if you plan to convert to Date objects
+  settledAt: string; 
 }
 
 export interface MyInfoOrder {
@@ -89,9 +80,7 @@ export interface MyInfoOrder {
 }
 
 const MyOrdersComponent: React.FC = () => {
-  const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { address, accessToken } = useTronWallet();
   const { myOrderData, fetchData } = useFetchData();
   const [myModalOpen, setMyModalOpen] = useState(false);
   const [myCancelOpen, setMyCancelOpen] = useState(false);
@@ -137,6 +126,7 @@ const MyOrdersComponent: React.FC = () => {
   );
 
   //Function to calculate total price :
+  /* 
   const handleTotal = (myFreeze: number, myPair: number | null) => {
     if (myPair === null) {
       return 0;
@@ -144,6 +134,7 @@ const MyOrdersComponent: React.FC = () => {
     const calcTotal = myFreeze * myPair;
     return calcTotal;
   };
+  */
 
   //Functions for info popup :
   const handleInfoClick = (order: MyMarketOrder) => {
@@ -171,7 +162,7 @@ const MyOrdersComponent: React.FC = () => {
       <MyOrdersWrapper className="my-orders-bg2">
         <OrderMainWrapper>
           <OrdersNavHeaderWrapper>
-            <LegacyCardName>My Orders</LegacyCardName>
+            <LegacyCardName>{t("Text104")}</LegacyCardName>
             <MyFilterComponent
               listKey="myOrders"
               options={["latest", "energy", "bandwidth", "price", "oldest"]}
@@ -183,23 +174,23 @@ const MyOrdersComponent: React.FC = () => {
               <MyOrdersNavWrapper>
                 <MyOrdersNavTextWrapper>
                   <MyOrdersTextWrapper style={{ marginLeft: "3rem" }}>
-                    <OrderNavText>{t("date")}</OrderNavText>
+                    <OrderNavText>{t("Text80")}</OrderNavText>
                   </MyOrdersTextWrapper>
 
                   <MyOrdersTextWrapper>
-                    <OrderNavText>amount</OrderNavText>
+                    <OrderNavText>{t("Text81")}</OrderNavText>
                   </MyOrdersTextWrapper>
 
                   <MyOrdersTextWrapper>
-                    <OrderNavText>{t("price")}</OrderNavText>
+                    <OrderNavText>{t("Text82")}</OrderNavText>
                   </MyOrdersTextWrapper>
 
                   <MyOrdersTextWrapper>
-                    <OrderNavText>{t("payment")}</OrderNavText>
+                    <OrderNavText>{t("Text83")}</OrderNavText>
                   </MyOrdersTextWrapper>
 
                   <MyOrdersTextWrapper>
-                    <OrderNavText>{t("fulfilled")}</OrderNavText>
+                    <OrderNavText>{t("Text84")}</OrderNavText>
                   </MyOrdersTextWrapper>
                 </MyOrdersNavTextWrapper>
               </MyOrdersNavWrapper>
@@ -329,7 +320,7 @@ const MyOrdersComponent: React.FC = () => {
                         <MyOrdersSellBtnWrapper
                           onClick={() => handleCancelClick(myData)}
                         >
-                          <MyOrdersSell>Cancel</MyOrdersSell>
+                          <MyOrdersSell>{t("Text100")}</MyOrdersSell>
                         </MyOrdersSellBtnWrapper>
                       )}
 

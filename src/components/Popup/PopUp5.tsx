@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
 import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
 import {
   Popup2HeaderWrapper,
@@ -24,6 +23,7 @@ import { useTronWallet } from "../../contexts/TronWalletContext";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
+import { useTranslation } from "react-i18next";
 
 interface MyOrderCancelPopupProps {
   open: boolean;
@@ -36,6 +36,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
   onClose,
   orderData,
 }) => {
+  const { t } = useTranslation();
   const { address, adapter } = useTronWallet();
   const dispatch = useDispatch();
   //State for disabling the button after submitting for 300 ms :
@@ -51,7 +52,6 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
     try {
       setIsSubmitting(true);
       const window_tronweb = (window as any).tronWeb;
-      const baseURL = process.env.REACT_APP_BASE_URL;
       const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
       // Check if adapter is available
@@ -157,7 +157,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         }}
       >
         <Popup2HeaderWrapper>
-          <Popup2Header>Cancel Operation</Popup2Header>
+          <Popup2Header>{t("Text110")}</Popup2Header>
         </Popup2HeaderWrapper>
 
         <Popup2ImgWrapper style={{ marginBottom: "1rem" }}>
@@ -195,16 +195,15 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
                   : { color: "#430E00" }
               }
             >
-              {orderData.resourceType === "energy" ? "Energy" : "Bandwidth"}
+              {orderData.resourceType === "energy" ? `${t("Text6")}` : `${t("Text9")}`}
             </Popup2ItemName>
           </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>
         <DialogContent>
           <Popup5TextWrapper>
             <Popup5Text>
-              To cancel this order you lose {cancelTrxAmount} TRX from your
-              account,
-              <br /> Are you sure ?
+              {t("Text111")} {cancelTrxAmount} TRX {t("Text112")}
+              <br /> {t("Text113")}
             </Popup5Text>
           </Popup5TextWrapper>
         </DialogContent>
@@ -239,8 +238,8 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
             {" "}
             <LoadingButtonContent
               loading={isSubmitting}
-              loadingText="Confirming..."
-              normalText="Confirm"
+              loadingText={`${t("Text74")}...`}
+              normalText={`${t("Text114")}`}
             />
           </Button>
           <Button
@@ -258,7 +257,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
               },
             }}
           >
-            cancel
+            {t("Text100")}
           </Button>
         </DialogActions>
       </Dialog>

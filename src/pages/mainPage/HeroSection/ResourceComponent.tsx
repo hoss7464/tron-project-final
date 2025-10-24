@@ -28,11 +28,11 @@ import energyIcon from "../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
 import recoveryIcon from "../../../assets/svg/RecoveryIcon.svg";
 import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg";
-
+import { useTranslation } from "react-i18next";
 //----------------------------------------------------------------------------------------
-
 const ResourceComponent: React.FC = () => {
   //states :
+  const { t } = useTranslation();
   const { resourceData, fetchData } = useFetchData();
 
   const refreshTrigger = useSelector(
@@ -105,13 +105,13 @@ const ResourceComponent: React.FC = () => {
                     />
                   </HeroGridCardIconWrapper>
                   <HeroGridCardHeaderWrapper>
-                    <HeroGridCardHeader>Ready Resource</HeroGridCardHeader>
+                    <HeroGridCardHeader>{t("Text13")}</HeroGridCardHeader>
                   </HeroGridCardHeaderWrapper>
                 </HeroGridCardIconHeaderWrapper>
 
                 <HeroGridCardSubHeaderWrapper>
                   <HeroGridCardSubHeader>
-                    Your flexible energy and bandwidth,ready when you are.
+                    {t("Text14")}
                   </HeroGridCardSubHeader>
                 </HeroGridCardSubHeaderWrapper>
 
@@ -168,13 +168,13 @@ const ResourceComponent: React.FC = () => {
                     <HeroGridCardIcon alt="recovery icon" src={recoveryIcon} />
                   </HeroGridCardIconWrapper>
                   <HeroGridCardHeaderWrapper>
-                    <HeroGridCardHeader>24h Recovery</HeroGridCardHeader>
+                    <HeroGridCardHeader>{t("Text15")}</HeroGridCardHeader>
                   </HeroGridCardHeaderWrapper>
                 </HeroGridCardIconHeaderWrapper>
 
                 <HeroGridCardSubHeaderWrapper>
                   <HeroGridCardSubHeader>
-                    Your energy and bandwidth are restored every 24 hours.
+                    {t("Text16")}
                   </HeroGridCardSubHeader>
                 </HeroGridCardSubHeaderWrapper>
 
@@ -231,13 +231,13 @@ const ResourceComponent: React.FC = () => {
                     />
                   </HeroGridCardIconWrapper>
                   <HeroGridCardHeaderWrapper>
-                    <HeroGridCardHeader>APY for sellers</HeroGridCardHeader>
+                    <HeroGridCardHeader>{t("Text17")}</HeroGridCardHeader>
                   </HeroGridCardHeaderWrapper>
                 </HeroGridCardIconHeaderWrapper>
 
                 <HeroGridCardSubHeaderWrapper>
                   <HeroGridCardSubHeader>
-                    Earn passive APY by supplying energy and bandwidth.
+                    {t("Text18")}
                   </HeroGridCardSubHeader>
                 </HeroGridCardSubHeaderWrapper>
 

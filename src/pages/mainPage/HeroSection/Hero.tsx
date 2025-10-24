@@ -14,21 +14,12 @@ import {
   HeroUniqueTextWrapper,
   HeroUniqueText,
 } from "./HeroElements";
-
-import { useDispatch } from "react-redux";
-import { useTronWallet } from "../../../contexts/TronWalletContext";
-import { clickToggle } from "../../../redux/actions/toggleSlice";
 import uniqueText from "../../../assets/svg/unique/UniqueText11.svg";
 import ResourceComponent from "./ResourceComponent";
+import { useTranslation } from "react-i18next";
 
 const Hero: React.FC = () => {
-  const dispatch = useDispatch();
-  const { address } = useTronWallet();
-
-  const shortenAddress = (address: string) => {
-    if (address.length <= 6) return address;
-    return `${address.slice(0, 4)}...${address.slice(-4)}`;
-  };
+  const { t } = useTranslation();
 
   return (
     <>
@@ -37,20 +28,19 @@ const Hero: React.FC = () => {
         <HeroTextButtonHeaderWrapper>
           <HeroHeaderWrapper>
             <HeroHeader>
-              Fuel Your dApps with{" "}
-              <span style={{ color: "#416872" }}>Energy</span> and
-              <span style={{ color: "#416872" }}> Bandwidth</span>.
+              {t("Text5")}{" "}
+              <span style={{ color: "#416872" }}>{t("Text6")}</span> {t("Text8")}
+              <span style={{ color: "#416872" }}> {t("Text9")}</span>.
             </HeroHeader>
           </HeroHeaderWrapper>
           <HeroTextWrapper>
             <HeroText>
-              Lower fees, faster transactions, take your decentralized
-              applications to the next level.
+              {t("Text11")}
             </HeroText>
           </HeroTextWrapper>
           <HeroButtonWrapper>
             <HeroButtonWrapper2>
-              <HeroButtonText>Get Started</HeroButtonText>
+              <HeroButtonText>{t("Text12")}</HeroButtonText>
             </HeroButtonWrapper2>
           </HeroButtonWrapper>
         </HeroTextButtonHeaderWrapper>
