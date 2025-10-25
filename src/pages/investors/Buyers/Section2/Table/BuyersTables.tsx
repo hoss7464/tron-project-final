@@ -13,6 +13,7 @@ import { styled } from "@mui/material/styles";
 import { ToggleButtonGroup, ToggleButton } from "@mui/material";
 import BuyersTable1 from "./Table1/BuyersTable1";
 import BuyersTable2 from "./Table2/BuyersTable2";
+import { useTranslation } from "react-i18next";
 
 // Custom ToggleButtonGroup with full width
 const FullWidthToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
@@ -44,6 +45,7 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
 }));
 
 const BuyersTables: React.FC = () => {
+  const { t } = useTranslation();
   const [BuyersTableSitchBtn, setBuyersTableSwitchBtn] = useState<
     string | null
   >("Orders");
@@ -70,8 +72,8 @@ const BuyersTables: React.FC = () => {
               exclusive
               onChange={buyerBuyersTableSwitchBtnChange}
             >
-              <CustomToggleButton value="Orders">Orders</CustomToggleButton>
-              <CustomToggleButton value="Deposit">Deposit</CustomToggleButton>
+              <CustomToggleButton value="Orders">{t("Text79")}</CustomToggleButton>
+              <CustomToggleButton value="Deposit">{t("Text156")}</CustomToggleButton>
             </FullWidthToggleButtonGroup>
           </OrdersNavHeaderWrapper>
         </OrderMainWrapper>

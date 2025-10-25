@@ -498,7 +498,7 @@ const OrderFormComponent: React.FC = () => {
     }
 
     if (isNaN(numValue)) {
-      return `${t("Text32")}`;
+      return `${t("Text36")}`;
     }
 
     //skip the validation if minAmountPrice and durationInSec are not loaded yet
@@ -1013,7 +1013,7 @@ const OrderFormComponent: React.FC = () => {
             <FormAddInputLabelWrapper>
               <FormAddLabelWrapper>
                 <FormAddLabel>{t("Text46")}</FormAddLabel>
-                <Info tooltipText={`${t("Text7")}`} placement="top" />
+                <Info tooltipText={`${t("Text47")}`} placement="top" />
                 {walletAddError ? (
                   <FormErrorWrapper>
                     <FormError>{walletAddError}</FormError>

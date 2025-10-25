@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useFetchData } from "../../../../../contexts/FetchDataContext";
 import { SellersOrdersResponse } from "../../../../../services/requestService";
 import {
@@ -34,14 +34,17 @@ import energyIcon from "../../../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../../../assets/svg/BandwidthIcon.svg";
 import { truncateTxid2 } from "../../../../../utils/truncate";
 import { Link } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const SellersTable1: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { sellersOrderInfo } = useFetchData();
   const [wholeSellersOrderInfo, setWholeSellersOrderInfo] =
     useState<SellersOrdersResponse | null>(null);
   const tronscanUrl = process.env.REACT_APP_TRONSCAN_TXID_URL;
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  
+  const rowsPerPage = i18n.language === "en" ? 10 : 9;
 
   //to get data from server :
   useEffect(() => {
@@ -75,27 +78,27 @@ const SellersTable1: React.FC = () => {
                 style={{ justifyContent: "space-between", width: "97%" }}
               >
                 <MyOrdersTextWrapper>
-                  <OrderNavText>Date</OrderNavText>
+                  <OrderNavText>{t("Text80")}</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>Receiver</OrderNavText>
+                  <OrderNavText>{t("Text71")}</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>Amount</OrderNavText>
+                  <OrderNavText>{t("Text81")}</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>Profit</OrderNavText>
+                  <OrderNavText>{t("Text150")}</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>TxId</OrderNavText>
+                  <OrderNavText>{t("Text151")}</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>Expired</OrderNavText>
+                  <OrderNavText>{t("Text152")}</OrderNavText>
                 </MyOrdersTextWrapper>
               </MyOrdersNavTextWrapper>
             </MyOrdersNavWrapper>

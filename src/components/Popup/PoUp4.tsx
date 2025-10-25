@@ -142,7 +142,7 @@ const PopUp4: React.FC<MyOrderSuccessPopupProps> = ({
                         color: "#003543",
                       }}
                     >
-                      {t("Text107")} (TXID)
+                      {t("Text107")} ({t("Text151")})
                     </TableCell>
                     <TableCell
                       sx={{

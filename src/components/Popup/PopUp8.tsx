@@ -11,6 +11,7 @@ import {
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
+import { useTranslation } from "react-i18next";
 
 interface BuyerChangeApiProps {
   open: boolean;
@@ -25,6 +26,7 @@ interface BuyerChangeApiData {
 }
 
 const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { accessToken } = useTronWallet();
 
@@ -112,12 +114,12 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
         }}
       >
         <Popup2HeaderWrapper>
-          <Popup2Header>Change API</Popup2Header>
+          <Popup2Header>{t("Text160")}</Popup2Header>
         </Popup2HeaderWrapper>
 
         <DialogContent>
           <Popup5TextWrapper>
-            <Popup5Text>Do you want to change your API ?</Popup5Text>
+            <Popup5Text>{t("Text161")}</Popup5Text>
           </Popup5TextWrapper>
         </DialogContent>
 
@@ -152,8 +154,8 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
             {" "}
             <LoadingButtonContent
               loading={isSubmitting}
-              loadingText="Changing..."
-              normalText="Yes"
+              loadingText={`${t("Text162")}...`}
+              normalText={`${t("Text163")}`}
             />
           </Button>
           <Button
@@ -171,7 +173,7 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
               },
             }}
           >
-            No
+            {t("Text164")}
           </Button>
         </DialogActions>
       </Dialog>

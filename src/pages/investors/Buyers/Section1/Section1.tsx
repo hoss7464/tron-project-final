@@ -52,6 +52,7 @@ import balanceIcon from "../../../../assets/svg/BalanceIcon.svg";
 import PopUp8 from "../../../../components/Popup/PopUp8";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../../../redux/actions/notifSlice";
+import { useTranslation } from "react-i18next";
 import LoadingButtonContent from "../../../../components/LoadingBtnContent/LoadingBtnContent";
 
 interface depositTrxData {
@@ -68,6 +69,7 @@ interface depositTrxConfirmation {
 }
 
 const Section1: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { address, isConnectedTrading, accessToken, transferTrx } =
     useTronWallet();
@@ -113,7 +115,7 @@ const Section1: React.FC = () => {
 
       // Validate immediately after setting the allowed value
       if (value && Number(value) < 10) {
-        setDepositError("Minimum deposit: 10 TRX");
+        setDepositError(`${t("Text155")}: 10 TRX`);
       } else {
         setDepositError("");
       }
@@ -125,7 +127,7 @@ const Section1: React.FC = () => {
       dispatch(
         showNotification({
           name: "deposit-error-5",
-          message: "Connect your wallet.",
+          message: `${t("Text39")}`,
           severity: "error",
         })
       );
@@ -253,7 +255,7 @@ const Section1: React.FC = () => {
       dispatch(
         showNotification({
           name: "deposit-error-1",
-          message: "Connect your wallet.",
+          message: `${t("Text39")}`,
           severity: "error",
         })
       );
@@ -272,7 +274,7 @@ const Section1: React.FC = () => {
       dispatch(
         showNotification({
           name: "copy-notif",
-          message: "Copied to clipboard",
+          message: `${t("Text19")}`,
           severity: "success",
         })
       );
@@ -305,7 +307,7 @@ const Section1: React.FC = () => {
                       </LegacyCardIconWrapper2>
                     </LegacyCardIconWrapper1>
                     <LegacyCardNameWrapper>
-                      <LegacyCardName>Deposit</LegacyCardName>
+                      <LegacyCardName>{t("Text156")}</LegacyCardName>
                     </LegacyCardNameWrapper>
                   </LegacyCardIconNameWrapper>
                   <SellersCardThingsWrapper>
@@ -326,7 +328,7 @@ const Section1: React.FC = () => {
                           <FormAddInputWrapper2>
                             <FormAddInput
                               value={deposit}
-                              placeholder="min-amount: 10 TRX"
+                              placeholder={`${t("Text155")}: 10 TRX`}
                               style={{ height: "25px" }}
                               onChange={handleDepositChange}
                             />
@@ -341,8 +343,8 @@ const Section1: React.FC = () => {
                         >
                           <LoadingButtonContent
                             loading={isSubmitting}
-                            loadingText="Depositing..."
-                            normalText="Deposit"
+                            loadingText={`${t("Text157")}...`}
+                            normalText={`${t("Text156")}`}
                           />
                         </OrderSubmitBtn>
                       </OrderSubmitBtnWrapper>
@@ -364,14 +366,14 @@ const Section1: React.FC = () => {
                       </LegacyCardIconWrapper2>
                     </LegacyCardIconWrapper1>
                     <LegacyCardNameWrapper>
-                      <LegacyCardName>API balance</LegacyCardName>
+                      <LegacyCardName>{t("Text158")}</LegacyCardName>
                     </LegacyCardNameWrapper>
                   </LegacyCardIconNameWrapper>
                   <Sec1CardThingsWrapper>
                     <SellersCardThingsWrapper2 style={{ padding: "0" }}>
                       <SellersCardThingsNameIconWrapper>
                         <SellersCardThingsNameWrapper>
-                          <SellersCardThingsName>Credit </SellersCardThingsName>
+                          <SellersCardThingsName>{t("Text148")}</SellersCardThingsName>
                         </SellersCardThingsNameWrapper>
                       </SellersCardThingsNameIconWrapper>
                       <SellersCardThingsNumberWrapper>
@@ -402,21 +404,21 @@ const Section1: React.FC = () => {
                       </LegacyCardIconWrapper2>
                     </LegacyCardIconWrapper1>
                     <LegacyCardNameWrapper>
-                      <LegacyCardName>API key</LegacyCardName>
+                      <LegacyCardName>{t("Text159")}</LegacyCardName>
                     </LegacyCardNameWrapper>
                   </LegacyCardIconNameWrapper>
                   <Sec1CardThingsWrapper>
                     <FormAddInputWrapper style={{ marginBottom: "1rem" }}>
                       <FormAddInputIconWrapper>
                         <FormAddInputWrapper2>
-                          <FormAddInput value={apiKey} placeholder="API key" />
+                          <FormAddInput value={apiKey} placeholder={`${t("Text159")}`} />
                         </FormAddInputWrapper2>
 
                         <Sec1CopyIcon onClick={handleCopy} />
                       </FormAddInputIconWrapper>
                     </FormAddInputWrapper>
                     <Sec1ButtonWrapper onClick={handlePopUp8Click}>
-                      <Sec1ButtonText>Change API</Sec1ButtonText>
+                      <Sec1ButtonText>{t("Text160")}</Sec1ButtonText>
                     </Sec1ButtonWrapper>
                   </Sec1CardThingsWrapper>
                 </LegacyCardWrapper3>

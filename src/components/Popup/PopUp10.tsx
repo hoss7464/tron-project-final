@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-
+import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogActions, Button } from "@mui/material";
 import {
   Popup2HeaderWrapper,
@@ -36,7 +36,8 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
   onClose,
   orderData,
 }) => {
-  const { address, adapter, accessToken } = useTronWallet();
+  const { t } = useTranslation();
+  const { accessToken } = useTronWallet();
   const dispatch = useDispatch();
   //State for disabling the button after submitting for 300 ms :
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -131,7 +132,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         }}
       >
         <Popup2HeaderWrapper>
-          <Popup2Header>Cancel Operation</Popup2Header>
+          <Popup2Header>{t("Text110")}</Popup2Header>
         </Popup2HeaderWrapper>
 
         <Popup2ImgWrapper style={{ marginBottom: "1rem" }}>
@@ -169,16 +170,15 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
                   : { color: "#430E00" }
               }
             >
-              {orderData.resourceType === "energy" ? "Energy" : "Bandwidth"}
+              {orderData.resourceType === "energy" ? `${t("Text6")}` : `${t("Text9")}`}
             </Popup2ItemName>
           </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>
         <DialogContent>
           <Popup5TextWrapper>
             <Popup5Text>
-              To cancel this order you lose {cancelTrxAmount} TRX from your
-              account,
-              <br /> Are you sure ?
+              {t("Text111")} {cancelTrxAmount} TRX {t("Text112")}
+              <br /> {t("Text113")}
             </Popup5Text>
           </Popup5TextWrapper>
         </DialogContent>
@@ -214,8 +214,8 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
             {" "}
             <LoadingButtonContent
               loading={isSubmitting}
-              loadingText="Confirming..."
-              normalText="Confirm"
+              loadingText={`${t("Text74")}...`}
+              normalText={`${t("Text114")}`}
             />
           </Button>
           <Button
@@ -233,7 +233,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
               },
             }}
           >
-            cancel
+            {t("Text100")}
           </Button>
         </DialogActions>
       </Dialog>

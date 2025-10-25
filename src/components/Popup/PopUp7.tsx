@@ -8,20 +8,21 @@ import {
   ConnectText,
 } from "../Navbar/NavElements";
 import { useTronWallet } from "../../contexts/TronWalletContext";
+import { useTranslation } from "react-i18next";
 
 export const PopUp7: React.FC = () => {
-    const {connectWallet} = useTronWallet()
+  const { connectWallet } = useTronWallet();
+  const { t } = useTranslation();
 
-    
   return (
     <>
-      <PopUp >
+      <PopUp>
         <ConnectWrapper onClick={connectWallet}>
           <ConnectIconWrapper>
             <ConnectIcon />
           </ConnectIconWrapper>
           <ConnectBtn>
-            <ConnectText>Connect Your wallet</ConnectText>
+            <ConnectText>{t("Text129")}</ConnectText>
           </ConnectBtn>
         </ConnectWrapper>
       </PopUp>

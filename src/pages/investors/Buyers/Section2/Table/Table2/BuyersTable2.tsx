@@ -32,8 +32,10 @@ import {
 } from "../../../../../../utils/dateTime";
 import { truncateTxid2 } from "../../../../../../utils/truncate";
 import { Tooltip } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const BuyersTable2: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { tradingRefundInfo } = useFetchData();
   const [wholeRefundInfo, setWholeRefundInfo] = useState<RefundResponse | null>(
     null
@@ -41,7 +43,8 @@ const BuyersTable2: React.FC = () => {
   const tronscanUrl = process.env.REACT_APP_TRONSCAN_TXID_URL;
 
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 12;
+
+  const rowsPerPage = i18n.language === "en" ? 12 : 11;
 
   //to get data from server :
   useEffect(() => {
@@ -81,23 +84,23 @@ const BuyersTable2: React.FC = () => {
             <AvailableNavWrapper style={{padding: "0.4rem 0.5rem 0.4rem 0.5rem"}}>
               <BuyersAvailableNavbar>
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}} >
-                  <OrderNavText>Date</OrderNavText>
+                  <OrderNavText>{t("Text80")}</OrderNavText>
                 </AvailableNavTextWrapper>
 
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}}>
-                  <OrderNavText>Requester</OrderNavText>
+                  <OrderNavText>{t("Text70")}</OrderNavText>
                 </AvailableNavTextWrapper>
 
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}}>
-                  <OrderNavText>Amount</OrderNavText>
+                  <OrderNavText>{t("Text81")}</OrderNavText>
                 </AvailableNavTextWrapper>
 
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}}>
-                  <OrderNavText>TxId</OrderNavText>
+                  <OrderNavText>{t("Text151")}</OrderNavText>
                 </AvailableNavTextWrapper>
 
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}}>
-                  <OrderNavText>Paid-At</OrderNavText>
+                  <OrderNavText>{t("Text153")}</OrderNavText>
                 </AvailableNavTextWrapper>
 
                

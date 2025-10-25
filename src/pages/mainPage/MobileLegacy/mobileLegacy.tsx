@@ -38,6 +38,7 @@ import energyIcon from "../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../../redux/actions/notifSlice";
+import { useTranslation } from "react-i18next";
 
 const MobileLegacy: React.FC = () => {
   const {
@@ -49,6 +50,7 @@ const MobileLegacy: React.FC = () => {
     allEnergy,
   } = useTronWallet();
   const dispatch = useDispatch();
+  const { t } = useTranslation()
 
   //Funtion for copy button :
   const handleCopy = () => {
@@ -57,7 +59,7 @@ const MobileLegacy: React.FC = () => {
       dispatch(
         showNotification({
           name: "copy-notif",
-          message: "Copied to clipboard",
+          message: `${t("Text19")}`,
           severity: "success",
         })
       );
@@ -77,7 +79,7 @@ const MobileLegacy: React.FC = () => {
                 </LegacyCardIconWrapper2>
               </LegacyCardIconWrapper1>
               <LegacyCardNameWrapper>
-                <LegacyCardName>Account</LegacyCardName>
+                <LegacyCardName>{t("Text22")}</LegacyCardName>
               </LegacyCardNameWrapper>
             </LegacyCardIconNameWrapper>
             <LegacyAccountInfoWrapper className="account-info-bg">
@@ -110,7 +112,7 @@ const MobileLegacy: React.FC = () => {
                   </LegacyIconWrapper>
                   <LegacyBalanceWrapper>
                     <LegacyBalance>
-                      Balance{" "}
+                      {t("Text25")}{" "}
                       <span style={{ fontSize: "13px", color: "#003543" }}>
                         {"(TRX)"}
                       </span>
@@ -138,17 +140,17 @@ const MobileLegacy: React.FC = () => {
                     </LegacyIconWrapper2>
                   </LegacyIconWrapper>
                   <LegacyBalanceWrapper>
-                    <LegacyBalance>Energy</LegacyBalance>
+                    <LegacyBalance>{t("Text6")}</LegacyBalance>
                   </LegacyBalanceWrapper>
                 </LegacyIconBalanceWrapper>
                 <LegacyNumberWrapper>
                   {address ? (
                     <>
                       <LegacyNumber style={{ color: "#003543" }}>
-                        {availableEnergy}/{" "}
+                        {availableEnergy?.toLocaleString()}/{" "}
                       </LegacyNumber>
                       <LegacyNumber style={{ color: "#003543" }}>
-                        {allEnergy}
+                        {allEnergy?.toLocaleString()}
                       </LegacyNumber>
                     </>
                   ) : (
@@ -177,17 +179,17 @@ const MobileLegacy: React.FC = () => {
                     </LegacyIconWrapper2>
                   </LegacyIconWrapper>
                   <LegacyBalanceWrapper>
-                    <LegacyBalance>Bandwidth</LegacyBalance>
+                    <LegacyBalance>{t("Text9")}</LegacyBalance>
                   </LegacyBalanceWrapper>
                 </LegacyIconBalanceWrapper>
                 <LegacyNumberWrapper>
                   {address ? (
                     <>
                       <LegacyNumber style={{ color: "#430E00" }}>
-                        {allBandwidth}/{" "}
+                        {allBandwidth?.toLocaleString()}/{" "}
                       </LegacyNumber>
                       <LegacyNumber style={{ color: "#430E00" }}>
-                        {availableBandwidth}
+                        {availableBandwidth?.toLocaleString()}
                       </LegacyNumber>
                     </>
                   ) : (

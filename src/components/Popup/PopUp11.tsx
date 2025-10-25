@@ -19,12 +19,10 @@ import {
   FormControlLabel,
 } from "@mui/material";
 import {
-  Form,
   FormHeaderSwitchWrapper,
   FormHeaderIconWrapper,
   FormIconWrapper,
   FormHeaderWrapper,
-  FormSwitchWrapper,
   FormAddInputLabelWrapper,
   FormAddLabelWrapper,
   FormAddLabel,
@@ -32,29 +30,12 @@ import {
   FormError,
   FormAddInputWrapper,
   FormAddInputIconWrapper,
-  FormAddIcon,
   FormAddInputWrapper2,
   FormAddInput,
-  InputMiniBtnWrapper,
-  InputMiniBtnWrapper2,
-  InputMiniBtn,
-  FormSettingWrapper,
-  FormSettingIconWrapper1,
-  FormSettingIconWrapper2,
-  FormSettingIcon,
-  OrderInfoWrapper,
-  OrderInfoHeaderWrapper,
-  AccountHeader,
-  OrderInfoTextWrapper,
-  OrderInfoTextWrapper2,
-  OrderInfoText,
-  OrderSubmitBtnWrapper,
-  OrderSubmitBtn,
 } from "../../pages/mainPage/mainPageElements";
 import { AccountInfoResponse } from "../../services/requestService";
 import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../assets/svg/BandwidthIcon.svg";
-
 import {
   HeroGridCardNumberIconWrapper2,
   HeroGridCardNumberIconWrapper3,
@@ -89,8 +70,9 @@ const boxStyle = {
 
 const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   const dispatch = useDispatch();
+  const { t } = useTranslation()
   const { tradingAccountInfo, resourceData, fetchData } = useFetchData();
-  const { isConnectedTrading, address, accessToken } = useTronWallet();
+  const { isConnectedTrading, accessToken } = useTronWallet();
   const refreshTrigger = useSelector(
     (state: RootState) => state.refresh.refreshTrigger
   );
@@ -271,46 +253,58 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const trimmed = value.trim();
 
     if (trimmed === "") {
-      return "required";
+      return `${t("Text32")}`;
     }
     //valid time between options :
     const validDurations = [
-      "15 minutes",
-      "1 hour",
-      "3 hours",
+      `15 ${t("Text53")}`,
+      `1 ${t("Text55")}`,
+      `3 ${t("Text56")}`,
       ...Array.from(
         { length: 30 },
-        (_, i) => `${i + 1} ${i + 1 === 1 ? "day" : "days"}`
+        (_, i) => `${i + 1} ${i + 1 === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
       ),
     ];
 
     if (!validDurations.includes(trimmed)) {
-      return "invalid time";
+      return `${t("Text35")}`;
     }
     return "";
   };
   //Function to convert duration in seconds :
   const getDurationInSeconds = (value: string): number | null => {
     const trimmed = value.trim().toLowerCase();
-    const match = trimmed.match(/^(\d+)\s*(minutes?|hours?|days?)$/);
+
+    // Get all possible unit translations
+    const minuteUnits = [`${t("Text53")}`.toLowerCase()]; // minutes
+    const hourUnits = [
+      `${t("Text55")}`.toLowerCase(),
+      `${t("Text56")}`.toLowerCase(),
+    ]; // hours
+    const dayUnits = [
+      `${t("Text58")}`.toLowerCase(),
+      `${t("Text59")}`.toLowerCase(),
+    ]; // days
+
+    // Create regex pattern with all possible units
+    const allUnits = [...minuteUnits, ...hourUnits, ...dayUnits];
+    const regexPattern = new RegExp(`^(\\d+)\\s*(${allUnits.join("|")})$`);
+
+    const match = trimmed.match(regexPattern);
 
     if (!match) return null;
 
     const number = parseInt(match[1], 10);
     const unit = match[2];
 
-    switch (unit) {
-      case "minute":
-      case "minutes":
-        return number * 60;
-      case "hour":
-      case "hours":
-        return number * 3600;
-      case "day":
-      case "days":
-        return number * 86400;
-      default:
-        return null;
+    if (minuteUnits.includes(unit)) {
+      return number * 60;
+    } else if (hourUnits.includes(unit)) {
+      return number * 3600;
+    } else if (dayUnits.includes(unit)) {
+      return number * 86400;
+    } else {
+      return null;
     }
   };
   //funtion to get duration from seconds :
@@ -323,13 +317,13 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const days = seconds / 86400;
 
     // Check for exact matches with your available options
-    if (seconds === 15 * 60) return "15 minutes";
-    if (seconds === 1 * 3600) return "1 hour";
-    if (seconds === 3 * 3600) return "3 hours";
+    if (seconds === 15 * 60) return `15 ${t("Text53")}`;
+    if (seconds === 1 * 3600) return `1 ${t("Text55")}`;
+    if (seconds === 3 * 3600) return `3 ${t("Text56")}`;
 
     // Check for days (1-30)
     if (days >= 1 && days <= 30 && Number.isInteger(days)) {
-      return `${days} ${days === 1 ? "day" : "days"}`;
+      return `${days} ${days === 1 ? `${t("Text58")}` : `${t("Text59")}`}`;
     }
 
     // If it doesn't match any of the predefined options, return the closest representation
@@ -337,31 +331,31 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     if (days >= 1) {
       const roundedDays = Math.round(days);
       if (roundedDays >= 1 && roundedDays <= 30) {
-        return `${roundedDays} ${roundedDays === 1 ? "day" : "days"}`;
+        return `${roundedDays} ${roundedDays === 1 ? `${t("Text58")}` : `${t("Text59")}`}`;
       }
     }
 
     if (hours >= 1) {
       const roundedHours = Math.round(hours);
       if (roundedHours === 1 || roundedHours === 3) {
-        return `${roundedHours} ${roundedHours === 1 ? "hour" : "hours"}`;
+        return `${roundedHours} ${roundedHours === 1 ? `${t("Text55")}` : `${t("Text56")}`}`;
       }
     }
 
     if (minutes === 15) {
-      return "15 minutes";
+      return `15 ${t("Text53")}`;
     }
 
     // Fallback: return the value in the most appropriate unit
     if (seconds >= 86400) {
       const dayCount = Math.round(seconds / 86400);
-      return `${dayCount} ${dayCount === 1 ? "day" : "days"}`;
+      return `${dayCount} ${dayCount === 1 ? `${t("Text58")}` : `${t("Text59")}`}`;
     } else if (seconds >= 3600) {
       const hourCount = Math.round(seconds / 3600);
-      return `${hourCount} ${hourCount === 1 ? "hour" : "hours"}`;
+      return `${hourCount} ${hourCount === 1 ? `${t("Text55")}` : `${t("Text56")}`}`;
     } else {
       const minuteCount = Math.round(seconds / 60);
-      return `${minuteCount} ${minuteCount === 1 ? "minute" : "minutes"}`;
+      return `${minuteCount} ${minuteCount === 1 ? `${t("Text198")}` : `${t("Text53")}`}`;
     }
   };
   //Function for click on energy min-duration:
@@ -415,9 +409,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     if (rawValue.trim() === "") {
-      return "required";
+      return `${t("Text32")}`;
     } else if (isNaN(numericValue)) {
-      return "required";
+      return `${t("Text32")}`;
     }
 
     if (numericValue < minAmount.energy) {
@@ -457,9 +451,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     if (rawValue.trim() === "") {
-      return "required";
+      return `${t("Text32")}`;
     } else if (isNaN(numericValue)) {
-      return "required";
+      return `${t("Text32")}`;
     }
 
     if (numericValue < minAmount.bandwidth) {
@@ -504,9 +498,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     if (rawValue.trim() === "") {
-      return "required";
+      return `${t("Text32")}`;
     } else if (isNaN(numericValue)) {
-      return "required";
+      return `${t("Text32")}`;
     }
 
     if (numericValue < minPrice.energy) {
@@ -545,9 +539,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     if (rawValue.trim() === "") {
-      return "required";
+      return `${t("Text32")}`;
     } else if (isNaN(numericValue)) {
-      return "required";
+      return `${t("Text32")}`;
     }
 
     if (numericValue < minPrice.bandwidth) {
@@ -657,7 +651,6 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       profit: profit / 100,
       isActive: activeSell,
     };
-    console.log(settingPayload)
     try {
       const settingResponse = await axios.post<AccountInfoResponse>(
         `${baseURL}/Buyer/updateAccountInfo`,
@@ -760,7 +753,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                 </FormIconWrapper>
                 <FormHeaderWrapper>
                   <HeroGridCardHeader style={{ color: "#003543" }}>
-                    Energy
+                    {t("Text6")}
                   </HeroGridCardHeader>
                 </FormHeaderWrapper>
               </FormHeaderIconWrapper>
@@ -769,7 +762,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
               {/** energy min-duration */}
               <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
                 <FormAddLabelWrapper>
-                  <FormAddLabel>Min-Duration</FormAddLabel>
+                  <FormAddLabel>{t("Text199")}</FormAddLabel>
                   {energyDurationError && (
                     <FormErrorWrapper>
                       <FormError>{energyDurationError}</FormError>
@@ -780,7 +773,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                   <ClickAwayListener onClickAway={() => setEnergyOpen(false)}>
                     <Box>
                       <TextField
-                        placeholder="Duration"
+                        placeholder={`${t("Text50")}`}
                         value={energyDurationValue}
                         onChange={(e) => setEnergyDurationValue(e.target.value)}
                         onFocus={() => setEnergyOpen(true)}
@@ -829,7 +822,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                             borderRadius: 2,
                           }}
                         >
-                          <Typography fontWeight="bold">Minutes</Typography>
+                          <Typography fontWeight="bold">{t("Text52")}</Typography>
                           <Grid container spacing={1} mb={2}>
                             {minutes.map((min) => (
                               <Grid key={min}>
@@ -837,7 +830,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   sx={boxStyle}
                                   onClick={(e) => {
                                     e.stopPropagation(); // prevent triggering events on other components
-                                    handleOptionClick1(`${min} minutes`);
+                                    handleOptionClick1(`${min} ${t("Text53")}`);
                                   }}
                                 >
                                   {min}
@@ -845,7 +838,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                               </Grid>
                             ))}
                           </Grid>
-                          <Typography fontWeight="bold">Hours</Typography>
+                          <Typography fontWeight="bold">{t("Text54")}</Typography>
                           <Grid container spacing={1} mb={2}>
                             {hours.map((hr) => (
                               <Grid key={hr}>
@@ -854,7 +847,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleOptionClick1(
-                                      `${hr} ${hr === 1 ? "hour" : "hours"}`
+                                      `${hr} ${hr === 1 ?  `${t("Text55")}` : `${t("Text56")}`}`
                                     );
                                   }}
                                 >
@@ -863,7 +856,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                               </Grid>
                             ))}
                           </Grid>
-                          <Typography fontWeight="bold">Days</Typography>
+                          <Typography fontWeight="bold">{t("Text57")}</Typography>
                           <Grid container spacing={1}>
                             {days.map((day) => (
                               <Grid size={2} key={day}>
@@ -875,7 +868,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleOptionClick1(
-                                      `${day} ${day === 1 ? "day" : "days"}`
+                                      `${day} ${day === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
                                     );
                                   }}
                                 >
@@ -896,7 +889,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                 <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
                   <FormAddInputLabelWrapper>
                     <FormAddLabelWrapper>
-                      <FormAddLabel>Min-Amount</FormAddLabel>
+                      <FormAddLabel>{t("Text200")}</FormAddLabel>
                       {energyAmountError && (
                         <FormErrorWrapper>
                           <FormError>{energyAmountError}</FormError>
@@ -920,7 +913,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                 <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
                   <FormAddInputLabelWrapper>
                     <FormAddLabelWrapper>
-                      <FormAddLabel>Min-Price</FormAddLabel>
+                      <FormAddLabel>{t("Text201")}</FormAddLabel>
                       {energyPriceError && (
                         <FormErrorWrapper>
                           <FormError>{energyPriceError}</FormError>
@@ -965,7 +958,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                 </FormIconWrapper>
                 <FormHeaderWrapper>
                   <HeroGridCardHeader style={{ color: "#430E00" }}>
-                    Bandwidth
+                    {t("Text9")}
                   </HeroGridCardHeader>
                 </FormHeaderWrapper>
               </FormHeaderIconWrapper>
@@ -974,7 +967,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
               {/** bandwidth min-duration */}
               <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
                 <FormAddLabelWrapper>
-                  <FormAddLabel>Min-Duration</FormAddLabel>
+                  <FormAddLabel>{t("Text199")}</FormAddLabel>
                   {bandwidthDurationError && (
                     <FormErrorWrapper>
                       <FormError>{bandwidthDurationError}</FormError>
@@ -987,7 +980,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                   >
                     <Box>
                       <TextField
-                        placeholder="Duration"
+                        placeholder={`${t("Text50")}`}
                         value={bandwidthDurationValue}
                         onChange={(e) =>
                           setBandwidthDurationValue(e.target.value)
@@ -1038,7 +1031,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                             borderRadius: 2,
                           }}
                         >
-                          <Typography fontWeight="bold">Minutes</Typography>
+                          <Typography fontWeight="bold">{t("Text52")}</Typography>
                           <Grid container spacing={1} mb={2}>
                             {minutes.map((min) => (
                               <Grid key={min}>
@@ -1046,7 +1039,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   sx={boxStyle}
                                   onClick={(e) => {
                                     e.stopPropagation(); // prevent triggering events on other components
-                                    handleOptionClick2(`${min} minutes`);
+                                    handleOptionClick2(`${min} ${t("Text53")}`);
                                   }}
                                 >
                                   {min}
@@ -1054,7 +1047,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                               </Grid>
                             ))}
                           </Grid>
-                          <Typography fontWeight="bold">Hours</Typography>
+                          <Typography fontWeight="bold">{t("Text54")}</Typography>
                           <Grid container spacing={1} mb={2}>
                             {hours.map((hr) => (
                               <Grid key={hr}>
@@ -1063,7 +1056,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleOptionClick2(
-                                      `${hr} ${hr === 1 ? "hour" : "hours"}`
+                                      `${hr} ${hr === 1 ? `${t("Text55")}` : `${t("Text56")}`}`
                                     );
                                   }}
                                 >
@@ -1072,7 +1065,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                               </Grid>
                             ))}
                           </Grid>
-                          <Typography fontWeight="bold">Days</Typography>
+                          <Typography fontWeight="bold">{t("Text57")}</Typography>
                           <Grid container spacing={1}>
                             {days.map((day) => (
                               <Grid size={2} key={day}>
@@ -1084,7 +1077,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleOptionClick2(
-                                      `${day} ${day === 1 ? "day" : "days"}`
+                                      `${day} ${day === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
                                     );
                                   }}
                                 >
@@ -1105,7 +1098,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                 <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
                   <FormAddInputLabelWrapper>
                     <FormAddLabelWrapper>
-                      <FormAddLabel>Min-Amount</FormAddLabel>
+                      <FormAddLabel>{t("Text200")}</FormAddLabel>
                       {bandwidthAmountError && (
                         <FormErrorWrapper>
                           <FormError>{bandwidthAmountError}</FormError>
@@ -1129,7 +1122,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                 <Grid size={{ xs: 6, sm: 6, md: 6, lg: 6 }}>
                   <FormAddInputLabelWrapper>
                     <FormAddLabelWrapper>
-                      <FormAddLabel>Min-Price</FormAddLabel>
+                      <FormAddLabel>{t("Text201")}</FormAddLabel>
                       {bandwidthPriceError && (
                         <FormErrorWrapper>
                           <FormError>{bandwidthPriceError}</FormError>
@@ -1164,7 +1157,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                     <FormAddLabelWrapper
                       style={{ width: "100%", justifyContent: "space-between" }}
                     >
-                      <FormAddLabel>Profit</FormAddLabel>
+                      <FormAddLabel>{t("Text202")}</FormAddLabel>
                       <FormAddLabel>{profit} %</FormAddLabel>
                     </FormAddLabelWrapper>
                     <Slider
@@ -1225,7 +1218,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                           }}
                         />
                       }
-                      label="Active-Sell"
+                      label={`${t("Text203")}`}
                     />
                   </FormAddInputLabelWrapper>
                 </Grid>
@@ -1264,8 +1257,8 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
             {" "}
             <LoadingButtonContent
               loading={isSubmitting}
-              loadingText="Changing..."
-              normalText="Change"
+              loadingText={`${t("Text162")}...`}
+              normalText={`${t("Text204")}`}
             />
           </Button>
           <Button
@@ -1283,7 +1276,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
               },
             }}
           >
-            cancel
+            {t("Text100")}
           </Button>
         </DialogActions>
       </Dialog>

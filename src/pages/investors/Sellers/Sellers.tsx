@@ -67,8 +67,10 @@ import { useFetchData } from "../../../contexts/FetchDataContext";
 import PopUp6 from "../../../components/Popup/PopUp6";
 import PopUp7 from "../../../components/Popup/PopUp7";
 import PopUp11 from "../../../components/Popup/PopUp11";
+import { useTranslation } from "react-i18next";
 
 const Sellers: React.FC = () => {
+  const { t } = useTranslation();
   const {
     address,
     allBandwidth,
@@ -157,14 +159,14 @@ const Sellers: React.FC = () => {
           {/*Sellers header */}
           <SellersMainHeaderBtnWrapper>
             <SellersMainHeaderWrapper>
-              <SellersMainHeader>Dashboard</SellersMainHeader>
+              <SellersMainHeader>{t("Text143")}</SellersMainHeader>
             </SellersMainHeaderWrapper>
 
             <SellersBtnWrapper onClick={handleSettingPopupOpen}>
               <SelersSettingIconWrapper>
                 <SelersSettingIcon />
               </SelersSettingIconWrapper>
-              <SellersBtnText>Setting</SellersBtnText>
+              <SellersBtnText>{t("Text144")}</SellersBtnText>
             </SellersBtnWrapper>
           </SellersMainHeaderBtnWrapper>
           <SellersTopWrapper>
@@ -213,7 +215,7 @@ const Sellers: React.FC = () => {
                         <SellersPeopertyWrapper2>
                           <LegacyPropertyHeaderWrapper>
                             <LegacyCardName style={{ fontWeight: "600" }}>
-                              Energy
+                              {t("Text6")}
                             </LegacyCardName>
                           </LegacyPropertyHeaderWrapper>
                           <LegacyPropertyNumberWrapper>
@@ -231,7 +233,7 @@ const Sellers: React.FC = () => {
                         <SellersPeopertyWrapper2>
                           <LegacyPropertyHeaderWrapper>
                             <LegacyCardName style={{ fontWeight: "600" }}>
-                              Min-Price
+                              {t("Text145")}
                             </LegacyCardName>
                           </LegacyPropertyHeaderWrapper>
                           <LegacyPropertyNumberWrapper>
@@ -303,7 +305,7 @@ const Sellers: React.FC = () => {
                         <SellersPeopertyWrapper2>
                           <LegacyPropertyHeaderWrapper>
                             <LegacyCardName style={{ fontWeight: "600" }}>
-                              Bandwidth
+                             {t("Text9")}
                             </LegacyCardName>
                           </LegacyPropertyHeaderWrapper>
                           <LegacyPropertyNumberWrapper>
@@ -321,7 +323,7 @@ const Sellers: React.FC = () => {
                         <SellersPeopertyWrapper2>
                           <LegacyPropertyHeaderWrapper>
                             <LegacyCardName style={{ fontWeight: "600" }}>
-                              Min-Price
+                              {t("Text145")}
                             </LegacyCardName>
                           </LegacyPropertyHeaderWrapper>
                           <LegacyPropertyNumberWrapper>
@@ -373,7 +375,7 @@ const Sellers: React.FC = () => {
                         </LegacyCardIconWrapper2>
                       </LegacyCardIconWrapper1>
                       <SellersCardHeaderWrapper>
-                        <SellersCardHeader>Delegation Count</SellersCardHeader>
+                        <SellersCardHeader>{t("Text146")}</SellersCardHeader>
                       </SellersCardHeaderWrapper>
                     </SellersCardIconHeaderWrapper>
 
@@ -396,7 +398,7 @@ const Sellers: React.FC = () => {
                           </HeroGridCardNumberIconWrapper>
                           <SellersCardThingsNameWrapper>
                             <SellersCardThingsName>
-                              Energy
+                             {t("Text6")}
                             </SellersCardThingsName>
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>
@@ -433,7 +435,7 @@ const Sellers: React.FC = () => {
                           </HeroGridCardNumberIconWrapper>
                           <SellersCardThingsNameWrapper>
                             <SellersCardThingsName>
-                              Bandwidth
+                              {t("Text9")}
                             </SellersCardThingsName>
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>
@@ -472,7 +474,7 @@ const Sellers: React.FC = () => {
                         </LegacyCardIconWrapper2>
                       </LegacyCardIconWrapper1>
                       <SellersCardHeaderWrapper>
-                        <SellersCardHeader>Daily Profit</SellersCardHeader>
+                        <SellersCardHeader>{t("Text147")}</SellersCardHeader>
                       </SellersCardHeaderWrapper>
                     </SellersCardIconHeaderWrapper>
 
@@ -481,7 +483,7 @@ const Sellers: React.FC = () => {
                         <SellersCardThingsNameIconWrapper>
                           <SellersCardThingsNameWrapper>
                             <SellersCardThingsName>
-                              Credit{" "}
+                              {t("Text148")}{" "}
                             </SellersCardThingsName>
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>
@@ -520,7 +522,7 @@ const Sellers: React.FC = () => {
                         </LegacyCardIconWrapper2>
                       </LegacyCardIconWrapper1>
                       <SellersCardHeaderWrapper>
-                        <SellersCardHeader>Total Delegated</SellersCardHeader>
+                        <SellersCardHeader>{t("Text149")}</SellersCardHeader>
                       </SellersCardHeaderWrapper>
                     </SellersCardIconHeaderWrapper>
 
@@ -543,7 +545,7 @@ const Sellers: React.FC = () => {
                           </HeroGridCardNumberIconWrapper>
                           <SellersCardThingsNameWrapper>
                             <SellersCardThingsName>
-                              Energy
+                              {t("Text6")}
                             </SellersCardThingsName>
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>
@@ -580,7 +582,7 @@ const Sellers: React.FC = () => {
                           </HeroGridCardNumberIconWrapper>
                           <SellersCardThingsNameWrapper>
                             <SellersCardThingsName>
-                              Bandwidth
+                              {t("Text9")}
                             </SellersCardThingsName>
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>

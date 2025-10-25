@@ -10,20 +10,12 @@ import {
 import {
   Popup2HeaderWrapper,
   Popup2Header,
-  Popup2ImgWrapper,
-  Popup2ItemNameWrapper,
-  Popup2ItemName,
   Popup5TextWrapper,
   Popup5Text,
 } from "../../../../../../components/Popup/PopUpElements";
-import {
-  LegacyCardIconWrapper1,
-  LegacyCardIconWrapper2,
-  LegacyCardIconWrapper3,
-  LegacyCardIcon,
-} from "../../../../../mainPage/LegacySection/LegacyElements";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../../../../../redux/actions/notifSlice";
+import { useTranslation } from "react-i18next";
 
 interface bulkOrderPopupProps {
   open: boolean;
@@ -42,6 +34,7 @@ const Form2PopUp1: React.FC<bulkOrderPopupProps> = ({
   setBulkOrder,
   setWalletAddError,
 }) => {
+  const { t } = useTranslation()
   const dispatch = useDispatch();
   const [bulkOrderAdds, setBulkOrderAdds] = useState<string>("");
   const [errorLines, setErrorLines] = useState<Set<number>>(new Set());
@@ -134,10 +127,10 @@ const handleBulkOrderClick = () => {
 
   // Check if there are any invalid lines (including duplicates)
   if (errorLines.size > 0 || hasDuplicates) {
-    let errorMessage = "Please fix all invalid addresses before confirming.";
+    let errorMessage = `${t("Text185")}`;
 
     if (hasDuplicates) {
-      errorMessage = "Please remove duplicate wallet addresses before confirming.";
+      errorMessage = `${t("Text186")}`;
     }
 
     dispatch(
@@ -155,7 +148,7 @@ const handleBulkOrderClick = () => {
     dispatch(
       showNotification({
         name: "error1",
-        message: "Please enter at least one valid wallet address.",
+        message:`${t("Text187")}`,
         severity: "error",
       })
     );
@@ -171,7 +164,7 @@ const handleBulkOrderClick = () => {
   dispatch(
     showNotification({
       name: "error1",
-      message: `Bulk order confirmed for ${lines.length} unique addresses.`,
+      message: `${t("Text188")} ${lines.length} ${t("Text189")}`,
       severity: "success",
     })
   );
@@ -190,10 +183,11 @@ const handleBulkOrderClick = () => {
   };
 
   // Function to check if a specific line has error
+  /* 
   const hasLineError = (lineIndex: number): boolean => {
     return errorLines.has(lineIndex);
   };
-
+  */
   // Function to get error type for a specific line (for more detailed error display)
   const getLineErrorType = (lineIndex: number): string => {
     const lines = bulkOrderAdds.split("\n");
@@ -203,13 +197,13 @@ const handleBulkOrderClick = () => {
 
     // Check if line is too long or invalid format
     if (currentLine.length > 34 || !validateAddressLine(currentLine)) {
-      return "invalid";
+      return `${t("Text190")}`;
     }
 
     // Check if line is duplicate
     const previousLines = lines.slice(0, lineIndex);
     if (previousLines.some((line) => line.trim() === currentLine)) {
-      return "duplicate";
+      return `${t("Text191")}`;
     }
 
     return "";
@@ -281,15 +275,15 @@ const handleBulkOrderClick = () => {
         }}
       >
         <Popup2HeaderWrapper>
-          <Popup2Header>Bulk Order Mode</Popup2Header>
+          <Popup2Header>{t("Text192")}</Popup2Header>
         </Popup2HeaderWrapper>
 
         <DialogContent>
           <Popup5TextWrapper>
             <Popup5Text>
-              You are in bulk order mode
+              {t("Text193")}
               <br />
-              enter the list of your wallet addresses.
+              {t("Text194")}
             </Popup5Text>
           </Popup5TextWrapper>
 
@@ -308,7 +302,7 @@ const handleBulkOrderClick = () => {
               error={errorLines.size > 0}
               helperText={
                 errorLines.size > 0
-                  ? `${errorLines.size} invalid address(es) detected`
+                  ? `${errorLines.size} ${t("Text195")}`
                   : ""
               }
               sx={{
@@ -356,10 +350,10 @@ const handleBulkOrderClick = () => {
 
                 if (errorType === "invalid") {
                   color = "#f44336"; // Red for invalid format
-                  title = "Invalid wallet address format";
+                  title = `${t("Text196")}`;
                 } else if (errorType === "duplicate") {
                   color = "#ff9800"; // Orange for duplicates
-                  title = "Duplicate wallet address";
+                  title = `${t("Text197")}`;
                 }
 
                 return (
@@ -403,7 +397,7 @@ const handleBulkOrderClick = () => {
             }}
           >
             {" "}
-            Confirm
+            {t("Text114")}
           </Button>
           <Button
             fullWidth
@@ -420,7 +414,7 @@ const handleBulkOrderClick = () => {
               },
             }}
           >
-            cancel
+            {t("Text100")}
           </Button>
         </DialogActions>
       </Dialog>

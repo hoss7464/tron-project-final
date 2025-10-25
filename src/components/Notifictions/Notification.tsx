@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import Alert from "@mui/joy/Alert";
 import AspectRatio from "@mui/joy/AspectRatio";
 import IconButton from "@mui/joy/IconButton";
-import Box from "@mui/joy/Box";
 import Typography from "@mui/joy/Typography";
 import Stack from "@mui/joy/Stack";
 import LinearProgress from "@mui/joy/LinearProgress";
@@ -14,6 +13,7 @@ import Close from "@mui/icons-material/Close";
 import Warning from "@mui/icons-material/Warning";
 import Error from "@mui/icons-material/Error";
 import Info from "@mui/icons-material/Info";
+import { useTranslation } from "react-i18next";
 
 // Icon mapping based on severity
 const severityIcons = {
@@ -23,43 +23,46 @@ const severityIcons = {
   info: Info,
 };
 
-// Title mapping based on severity
-const severityTitles = {
-  success: "Success",
-  error: "Error",
-  warning: "Warning",
-  info: "Information",
-};
-
 // Map your severity types to MUI's color palette
 const severityToColor = {
   success: "success",
   error: "danger",
   warning: "warning",
-  info: "primary"
+  info: "primary",
 } as const;
 
 // Gradient backgrounds for each severity type
 const severityGradients = {
-  success: 'linear-gradient(90deg,rgba(0, 53, 67, 1) 0%, rgba(176, 192, 197, 1) 100%)',
-  error: 'linear-gradient(90deg,rgba(67, 14, 0, 1) 0%, rgba(197, 180, 176, 1) 100%)',
-  warning: 'linear-gradient(135deg, #FF9800 0%, #FFA726 50%, #FFB74D 100%)',
-  info: 'linear-gradient(135deg, #2196F3 0%, #42A5F5 50%, #64B5F6 100%)'
+  success:
+    "linear-gradient(90deg,rgba(0, 53, 67, 1) 0%, rgba(176, 192, 197, 1) 100%)",
+  error:
+    "linear-gradient(90deg,rgba(67, 14, 0, 1) 0%, rgba(197, 180, 176, 1) 100%)",
+  warning: "linear-gradient(135deg, #FF9800 0%, #FFA726 50%, #FFB74D 100%)",
+  info: "linear-gradient(135deg, #2196F3 0%, #42A5F5 50%, #64B5F6 100%)",
 } as const;
 
 // Custom icon colors for each severity
 const severityIconColors = {
-  success: '#003543', // White for success icon
-  error: '#430e00',   // White for error icon
-  warning: '#FFFFFF', // White for warning icon
-  info: '#FFFFFF'     // White for info icon
+  success: "#003543", // White for success icon
+  error: "#430e00", // White for error icon
+  warning: "#FFFFFF", // White for warning icon
+  info: "#FFFFFF", // White for info icon
 } as const;
 
 const Notification: React.FC = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const notifications = useSelector(
     (state: RootState) => state.notif.notifications
   );
+
+  // Title mapping based on severity
+    const severityKey = {
+    success: "Text205",
+    error:   "Text206",
+    warning: "Text207",
+    info:    "Text208",
+  } as const;
 
   // Get all active notifications
   const activeNotifications = Object.entries(notifications)
@@ -103,7 +106,7 @@ const Notification: React.FC = () => {
           lg: "35%",
         },
         position: "fixed",
-     
+
         zIndex: 9999,
         padding: "16px",
         boxSizing: "border-box",
@@ -114,7 +117,8 @@ const Notification: React.FC = () => {
         const color = severityToColor[severity];
         const gradient = severityGradients[severity];
         const iconColor = severityIconColors[severity];
-        
+        const title = t(severityKey[severity]);
+
         return (
           <Alert
             key={name}
@@ -124,12 +128,12 @@ const Notification: React.FC = () => {
             invertedColors
             sx={{
               background: gradient,
-              alignItems: 'flex-start',
-              overflow: 'hidden',
+              alignItems: "flex-start",
+              overflow: "hidden",
               // Ensure text remains visible against gradient background
-              '& .MuiAlert-message': {
-                color: 'white',
-              }
+              "& .MuiAlert-message": {
+                color: "white",
+              },
             }}
             startDecorator={
               <AspectRatio
@@ -137,9 +141,9 @@ const Notification: React.FC = () => {
                 ratio="1"
                 sx={{
                   minWidth: 40,
-                  borderRadius: '50%',
-                  boxShadow: '0 2px 12px 0 rgb(0 0 0/0.2)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  borderRadius: "50%",
+                  boxShadow: "0 2px 12px 0 rgb(0 0 0/0.2)",
+                  backgroundColor: "rgba(255, 255, 255, 0.2)",
                 }}
               >
                 <div>
@@ -151,12 +155,12 @@ const Notification: React.FC = () => {
               <IconButton
                 variant="plain"
                 sx={{
-                  '--IconButton-size': '32px',
-                  transform: 'translate(0.5rem, -0.5rem)',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  }
+                  "--IconButton-size": "32px",
+                  transform: "translate(0.5rem, -0.5rem)",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                  },
                 }}
                 onClick={() => dispatch(hideNotification(name))}
               >
@@ -165,10 +169,10 @@ const Notification: React.FC = () => {
             }
           >
             <div>
-              <Typography level="title-lg" sx={{ color: 'white' }}>
-                {severityTitles[severity]}
+              <Typography level="title-lg" sx={{ color: "white" }}>
+                {title}
               </Typography>
-              <Typography level="body-sm" sx={{ color: 'white' }}>
+              <Typography level="body-sm" sx={{ color: "white" }}>
                 {message}
               </Typography>
             </div>
@@ -177,15 +181,15 @@ const Notification: React.FC = () => {
               color={color}
               value={40}
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 bottom: 0,
                 left: 0,
                 right: 0,
                 borderRadius: 0,
-                backgroundColor: 'rgba(255, 255, 255, 0.3)',
-                '& .MuiLinearProgress-bar': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                }
+                backgroundColor: "rgba(255, 255, 255, 0.3)",
+                "& .MuiLinearProgress-bar": {
+                  backgroundColor: "rgba(255, 255, 255, 0.8)",
+                },
               }}
             />
           </Alert>

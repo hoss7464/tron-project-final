@@ -5,7 +5,6 @@ import {
   BuyerSignWrapper,
   CheckedSign,
   CanceledSign,
-  ProcessSign,
   BuyersAvailableNavbar,
 } from "../../../Buyers/Section2/Table/BuyersTableElements";
 import { Link } from "@mui/material";
@@ -28,14 +27,16 @@ import Pagination from "@mui/material/Pagination";
 import { formatDateTime, formatDateTime2 } from "../../../../../utils/dateTime";
 import { truncateTxid2 } from "../../../../../utils/truncate";
 import { Tooltip } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const SellersTable2: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { sellersWithdrawInfo } = useFetchData();
   const [wholeSellersWithdrawInfo, setWholeSellersWithdrawInfo] =
     useState<SellersWithdrawResponse | null>(null);
   const tronscanUrl = process.env.REACT_APP_TRONSCAN_TXID_URL;
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 12;
+  const rowsPerPage = i18n.language === "en" ? 12 : 11;
 
   //to get data from server :
   useEffect(() => {
@@ -80,31 +81,31 @@ const SellersTable2: React.FC = () => {
                 <AvailableNavTextWrapper
                   style={{ width: "20%", justifyContent: "flex-start" }}
                 >
-                  <OrderNavText>Date</OrderNavText>
+                  <OrderNavText>{t("Text80")}</OrderNavText>
                 </AvailableNavTextWrapper>
 
                 <AvailableNavTextWrapper
                   style={{ width: "20%", justifyContent: "flex-start" }}
                 >
-                  <OrderNavText>Receiver</OrderNavText>
+                  <OrderNavText>{t("Text71")}</OrderNavText>
                 </AvailableNavTextWrapper>
 
                 <AvailableNavTextWrapper
                   style={{ width: "20%", justifyContent: "flex-start" }}
                 >
-                  <OrderNavText>Amount</OrderNavText>
+                  <OrderNavText>{t("Text81")}</OrderNavText>
                 </AvailableNavTextWrapper>
 
                 <AvailableNavTextWrapper
                   style={{ width: "20%", justifyContent: "flex-start" }}
                 >
-                  <OrderNavText>TxId</OrderNavText>
+                  <OrderNavText>{t("Text151")}</OrderNavText>
                 </AvailableNavTextWrapper>
 
                 <AvailableNavTextWrapper
                   style={{ width: "20%", justifyContent: "flex-start" }}
                 >
-                  <OrderNavText>Paid-At</OrderNavText>
+                  <OrderNavText>{t("Text153")}</OrderNavText>
                 </AvailableNavTextWrapper>
               </BuyersAvailableNavbar>
             </AvailableNavWrapper>

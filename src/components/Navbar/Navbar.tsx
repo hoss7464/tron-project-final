@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import "./Navbar.css";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -31,7 +31,7 @@ import Logo from "../../assets/svg/Logo/Logo3.svg";
 
 const Navbar: React.FC = () => {
   const Location = useLocation();
-  const [age, setAge] = React.useState("EN");
+  const [selectedLanguage, setSelectedLanguage] = React.useState("EN");
   const { t, i18n } = useTranslation();
   const avatarRef = useRef<HTMLButtonElement | null>(null);
   const {
@@ -49,9 +49,34 @@ const Navbar: React.FC = () => {
 
   const isMarketPage = Location.pathname === "/";
   //const isBuyersOrSellers = Location.pathname === "/Buyers" || Location.pathname === "/Sellers";
+  // Update dropdown when language changes
+  useEffect(() => {
+    // Map i18n language codes to your dropdown values
+    const languageMap: { [key: string]: string } = {
+      en: "EN",
+      ja: "JA", 
+      ru: "RU"
+    };
+    
+    const dropdownValue = languageMap[i18n.language] || "EN";
+    setSelectedLanguage(dropdownValue);
+  }, [i18n.language]);
 
   const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value);
+    const newValue = event.target.value;
+    setSelectedLanguage(newValue);
+    
+    // Map dropdown values to i18n language codes
+    const languageCodeMap: { [key: string]: string } = {
+      "EN": "en",
+      "JA": "ja",
+      "RU": "ru"
+    };
+    
+    const languageCode = languageCodeMap[newValue];
+    if (languageCode) {
+      i18n.changeLanguage(languageCode);
+    }
   };
 
   const shortenAddress = (address: string) => {
@@ -139,7 +164,7 @@ const Navbar: React.FC = () => {
               <TranslateWrapper>
                 <FormControl sx={{ mr: 1 }}>
                   <Select
-                    value={age}
+                    value={selectedLanguage}
                     onChange={handleChange}
                     displayEmpty
                     inputProps={{ "aria-label": "Without label" }}

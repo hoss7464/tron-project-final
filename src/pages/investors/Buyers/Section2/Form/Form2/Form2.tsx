@@ -301,7 +301,7 @@ const Form2: React.FC = () => {
 
     //if bulk order === false and address input length was more than 34 characters return an error:
     if (bulkOrder === false && newValue.length > 34) {
-      setWalletAddError("bulk order restriction");
+      setWalletAddError(`${t("Text169")}`);
       return;
     }
 
@@ -309,7 +309,7 @@ const Form2: React.FC = () => {
     setWalletAdd(newValue);
     //if address input is empty and we are connected in buyers page show this error :
     if (newValue.trim() === "" && isConnectedTrading === true) {
-      setWalletAddError("fill address");
+      setWalletAddError(`${t("Text170")}`);
       return;
     }
 
@@ -318,7 +318,7 @@ const Form2: React.FC = () => {
       //validate newValue based on bulkOrderValidation :
       const isValid = bulkOrderValidation(newValue);
       if (!isValid) {
-        setWalletAddError("wrong format");
+        setWalletAddError(`${t("Text171")}`);
       } else {
         setWalletAddError("");
       }
@@ -327,7 +327,7 @@ const Form2: React.FC = () => {
       //validate newValue based on validationWalletAdd
       const isValid = validationWalletAdd(newValue);
       if (!isValid) {
-        setWalletAddError("wrong format");
+        setWalletAddError(`${t("Text171")}`);
       } else {
         setWalletAddError("");
       }
@@ -384,7 +384,7 @@ const Form2: React.FC = () => {
       dispatch(
         showNotification({
           name: "error2",
-          message: "Connect your wallet.",
+          message: `${t("Text39")}`,
           severity: "error",
         })
       );
@@ -398,8 +398,7 @@ const Form2: React.FC = () => {
       dispatch(
         showNotification({
           name: "error3",
-          message:
-            "You can't use balk order mode when you selected pull-charge.",
+          message:`${t("Text172")}`,
           severity: "error",
         })
       );
@@ -479,37 +478,37 @@ const Form2: React.FC = () => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     if (rawValue.trim() === "") {
-      return "required";
+      return `${t("Text32")}`;
     } else if (isNaN(numericValue)) {
-      return "required";
+      return `${t("Text32")}`;
     }
 
     if (radioPrice === "FastCharge") {
       if (switchBtn === "energy") {
         if (numericValue < pullFastChargeMinAmount.energy) {
-          return `Less than ${pullFastChargeMinAmount.energy}`;
+          return `${t("Text33")} ${pullFastChargeMinAmount.energy}`;
         } else if (numericValue > pullFastChargeMaxAmount.energy) {
-          return `More than ${pullFastChargeMaxAmount.energy}`;
+          return `${t("Text173")} ${pullFastChargeMaxAmount.energy}`;
         } else {
         }
       } else {
         if (numericValue < pullFastChargeMinAmount.bandwidth) {
-          return `Less than ${pullFastChargeMinAmount.bandwidth}`;
+          return `${t("Text33")} ${pullFastChargeMinAmount.bandwidth}`;
         } else if (numericValue > pullFastChargeMaxAmount.bandwidth) {
-          return `More than ${pullFastChargeMaxAmount.bandwidth}`;
+          return `${t("Text173")} ${pullFastChargeMaxAmount.bandwidth}`;
         } else {
         }
       }
     } else {
       if (switchBtn === "energy") {
         if (numericValue < minAmount.energy) {
-          return `Less than ${minAmount.energy}`;
+          return `${t("Text33")} ${minAmount.energy}`;
         } else if (numericValue > 300000000) {
-          return "Maximum limitation";
+          return `${t("Text34")}`;
         }
       } else if (switchBtn === "bandwidth") {
         if (numericValue < minAmount.bandwidth) {
-          return `Less than ${minAmount.bandwidth}`;
+          return `${t("Text33")} ${minAmount.bandwidth}`;
         }
       } else {
       }
@@ -557,46 +556,58 @@ const Form2: React.FC = () => {
     const trimmed = value.trim();
 
     if (trimmed === "") {
-      return "required";
+      return `${t("Text32")}`;
     }
     //valid time between options :
     const validDurations = [
-      "15 minutes",
-      "1 hour",
-      "3 hours",
+      `15 ${t("Text53")}`,
+      `1 ${t("Text55")}`,
+      `3 ${t("Text56")}`,
       ...Array.from(
         { length: 30 },
-        (_, i) => `${i + 1} ${i + 1 === 1 ? "day" : "days"}`
+        (_, i) => `${i + 1} ${i + 1 === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
       ),
     ];
 
     if (!validDurations.includes(trimmed)) {
-      return "invalid time";
+      return `${t("Text35")}`;
     }
     return "";
   };
   //Function to convert duration in seconds :
   const getDurationInSeconds = (value: string): number | null => {
     const trimmed = value.trim().toLowerCase();
-    const match = trimmed.match(/^(\d+)\s*(minutes?|hours?|days?)$/);
+
+    // Get all possible unit translations
+    const minuteUnits = [`${t("Text53")}`.toLowerCase()]; // minutes
+    const hourUnits = [
+      `${t("Text55")}`.toLowerCase(),
+      `${t("Text56")}`.toLowerCase(),
+    ]; // hours
+    const dayUnits = [
+      `${t("Text58")}`.toLowerCase(),
+      `${t("Text59")}`.toLowerCase(),
+    ]; // days
+
+    // Create regex pattern with all possible units
+    const allUnits = [...minuteUnits, ...hourUnits, ...dayUnits];
+    const regexPattern = new RegExp(`^(\\d+)\\s*(${allUnits.join("|")})$`);
+
+    const match = trimmed.match(regexPattern);
 
     if (!match) return null;
 
     const number = parseInt(match[1], 10);
     const unit = match[2];
 
-    switch (unit) {
-      case "minute":
-      case "minutes":
-        return number * 60;
-      case "hour":
-      case "hours":
-        return number * 3600;
-      case "day":
-      case "days":
-        return number * 86400;
-      default:
-        return null;
+    if (minuteUnits.includes(unit)) {
+      return number * 60;
+    } else if (hourUnits.includes(unit)) {
+      return number * 3600;
+    } else if (dayUnits.includes(unit)) {
+      return number * 86400;
+    } else {
+      return null;
     }
   };
 
@@ -643,11 +654,11 @@ const Form2: React.FC = () => {
   const validatePrice = (value: string): string => {
     const numValue = parseInt(value, 10);
     if (value.trim() === "") {
-      return "Required";
+      return `${t("Text32")}`;
     }
 
     if (isNaN(numValue)) {
-      return "Invalid number";
+      return `${t("Text36")}`;
     }
 
     //skip the validation if minAmountPrice and durationInSec are not loaded yet
@@ -676,16 +687,16 @@ const Form2: React.FC = () => {
       });
 
       if (!matchedItem) {
-        return "Invalid price";
+        return `${t("Text37")}`;
       }
 
       const rate_energy = matchedItem.rate.energy;
       const rate_bandwidth = matchedItem.rate.bandwidth;
 
       if (switchBtn === "energy") {
-        return numValue < rate_energy ? `less than ${rate_energy} ` : "";
+        return numValue < rate_energy ? `${t("Text33")} ${rate_energy} ` : "";
       } else if (switchBtn === "bandwidth") {
-        return numValue < rate_bandwidth ? `less than ${rate_bandwidth} ` : "";
+        return numValue < rate_bandwidth ? `${t("Text33")} ${rate_bandwidth} ` : "";
       }
     }
 
@@ -777,7 +788,7 @@ const Form2: React.FC = () => {
   useEffect(() => {
     // When switchBtn changes, immediately use the existing data if available
     if (minAmountPrice.length > 0) {
-      const defaultDuration = "30 days";
+      const defaultDuration = `30 ${t("Text59")}`;
       const durationInSeconds = getDurationInSeconds(defaultDuration);
 
       // Set duration immediately
@@ -808,7 +819,7 @@ const Form2: React.FC = () => {
             switchBtn === "energy"
               ? matchedItem.rate.energy
               : matchedItem.rate.bandwidth;
-          setDynamicPlaceholder(`Min price: ${rate}`);
+          setDynamicPlaceholder(`${t("Text38")} ${rate}`);
           setInputValue(rate.toString());
         }
       }
@@ -828,7 +839,7 @@ const Form2: React.FC = () => {
         setMinAmountUnit("0");
         setLimitInputError("");
         setMinAmountUnitError("");
-        const defaultDuration = "30 days";
+        const defaultDuration = `30 ${t("Text59")}`;
         const durationInSeconds = getDurationInSeconds(defaultDuration);
         setDurationValue(defaultDuration);
         setDurationInSec(durationInSeconds);
@@ -868,7 +879,7 @@ const Form2: React.FC = () => {
               ? matchedItem.rate.energy
               : matchedItem.rate.bandwidth;
 
-          setDynamicPlaceholder(`Min price: ${rate}`);
+          setDynamicPlaceholder(`${t("Text38")} ${rate}`);
           setInputValue(rate.toString());
         }
       }
@@ -917,9 +928,9 @@ const Form2: React.FC = () => {
     const numericAmount = getNumericAmount(amount);
 
     if (rawValue.trim() === "") {
-      return "required";
+      return `${t("Text32")}`;
     } else if (isNaN(numericValue)) {
-      return "required";
+      return `${t("Text32")}`;
     }
 
     if (switchBtn === "energy") {
@@ -974,9 +985,9 @@ const Form2: React.FC = () => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     if (rawValue.trim() === "") {
-      return "required";
+      return `${t("Text32")}`;
     } else if (isNaN(numericValue)) {
-      return "required";
+      return `${t("Text32")}`;
     }
 
     if (radioPrice === "FastCharge") {
@@ -1038,9 +1049,9 @@ const Form2: React.FC = () => {
     const numericValue = Number(rawValue.replace(/,/g, ""));
 
     if (rawValue.trim() === "") {
-      return "required";
+      return `${t("Text32")}`;
     } else if (isNaN(numericValue)) {
-      return "required";
+      return `${t("Text32")}`;
     }
 
     if (radioPrice === "FastCharge") {
@@ -1156,7 +1167,7 @@ const Form2: React.FC = () => {
       dispatch(
         showNotification({
           name: "error1",
-          message: "Connect your wallet.",
+          message: `${t("Text39")}`,
           severity: "error",
         })
       );
@@ -1428,11 +1439,11 @@ const Form2: React.FC = () => {
               <FormHeaderWrapper>
                 {switchBtn === "energy" ? (
                   <HeroGridCardHeader style={{ color: "#003543" }}>
-                    {t("energy")}
+                    {t("Text7")}
                   </HeroGridCardHeader>
                 ) : (
                   <HeroGridCardHeader style={{ color: "#003543" }}>
-                    {t("bandwidth")}
+                    {t("Text10")}
                   </HeroGridCardHeader>
                 )}
               </FormHeaderWrapper>
@@ -1444,10 +1455,10 @@ const Form2: React.FC = () => {
                 onChange={handleChange}
               >
                 <CustomToggleButton value="energy">
-                  {t("energy")}
+                  {t("Text7")}
                 </CustomToggleButton>
                 <CustomToggleButton value="bandwidth">
-                  {t("bandwidth")}
+                  {t("Text10")}
                 </CustomToggleButton>
               </ToggleButtonGroup>
             </FormSwitchWrapper>
@@ -1461,9 +1472,9 @@ const Form2: React.FC = () => {
               }}
             >
               <Form2LableErrorWrapper>
-                <FormAddLabel>Wallet Address</FormAddLabel>
+                <FormAddLabel>{t("Text46")}</FormAddLabel>
                 <Info
-                  tooltipText="The target address obtained.It can't be a contract address or any other invalid address."
+                  tooltipText={`${t("Text47")}`}
                   placement="top"
                 />
                 {walletAddError ? (
@@ -1477,7 +1488,7 @@ const Form2: React.FC = () => {
 
               <Form2BulkOrderTextWrapper>
                 <Form2BulkOrderText onClick={handleBulkOrderClick}>
-                  Bulk order
+                  {t("Text174")}
                 </Form2BulkOrderText>
               </Form2BulkOrderTextWrapper>
             </FormAddLabelWrapper>
@@ -1501,11 +1512,11 @@ const Form2: React.FC = () => {
           {/** Form amount input component */}
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
-              <FormAddLabel>Amount</FormAddLabel>
+              <FormAddLabel>{t("Text48")}</FormAddLabel>
               <Info
-                tooltipText={`the amount expected for ${
-                  switchBtn === "energy" ? "energy" : "bandwidth"
-                }.`}
+                tooltipText={`${t("Text49")} ${
+                    switchBtn === "energy" ? `${t("Text7")}` : `${t("Text10")}`
+                  }.`}
                 placement="top"
               />
               {amountError && (
@@ -1521,11 +1532,7 @@ const Form2: React.FC = () => {
                     style={{ fontSize: "16px", marginLeft: "0.5rem" }}
                     value={Number(amount).toLocaleString()}
                     onChange={amountHandleChange}
-                    placeholder={`Amount of ${
-                      switchBtn === "energy"
-                        ? `energy (${minAmount.energy} - 100,000,000)`
-                        : `bandwidth (${minAmount.bandwidth} - ...)`
-                    }`}
+                    placeholder={`${t("Text48")}`}
                   />
                 </FormAddInputWrapper2>
               </FormAddInputIconWrapper>
@@ -1641,9 +1648,9 @@ const Form2: React.FC = () => {
                 {/** Form duration dropdown component */}
                 <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
                   <FormAddLabelWrapper>
-                    <FormAddLabel>Duration</FormAddLabel>
+                    <FormAddLabel>{t("Text50")}</FormAddLabel>
                     <Info
-                      tooltipText="The duration of the bought resource."
+                      tooltipText={`${t("Text51")}`}
                       placement="top"
                     />
                     {durationError && (
@@ -1656,7 +1663,7 @@ const Form2: React.FC = () => {
                     <ClickAwayListener onClickAway={() => setOpen(false)}>
                       <Box>
                         <TextField
-                          placeholder="Duration"
+                          placeholder={`${t("Text50")}`}
                           value={durationValue}
                           onChange={(e) => setDurationValue(e.target.value)}
                           onFocus={() => setOpen(true)}
@@ -1707,7 +1714,7 @@ const Form2: React.FC = () => {
                               borderRadius: 2,
                             }}
                           >
-                            <Typography fontWeight="bold">Minutes</Typography>
+                            <Typography fontWeight="bold">{t("Text52")}</Typography>
                             <Grid container spacing={1} mb={2}>
                               {minutes.map((min) => (
                                 <Grid key={min}>
@@ -1715,7 +1722,7 @@ const Form2: React.FC = () => {
                                     sx={boxStyle}
                                     onClick={(e) => {
                                       e.stopPropagation(); // prevent triggering events on other components
-                                      handleOptionClick(`${min} minutes`);
+                                      handleOptionClick(`${min} ${t("Text53")}`);
                                     }}
                                   >
                                     {min}
@@ -1723,7 +1730,7 @@ const Form2: React.FC = () => {
                                 </Grid>
                               ))}
                             </Grid>
-                            <Typography fontWeight="bold">Hours</Typography>
+                            <Typography fontWeight="bold">{t("Text54")}</Typography>
                             <Grid container spacing={1} mb={2}>
                               {hours.map((hr) => (
                                 <Grid key={hr}>
@@ -1732,7 +1739,7 @@ const Form2: React.FC = () => {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleOptionClick(
-                                        `${hr} ${hr === 1 ? "hour" : "hours"}`
+                                        `${hr} ${hr === 1 ? `${t("Text55")}` : `${t("Text56")}`}`
                                       );
                                     }}
                                   >
@@ -1741,7 +1748,7 @@ const Form2: React.FC = () => {
                                 </Grid>
                               ))}
                             </Grid>
-                            <Typography fontWeight="bold">Days</Typography>
+                            <Typography fontWeight="bold">{t("Text57")}</Typography>
                             <Grid container spacing={1}>
                               {days.map((day) => (
                                 <Grid size={2} key={day}>
@@ -1753,7 +1760,7 @@ const Form2: React.FC = () => {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleOptionClick(
-                                        `${day} ${day === 1 ? "day" : "days"}`
+                                        `${day} ${day === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
                                       );
                                     }}
                                   >
@@ -1777,9 +1784,9 @@ const Form2: React.FC = () => {
                       justifyContent: "space-between",
                     }}
                   >
-                    <FormAddLabel>Partial</FormAddLabel>
+                    <FormAddLabel>{t("Text175")}</FormAddLabel>
                     <Info
-                      tooltipText="Minimum amount for the resource to buy."
+                      tooltipText={`${t("Text63")}`}
                       placement="top"
                     />
                     {partialFieldError ? (
@@ -1823,12 +1830,12 @@ const Form2: React.FC = () => {
                     }}
                   >
                     <FormAddLabel>
-                      Min {switchBtn === "energy" ? "Energy" : "Bandwidth"}
+                      {t("Text176")} {switchBtn === "energy" ? `${t("Text6")}` : `${t("Text9")}`}
                     </FormAddLabel>
                     <Info
-                      tooltipText={`If the amount of your ${
-                        switchBtn === "energy" ? "energy" : "bandwidth"
-                      } was under this amount ,you will be charged automatically. `}
+                      tooltipText={`${t("Text177")} ${
+                        switchBtn === "energy" ? `${t("Text7")}` : `${t("Text10")}`
+                      } ${t("Text178")}`}
                       placement="top"
                     />
                     {minAmountUnitError ? (
@@ -1867,9 +1874,9 @@ const Form2: React.FC = () => {
                       justifyContent: "space-between",
                     }}
                   >
-                    <FormAddLabel>Limit</FormAddLabel>
+                    <FormAddLabel>{t("Text179")}</FormAddLabel>
                     <Info
-                      tooltipText="The maximum amount of TRX to spend on auto buying or max number of orders."
+                      tooltipText={`${t("Text180")}`}
                       placement="top"
                     />
                     {limitInputError ? (
@@ -1906,9 +1913,9 @@ const Form2: React.FC = () => {
           {/** Form price component */}
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
-              <FormAddLabel>Price</FormAddLabel>
+              <FormAddLabel>{t("Text60")}</FormAddLabel>
               <Info
-                tooltipText="The price in sun for the expected resource."
+                tooltipText={`${t("Text61")}`}
                 placement="right"
               />
               {priceError && (
@@ -1988,7 +1995,7 @@ const Form2: React.FC = () => {
                       }}
                     />
                   }
-                  label="Fast"
+                  label={`${t("Text181")}`}
                 />
                 <FormControlLabel
                   value="FastCharge"
@@ -2004,7 +2011,7 @@ const Form2: React.FC = () => {
                       }}
                     />
                   }
-                  label="Fast charge"
+                  label={`${t("Text182")}`}
                 />
                 <FormControlLabel
                   value="Manual"
@@ -2019,7 +2026,7 @@ const Form2: React.FC = () => {
                       }}
                     />
                   }
-                  label="Manual"
+                  label={`${t("Text183")}`}
                 />
               </RadioGroup>
             </FormControl>
@@ -2034,13 +2041,13 @@ const Form2: React.FC = () => {
                   fontWeight: "800",
                 }}
               >
-                Order Info
+                {t("Text64")}
               </AccountHeader>
             </OrderInfoHeaderWrapper>
             <OrderInfoTextWrapper>
               <OrderInfoTextWrapper2>
                 <OrderInfoText style={{ color: "#003543" }}>
-                  Amount
+                  {t("Text48")}
                 </OrderInfoText>
               </OrderInfoTextWrapper2>
               <OrderInfoTextWrapper2>
@@ -2053,7 +2060,7 @@ const Form2: React.FC = () => {
             <OrderInfoTextWrapper>
               <OrderInfoTextWrapper2>
                 <OrderInfoText style={{ color: "#003543" }}>
-                  Duration
+                  {t("Text50")}
                 </OrderInfoText>
               </OrderInfoTextWrapper2>
               <OrderInfoTextWrapper2>
@@ -2066,7 +2073,7 @@ const Form2: React.FC = () => {
             <OrderInfoTextWrapper>
               <OrderInfoTextWrapper2>
                 <OrderInfoText style={{ color: "#003543" }}>
-                  Payout
+                  {t("Text65")}
                 </OrderInfoText>
               </OrderInfoTextWrapper2>
 
@@ -2091,8 +2098,8 @@ const Form2: React.FC = () => {
             <OrderSubmitBtn type="submit" disabled={isSubmitting}>
               <LoadingButtonContent
                 loading={isSubmitting}
-                loadingText="Confirming..."
-                normalText="Confirm Created Rule"
+                loadingText={`${t("Text74")}...`}
+                normalText={`${t("Text184")}`}
               />
             </OrderSubmitBtn>
           </OrderSubmitBtnWrapper>

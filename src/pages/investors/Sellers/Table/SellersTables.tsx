@@ -12,6 +12,7 @@ import { styled } from "@mui/material/styles";
 import { ToggleButtonGroup, ToggleButton } from "@mui/material";
 import SellersTable1 from "./Table1/Table1";
 import SellersTable2 from "./Table2/Table2";
+import { useTranslation } from "react-i18next";
 
 // Custom ToggleButtonGroup with full width
 const FullWidthToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
@@ -43,6 +44,7 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
 }));
 
 const SellersTables: React.FC = () => {
+  const { t } = useTranslation();
   const [sellersTableSwitchBtn, setSelersTableSwitchBtn] = useState<
     string | null
   >("Orders");
@@ -67,8 +69,8 @@ const SellersTables: React.FC = () => {
               exclusive
               onChange={sellersTableSwitchBtnChange}
             >
-              <CustomToggleButton value="Orders">Orders</CustomToggleButton>
-              <CustomToggleButton value="Withdraw">Withdraw</CustomToggleButton>
+              <CustomToggleButton value="Orders">{t("Text79")}</CustomToggleButton>
+              <CustomToggleButton value="Withdraw">{t("Text154")}</CustomToggleButton>
             </FullWidthToggleButtonGroup>
           </OrdersNavHeaderWrapper>
         </OrderMainWrapper>

@@ -35,9 +35,11 @@ import { clickToggle } from "../../redux/actions/toggleSlice";
 import { ConnectPopupData1 } from "../../helpers/ConnectPopupData";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import tronLinkImg from "../../assets/svg/TronLinkImg.svg";
+import { useTranslation } from "react-i18next";
 
 const SelectWalletComponent: React.FC = () => {
   const dispatch = useDispatch();
+  const { t } = useTranslation()
   const { connectWallet, address } = useTronWallet();
 
   useEffect(() => {
@@ -63,11 +65,11 @@ const SelectWalletComponent: React.FC = () => {
           </ConnectCloseBtnWrapper>
           <ConnectLeftWrapper>
             <ConnectLeftHeaderWrapper>
-              <ConnectLeftHeader>Connect Your Wallet</ConnectLeftHeader>
+              <ConnectLeftHeader>{t("Text209")}</ConnectLeftHeader>
             </ConnectLeftHeaderWrapper>
             <ConnectLeftSubheaderWrapper>
               <ConnectLeftSubheader>
-                Choose a wallet to connect.
+                {t("Text210")}
               </ConnectLeftSubheader>
             </ConnectLeftSubheaderWrapper>
             <ConnectBoxBtnWrapper>
@@ -91,7 +93,7 @@ const SelectWalletComponent: React.FC = () => {
               </ConnectBoxWrapper>
 
               <ConnectBtnWrapper onClick={connectWallet}>
-                <ConnectBtnText>Connect</ConnectBtnText>
+                <ConnectBtnText>{t("Text211")}</ConnectBtnText>
               </ConnectBtnWrapper>
             </ConnectBoxBtnWrapper>
           </ConnectLeftWrapper>
@@ -101,12 +103,11 @@ const SelectWalletComponent: React.FC = () => {
               <ConnectRightIcon alt="tronlink" src={tronLinkImg} />
             </ConnectRightIconWrapper>
             <ConnectRightNameWrapper>
-              <ConnectRightName>TronLink</ConnectRightName>
+              <ConnectRightName>{t("Text212")}</ConnectRightName>
             </ConnectRightNameWrapper>
             <ConnectRightTextWrapper>
               <ConnectRightText>
-                To log into your wallet , firstly open TronLink browser
-                extension and unlock your wallet.{" "}
+                {t("Text213")}{" "}
               </ConnectRightText>
             </ConnectRightTextWrapper>
           </ConnectRightWrapper>

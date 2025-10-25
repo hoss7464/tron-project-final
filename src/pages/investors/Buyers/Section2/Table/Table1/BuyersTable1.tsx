@@ -44,18 +44,20 @@ import energyIcon from "../../../../../../assets/svg/EnergyIcon.svg";
 import bandwidthIcon from "../../../../../../assets/svg/BandwidthIcon.svg";
 import PopUp9 from "../../../../../../components/Popup/PopUp9";
 import PopUp10 from "../../../../../../components/Popup/PopUp10";
+import { useTranslation } from "react-i18next";
 
 const BuyersTable1: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { tradingOrderInfo } = useFetchData();
   const [wholeOrderInfo, setWholeOrderInfo] =
     useState<GetOrderResoponse | null>(null);
   const [myModalOpen, setMyModalOpen] = useState(false);
   const [myCancelOpen, setMyCancelOpen] = useState(false);
-  const tronscanUrl = process.env.REACT_APP_TRONSCAN_TXID_URL;
 
   const [selectedOrder, setSelectedOrder] = useState<GetOrderData | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+
+  const rowsPerPage = i18n.language === "en" ? 10 : 9;
 
   //to get data from server :
   useEffect(() => {
@@ -106,23 +108,23 @@ const BuyersTable1: React.FC = () => {
             <MyOrdersNavWrapper >
               <MyOrdersNavTextWrapper>
                 <MyOrdersTextWrapper style={{ marginLeft: "3rem" }}>
-                  <OrderNavText>Date</OrderNavText>
+                  <OrderNavText>{t("Text80")}</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>Amount</OrderNavText>
+                  <OrderNavText>{t("Text81")}</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>Price</OrderNavText>
+                  <OrderNavText>{t("Text82")}</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>Payment</OrderNavText>
+                  <OrderNavText>{t("Text83")}</OrderNavText>
                 </MyOrdersTextWrapper>
 
                 <MyOrdersTextWrapper>
-                  <OrderNavText>Fulfilled</OrderNavText>
+                  <OrderNavText>{t("Text84")}</OrderNavText>
                 </MyOrdersTextWrapper>
               </MyOrdersNavTextWrapper>
             </MyOrdersNavWrapper>
@@ -247,7 +249,7 @@ const BuyersTable1: React.FC = () => {
                       <MyOrdersSellBtnWrapper
                         onClick={() => handleCancelClick(myData)}
                       >
-                        <MyOrdersSell>Cancel</MyOrdersSell>
+                        <MyOrdersSell>{t("Text100")}</MyOrdersSell>
                       </MyOrdersSellBtnWrapper>
                     )}
 

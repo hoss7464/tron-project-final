@@ -1,17 +1,14 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import {
   Drawer,
   Box,
-  Typography,
   IconButton,
   List,
   ListItem,
-  ListItemButton,
   ListItemIcon,
-  ListItemText,
   Divider,
   useTheme,
   useMediaQuery,
@@ -48,16 +45,56 @@ interface RightSidebarProps {
 }
 
 const Sidebar: React.FC<RightSidebarProps> = ({ open, onClose }) => {
-  const { address } = useTronWallet();
-  const [age, setAge] = React.useState("EN");
+  const {
+    address,
+    isConnectedMarket,
+    isConnectedTrading,
+    connectWalletMarket,
+    connectWallet,
+    disconnectWallet2,
+    disconnectWallet,
+  } = useTronWallet();
+  const [selectedLanguage, setSelectedLanguage] = useState("EN");
   const { t, i18n } = useTranslation();
+  const avatarRef = useRef<HTMLButtonElement | null>(null);
   const Location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMarketPage = Location.pathname === "/";
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value);
-  };
+  const isConnected = isMarketPage ? isConnectedMarket : isConnectedTrading;
+  const handleConnect = isMarketPage ? connectWalletMarket : connectWallet;
+  const handleDisconnect = isMarketPage ? disconnectWallet2 : disconnectWallet;
+
+   // Update dropdown when language changes
+    useEffect(() => {
+      // Map i18n language codes to your dropdown values
+      const languageMap: { [key: string]: string } = {
+        en: "EN",
+        ja: "JA", 
+        ru: "RU"
+      };
+      
+      const dropdownValue = languageMap[i18n.language] || "EN";
+      setSelectedLanguage(dropdownValue);
+    }, [i18n.language]);
+
+   const handleChange = (event: SelectChangeEvent) => {
+      const newValue = event.target.value;
+      setSelectedLanguage(newValue);
+      
+      // Map dropdown values to i18n language codes
+      const languageCodeMap: { [key: string]: string } = {
+        "EN": "en",
+        "JA": "ja",
+        "RU": "ru"
+      };
+      
+      const languageCode = languageCodeMap[newValue];
+      if (languageCode) {
+        i18n.changeLanguage(languageCode);
+      }
+    };
 
   const shortenAddress = (address: string) => {
     if (address.length <= 6) return address;
@@ -66,24 +103,22 @@ const Sidebar: React.FC<RightSidebarProps> = ({ open, onClose }) => {
 
   const menuItems = [
     {
-      text: "Market",
+      text: `${t("Text2")}`,
       icon: <NavMarketIcon />,
       to: "/",
     },
     {
-      text: "Buyers",
+      text: `${t("Text3")}`,
       icon: <NavBuyersIcon />,
       to: "/Buyers",
     },
     {
-      text: "Sellers",
+      text: `${t("Text4")}`,
       icon: <NavSellersIcon />,
       to: "/Sellers",
     },
   ];
-  if (!address) {
-    return null;
-  }
+
   return (
     <>
       <Drawer
@@ -133,7 +168,7 @@ const Sidebar: React.FC<RightSidebarProps> = ({ open, onClose }) => {
           <TranslateWrapper style={{ width: "100%" }}>
             <FormControl sx={{ width: "100%" }}>
               <Select
-                value={age}
+                value={selectedLanguage}
                 onChange={handleChange}
                 displayEmpty
                 inputProps={{ "aria-label": "Without label" }}
@@ -190,14 +225,27 @@ const Sidebar: React.FC<RightSidebarProps> = ({ open, onClose }) => {
         </Box>
 
         <Box sx={{ padding: theme.spacing(2) }}>
-          <ConnectWrapper>
-            <ConnectIconWrapper>
-              <ConnectIcon />
-            </ConnectIconWrapper>
-            <ConnectBtn>
-              <ConnectText>{shortenAddress(address)}</ConnectText>
-            </ConnectBtn>
-          </ConnectWrapper>
+          {isConnected ? (
+            <span ref={avatarRef}>
+              <ConnectWrapper onClick={handleDisconnect}>
+                <ConnectIconWrapper>
+                  <ConnectIcon />
+                </ConnectIconWrapper>
+                <ConnectBtn>
+                  <ConnectText>{shortenAddress(address ?? "")}</ConnectText>
+                </ConnectBtn>
+              </ConnectWrapper>
+            </span>
+          ) : (
+            <ConnectWrapper onClick={handleConnect}>
+              <ConnectIconWrapper>
+                <ConnectIcon />
+              </ConnectIconWrapper>
+              <ConnectBtn>
+                <ConnectText>{t("Text1")}</ConnectText>
+              </ConnectBtn>
+            </ConnectWrapper>
+          )}
         </Box>
         <Divider />
 
@@ -207,7 +255,7 @@ const Sidebar: React.FC<RightSidebarProps> = ({ open, onClose }) => {
               <ListItem
                 key={index}
                 disablePadding
-                sx={{ display: "block", mt: 1, borderRadius : "10px" }}
+                sx={{ display: "block", mt: 1, borderRadius: "10px" }}
               >
                 <NavLink
                   to={item.to}

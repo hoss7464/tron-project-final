@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { useFetchData } from "../../contexts/FetchDataContext";
@@ -27,8 +27,10 @@ import {
   LegacyCardIconWrapper2,
   LegacyCardIconWrapper3,
 } from "../../pages/mainPage/LegacySection/LegacyElements";
+import { useTranslation } from "react-i18next";
 
 const PopUp6: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { resourceData } = useFetchData();
   const handleCopy = (text?: string) => {
@@ -37,7 +39,7 @@ const PopUp6: React.FC = () => {
       dispatch(
         showNotification({
           name: "copy-notif",
-          message: "Copied to clipboard",
+          message: `${t("Text19")}`,
           severity: "success",
         })
       );
@@ -49,7 +51,7 @@ const PopUp6: React.FC = () => {
         <Popup6Container>
           <Popup6HeaderWrapper>
             <Popup2HeaderWrapper>
-              <Popup2Header>Authorization</Popup2Header>
+              <Popup2Header>{t("Text130")}</Popup2Header>
             </Popup2HeaderWrapper>
             <Popup2ImgWrapper>
               <LegacyCardIconWrapper1>
@@ -67,7 +69,7 @@ const PopUp6: React.FC = () => {
               <PopUp6Wrapper1>
                 <Popup2NameWrapper>
                   <Popup2Name style={{ fontWeight: "700" }}>
-                    Permission Name:
+                    {t("Text131")}:
                   </Popup2Name>
                 </Popup2NameWrapper>
                 <Popup2ItemWrapper>
@@ -93,7 +95,7 @@ const PopUp6: React.FC = () => {
               <PopUp6Wrapper1>
                 <Popup2NameWrapper>
                   <Popup2Name style={{ fontWeight: "700" }}>
-                    Authorization Address:
+                    {t("Text132")}:
                   </Popup2Name>
                 </Popup2NameWrapper>
                 <Popup2ItemWrapper>
@@ -120,24 +122,24 @@ const PopUp6: React.FC = () => {
             >
               <Popup2NameWrapper>
                 <Popup2Name style={{ fontWeight: "700" }}>
-                  Operation(s):
+                  {t("Text133")}:
                 </Popup2Name>
               </Popup2NameWrapper>
               <Popup6TextWrapper>
-                <Popup6Text>Delegate Resources(Required)</Popup6Text>
+                <Popup6Text>{t("Text134")}({t("Text135")})</Popup6Text>
               </Popup6TextWrapper>
               <Popup6TextWrapper>
-                <Popup6Text>Reclaim Resources(Required)</Popup6Text>
+                <Popup6Text>{t("Text136")}({t("Text135")})</Popup6Text>
               </Popup6TextWrapper>
 
               <Popup6TextWrapper style={{ backgroundColor: "#430E00" }}>
-                <Popup6Text>Vote claim</Popup6Text>
+                <Popup6Text>{t("Text137")}</Popup6Text>
               </Popup6TextWrapper>
               <Popup6TextWrapper style={{ backgroundColor: "#430E00" }}>
-                <Popup6Text>Voting</Popup6Text>
+                <Popup6Text>{t("Text138")}</Popup6Text>
               </Popup6TextWrapper>
               <Popup6TextWrapper style={{ backgroundColor: "#430E00" }}>
-                <Popup6Text>Rewards TRX stake(2.0)</Popup6Text>
+                <Popup6Text>{t("Text139")} TRX {t("Text140")}(2.0)</Popup6Text>
               </Popup6TextWrapper>
             </Popup2NameItemWrapper>
           </Popup6ContentWrapper>
@@ -153,7 +155,7 @@ const PopUp6: React.FC = () => {
               <PopUp6Wrapper1 style={{ marginRight: "2rem" }}>
                 <Popup2NameWrapper>
                   <Popup2Name style={{ fontWeight: "700" }}>
-                    Threshold:
+                    {t("Text141")}:
                   </Popup2Name>
                 </Popup2NameWrapper>
                 <Popup6TextWrapper>
@@ -163,7 +165,7 @@ const PopUp6: React.FC = () => {
 
               <PopUp6Wrapper1>
                 <Popup2NameWrapper>
-                  <Popup2Name style={{ fontWeight: "700" }}>weight:</Popup2Name>
+                  <Popup2Name style={{ fontWeight: "700" }}>{t("Text142")}:</Popup2Name>
                 </Popup2NameWrapper>
                 <Popup6TextWrapper>
                   <Popup6Text>1</Popup6Text>

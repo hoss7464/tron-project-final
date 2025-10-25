@@ -11,6 +11,7 @@ import { styled } from "@mui/material/styles";
 import { ToggleButtonGroup, ToggleButton } from "@mui/material";
 import Form1 from "./Form1/Form1";
 import Form2 from "./Form2/Form2";
+import { useTranslation } from "react-i18next";
 
 // Custom ToggleButtonGroup with full width
 const FullWidthToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
@@ -43,6 +44,7 @@ const CustomToggleButton = styled(ToggleButton)(({ theme }) => ({
 }));
 
 const BuyerForms: React.FC = () => {
+  const { t } = useTranslation()
   //State for switch btn 1 to change the form 
   const [buyerSwitchBtn, setBuyerSwitchBtn] = useState<string | null>("Manual");
 
@@ -71,8 +73,8 @@ const BuyerForms: React.FC = () => {
                 exclusive
                 onChange={buyerSwitchBtnChange}
               >
-                <CustomToggleButton value="Manual">Manual</CustomToggleButton>
-                <CustomToggleButton value="Auto">Auto</CustomToggleButton>
+                <CustomToggleButton value="Manual">{t("Text167")}</CustomToggleButton>
+                <CustomToggleButton value="Auto">{t("Text168")}</CustomToggleButton>
               </FullWidthToggleButtonGroup>
             </FormSwitchBtnWrapper>
             <BuyerFormContentWrapper >
