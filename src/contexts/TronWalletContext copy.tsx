@@ -12,7 +12,9 @@ import { useDispatch } from "react-redux";
 import { showNotification } from "../redux/actions/notifSlice";
 import { toggleRefresh } from "../redux/actions/refreshSlice";
 import { useLocation } from "react-router-dom";
-import { useFetchData } from "./FetchDataContext";
+import { Buffer } from "buffer";
+import { FetchDataResourceRef } from "./FetchDataContext";
+import { ResourceResponse } from "../services/requestService";
 
 // Context interface
 interface TronWalletContextProps {
@@ -82,6 +84,19 @@ interface TronLinkEventData {
   data: any;
 }
 
+// ali ezafe karde
+interface ActivePermission {
+  id?: number;
+  permission_name?: string;
+  threshold?: number;
+  operations?: string;
+  keys?: PermissionKey[];
+}
+interface PermissionKey {
+  address?: string;
+  weight?: number;
+}
+
 // types/tronlink.d.ts (create this file)
 export interface TronLinkWallet {
   tronWeb: {
@@ -124,7 +139,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const dispatch = useDispatch();
   const location = useLocation();
   const tronWebRef = useRef<any>(null);
-  
 
   //States :
   const [address, setAddress] = useState<string | null>(null);
@@ -158,7 +172,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const accountRefreshDataTime = Number(
     process.env.REACT_APP_ACCOUNT_REFRESH_DATA
   );
-  
   //-------------------------------------------------------------------------------------
   //To initiate TronLinkAdapter
   const adapterRef = useRef<TronLinkAdapter | null>(null);
@@ -181,20 +194,62 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     setAccessToken(null);
   }, []);
   //-------------------------------------------------------------------------------------
+  //Function to get resourceData from fetchDataContext :
+  const getResourceData = useCallback((): ResourceResponse | null => {
+    return FetchDataResourceRef.current;
+  }, []);
+  //ali ezafe karde-------------------------------------------------------------------------------------
+  function hasBothDelegateOps(opsHex?: string | null): boolean {
+    if (!opsHex || typeof opsHex !== "string") return false;
+    const hex = opsHex.startsWith("0x") ? opsHex.slice(2) : opsHex;
+    const buf = Buffer.from(hex, "hex");
+    const isSet = (id: number) => {
+      const bi = Math.floor(id / 8),
+        bj = id % 8;
+      const b = buf[bi] ?? 0;
+      return ((b >> bj) & 1) === 1;
+    };
+    return isSet(57) && isSet(58);
+  }
   // Add cleanup on unmount
   const fetchWalletData = async (walletAddress: string) => {
     try {
       const tronWeb = await getTronWeb();
 
-      // Make both requests in parallel
-      const [balanceInSun, resource] = await Promise.all([
+      // Get resource data
+      const resourceData = getResourceData();
+      const myDappAddress = resourceData?.data.DappAddress;
+
+      // Determine which address to use based on sellersPermission
+      const addressToUse = myDappAddress 
+
+      // Use Promise.allSettled instead of Promise.all
+      const [accountResult, resourceResult] = await Promise.allSettled([
         // Get balance
-        tronWeb.trx.getBalance(walletAddress),
+        tronWeb.trx.getAccount(walletAddress),
         // Get resources
         tronWeb.trx.getAccountResources(walletAddress),
       ]);
 
-      const balanceTRX = tronWeb.fromSun(balanceInSun);
+      // Handle account result
+      let account: any = null;
+      if (accountResult.status === "fulfilled") {
+        account = accountResult.value;
+      } else {
+        console.error("Failed to get account:", accountResult.reason);
+        throw new Error("Failed to fetch account data");
+      }
+
+      // Handle resource result
+      let resource: any = null;
+      if (resourceResult.status === "fulfilled") {
+        resource = resourceResult.value;
+      } else {
+        console.error("Failed to get resources:", resourceResult.reason);
+        throw new Error("Failed to fetch resource data");
+      }
+
+      const balanceTRX = tronWeb.fromSun(account.balance);
       setBalance(Number(balanceTRX).toFixed(2));
 
       const freeNetLimit = resource.freeNetLimit ?? 0;
@@ -207,6 +262,50 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const totalBw = freeNetLimit + netLimit;
       const all_energy = energyLimit;
       const available_energy = energyLimit - energyUsed;
+
+      // perm
+      let havedperm = false;
+      const meHex = tronWeb.address.toHex(addressToUse).toLowerCase();
+      let havedStake = false;
+
+      if (Array.isArray(account?.frozenV2) && account.frozenV2.length > 0) {
+        if (
+          account.frozenV2[0]?.amount >= 1e6 ||
+          account.frozenV2[1]?.amount >= 1e6
+        ) {
+          havedStake = true;
+        }
+      }
+
+      const raw = account?.active_permission;
+      const actives = Array.isArray(raw) ? raw : raw ? [raw] : [];
+      const quickCheck = (p: ActivePermission) => {
+        const keys = Array.isArray(p?.keys) ? p.keys : [];
+        let weightSum = 0;
+        for (const k of keys) {
+          const kHex = tronWeb.address.toHex(k?.address).toLowerCase();
+          if (kHex && kHex === meHex) weightSum += Number(k?.weight || 0);
+        }
+
+        const threshold = Number(p?.threshold ?? 1);
+        const hasAddress = weightSum > 0;
+        const opsOk = hasBothDelegateOps(p?.operations);
+        const passes =
+          hasAddress && weightSum === 1 && threshold === 1 && opsOk;
+        return { hasAddress, weightSum, threshold, opsOk, passes };
+      };
+
+      if (havedStake) {
+        for (const perm of actives) {
+          const c = quickCheck(perm);
+          if (c.passes) {
+            havedperm = true;
+            break;
+          }
+        }
+      }
+
+      setSellersPermission(havedperm);
 
       setAllBandwidth(all_bw);
       setAvailableBandwidth(totalBw);
@@ -227,13 +326,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Function to start the refresh interval
   const startRefreshInterval = (walletAddress: string) => {
+    // Make initial call immediately
+    fetchWalletData(walletAddress);
     // Clear any existing interval
     stopRefreshInterval();
 
-    // Make initial call immediately
-    fetchWalletData(walletAddress);
-
-    // Set new interval (5000ms = 5 seconds)
+    // Set new interval (20000ms = 20 seconds)
     refreshIntervalRef.current = setInterval(async () => {
       await fetchWalletData(walletAddress);
     }, accountRefreshDataTime);
@@ -335,6 +433,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsConnected(false);
       stopRefreshInterval();
       setIsConnectedTrading(false);
+      setSellersPermission(false)
+      if (address === null) {
+        return 
+      }
+      startRefreshInterval(address)
 
       dispatch(
         showNotification({
@@ -433,7 +536,12 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           await disconnectWallet2();
           return;
         }
-
+        
+       
+        if (address !== nextAddress) {
+          setSellersPermission(false);
+        }
+       
         if (address && address !== nextAddress) {
           // Reset current state
           setAddress(null);
@@ -526,22 +634,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         startRefreshInterval(nextAddress);
         fetchWalletData(nextAddress);
 
-        if (
-        !(
-          location.pathname === "/Sellers" &&
-          !sellersPermission
-        )
-      )  {
-         dispatch(
-          showNotification({
-            name: "tron-account-changed",
-            message: "Wallet account changed successfully",
-            severity: "success",
-          })
-        );
-      }
-
-       
+        if (!(location.pathname === "/Sellers" && !sellersPermission)) {
+          dispatch(
+            showNotification({
+              name: "tron-account-changed",
+              message: "Wallet account changed successfully",
+              severity: "success",
+            })
+          );
+        }
       } catch (err) {
         console.error("Error during wallet change:", err);
         await disconnectWallet2();
@@ -604,14 +705,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     // If we already have an address in state when the app loads
-    if (address) {
+    if (address ) {
+     
       setIsConnected(true);
       startRefreshInterval(address);
     } else {
       setIsConnected(false);
       stopRefreshInterval();
     }
-  }, [address, startRefreshInterval, stopRefreshInterval]);
+  }, [address, startRefreshInterval, stopRefreshInterval, isConnectedTrading]);
 
   //Funtion to connect wallet :
   const connectWallet = async () => {
@@ -629,6 +731,9 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         );
         return;
       }
+
+      // Start refresh interval
+      startRefreshInterval(addr);
 
       //To get data from any network
       const window_tronweb = (window as any).tronWeb;
@@ -653,6 +758,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             severity: "error",
           })
         );
+        disconnectWallet2()
         return;
       }
 
@@ -705,38 +811,32 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       //To get access token :
       const access_Token = server_data_json.data.access_token;
+      if (access_Token === null) {
+        disconnectWallet2()
+      }
       setAccessToken(access_Token);
+      
 
       //To save refressh_token, access_token, wallet address into a json
       const localStorageSavedData = {
         wallet_address: addr,
       };
-      //To save localStorageSavedData in localStorage :
-
+      
+      //setSellersPermission(false);
       //wallet address state :
       setAddress(addr);
 
       setIsConnectedTrading(true);
 
-      // Start refresh interval
-      startRefreshInterval(addr);
 
-      //To show success notification after wallet connection :
 
-      if (
-        !(
-          location.pathname === "/Sellers" &&
-          !sellersPermission
-        )
-      ) {
-        dispatch(
-          showNotification({
-            name: "tron-success5",
-            message: "Wallet connection successful.",
-            severity: "success",
-          })
-        );
-      }
+      dispatch(
+        showNotification({
+          name: "tron-success5",
+          message: "Wallet connection successful.",
+          severity: "success",
+        })
+      );
     } catch (err) {
       setIsConnectedTrading(false);
       // Check for TronLink rejection specifically
@@ -801,6 +901,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
+      //setSellersPermission(false);
       // Update state
       setAddress(addr);
 
@@ -852,8 +953,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         setAddress(walletAddr);
 
         // Get balance
-        const balanceInSun = await tronWeb.trx.getBalance(walletAddr);
-        setBalance(Number(tronWeb.fromSun(balanceInSun)).toFixed(2));
+        const account = await tronWeb.trx.getAccount(walletAddr);
+        setBalance(Number(tronWeb.fromSun(account.balance)).toFixed(2));
 
         // Get bandwidth and energy
         const resource = await tronWeb.trx.getAccountResources(walletAddr);
@@ -903,24 +1004,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
     autoConnect();
   }, [location.pathname]);
-
-  useEffect(() => {
-    // Check for restricted access on /Sellers
-    if (
-      location.pathname === "/Sellers" &&
-      isConnectedTrading === true &&
-      sellersPermission === false
-    ) {
-      dispatch(
-        showNotification({
-          name: "tron-seller-error",
-          message:
-            "Access denied: You need seller permission to use this page.",
-          severity: "error",
-        })
-      );
-    }
-  }, [location.pathname, isConnectedTrading, sellersPermission]);
 
   //-------------------------------------------------------------------------------------
   //To transfer TRX :
@@ -1260,6 +1343,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
   //-------------------------------------------------------------------------------------
+ 
 
   return (
     <TronWalletContext.Provider

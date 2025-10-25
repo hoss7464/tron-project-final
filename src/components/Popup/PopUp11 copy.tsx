@@ -471,8 +471,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     } else if (isNaN(numericValue)) {
       return "required";
     }
-
-    console.log(maxPriceValue);
+    
     if (switchBtn === "energy") {
       if (numericValue < priceValue.energy) {
         return `< ${priceValue.energy}`;
@@ -584,7 +583,6 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       profit: profit,
       isActive: activeSell,
     };
-    console.log(settingPayload)
 
     try {
       const settingResponse = await axios.post<AccountInfoResponse>(
