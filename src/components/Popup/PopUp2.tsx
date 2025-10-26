@@ -68,12 +68,14 @@ interface OrderData {
 
 interface ApiResponse {
   success: boolean;
+  code: string;
   message: string;
   data: OrderData;
 }
 
 interface VerifyPaymentResponse {
   success: boolean;
+  code: string;
   message: string;
 }
 
@@ -99,8 +101,6 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const { transferTrx, isTransferring, address } = useTronWallet();
   const baseUrl = process.env.REACT_APP_BASE_URL;
   const [isProcessing, setIsProcessing] = useState(false);
-
-  //create order states :
 
   //base url :
   const baseURL = process.env.REACT_APP_BASE_URL;
@@ -155,7 +155,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           },
           timeout: axiosTimeOut,
           withCredentials: true,
-          validateStatus: (status: number) => status < 500,
+          validateStatus: (status: number) => status < 550,
         }
       );
 
@@ -182,7 +182,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
                 "Content-Type": "application/json",
               },
               timeout: axiosTimeOut,
-              validateStatus: (status: number) => status < 500,
+              validateStatus: (status: number) => status < 550,
             }
           );
 
@@ -190,22 +190,38 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             dispatch(
               showNotification({
                 name: "success1",
-                message: "Transaction successful.",
+                message: `${t("Text217")}`,
                 severity: "success",
               })
             );
             resetForm();
             onClose(); // Close popup automatically on success
-
             return;
+          } else {
+            dispatch(
+              showNotification({
+                name: "success1",
+                message: `${t("Text214")}: ${veryfyPayment.data.code}`,
+                severity: "success",
+              })
+            );
           }
+        } else {
+          dispatch(
+            showNotification({
+              name: "error2",
+              message: `${t("Text216")} TRX `,
+              severity: "error",
+            })
+          );
+          return;
         }
       } else {
         //do something with orderResponse
         dispatch(
           showNotification({
             name: "error10",
-            message: "There is something wrong with server.",
+            message: `${t("Text214")}: ${orderResponse.data.code}`,
             severity: "error",
           })
         );
@@ -215,7 +231,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
       dispatch(
         showNotification({
           name: "error2",
-          message: `Error sending TRX ${error}`,
+          message: `${t("Text216")} TRX `,
           severity: "error",
         })
       );
@@ -422,11 +438,12 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             }}
           >
             {" "}
-            
             <LoadingButtonContent
               loading={isProcessing}
               loadingText={`${t("Text74")}...`}
-              normalText={mySwitchBtn === "energy" ? `${t("Text75")}` : `${t("Text76")}`}
+              normalText={
+                mySwitchBtn === "energy" ? `${t("Text75")}` : `${t("Text76")}`
+              }
             />
           </Button>
 

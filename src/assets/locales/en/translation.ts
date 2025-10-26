@@ -247,7 +247,11 @@
   "Text211": "Connect",
   "Text212": "TronLink",
   "Text213": "To log into your wallet , firstly open TronLink browser extension and unlock your wallet.",
-
+  //---------------------------------Error handling-------------------------------
+  "Text214": "Error",
+  "Text215": "Error to refresh data",
+  "Text216": "Error in transfering",
+  "Text217": "Transaction successful.",
   
 } as const
 

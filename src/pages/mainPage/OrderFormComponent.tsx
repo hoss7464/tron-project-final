@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
 import { showNotification } from "../../redux/actions/notifSlice";
 import { useFetchData } from "../../contexts/FetchDataContext";
-import { ResourceResponse } from "../../services/requestService";
 import "./mainPage.css";
 import {
   FormControl,
@@ -70,20 +69,6 @@ import energyIcon from "../../assets/svg/EnergyIcon.svg";
 import { useTronWallet } from "../../contexts/TronWalletContext";
 import PopUp2 from "../../components/Popup/PopUp2";
 import Info from "../../components/Info-Icon-component/Info";
-//------------------------------------------------------------------------------------
-interface Form1ApiData {
-  durationSec: number;
-  options: {
-    allow_partial: boolean;
-  };
-  price: number;
-  receiver: string;
-  requester: string;
-  resourceAmount: number;
-  resourceType: string;
-  totalPrice: number;
-  partialField: number;
-}
 //-------------------------------------------------------------------------------------
 //Duration input components :
 const boxStyle = {
@@ -220,10 +205,12 @@ const OrderFormComponent: React.FC = () => {
   };
   //--------------------------------------------------------------------------------------
   //Functions for stting button (Bulk order) :
+  /* 
   const handleBulkOrder = (event: React.ChangeEvent<HTMLInputElement>) => {
     const bulkValue = event.target.checked;
     setBulkOrder(bulkValue);
   };
+  */
   //--------------------------------------------------------------------------------------
   //Functions for wallet address :
   //Wallet address validation :
@@ -300,10 +287,15 @@ const OrderFormComponent: React.FC = () => {
       try {
         await fetchData();
       } catch (error) {
-        console.error("Error refreshing data:", error);
+        dispatch(
+        showNotification({
+          name: "error1",
+          message: `${t("Text215")}`,
+          severity: "error",
+        })
+      );
       }
     };
-
     if (refreshTrigger) {
       refreshData();
     }
@@ -557,6 +549,7 @@ const OrderFormComponent: React.FC = () => {
     }
   };
   //Function to filter the dropdown to shows nothing if the entered value was more than max-price :
+  /*
   const filterPriceOptions = (
     options: typeof priceOptions,
     state: { inputValue: string }
@@ -573,6 +566,7 @@ const OrderFormComponent: React.FC = () => {
 
     return options;
   };
+  */
   //Function for getting nearest smaller selected price value in price options and getting the numeric value out of that.
   const getNumericSelectedPrice = (selectedPrice: string): number | null => {
     const inputNum = parseInt(selectedPrice, 10);
@@ -887,7 +881,6 @@ const OrderFormComponent: React.FC = () => {
     }
 
     //Fetch data towards server :
-
     try {
       if (balance) {
         const balanceNum = parseFloat(balance);
