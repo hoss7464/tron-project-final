@@ -840,6 +840,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     } catch (err) {
       setIsConnectedTrading(false);
       // Check for TronLink rejection specifically
+      /* 
       const isTronLinkRejection =
         err instanceof Error &&
         (err.message.includes("confirmation declined by user") ||
@@ -876,6 +877,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           })
         );
       }
+       */
+      dispatch(
+          showNotification({
+            name: "tron-rejection",
+            message: "hossein",
+            severity: "warning",
+          })
+        );
+        
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current);
         refreshIntervalRef.current = null;

@@ -206,6 +206,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
               })
             );
           }
+          return
         } else {
           dispatch(
             showNotification({
@@ -235,6 +236,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           severity: "error",
         })
       );
+      return
     } finally {
       // Re-enable the button after 300ms
       setTimeout(() => {
