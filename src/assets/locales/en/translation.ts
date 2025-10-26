@@ -252,6 +252,20 @@
   "Text215": "Error to refresh data",
   "Text216": "Error in transfering",
   "Text217": "Transaction successful.",
+  "Text218": "Authentication Faild",
+  "Text219": "Receiver must be non-empty array",
+  "Text220": "Total price must be positive (in TRX)",
+  "Text221": "Insufficient balance",
+  "Text222": "Something went wrong",
+  "Text223": "Invalid request",
+  "Text224": "Market setting is not available",
+  "Text225": "Something wrong",
+  "Text226": "Less than minimum rate",
+  "Text227": "No rate found for this duration",
+  "Text228": "Rate for this resource is not defined",
+  "Text229": "less than minimum amount",
+  "Text230": "Selected price doesn't match",
+  "Text231": "Your request is in process",
   
 } as const
 

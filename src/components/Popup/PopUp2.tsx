@@ -36,6 +36,8 @@ import { Divider } from "@mui/material";
 import { formatStrictDuration } from "../../utils/fromSec";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 import { useTranslation } from "react-i18next";
+import { serverErrorMessageFunc } from "../../utils/errorFunctions";
+
 
 interface OrderSuccessPopupProps {
   open: boolean;
@@ -102,6 +104,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const baseUrl = process.env.REACT_APP_BASE_URL;
   const [isProcessing, setIsProcessing] = useState(false);
 
+
   //base url :
   const baseURL = process.env.REACT_APP_BASE_URL;
   //to get axios timeout :
@@ -110,6 +113,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const handleReject = () => {
     onClose();
   };
+
 
   const handleSendTrx = async () => {
     setIsProcessing(true); // Disable buttons
@@ -198,10 +202,11 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             onClose(); // Close popup automatically on success
             return;
           } else {
+            const serverError = serverErrorMessageFunc(veryfyPayment.data.code)
             dispatch(
               showNotification({
                 name: "success1",
-                message: `${t("Text214")}: ${veryfyPayment.data.code}`,
+                message: `${serverError}`,
                 severity: "success",
               })
             );
@@ -219,10 +224,11 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
         }
       } else {
         //do something with orderResponse
+        const serverError = serverErrorMessageFunc(orderResponse.data.code)
         dispatch(
           showNotification({
             name: "error10",
-            message: `${t("Text214")}: ${orderResponse.data.code}`,
+            message: `${serverError}`,
             severity: "error",
           })
         );
