@@ -1153,6 +1153,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         txId: txResult.transaction?.txID || txResult.txid,
       };
     } catch (err) {
+      /* 
       const errorMessage =
         err instanceof Error ? err.message : "Transfer failed";
 
@@ -1165,7 +1166,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       );
 
       setTransferError(errorMessage);
-      return { success: false, error: errorMessage };
+      */
+      return { success: false, error: ""};
     } finally {
       setIsTransferring(false);
     }
