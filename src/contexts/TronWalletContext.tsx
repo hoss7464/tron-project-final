@@ -827,16 +827,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAddress(addr);
 
       setIsConnectedTrading(true);
-
-
-
-      dispatch(
-        showNotification({
-          name: "tron-success5",
-          message: "Wallet connection successful.",
-          severity: "success",
-        })
-      );
     } catch (err) {
       setIsConnectedTrading(false);
       // Check for TronLink rejection specifically
@@ -918,14 +908,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsConnectedMarket(true);
 
       startRefreshInterval(addr);
-
-      dispatch(
-        showNotification({
-          name: "tron-market-connected",
-          message: "Market wallet connected successfully.",
-          severity: "success",
-        })
-      );
     } catch (err) {
       setIsConnectedMarket(false);
       dispatch(
@@ -987,7 +969,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         // Start refreshing wallet data automatically
 
         startRefreshInterval(walletAddr);
-
+        /* 
         if (location.pathname === "/" && !isConnectedMarket) {
           dispatch(
             showNotification({
@@ -997,6 +979,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             })
           );
         }
+          */
       } catch (err) {
         console.error("Auto-connect failed:", err);
         // If something fails, clear local state
