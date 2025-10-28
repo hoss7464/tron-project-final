@@ -221,6 +221,7 @@ export interface GetOrderResoponse {
   success: boolean;
   message: string;
   data: GetOrderData[];
+  code?:string;
 }
 
 export interface GetOrderData {

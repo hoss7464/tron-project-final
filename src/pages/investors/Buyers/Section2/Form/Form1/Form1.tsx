@@ -63,15 +63,16 @@ import { useFetchData } from "../../../../../../contexts/FetchDataContext";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../../../../redux/store/store";
 import { useTronWallet } from "../../../../../../contexts/TronWalletContext";
-import { ResourceResponse } from "../../../../../../services/requestService";
 import { showNotification } from "../../../../../../redux/actions/notifSlice";
 import Autocomplete from "@mui/material/Autocomplete";
 import axios from "axios";
 import LoadingButtonContent from "../../../../../../components/LoadingBtnContent/LoadingBtnContent";
 import Info from "../../../../../../components/Info-Icon-component/Info";
+import { serverErrorMessageFunc } from "../../../../../../utils/errorFunctions";
 //------------------------------------------------------------------------------------
 interface Form1ApiResponse {
   success: boolean;
+  code: string;
   message: string;
   data: Form1ApiData;
 }
@@ -239,10 +240,12 @@ const Form1: React.FC = () => {
 
   //--------------------------------------------------------------------------------------
   //Functions for stting button (Bulk order) :
+  /* 
   const handleBulkOrder = (event: React.ChangeEvent<HTMLInputElement>) => {
     const bulkValue = event.target.checked;
     setBulkOrder(bulkValue);
   };
+  */
   //--------------------------------------------------------------------------------------
   //Functions for wallet address :
   //Wallet address validation :
@@ -291,7 +294,7 @@ const Form1: React.FC = () => {
     const addresses = walletAdd.split(",").map((addr) => addr.trim());
     const allValid = addresses.every((addr) => validationWalletAdd(addr));
     if (!allValid) {
-      setWalletAddError("addresses must be valid and separated by ','");
+      setWalletAddError(`${t("Text31")}`);
       return false;
     } else {
       setWalletAddError(null);
@@ -319,7 +322,13 @@ const Form1: React.FC = () => {
       try {
         await fetchData();
       } catch (error) {
-        console.error("Error refreshing data:", error);
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text215")}`,
+            severity: "error",
+          })
+        );
       }
     };
 
@@ -423,7 +432,8 @@ const Form1: React.FC = () => {
       `3 ${t("Text56")}`,
       ...Array.from(
         { length: 30 },
-        (_, i) => `${i + 1} ${i + 1 === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
+        (_, i) =>
+          `${i + 1} ${i + 1 === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
       ),
     ];
 
@@ -554,7 +564,9 @@ const Form1: React.FC = () => {
     if (switchBtn === "energy") {
       return numValue < rate_energy ? `${t("Text33")} ${rate_energy}` : "";
     } else if (switchBtn === "bandwidth") {
-      return numValue < rate_bandwidth ? `${t("Text33")} ${rate_bandwidth}` : "";
+      return numValue < rate_bandwidth
+        ? `${t("Text33")} ${rate_bandwidth}`
+        : "";
     }
 
     return "";
@@ -574,6 +586,7 @@ const Form1: React.FC = () => {
     }
   };
   //Function to filter the dropdown to shows nothing if the entered value was more than max-price :
+  /* 
   const filterPriceOptions = (
     options: typeof priceOptions,
     state: { inputValue: string }
@@ -590,6 +603,7 @@ const Form1: React.FC = () => {
 
     return options;
   };
+  */
   //Function for getting nearest smaller selected price value in price options and getting the numeric value out of that.
   const getNumericSelectedPrice = (selectedPrice: string): number | null => {
     const inputNum = parseInt(selectedPrice, 10);
@@ -954,10 +968,11 @@ const Form1: React.FC = () => {
           );
 
           if (form1Response.data.success === false) {
+            const serverError = serverErrorMessageFunc(form1Response.data.code)
             dispatch(
               showNotification({
                 name: "form1-error",
-                message: "Error in sending data.",
+                message: `${serverError}`,
                 severity: "error",
               })
             );
@@ -966,7 +981,7 @@ const Form1: React.FC = () => {
             dispatch(
               showNotification({
                 name: "form1-success",
-                message: "Data has been sent successfully.",
+                message: `${t("Text271")}`,
                 severity: "success",
               })
             );
@@ -1003,7 +1018,7 @@ const Form1: React.FC = () => {
             return;
           } else {
             const form1Response = await axios.post<Form1ApiResponse>(
-              `${baseURL}/`,
+              `${baseURL}/Buyer/CreateOrder`,
               postData,
               {
                 headers: {
@@ -1016,10 +1031,11 @@ const Form1: React.FC = () => {
             );
 
             if (form1Response.data.success === false) {
+              const serverError = serverErrorMessageFunc(form1Response.data.code)
               dispatch(
                 showNotification({
                   name: "form1-error",
-                  message: "Error in sending data.",
+                  message: `${serverError}`,
                   severity: "error",
                 })
               );
@@ -1028,7 +1044,7 @@ const Form1: React.FC = () => {
               dispatch(
                 showNotification({
                   name: "form1-success",
-                  message: "Data has been sent successfully.",
+                  message: `${t("Text271")}`,
                   severity: "success",
                 })
               );
@@ -1058,9 +1074,7 @@ const Form1: React.FC = () => {
           dispatch(
             showNotification({
               name: "error5",
-              message: `${t("Text41")} ${
-                totalPrice + 0.4
-              } ${t(
+              message: `${t("Text41")} ${totalPrice + 0.4} ${t(
                 "Text42"
               )} ${totalPrice} ${t("Text43")}`,
               severity: "error",
@@ -1159,7 +1173,7 @@ const Form1: React.FC = () => {
                 onChange={handleChange}
               >
                 <CustomToggleButton value="energy">
-                   {t("Text7")}
+                  {t("Text7")}
                 </CustomToggleButton>
                 <CustomToggleButton value="bandwidth">
                   {t("Text10")}
@@ -1171,10 +1185,7 @@ const Form1: React.FC = () => {
           <FormAddInputLabelWrapper>
             <FormAddLabelWrapper>
               <FormAddLabel>{t("Text46")}</FormAddLabel>
-              <Info
-                tooltipText={`${t("Text47")}`}
-                placement="top"
-              />
+              <Info tooltipText={`${t("Text47")}`} placement="top" />
               {walletAddError ? (
                 <FormErrorWrapper>
                   <FormError>{walletAddError}</FormError>
@@ -1206,8 +1217,8 @@ const Form1: React.FC = () => {
               <FormAddLabel>{t("Text48")}</FormAddLabel>
               <Info
                 tooltipText={`${t("Text49")} ${
-                    switchBtn === "energy" ? `${t("Text7")}` : `${t("Text10")}`
-                  }.`}
+                  switchBtn === "energy" ? `${t("Text7")}` : `${t("Text10")}`
+                }.`}
                 placement="top"
               />
               {amountError && (
@@ -1344,10 +1355,7 @@ const Form1: React.FC = () => {
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>{t("Text50")}</FormAddLabel>
-              <Info
-                tooltipText={`${t("Text51")}`}
-                placement="top"
-              />
+              <Info tooltipText={`${t("Text51")}`} placement="top" />
               {durationError && (
                 <FormErrorWrapper>
                   <FormError>{durationError}</FormError>
@@ -1430,7 +1438,11 @@ const Form1: React.FC = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleOptionClick(
-                                  `${hr} ${hr === 1 ? `${t("Text55")}` : `${t("Text56")}`}`
+                                  `${hr} ${
+                                    hr === 1
+                                      ? `${t("Text55")}`
+                                      : `${t("Text56")}`
+                                  }`
                                 );
                               }}
                             >
@@ -1451,7 +1463,11 @@ const Form1: React.FC = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleOptionClick(
-                                  `${day} ${day === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
+                                  `${day} ${
+                                    day === 1
+                                      ? `${t("Text58")}`
+                                      : `${t("Text59")}`
+                                  }`
                                 );
                               }}
                             >
@@ -1470,10 +1486,7 @@ const Form1: React.FC = () => {
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>{t("Text60")}</FormAddLabel>
-              <Info
-                tooltipText={`${t("Text61")}`}
-                placement="right"
-              />
+              <Info tooltipText={`${t("Text61")}`} placement="right" />
               {priceError && (
                 <FormErrorWrapper>
                   <FormError>{priceError}</FormError>
@@ -1593,10 +1606,7 @@ const Form1: React.FC = () => {
                   }
                   label={`${t("Text62")}`}
                 />
-                <Info
-                  tooltipText={`${t("Text63")}`}
-                  placement="top"
-                />
+                <Info tooltipText={`${t("Text63")}`} placement="top" />
               </MenuItem>
             </Menu>
             {partialFill && (

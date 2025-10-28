@@ -54,14 +54,17 @@ import { useDispatch } from "react-redux";
 import { showNotification } from "../../../../redux/actions/notifSlice";
 import { useTranslation } from "react-i18next";
 import LoadingButtonContent from "../../../../components/LoadingBtnContent/LoadingBtnContent";
+import { serverErrorMessageFunc } from "../../../../utils/errorFunctions";
 
 interface depositTrxData {
   success: boolean;
+  code: string;
   depositId: string;
 }
 
 interface depositTrxConfirmation {
   success: boolean;
+  code: string;
   data: {
     txId: string;
     depositId: string;
@@ -91,7 +94,13 @@ const Section1: React.FC = () => {
       try {
         await fetchData();
       } catch (error) {
-        console.error("Error refreshing data:", error);
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text215")}`,
+            severity: "error",
+          })
+        );
       }
     };
 
@@ -135,7 +144,7 @@ const Section1: React.FC = () => {
     }
 
     if (depositError) {
-      return 
+      return;
     }
 
     const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -196,17 +205,18 @@ const Section1: React.FC = () => {
             dispatch(
               showNotification({
                 name: "deposit-success",
-                message: "Transaction Successful.",
+                message: `${t("Text217")}`,
                 severity: "success",
               })
             );
             setDeposit("");
             return;
           } else {
+            const serverError = serverErrorMessageFunc(confirmDepostTrx.data.code)
             dispatch(
               showNotification({
                 name: "deposit-error-",
-                message: "Transaction failed",
+                message: `${serverError}`,
                 severity: "error",
               })
             );
@@ -216,7 +226,7 @@ const Section1: React.FC = () => {
           dispatch(
             showNotification({
               name: "deposit-error-8",
-              message: "TronLink Error: transfer TRX faild",
+              message: `${t("Text267")}`,
               severity: "error",
             })
           );
@@ -224,10 +234,11 @@ const Section1: React.FC = () => {
         }
       } else {
         //if depositResponse.data.success === false ----> make an error
+        const serverError = serverErrorMessageFunc(depositResponse.data.code)
         dispatch(
           showNotification({
             name: "deposit-error-7",
-            message: "error in deposit data check",
+            message: `${serverError}`,
             severity: "error",
           })
         );
@@ -237,7 +248,7 @@ const Section1: React.FC = () => {
       dispatch(
         showNotification({
           name: "deposit-error-6",
-          message: `${error}`,
+          message: `${t("Text222")}`,
           severity: "error",
         })
       );
@@ -335,11 +346,11 @@ const Section1: React.FC = () => {
                           </FormAddInputWrapper2>
                         </FormAddInputIconWrapper>
                       </FormAddInputWrapper>
-                      <OrderSubmitBtnWrapper style={{marginTop : "0"}}>
+                      <OrderSubmitBtnWrapper style={{ marginTop: "0" }}>
                         <OrderSubmitBtn
                           onClick={handleDepositClick}
                           disabled={isSubmitting}
-                          style={{fontWeight : "600"}}
+                          style={{ fontWeight: "600" }}
                         >
                           <LoadingButtonContent
                             loading={isSubmitting}
@@ -373,7 +384,9 @@ const Section1: React.FC = () => {
                     <SellersCardThingsWrapper2 style={{ padding: "0" }}>
                       <SellersCardThingsNameIconWrapper>
                         <SellersCardThingsNameWrapper>
-                          <SellersCardThingsName>{t("Text148")}</SellersCardThingsName>
+                          <SellersCardThingsName>
+                            {t("Text148")}
+                          </SellersCardThingsName>
                         </SellersCardThingsNameWrapper>
                       </SellersCardThingsNameIconWrapper>
                       <SellersCardThingsNumberWrapper>
@@ -381,7 +394,8 @@ const Section1: React.FC = () => {
                           <SellersCardThingsNumber>
                             {sunToTrx(
                               tradingAccountInfo?.data.buyerCredit
-                            ).toLocaleString()} TRX
+                            ).toLocaleString()}{" "}
+                            TRX
                           </SellersCardThingsNumber>
                         ) : (
                           <SellersCardThingsNumber>_ _</SellersCardThingsNumber>
@@ -411,7 +425,10 @@ const Section1: React.FC = () => {
                     <FormAddInputWrapper style={{ marginBottom: "1rem" }}>
                       <FormAddInputIconWrapper>
                         <FormAddInputWrapper2>
-                          <FormAddInput value={apiKey} placeholder={`${t("Text159")}`} />
+                          <FormAddInput
+                            value={apiKey}
+                            placeholder={`${t("Text159")}`}
+                          />
                         </FormAddInputWrapper2>
 
                         <Sec1CopyIcon onClick={handleCopy} />

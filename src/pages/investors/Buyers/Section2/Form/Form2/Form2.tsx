@@ -69,6 +69,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Form2PopUp1 from "../FormPopups/Form2PopUp1";
 import axios from "axios";
 import Info from "../../../../../../components/Info-Icon-component/Info";
+import { serverErrorMessageFunc } from "../../../../../../utils/errorFunctions";
 import LoadingButtonContent from "../../../../../../components/LoadingBtnContent/LoadingBtnContent";
 //-----------------------------------------------------------------
 //Interfaces :
@@ -90,6 +91,7 @@ interface Form2Data {
 
 interface Form2Api {
   success: boolean;
+  code: string;
   message: string;
   data: Form2Data;
 }
@@ -144,7 +146,6 @@ const DropdownIconWithText: React.FC = () => {
   );
 };
 //-------------------------------------------------------------------------------------
-
 const Form2: React.FC = () => {
   //States :
   //translation states :
@@ -398,7 +399,7 @@ const Form2: React.FC = () => {
       dispatch(
         showNotification({
           name: "error3",
-          message:`${t("Text172")}`,
+          message: `${t("Text172")}`,
           severity: "error",
         })
       );
@@ -412,7 +413,13 @@ const Form2: React.FC = () => {
       try {
         await fetchData();
       } catch (error) {
-        console.error("Error refreshing data:", error);
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text215")}`,
+            severity: "error",
+          })
+        );
       }
     };
 
@@ -565,7 +572,8 @@ const Form2: React.FC = () => {
       `3 ${t("Text56")}`,
       ...Array.from(
         { length: 30 },
-        (_, i) => `${i + 1} ${i + 1 === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
+        (_, i) =>
+          `${i + 1} ${i + 1 === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
       ),
     ];
 
@@ -696,7 +704,9 @@ const Form2: React.FC = () => {
       if (switchBtn === "energy") {
         return numValue < rate_energy ? `${t("Text33")} ${rate_energy} ` : "";
       } else if (switchBtn === "bandwidth") {
-        return numValue < rate_bandwidth ? `${t("Text33")} ${rate_bandwidth} ` : "";
+        return numValue < rate_bandwidth
+          ? `${t("Text33")} ${rate_bandwidth} `
+          : "";
       }
     }
 
@@ -717,6 +727,7 @@ const Form2: React.FC = () => {
     }
   };
   //Function to filter the dropdown to shows nothing if the entered value was more than max-price :
+  /* 
   const filterPriceOptions = (
     options: typeof priceOptions,
     state: { inputValue: string }
@@ -733,6 +744,7 @@ const Form2: React.FC = () => {
 
     return options;
   };
+  */
   //Function for getting nearest smaller selected price value in price options and getting the numeric value out of that.
   const getNumericSelectedPrice = (selectedPrice: string): number | null => {
     const inputNum = parseInt(selectedPrice, 10);
@@ -1322,7 +1334,7 @@ const Form2: React.FC = () => {
           dispatch(
             showNotification({
               name: "success1",
-              message: "Data has been sent successful.",
+              message: `${t("Text271")}`,
               severity: "success",
             })
           );
@@ -1351,10 +1363,11 @@ const Form2: React.FC = () => {
           isUserInput.current = false;
           return;
         } else {
+          const serverError = serverErrorMessageFunc(form2Response.data.code)
           dispatch(
             showNotification({
               name: "error3",
-              message: "Error in sending data.",
+              message: `${serverError}`,
               severity: "error",
             })
           );
@@ -1364,7 +1377,7 @@ const Form2: React.FC = () => {
         dispatch(
           showNotification({
             name: "error5",
-            message: `Your credit is not enough`,
+            message: `${t("Text272")}`,
             severity: "error",
           })
         );
@@ -1374,7 +1387,7 @@ const Form2: React.FC = () => {
       dispatch(
         showNotification({
           name: "error4",
-          message: `Something went wrong: ${error}`,
+          message: `${t("Text222")}`,
           severity: "error",
         })
       );
@@ -1473,10 +1486,7 @@ const Form2: React.FC = () => {
             >
               <Form2LableErrorWrapper>
                 <FormAddLabel>{t("Text46")}</FormAddLabel>
-                <Info
-                  tooltipText={`${t("Text47")}`}
-                  placement="top"
-                />
+                <Info tooltipText={`${t("Text47")}`} placement="top" />
                 {walletAddError ? (
                   <FormErrorWrapper>
                     <FormError>{walletAddError}</FormError>
@@ -1515,8 +1525,8 @@ const Form2: React.FC = () => {
               <FormAddLabel>{t("Text48")}</FormAddLabel>
               <Info
                 tooltipText={`${t("Text49")} ${
-                    switchBtn === "energy" ? `${t("Text7")}` : `${t("Text10")}`
-                  }.`}
+                  switchBtn === "energy" ? `${t("Text7")}` : `${t("Text10")}`
+                }.`}
                 placement="top"
               />
               {amountError && (
@@ -1649,10 +1659,7 @@ const Form2: React.FC = () => {
                 <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
                   <FormAddLabelWrapper>
                     <FormAddLabel>{t("Text50")}</FormAddLabel>
-                    <Info
-                      tooltipText={`${t("Text51")}`}
-                      placement="top"
-                    />
+                    <Info tooltipText={`${t("Text51")}`} placement="top" />
                     {durationError && (
                       <FormErrorWrapper>
                         <FormError>{durationError}</FormError>
@@ -1714,7 +1721,9 @@ const Form2: React.FC = () => {
                               borderRadius: 2,
                             }}
                           >
-                            <Typography fontWeight="bold">{t("Text52")}</Typography>
+                            <Typography fontWeight="bold">
+                              {t("Text52")}
+                            </Typography>
                             <Grid container spacing={1} mb={2}>
                               {minutes.map((min) => (
                                 <Grid key={min}>
@@ -1722,7 +1731,9 @@ const Form2: React.FC = () => {
                                     sx={boxStyle}
                                     onClick={(e) => {
                                       e.stopPropagation(); // prevent triggering events on other components
-                                      handleOptionClick(`${min} ${t("Text53")}`);
+                                      handleOptionClick(
+                                        `${min} ${t("Text53")}`
+                                      );
                                     }}
                                   >
                                     {min}
@@ -1730,7 +1741,9 @@ const Form2: React.FC = () => {
                                 </Grid>
                               ))}
                             </Grid>
-                            <Typography fontWeight="bold">{t("Text54")}</Typography>
+                            <Typography fontWeight="bold">
+                              {t("Text54")}
+                            </Typography>
                             <Grid container spacing={1} mb={2}>
                               {hours.map((hr) => (
                                 <Grid key={hr}>
@@ -1739,7 +1752,11 @@ const Form2: React.FC = () => {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleOptionClick(
-                                        `${hr} ${hr === 1 ? `${t("Text55")}` : `${t("Text56")}`}`
+                                        `${hr} ${
+                                          hr === 1
+                                            ? `${t("Text55")}`
+                                            : `${t("Text56")}`
+                                        }`
                                       );
                                     }}
                                   >
@@ -1748,7 +1765,9 @@ const Form2: React.FC = () => {
                                 </Grid>
                               ))}
                             </Grid>
-                            <Typography fontWeight="bold">{t("Text57")}</Typography>
+                            <Typography fontWeight="bold">
+                              {t("Text57")}
+                            </Typography>
                             <Grid container spacing={1}>
                               {days.map((day) => (
                                 <Grid size={2} key={day}>
@@ -1760,7 +1779,11 @@ const Form2: React.FC = () => {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleOptionClick(
-                                        `${day} ${day === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
+                                        `${day} ${
+                                          day === 1
+                                            ? `${t("Text58")}`
+                                            : `${t("Text59")}`
+                                        }`
                                       );
                                     }}
                                   >
@@ -1785,10 +1808,7 @@ const Form2: React.FC = () => {
                     }}
                   >
                     <FormAddLabel>{t("Text175")}</FormAddLabel>
-                    <Info
-                      tooltipText={`${t("Text63")}`}
-                      placement="top"
-                    />
+                    <Info tooltipText={`${t("Text63")}`} placement="top" />
                     {partialFieldError ? (
                       <FormErrorWrapper>
                         <FormError>{partialFieldError}</FormError>
@@ -1830,11 +1850,16 @@ const Form2: React.FC = () => {
                     }}
                   >
                     <FormAddLabel>
-                      {t("Text176")} {switchBtn === "energy" ? `${t("Text6")}` : `${t("Text9")}`}
+                      {t("Text176")}{" "}
+                      {switchBtn === "energy"
+                        ? `${t("Text6")}`
+                        : `${t("Text9")}`}
                     </FormAddLabel>
                     <Info
                       tooltipText={`${t("Text177")} ${
-                        switchBtn === "energy" ? `${t("Text7")}` : `${t("Text10")}`
+                        switchBtn === "energy"
+                          ? `${t("Text7")}`
+                          : `${t("Text10")}`
                       } ${t("Text178")}`}
                       placement="top"
                     />
@@ -1875,10 +1900,7 @@ const Form2: React.FC = () => {
                     }}
                   >
                     <FormAddLabel>{t("Text179")}</FormAddLabel>
-                    <Info
-                      tooltipText={`${t("Text180")}`}
-                      placement="top"
-                    />
+                    <Info tooltipText={`${t("Text180")}`} placement="top" />
                     {limitInputError ? (
                       <FormErrorWrapper>
                         <FormError>{limitInputError}</FormError>
@@ -1914,10 +1936,7 @@ const Form2: React.FC = () => {
           <FormAddInputLabelWrapper style={{ marginBottom: "0" }}>
             <FormAddLabelWrapper>
               <FormAddLabel>{t("Text60")}</FormAddLabel>
-              <Info
-                tooltipText={`${t("Text61")}`}
-                placement="right"
-              />
+              <Info tooltipText={`${t("Text61")}`} placement="right" />
               {priceError && (
                 <FormErrorWrapper>
                   <FormError>{priceError}</FormError>

@@ -881,8 +881,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       dispatch(
           showNotification({
             name: "tron-rejection",
-            message: "hossein",
-            severity: "warning",
+            message: "Connection declined by user",
+            severity: "error",
           })
         );
         

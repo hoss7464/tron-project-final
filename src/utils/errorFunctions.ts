@@ -58,14 +58,8 @@ export const serverErrorMessageFunc = (myCode: string, resourceType?: string) =>
       case "STATE_CONFLICT":
         message = `${i18next.t("Text247")}`;
         break;
-      case "VALIDATION_FAILED":
-        message = `${i18next.t("Text248")}`;
-        break;
       case "VALIDATION_ERROR":
         message = `${i18next.t("Text248")}`;
-        break;
-      case "ORDER_NOT_FOUND":
-        message = `${i18next.t("Text249")}`;
         break;
       case "ORDER_CLOSED":
         message = `${i18next.t("Text250")}`;
@@ -94,12 +88,6 @@ export const serverErrorMessageFunc = (myCode: string, resourceType?: string) =>
       case "INVALID_AMOUNT":
         message = `${i18next.t("Text258")}`;
         break;
-      case "STATE_CONFLICT":
-        message = `${i18next.t("Text259")}`;
-        break;
-      case "VALIDATION_ERROR":
-        message = `${i18next.t("Text264")}`;
-        break;
       case "ORDER_ID_INVALID":
         message = `${i18next.t("Text265")}`;
         break;
@@ -111,6 +99,12 @@ export const serverErrorMessageFunc = (myCode: string, resourceType?: string) =>
         break;
       case "REFUND_FAILED":
         message = `${i18next.t("Text266")}`;
+        break;
+      case "BUSY_TRY_LATER":
+        message = `${i18next.t("Text270")}`;
+        break;
+      case "TRY_LATER":
+        message = `${i18next.t("Text270")}`;
         break;
 
       default:

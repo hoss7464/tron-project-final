@@ -24,6 +24,7 @@ import { useTronWallet } from "../../contexts/TronWalletContext";
 import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
+import { serverErrorMessageFunc } from "../../utils/errorFunctions";
 
 interface MyOrderCancelPopupProps {
   open: boolean;
@@ -75,17 +76,21 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         dispatch(
           showNotification({
             name: "cancel-success1",
-            message: "Cancel order successfull",
+            message: `${t("Text263")}`,
             severity: "success",
           })
         );
         onClose();
         return;
       } else {
+        if (confirmResponse.data.code === undefined) {
+            return 
+        } 
+        const serverError = serverErrorMessageFunc(confirmResponse.data.code)
         dispatch(
           showNotification({
             name: "cancel-error1",
-            message: `Cancel error: ${confirmResponse.data.message}`,
+            message: `${serverError}`,
             severity: "error",
           })
         );
@@ -96,7 +101,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
       dispatch(
         showNotification({
           name: "cancel-error2",
-          message: `Cancel error : ${error}`,
+          message: `${t("Text262")}`,
           severity: "error",
         })
       );

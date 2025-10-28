@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 import { useTranslation } from "react-i18next";
+import { serverErrorMessageFunc } from "../../utils/errorFunctions";
 
 interface BuyerChangeApiProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface BuyerChangeApiProps {
 
 interface BuyerChangeApiData {
   success: boolean;
+  code: string;
   data: {
     ApiKey: string;
   };
@@ -59,17 +61,18 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
         dispatch(
           showNotification({
             name: "change-api-success",
-            message: `API has been change successfully`,
+            message: `${t("Text269")}`,
             severity: "success",
           })
         );
         onClose();
         return;
       } else {
+        const serverError = serverErrorMessageFunc(changeApiResponse.data.code)
         dispatch(
           showNotification({
             name: "change-api-error1",
-            message: `Something went wrong in changing API operation`,
+            message: `${serverError}`,
             severity: "error",
           })
         );
@@ -80,7 +83,7 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
       dispatch(
         showNotification({
           name: "change-api-error2",
-          message: `Change API Error: ${error}`,
+          message: `${t("Text268")}`,
           severity: "error",
         })
       );
