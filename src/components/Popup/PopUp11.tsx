@@ -48,6 +48,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
 import { showNotification } from "../../redux/actions/notifSlice";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
+import { serverErrorMessageFunc } from "../../utils/errorFunctions";
 
 interface SettingPopupProps {
   open: boolean;
@@ -70,7 +71,7 @@ const boxStyle = {
 
 const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   const dispatch = useDispatch();
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const { tradingAccountInfo, resourceData, fetchData } = useFetchData();
   const { isConnectedTrading, accessToken } = useTronWallet();
   const refreshTrigger = useSelector(
@@ -168,7 +169,13 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       try {
         await fetchData();
       } catch (error) {
-        console.error("Error refreshing data:", error);
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text215")}`,
+            severity: "error",
+          })
+        );
       }
     };
 
@@ -200,10 +207,12 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     if (!settings || settings.profit == null) return;
 
     const newInfo = {
-      minDurationBandwidth: settings.minDurationBandwidth ?? info.minDurationBandwidth,
+      minDurationBandwidth:
+        settings.minDurationBandwidth ?? info.minDurationBandwidth,
       minDurationEnergy: settings.minDurationEnergy ?? info.minDurationEnergy,
       isActive: settings.isActive ?? info.isActive,
-      minPriceBandwidth: settings.minPriceBandwidth ?? settings.minPriceBandwidth,
+      minPriceBandwidth:
+        settings.minPriceBandwidth ?? settings.minPriceBandwidth,
       minPriceEnergy: settings.minPriceEnergy ?? settings.minPriceEnergy,
       minUnitBandwidth: settings.minUnitBandwidth ?? settings.minUnitBandwidth,
       minUnitEnergy: settings.minUnitEnergy ?? settings.minUnitEnergy,
@@ -262,7 +271,8 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       `3 ${t("Text56")}`,
       ...Array.from(
         { length: 30 },
-        (_, i) => `${i + 1} ${i + 1 === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
+        (_, i) =>
+          `${i + 1} ${i + 1 === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
       ),
     ];
 
@@ -331,14 +341,18 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     if (days >= 1) {
       const roundedDays = Math.round(days);
       if (roundedDays >= 1 && roundedDays <= 30) {
-        return `${roundedDays} ${roundedDays === 1 ? `${t("Text58")}` : `${t("Text59")}`}`;
+        return `${roundedDays} ${
+          roundedDays === 1 ? `${t("Text58")}` : `${t("Text59")}`
+        }`;
       }
     }
 
     if (hours >= 1) {
       const roundedHours = Math.round(hours);
       if (roundedHours === 1 || roundedHours === 3) {
-        return `${roundedHours} ${roundedHours === 1 ? `${t("Text55")}` : `${t("Text56")}`}`;
+        return `${roundedHours} ${
+          roundedHours === 1 ? `${t("Text55")}` : `${t("Text56")}`
+        }`;
       }
     }
 
@@ -349,13 +363,19 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     // Fallback: return the value in the most appropriate unit
     if (seconds >= 86400) {
       const dayCount = Math.round(seconds / 86400);
-      return `${dayCount} ${dayCount === 1 ? `${t("Text58")}` : `${t("Text59")}`}`;
+      return `${dayCount} ${
+        dayCount === 1 ? `${t("Text58")}` : `${t("Text59")}`
+      }`;
     } else if (seconds >= 3600) {
       const hourCount = Math.round(seconds / 3600);
-      return `${hourCount} ${hourCount === 1 ? `${t("Text55")}` : `${t("Text56")}`}`;
+      return `${hourCount} ${
+        hourCount === 1 ? `${t("Text55")}` : `${t("Text56")}`
+      }`;
     } else {
       const minuteCount = Math.round(seconds / 60);
-      return `${minuteCount} ${minuteCount === 1 ? `${t("Text198")}` : `${t("Text53")}`}`;
+      return `${minuteCount} ${
+        minuteCount === 1 ? `${t("Text198")}` : `${t("Text53")}`
+      }`;
     }
   };
   //Function for click on energy min-duration:
@@ -598,26 +618,36 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   //Function to close the popup :
   const handleCloseSetting = () => {
     if (tradingAccountInfo?.data === undefined) {
-      return 
+      return;
     }
-    setEnergyDurationValue(getDurationFromSeconds(tradingAccountInfo.data.settings.minDurationEnergy));
+    setEnergyDurationValue(
+      getDurationFromSeconds(tradingAccountInfo.data.settings.minDurationEnergy)
+    );
     setEnergyDurationError("");
-    setBandwidthDurationValue(getDurationFromSeconds(tradingAccountInfo.data.settings.minDurationBandwidth));
+    setBandwidthDurationValue(
+      getDurationFromSeconds(
+        tradingAccountInfo.data.settings.minDurationBandwidth
+      )
+    );
     setBandwidthDurationError("");
 
     setEnergyAmount(tradingAccountInfo.data.settings.minUnitEnergy.toString());
     setEnergyAmountError("");
-    setBandwidthAmount(tradingAccountInfo.data.settings.minUnitBandwidth.toString());
+    setBandwidthAmount(
+      tradingAccountInfo.data.settings.minUnitBandwidth.toString()
+    );
     setBandwidthAmountError("");
 
     setEnergyPrice(tradingAccountInfo.data.settings.minPriceEnergy.toString());
     setEnergyPriceError("");
-    setBandwidthPrice(tradingAccountInfo.data.settings.minPriceBandwidth.toString());
+    setBandwidthPrice(
+      tradingAccountInfo.data.settings.minPriceBandwidth.toString()
+    );
     setBandwidthPriceError("");
 
     setProfit(tradingAccountInfo?.data.settings.profit * 100);
     setActiveSell(tradingAccountInfo?.data.settings.isActive);
-    
+
     onClose();
   };
   //----------------------------------------------------------------------------
@@ -665,10 +695,14 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
         }
       );
       if (settingResponse.data.success === false) {
+        if (settingResponse.data.code === undefined) {
+          return 
+        }
+        const serverError = serverErrorMessageFunc(settingResponse.data.code)
         dispatch(
           showNotification({
             name: "setting-error1",
-            message: "Error in sending data.",
+            message: `${serverError}`,
             severity: "error",
           })
         );
@@ -677,18 +711,18 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
         dispatch(
           showNotification({
             name: "form1-success",
-            message: "Data has been sent successfully.",
+            message: `${t("Text271")}`,
             severity: "success",
           })
         );
-        onClose()
+        onClose();
         return;
       }
     } catch (error) {
       dispatch(
         showNotification({
           name: "setting-error2",
-          message: `${error}`,
+          message: `${t("Text222")}`,
           severity: "error",
         })
       );
@@ -822,7 +856,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                             borderRadius: 2,
                           }}
                         >
-                          <Typography fontWeight="bold">{t("Text52")}</Typography>
+                          <Typography fontWeight="bold">
+                            {t("Text52")}
+                          </Typography>
                           <Grid container spacing={1} mb={2}>
                             {minutes.map((min) => (
                               <Grid key={min}>
@@ -838,7 +874,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                               </Grid>
                             ))}
                           </Grid>
-                          <Typography fontWeight="bold">{t("Text54")}</Typography>
+                          <Typography fontWeight="bold">
+                            {t("Text54")}
+                          </Typography>
                           <Grid container spacing={1} mb={2}>
                             {hours.map((hr) => (
                               <Grid key={hr}>
@@ -847,7 +885,11 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleOptionClick1(
-                                      `${hr} ${hr === 1 ?  `${t("Text55")}` : `${t("Text56")}`}`
+                                      `${hr} ${
+                                        hr === 1
+                                          ? `${t("Text55")}`
+                                          : `${t("Text56")}`
+                                      }`
                                     );
                                   }}
                                 >
@@ -856,7 +898,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                               </Grid>
                             ))}
                           </Grid>
-                          <Typography fontWeight="bold">{t("Text57")}</Typography>
+                          <Typography fontWeight="bold">
+                            {t("Text57")}
+                          </Typography>
                           <Grid container spacing={1}>
                             {days.map((day) => (
                               <Grid size={2} key={day}>
@@ -868,7 +912,11 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleOptionClick1(
-                                      `${day} ${day === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
+                                      `${day} ${
+                                        day === 1
+                                          ? `${t("Text58")}`
+                                          : `${t("Text59")}`
+                                      }`
                                     );
                                   }}
                                 >
@@ -1031,7 +1079,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                             borderRadius: 2,
                           }}
                         >
-                          <Typography fontWeight="bold">{t("Text52")}</Typography>
+                          <Typography fontWeight="bold">
+                            {t("Text52")}
+                          </Typography>
                           <Grid container spacing={1} mb={2}>
                             {minutes.map((min) => (
                               <Grid key={min}>
@@ -1047,7 +1097,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                               </Grid>
                             ))}
                           </Grid>
-                          <Typography fontWeight="bold">{t("Text54")}</Typography>
+                          <Typography fontWeight="bold">
+                            {t("Text54")}
+                          </Typography>
                           <Grid container spacing={1} mb={2}>
                             {hours.map((hr) => (
                               <Grid key={hr}>
@@ -1056,7 +1108,11 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleOptionClick2(
-                                      `${hr} ${hr === 1 ? `${t("Text55")}` : `${t("Text56")}`}`
+                                      `${hr} ${
+                                        hr === 1
+                                          ? `${t("Text55")}`
+                                          : `${t("Text56")}`
+                                      }`
                                     );
                                   }}
                                 >
@@ -1065,7 +1121,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                               </Grid>
                             ))}
                           </Grid>
-                          <Typography fontWeight="bold">{t("Text57")}</Typography>
+                          <Typography fontWeight="bold">
+                            {t("Text57")}
+                          </Typography>
                           <Grid container spacing={1}>
                             {days.map((day) => (
                               <Grid size={2} key={day}>
@@ -1077,7 +1135,11 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleOptionClick2(
-                                      `${day} ${day === 1 ? `${t("Text58")}` : `${t("Text59")}`}`
+                                      `${day} ${
+                                        day === 1
+                                          ? `${t("Text58")}`
+                                          : `${t("Text59")}`
+                                      }`
                                     );
                                   }}
                                 >

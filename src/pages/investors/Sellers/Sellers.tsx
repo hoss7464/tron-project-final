@@ -56,7 +56,7 @@ import {
 import SellersTables from "./Table/SellersTables";
 import { Sec1CardThingsWrapper } from "../Buyers/Section1/Section1Elements";
 import { AccountInfoResponse } from "../../../services/requestService";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../redux/store/store";
 import { Grid } from "@mui/material";
 import energyIcon from "../../../assets/svg/EnergyIcon.svg";
@@ -68,9 +68,11 @@ import PopUp6 from "../../../components/Popup/PopUp6";
 import PopUp7 from "../../../components/Popup/PopUp7";
 import PopUp11 from "../../../components/Popup/PopUp11";
 import { useTranslation } from "react-i18next";
+import { showNotification } from "../../../redux/actions/notifSlice";
 
 const Sellers: React.FC = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch()
   const {
     address,
     allBandwidth,
@@ -96,7 +98,13 @@ const Sellers: React.FC = () => {
       try {
         await fetchData();
       } catch (error) {
-        console.error("Error refreshing data:", error);
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text215")}`,
+            severity: "error",
+          })
+        );
       }
     };
 
@@ -305,7 +313,7 @@ const Sellers: React.FC = () => {
                         <SellersPeopertyWrapper2>
                           <LegacyPropertyHeaderWrapper>
                             <LegacyCardName style={{ fontWeight: "600" }}>
-                             {t("Text9")}
+                              {t("Text9")}
                             </LegacyCardName>
                           </LegacyPropertyHeaderWrapper>
                           <LegacyPropertyNumberWrapper>
@@ -398,7 +406,7 @@ const Sellers: React.FC = () => {
                           </HeroGridCardNumberIconWrapper>
                           <SellersCardThingsNameWrapper>
                             <SellersCardThingsName>
-                             {t("Text6")}
+                              {t("Text6")}
                             </SellersCardThingsName>
                           </SellersCardThingsNameWrapper>
                         </SellersCardThingsNameIconWrapper>
@@ -478,7 +486,7 @@ const Sellers: React.FC = () => {
                       </SellersCardHeaderWrapper>
                     </SellersCardIconHeaderWrapper>
 
-                    <Sec1CardThingsWrapper style={{ marginBottom: "0.3rem"}} >
+                    <Sec1CardThingsWrapper style={{ marginBottom: "0.3rem" }}>
                       <SellersCardThingsWrapper2 style={{ padding: "0" }}>
                         <SellersCardThingsNameIconWrapper>
                           <SellersCardThingsNameWrapper>
@@ -492,7 +500,8 @@ const Sellers: React.FC = () => {
                             <SellersCardThingsNumber>
                               {sunToTrx(
                                 accountInfoData.data.sellerCredit
-                              ).toLocaleString()} TRX
+                              ).toLocaleString()}{" "}
+                              TRX
                             </SellersCardThingsNumber>
                           ) : (
                             <SellersCardThingsNumber>

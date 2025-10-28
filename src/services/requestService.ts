@@ -197,6 +197,7 @@ export interface AccountInfoResponse {
       };
     };
   };
+  code?: string;
 }
 
 //Interfaces for refund request in /Buyers :
