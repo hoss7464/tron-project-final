@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import "./mainPage.css";
 import { useTranslation } from "react-i18next";
-import { useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store/store";
 import {
   MyOrdersWrapper,
@@ -50,11 +50,13 @@ import { MyMarketOrder } from "../../services/requestService";
 import PopUp4 from "../../components/Popup/PoUp4";
 import PopUp5 from "../../components/Popup/PopUp5";
 import { Tooltip } from "@mui/material";
+import { useDispatch } from "react-redux";
+import { showNotification } from "../../redux/actions/notifSlice";
 
 interface Hold {
   qty: number;
   txid: string;
-  settledAt: string; 
+  settledAt: string;
 }
 
 export interface MyInfoOrder {
@@ -81,6 +83,7 @@ export interface MyInfoOrder {
 
 const MyOrdersComponent: React.FC = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const { myOrderData, fetchData } = useFetchData();
   const [myModalOpen, setMyModalOpen] = useState(false);
   const [myCancelOpen, setMyCancelOpen] = useState(false);
@@ -100,7 +103,13 @@ const MyOrdersComponent: React.FC = () => {
       try {
         await fetchData();
       } catch (error) {
-        console.error("Error refreshing data:", error);
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text215")}`,
+            severity: "error",
+          })
+        );
       }
     };
 
@@ -155,7 +164,6 @@ const MyOrdersComponent: React.FC = () => {
   const handlePopup5Close = useCallback(() => {
     setMyCancelOpen(false);
   }, []);
-
 
   return (
     <>
@@ -268,10 +276,7 @@ const MyOrdersComponent: React.FC = () => {
                       <MyOrderCardTextWrap>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>
-                            {Number(
-                              myData.totalPrice.toFixed(3)
-                            )}{" "}
-                            TRX
+                            {Number(myData.totalPrice.toFixed(3))} TRX
                           </OrdersCardText1>
                         </OrdersCardTextWrapper2>
                       </MyOrderCardTextWrap>

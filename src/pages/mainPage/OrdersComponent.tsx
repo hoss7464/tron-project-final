@@ -49,7 +49,6 @@ import { durationToNumber } from "../../utils/durationToNum";
 import PopUp3 from "../../components/Popup/PopUp3";
 import { useFetchData } from "../../contexts/FetchDataContext";
 
-
 export interface MarketOrder {
   _id: string;
   createdAt: string;
@@ -81,7 +80,7 @@ export const OrdersComponent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = i18n.language === "en" ? 9 : 8;
   const { address } = useTronWallet();
-  
+
   const [selectedOrder, setSelectedOrder] = useState<MarketOrder | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [delegateValue, setDelegateValue] = useState<number | null>(null);
@@ -101,7 +100,13 @@ export const OrdersComponent: React.FC = () => {
       try {
         await fetchData();
       } catch (error) {
-        console.error("Error refreshing data:", error);
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text215")}`,
+            severity: "error",
+          })
+        );
       }
     };
 
@@ -149,7 +154,7 @@ export const OrdersComponent: React.FC = () => {
     if (days > 0 && days < 1) {
       days = 1;
     }
-    const rPeriod = myTotal / (myFreeze / 1e6 );
+    const rPeriod = myTotal / (myFreeze / 1e6);
     const rawN = 365 / days;
     const n =
       opts?.compoundCapPerYear != null
@@ -196,7 +201,6 @@ export const OrdersComponent: React.FC = () => {
     <>
       <OrdersWrapper className="order-bg">
         <OrderMainWrapper>
-          
           <OrdersNavHeaderWrapper>
             <LegacyCardName style={{ color: "#003543" }}>
               {t("Text79")}
@@ -209,7 +213,7 @@ export const OrdersComponent: React.FC = () => {
           </OrdersNavHeaderWrapper>
 
           <OrdersCarouselWrapper>
-            <OrdersScroll style={{height: "607px"}} >
+            <OrdersScroll style={{ height: "607px" }}>
               <OrderNavWrapper>
                 <OrderNavTextWrapper1>
                   <OrderNavTextWrapper>
@@ -240,7 +244,6 @@ export const OrdersComponent: React.FC = () => {
 
                   return (
                     <OrdersDetail key={index}>
-                      
                       <OrdersCardTextWrap>
                         <OrdersCardTextWrapper2>
                           <OrdersCardText1>{time}</OrdersCardText1>
@@ -365,7 +368,7 @@ export const OrdersComponent: React.FC = () => {
           </OrdersCarouselWrapper>
         </OrderMainWrapper>
 
-        <OedersPaginationWrapper >
+        <OedersPaginationWrapper>
           <Pagination
             count={totalPages}
             page={currentPage}
@@ -376,7 +379,7 @@ export const OrdersComponent: React.FC = () => {
               "& .MuiPaginationItem-root.Mui-selected": {
                 backgroundColor: "#430E00",
                 color: "white",
-                
+
                 "&:hover": {
                   backgroundColor: "#430E00",
                 },
@@ -384,7 +387,6 @@ export const OrdersComponent: React.FC = () => {
             }}
           />
         </OedersPaginationWrapper>
-
       </OrdersWrapper>
       {isModalOpen && (
         <PopUp3

@@ -24,6 +24,7 @@ import { useDispatch } from "react-redux";
 import { showNotification } from "../../redux/actions/notifSlice";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 import { useTranslation } from "react-i18next";
+import { serverErrorMessageFunc } from "../../utils/errorFunctions";
 
 interface MyOrderCancelPopupProps {
   open: boolean;
@@ -56,7 +57,14 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
 
       // Check if adapter is available
       if (!adapter) {
-        throw new Error("Wallet adapter not available");
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text260")}`,
+            severity: "error",
+          })
+        );
+        return;
       }
 
       // Get nonce from server
@@ -70,7 +78,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         dispatch(
           showNotification({
             name: "tron-error3",
-            message: "Tron Error : User rejected signing message.",
+            message: `${t("Text261")}`,
             severity: "error",
           })
         );
@@ -100,17 +108,21 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
         dispatch(
           showNotification({
             name: "cancel-success1",
-            message: "Cancel order successfull",
+            message: `${t("Text263")}`,
             severity: "success",
           })
         );
         onClose();
         return;
       } else {
+        if (confirmResponse.data.code === undefined) {
+          return 
+        }
+        const serverError = serverErrorMessageFunc(confirmResponse.data.code)
         dispatch(
           showNotification({
             name: "cancel-error1",
-            message: `Cancel error: ${confirmResponse.data.message}`,
+            message: `${serverError}`,
             severity: "error",
           })
         );
@@ -121,7 +133,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
       dispatch(
         showNotification({
           name: "cancel-error2",
-          message: `Cancel error : ${error}`,
+          message: `${t("Text262")}`,
           severity: "error",
         })
       );
@@ -195,7 +207,9 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
                   : { color: "#430E00" }
               }
             >
-              {orderData.resourceType === "energy" ? `${t("Text6")}` : `${t("Text9")}`}
+              {orderData.resourceType === "energy"
+                ? `${t("Text6")}`
+                : `${t("Text9")}`}
             </Popup2ItemName>
           </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>

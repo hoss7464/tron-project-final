@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Hero.css";
 import { useFetchData } from "../../../contexts/FetchDataContext";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../redux/store/store";
 import {
   HeroResourceContainer,
@@ -29,10 +29,12 @@ import bandwidthIcon from "../../../assets/svg/BandwidthIcon.svg";
 import recoveryIcon from "../../../assets/svg/RecoveryIcon.svg";
 import apyForSellersIcon from "../../../assets/svg/ApyForSellersIcon.svg";
 import { useTranslation } from "react-i18next";
+import { showNotification } from "../../../redux/actions/notifSlice";
 //----------------------------------------------------------------------------------------
 const ResourceComponent: React.FC = () => {
   //states :
   const { t } = useTranslation();
+  const dispatch = useDispatch()
   const { resourceData, fetchData } = useFetchData();
 
   const refreshTrigger = useSelector(
@@ -60,7 +62,13 @@ const ResourceComponent: React.FC = () => {
       try {
         await fetchData();
       } catch (error) {
-        console.error("Error refreshing data:", error);
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text215")}`,
+            severity: "error",
+          })
+        );
       }
     };
 
@@ -110,9 +118,7 @@ const ResourceComponent: React.FC = () => {
                 </HeroGridCardIconHeaderWrapper>
 
                 <HeroGridCardSubHeaderWrapper>
-                  <HeroGridCardSubHeader>
-                    {t("Text14")}
-                  </HeroGridCardSubHeader>
+                  <HeroGridCardSubHeader>{t("Text14")}</HeroGridCardSubHeader>
                 </HeroGridCardSubHeaderWrapper>
 
                 <HeroGridCardNumberIconTextWrapper>
@@ -173,9 +179,7 @@ const ResourceComponent: React.FC = () => {
                 </HeroGridCardIconHeaderWrapper>
 
                 <HeroGridCardSubHeaderWrapper>
-                  <HeroGridCardSubHeader>
-                    {t("Text16")}
-                  </HeroGridCardSubHeader>
+                  <HeroGridCardSubHeader>{t("Text16")}</HeroGridCardSubHeader>
                 </HeroGridCardSubHeaderWrapper>
 
                 <HeroGridCardNumberIconTextWrapper>
@@ -236,9 +240,7 @@ const ResourceComponent: React.FC = () => {
                 </HeroGridCardIconHeaderWrapper>
 
                 <HeroGridCardSubHeaderWrapper>
-                  <HeroGridCardSubHeader>
-                    {t("Text18")}
-                  </HeroGridCardSubHeader>
+                  <HeroGridCardSubHeader>{t("Text18")}</HeroGridCardSubHeader>
                 </HeroGridCardSubHeaderWrapper>
 
                 <HeroGridCardNumberIconTextWrapper>

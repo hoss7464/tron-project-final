@@ -57,6 +57,7 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 import { useTranslation } from "react-i18next";
+import { serverErrorMessageFunc } from "../../utils/errorFunctions";
 
 interface Popup3Types {
   open: boolean;
@@ -90,11 +91,13 @@ interface ExtendedAccount {
 
 interface VerifyPaymentResponse {
   success: boolean;
+  code: string;
   message: string;
 }
 
 interface CheckOrderResponse {
   success: boolean;
+  code: string;
   res_id: string;
   // add other properties you expect in the response
 }
@@ -170,7 +173,13 @@ const PopUp3: React.FC<Popup3Types> = ({
       if (open && address && order && myDelegate !== null) {
         try {
         } catch (error) {
-          console.error("Error fetching max candle:", error);
+          dispatch(
+            showNotification({
+              name: "error1",
+              message: `${t("Text215")}`,
+              severity: "error",
+            })
+          );
         }
       }
     };
@@ -250,7 +259,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       dispatch(
         showNotification({
           name: "Order-popup-error1",
-          message: "Error in maxCandleHandler:" + error,
+          message: `${t("Text232")}`,
           severity: "error",
         })
       );
@@ -279,14 +288,14 @@ const PopUp3: React.FC<Popup3Types> = ({
       dispatch(
         showNotification({
           name: "Order-popup-error-max",
-          message: "Failed to get maximum available amount",
+          message: `${t("Text233")}`,
           severity: "error",
         })
       );
     }
   };
 
-    //-------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------
   //Function to calculate payout :
   const handlePayout = useMemo(() => {
     if (pairTrx === null || delegatedAmount === "" || delegatedAmount === "0") {
@@ -303,12 +312,13 @@ const PopUp3: React.FC<Popup3Types> = ({
   };
 
   if (order?.options.partial_min_trx === undefined) {
-    return 
+    return;
   }
 
-  const minimum_amount_validation = minimum_delegate_amount(order?.options.partial_min_trx)
+  const minimum_amount_validation = minimum_delegate_amount(
+    order?.options.partial_min_trx
+  );
 
-  
   //-------------------------------------------------------------------------------------------
   // Function for delegated input validation
   const handleDelegateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -345,7 +355,6 @@ const PopUp3: React.FC<Popup3Types> = ({
   };
   // Function to validate blur :
   const handleDelegateBlur = () => {
-
     if (delegatedAmount === "") return;
 
     const numericValue = parseFloat(delegatedAmount);
@@ -382,10 +391,6 @@ const PopUp3: React.FC<Popup3Types> = ({
   //-------------------------------------------------------------------------------------------
   //function to send data towards server and tronLink :
   const handleFill = async () => {
-    // To get minimum delegate amount from .env :
-    const MIN_DELEGATE_AMOUNT = Number(
-      process.env.REACT_APP_MIN_DELEGATE_AMOUNT
-    );
     //to get axios time out from .env :
     const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
     //To get base url from .env :
@@ -448,7 +453,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             "Content-Type": "application/json",
           },
           timeout: axiosTimeOut,
-          validateStatus: (status: number) => status < 500,
+          validateStatus: (status: number) => status < 550,
         }
       );
       //step2 ----> send data towards tronlink after checking data is successfull :
@@ -460,12 +465,12 @@ const PopUp3: React.FC<Popup3Types> = ({
         if (settingBtn) {
           // if multi signature address was empty return an error :
           if (!multiSignature) {
-            setSignatureError("Multi-signature address is required");
+            setSignatureError(`${t("Text235")}`);
             return;
           }
           //if multi signature address doesn't meet the validation return an error :
           if (!validationSignatureAdd(multiSignature)) {
-            setSignatureError("Invalid multi-signature address");
+            setSignatureError(`${t("Text236")}`);
             return;
           }
           //After checking multi signature address get permission ID :
@@ -475,7 +480,7 @@ const PopUp3: React.FC<Popup3Types> = ({
             dispatch(
               showNotification({
                 name: "Order-popup-error5",
-                message: "Failed to get permission ID",
+                message: `${t("Text237")}`,
                 severity: "error",
               })
             );
@@ -537,9 +542,23 @@ const PopUp3: React.FC<Popup3Types> = ({
                 "Content-Type": "application/json",
               },
               timeout: axiosTimeOut,
-              validateStatus: (status: number) => status < 500,
+              validateStatus: (status: number) => status < 550,
             }
           );
+
+          if (verifyFillPayment.data.success === false) {
+            const serverError = serverErrorMessageFunc(
+              verifyFillPayment.data.code
+            );
+            dispatch(
+              showNotification({
+                name: "err1",
+                message: `${serverError}`,
+                severity: "error",
+              })
+            );
+            return;
+          }
         }
         //if result.success === true show a notification then close the popup :
         if (result?.success) {
@@ -548,29 +567,28 @@ const PopUp3: React.FC<Popup3Types> = ({
           dispatch(
             showNotification({
               name: "Order-popup-success",
-              message: "Delegation successful!",
+              message: `${t("Text238")}`,
               severity: "success",
             })
           );
           handleClose();
         }
-      } else if (checkResponse.data.success === false) {
+      } else {
+        const serverError = serverErrorMessageFunc(checkResponse.data.code);
         dispatch(
           showNotification({
             name: "Order-popup-error6",
-            message: "Data is in processing try again 5 mins later.",
+            message: `${serverError}`,
             severity: "error",
           })
         );
         return;
-      } else {
-        return {};
       }
     } catch (err) {
       dispatch(
         showNotification({
           name: "Order-popuo-error4",
-          message: err instanceof Error ? err.message : "Transaction failed",
+          message: `${t("Text234")}`,
           severity: "error",
         })
       );
@@ -638,7 +656,14 @@ const PopUp3: React.FC<Popup3Types> = ({
       )) as ExtendedAccount;
 
       if (!account || !account.active_permission) {
-        throw new Error("No active permissions found for this account");
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text239")}`,
+            severity: "error",
+          })
+        );
+        return;
       }
 
       // Find the permission that includes our current address as a key
@@ -659,7 +684,14 @@ const PopUp3: React.FC<Popup3Types> = ({
         relevantPermission.id ?? relevantPermission.permission_id;
 
       if (permissionId === undefined) {
-        throw new Error("Permission ID not found in the permission");
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text240")}`,
+            severity: "error",
+          })
+        );
+        return;
       }
 
       return permissionId;
@@ -667,10 +699,7 @@ const PopUp3: React.FC<Popup3Types> = ({
       dispatch(
         showNotification({
           name: "Order-popup-error5",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Failed to get permission ID",
+          message:`${t("Text237")}`,
           severity: "error",
         })
       );
@@ -724,8 +753,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         dispatch(
           showNotification({
             name: "Order-popup-error10",
-            message:
-              "Your address doesn't have permission to act on this account",
+            message:`${t("Text241")}`,
             severity: "error",
           })
         );
@@ -746,8 +774,7 @@ const PopUp3: React.FC<Popup3Types> = ({
         dispatch(
           showNotification({
             name: "Order-popup-error10",
-            message:
-              "Your address doesn't have permission to act on this account",
+            message:`${t("Text241")}`,
             severity: "error",
           })
         );
@@ -760,7 +787,7 @@ const PopUp3: React.FC<Popup3Types> = ({
 
       if (permissionId === undefined) {
         setPermissionValid(false);
-        setSignatureError("Permission ID not found");
+        setSignatureError(`${t("Text240")}`);
         return false;
       }
 
@@ -769,20 +796,19 @@ const PopUp3: React.FC<Popup3Types> = ({
       return true;
     } catch (error) {
       setPermissionValid(false);
-      setSignatureError(
-        error instanceof Error ? error.message : "Failed to validate permission"
-      );
+      setSignatureError(`${t("Text242")}`);
       return false;
     }
   };
 
   if (myDelegate === null) {
-    return 
+    return;
   }
   //-------------------------------------------------------------------------------------------
   if (!order) return null;
+  /* 
   const { date, time } = formatDateTime(order.createdAt);
-
+  */
   return (
     <Pop3Form>
       <Dialog
@@ -840,7 +866,9 @@ const PopUp3: React.FC<Popup3Types> = ({
                   : { color: "#430E00" }
               }
             >
-              {order.resourceType === "energy" ? `${t("Text6")}` : `${t("Text9")}`}
+              {order.resourceType === "energy"
+                ? `${t("Text6")}`
+                : `${t("Text9")}`}
             </Popup2ItemName>
           </Popup2ItemNameWrapper>
         </Popup2ImgWrapper>
@@ -1007,7 +1035,9 @@ const PopUp3: React.FC<Popup3Types> = ({
                 <Popup2Name>{t("Text97")}:</Popup2Name>
               </Popup2NameWrapper>
               <Popup2ItemWrapper>
-                <Popup2Item>{Number(myDelegate / 1_000_000).toFixed(2) } TRX</Popup2Item>
+                <Popup2Item>
+                  {Number(myDelegate / 1_000_000).toFixed(2)} TRX
+                </Popup2Item>
               </Popup2ItemWrapper>
             </Popup2NameItemWrapper>
             {/*<Popup2NameItemWrapper>

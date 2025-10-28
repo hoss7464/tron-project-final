@@ -35,6 +35,7 @@ export interface MyOrdersResponse {
   success: boolean;
   message: string;
   data: MyMarketOrder[];
+  code?: string;
 }
 
 interface Hold {
