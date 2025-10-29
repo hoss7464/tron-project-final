@@ -100,7 +100,7 @@ const PopUp5: React.FC<MyOrderCancelPopupProps> = ({
           },
           timeout: axiosTimeOut,
           withCredentials: true,
-          validateStatus: (status: number) => status < 500,
+          validateStatus: (status: number) => status < 550,
         }
       );
 

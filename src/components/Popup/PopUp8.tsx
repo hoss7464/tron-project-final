@@ -53,7 +53,7 @@ const PopUp8: React.FC<BuyerChangeApiProps> = ({ open, onClose }) => {
             accesstoken: accessToken,
           },
           timeout: axiosTimeOut,
-          validateStatus: (status: number) => status < 500,
+          validateStatus: (status: number) => status < 550,
         }
       );
 

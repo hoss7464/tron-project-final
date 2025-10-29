@@ -6,6 +6,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { TronLinkAdapter } from "@tronweb3/tronwallet-adapters";
 import axios from "axios";
 import { useDispatch } from "react-redux";
@@ -15,6 +16,7 @@ import { useLocation } from "react-router-dom";
 import { Buffer } from "buffer";
 import { FetchDataResourceRef } from "./FetchDataContext";
 import { ResourceResponse } from "../services/requestService";
+import { serverErrorMessageFunc } from "../utils/errorFunctions";
 
 // Context interface
 interface TronWalletContextProps {
@@ -79,11 +81,6 @@ type fillOrder = {
   error?: string;
 };
 
-interface TronLinkEventData {
-  name: string;
-  data: any;
-}
-
 // ali ezafe karde
 interface ActivePermission {
   id?: number;
@@ -139,6 +136,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const dispatch = useDispatch();
   const location = useLocation();
   const tronWebRef = useRef<any>(null);
+  const { t } = useTranslation();
 
   //States :
   const [address, setAddress] = useState<string | null>(null);
@@ -221,7 +219,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       const myDappAddress = resourceData?.data.DappAddress;
 
       // Determine which address to use based on sellersPermission
-      const addressToUse = myDappAddress 
+      const addressToUse = myDappAddress;
 
       // Use Promise.allSettled instead of Promise.all
       const [accountResult, resourceResult] = await Promise.allSettled([
@@ -236,8 +234,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       if (accountResult.status === "fulfilled") {
         account = accountResult.value;
       } else {
-        console.error("Failed to get account:", accountResult.reason);
-        throw new Error("Failed to fetch account data");
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text273")}`,
+            severity: "error",
+          })
+        );
+        return;
       }
 
       // Handle resource result
@@ -245,8 +249,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       if (resourceResult.status === "fulfilled") {
         resource = resourceResult.value;
       } else {
-        console.error("Failed to get resources:", resourceResult.reason);
-        throw new Error("Failed to fetch resource data");
+        dispatch(
+          showNotification({
+            name: "error1",
+            message: `${t("Text273")}`,
+            severity: "error",
+          })
+        );
+        return;
       }
 
       const balanceTRX = tronWeb.fromSun(account.balance);
@@ -312,13 +322,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setAllEnergy(all_energy);
       setAvailableEnergy(available_energy);
     } catch (err) {
-      console.error("Error fetching wallet data:", err);
-      // Optional: show notification for refresh errors
       dispatch(
         showNotification({
           name: "tron-refresh-error",
-          message: "Failed to refresh wallet data",
-          severity: "warning",
+          message: `${t("Text274")}`,
+          severity: "error",
         })
       );
     }
@@ -374,15 +382,19 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           },
           withCredentials: true,
           timeout: axiosTimeOut,
-          validateStatus: (status: number) => status < 500,
+          validateStatus: (status: number) => status < 550,
         }
       );
 
       if (response.data.success === false) {
+        if (response.data.code === undefined) {
+          return;
+        }
+        const serverError = serverErrorMessageFunc(response.data.code);
         dispatch(
           showNotification({
             name: "disconnect-error",
-            message: `${response.data.message}`,
+            message: `${serverError}`,
             severity: "error",
           })
         );
@@ -403,7 +415,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       dispatch(
         showNotification({
           name: "tron-error6",
-          message: `Error during logout process : ${err}`,
+          message: `${t("Text275")}`,
           severity: "error",
         })
       );
@@ -415,13 +427,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const disconnectWallet = async () => {
     try {
       // First try to logout from server
-      const currentPath = window.location.pathname;
       await disconnectWalletFromServer();
 
       setShouldAutoConnect(false);
 
       // Clear local state only after successful server logout
-
       eventListenersAdded.current = false;
       clearAccessToken();
       setAddress(null);
@@ -433,19 +443,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsConnected(false);
       stopRefreshInterval();
       setIsConnectedTrading(false);
-      setSellersPermission(false)
+      setSellersPermission(false);
       if (address === null) {
-        return 
+        return;
       }
-      startRefreshInterval(address)
-
-      dispatch(
-        showNotification({
-          name: "tron-success6",
-          message: "Disconnect successful.",
-          severity: "success",
-        })
-      );
+      startRefreshInterval(address);
     } catch (err) {
       // If server logout fails, we still clear local state but show an error
       setAddress(null);
@@ -460,8 +462,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       dispatch(
         showNotification({
           name: "tron-error6",
-          message: "Disconnected locally but server logout failed",
-          severity: "warning",
+          message: `${t("Text275")}`,
+          severity: "error",
         })
       );
     }
@@ -469,12 +471,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const disconnectWallet2 = async () => {
     try {
-      // First try to logout from server
-
       setShouldAutoConnect(false);
-
       // Clear local state only after successful server logout
-
       setAddress(null);
       setBalance(null);
       setAllBandwidth(null);
@@ -488,7 +486,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setIsConnectedMarket(false);
     } catch (err) {
-      // If server logout fails, we still clear local state but show an error
       setAddress(null);
       setBalance(null);
       setAllBandwidth(null);
@@ -506,8 +503,8 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       dispatch(
         showNotification({
           name: "tron-network-changed",
-          message: "Network changed, please check your connection",
-          severity: "warning",
+          message: `${t("Text276")}`,
+          severity: "error",
         })
       );
       if (address) refreshWalletData();
@@ -536,12 +533,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           await disconnectWallet2();
           return;
         }
-        
-       
+
         if (address !== nextAddress) {
           setSellersPermission(false);
         }
-       
+
         if (address && address !== nextAddress) {
           // Reset current state
           setAddress(null);
@@ -563,18 +559,22 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
           const generate_msg = await axios.get<{
             success: boolean;
+            code?: string;
             data: { nonce: string };
           }>(`${baseURL}/Auth/get-message`, {
             headers: { "Content-Type": "application/json" },
             timeout: axiosTimeOut,
-            validateStatus: (status: number) => status < 500,
+            validateStatus: (status: number) => status < 550,
           });
 
-          if (!generate_msg.data.success) {
+          if (generate_msg.data.success === false) {
+            const serverError = serverErrorMessageFunc(
+              generate_msg.data.code ?? ""
+            );
             dispatch(
               showNotification({
                 name: "tron-error2",
-                message: "Tron Error : Something went wrong.",
+                message: `${serverError}`,
                 severity: "error",
               })
             );
@@ -590,7 +590,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             dispatch(
               showNotification({
                 name: "tron-error3",
-                message: "User rejected signing message.",
+                message: `${t("Text277")}`,
                 severity: "error",
               })
             );
@@ -600,6 +600,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
           const verifyResp = await axios.post<{
             success: boolean;
+            code?: string;
             data: { access_token: string };
           }>(
             `${baseURL}/Auth/verify-request`,
@@ -608,15 +609,18 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
               headers: { "Content-Type": "application/json" },
               withCredentials: true,
               timeout: axiosTimeOut,
-              validateStatus: (status: number) => status < 500,
+              validateStatus: (status: number) => status < 550,
             }
           );
 
-          if (!verifyResp.data.success) {
+          if (verifyResp.data.success === false) {
+            const serverError = serverErrorMessageFunc(
+              verifyResp.data.code ?? ""
+            );
             dispatch(
               showNotification({
                 name: "tron-error4",
-                message: "Verification failed.",
+                message: `${serverError}`,
                 severity: "error",
               })
             );
@@ -633,7 +637,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
         startRefreshInterval(nextAddress);
         fetchWalletData(nextAddress);
-
+        /* 
         if (!(location.pathname === "/Sellers" && !sellersPermission)) {
           dispatch(
             showNotification({
@@ -643,8 +647,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
             })
           );
         }
+          */
       } catch (err) {
-        console.error("Error during wallet change:", err);
+        dispatch(
+          showNotification({
+            name: "tron-error4",
+            message: `${t("Text278")}`,
+            severity: "error",
+          })
+        );
         await disconnectWallet2();
       } finally {
         isAuthenticating.current = false;
@@ -671,7 +682,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       tw.on("networkChanged", handleNetworkChanged);
       eventListenersAdded.current = true;
     } catch (e) {
-      console.error("Error setting up TronLink listeners:", e);
+      
     }
 
     return () => {
@@ -680,7 +691,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         tw.off("networkChanged", handleNetworkChanged);
         eventListenersAdded.current = false;
       } catch (e) {
-        console.error("Error removing TronLink listeners:", e);
+        
       }
     };
   }, [isConnected, handleAccountChanged, handleNetworkChanged]);
@@ -705,8 +716,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     // If we already have an address in state when the app loads
-    if (address ) {
-     
+    if (address) {
       setIsConnected(true);
       startRefreshInterval(address);
     } else {
@@ -725,7 +735,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error1",
-            message: "No wallet address found. Please connect your wallet.",
+            message: `${t("Text39")}`,
             severity: "error",
           })
         );
@@ -742,23 +752,25 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //Message in signature form based nonce :
       const generate_msg = await axios.get<{
         success: boolean;
+        code? :string;
         data: { nonce: string };
       }>(`${baseURL}/Auth/get-message`, {
         headers: { "Content-Type": "application/json" },
         timeout: axiosTimeOut,
-        validateStatus: (status: number) => status < 500,
+        validateStatus: (status: number) => status < 550,
       });
       //To convert he message into json :
       const responseBody = generate_msg.data;
       if (responseBody.success === false) {
+        const serverError = serverErrorMessageFunc(responseBody.code ?? "")
         dispatch(
           showNotification({
             name: "tron-error2",
-            message: "Tron Error : Something went wrong.",
+            message: `${serverError}`,
             severity: "error",
           })
         );
-        disconnectWallet2()
+        disconnectWallet2();
         return;
       }
 
@@ -771,7 +783,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error3",
-            message: "Tron Error : User rejected signing message.",
+            message: `${t("Text277")}`,
             severity: "error",
           })
         );
@@ -780,6 +792,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //To send address , message , signature hash towards the server :
       const postServerData = await axios.post<{
         success: boolean;
+        code? :string;
         data: { access_token: string };
       }>(
         `${baseURL}/Auth/verify-request`,
@@ -792,17 +805,18 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
           timeout: axiosTimeOut,
-          validateStatus: (status: number) => status < 500,
+          validateStatus: (status: number) => status < 550,
         }
       );
 
       //To convert postServerData into json
       const server_data_json = postServerData.data;
       if (server_data_json.success === false) {
+        const serverError = serverErrorMessageFunc(server_data_json.code ?? "")
         dispatch(
           showNotification({
             name: "tron-error4",
-            message: "Tron Error : error fetching data from server.",
+            message: `${serverError}`,
             severity: "error",
           })
         );
@@ -812,16 +826,17 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //To get access token :
       const access_Token = server_data_json.data.access_token;
       if (access_Token === null) {
-        disconnectWallet2()
+        disconnectWallet2();
       }
       setAccessToken(access_Token);
-      
 
       //To save refressh_token, access_token, wallet address into a json
+      /* 
       const localStorageSavedData = {
         wallet_address: addr,
       };
-      
+      */
+
       //setSellersPermission(false);
       //wallet address state :
       setAddress(addr);
@@ -869,13 +884,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       }
        */
       dispatch(
-          showNotification({
-            name: "tron-rejection",
-            message: "Connection declined by user",
-            severity: "error",
-          })
-        );
-        
+        showNotification({
+          name: "tron-rejection",
+          message: `${t("Text222")}`,
+          severity: "error",
+        })
+      );
+
       if (refreshIntervalRef.current) {
         clearInterval(refreshIntervalRef.current);
         refreshIntervalRef.current = null;
@@ -894,7 +909,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error-market",
-            message: "No wallet address found. Please connect your wallet.",
+            message: `${t("Text39")}`,
             severity: "error",
           })
         );
@@ -913,9 +928,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       dispatch(
         showNotification({
           name: "tron-error-market",
-          message:
-            "Market wallet connection failed: " +
-            (err instanceof Error ? err.message : "Unknown error"),
+          message:`${t("Text282")}`,
           severity: "error",
         })
       );
@@ -981,7 +994,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         }
           */
       } catch (err) {
-        console.error("Auto-connect failed:", err);
         // If something fails, clear local state
         setAddress(null);
         setBalance(null);
@@ -1009,16 +1021,15 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
     try {
       //validate connection :
-      const baseUrl = process.env.REACT_APP_TRON_API;
       if (!address || !adapter.connected) {
         dispatch(
           showNotification({
             name: "tron-error6",
-            message: "No wallet address found. Please connect your wallet.",
+            message: `${t("Text39")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "Wallet not connected" };
+        return { success: false, error: `${t("Text39")}` };
       }
 
       //To import TronWeb localy :
@@ -1028,22 +1039,22 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error100",
-            message: "Switch to mainnet network.",
+            message: `${t("Text279")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "Switch to mainnet network." };
+        return { success: false, error: `${t("Text279")}` };
       }
 
       if (!tronWeb) {
         dispatch(
           showNotification({
             name: "tron-error7",
-            message: "TronWeb is not available.",
+            message: `${t("Text280")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "TronWeb is not available." };
+        return { success: false, error: `${t("Text280")}` };
       }
 
       // Validate inputs
@@ -1051,22 +1062,22 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error8",
-            message: "Invalid recipient address.",
+            message: `${t("Text281")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "Invalid recipient address." };
+        return { success: false, error: `${t("Text281")}` };
       }
 
       if (amount <= 0 || isNaN(amount)) {
         dispatch(
           showNotification({
             name: "tron-error9",
-            message: "Amount must be a positive number.",
+            message: `${t("Text90")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "Amount must be a positive number." };
+        return { success: false, error: `${t("Text90")}` };
       }
 
       // Check balance
@@ -1075,11 +1086,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error10",
-            message: "Insufficient balance.",
+            message: `${t("Text221")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "Insufficient balance." };
+        return { success: false, error: `${t("Text221")}` };
       }
 
       // Convert amount to sun (fixed type issue)
@@ -1102,13 +1113,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error11",
-            message: `Transaction failed: ${txResult.code}`,
+            message: `${t("Text234")}`,
             severity: "error",
           })
         );
         return {
           success: false,
-          error: `Transaction failed: ${txResult.code}`,
+          error: `${t("Text234")}`,
         };
       }
 
@@ -1117,13 +1128,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error11",
-            message: "Transaction failed: no transaction ID received.",
+            message: `${t("Text234")}`,
             severity: "error",
           })
         );
         return {
           success: false,
-          error: "Transaction failed: no transaction ID received.",
+          error: `${t("Text234")}`,
         };
       }
 
@@ -1150,7 +1161,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setTransferError(errorMessage);
       */
-      return { success: false, error: ""};
+      return { success: false, error: "" };
     } finally {
       setIsTransferring(false);
     }
@@ -1177,11 +1188,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error6",
-            message: "No wallet address found. Please connect your wallet.",
+            message: `${t("Text39")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "Wallet not connected" };
+        return { success: false, error: `${t("Text39")}` };
       }
 
       //To import TronWeb localy :
@@ -1193,22 +1204,22 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error100",
-            message: "Switch to mainnet network.",
+            message: `${t("Text279")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "Switch to mainnet network." };
+        return { success: false, error: `${t("Text279")}` };
       }
 
       if (!tronWeb) {
         dispatch(
           showNotification({
             name: "tron-error7",
-            message: "TronWeb is not available.",
+            message: `${t("Text280")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "TronWeb is not available." };
+        return { success: false, error: `${t("Text280")}` };
       }
 
       // Validate inputs
@@ -1216,11 +1227,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error8",
-            message: "Invalid recipient address.",
+            message: `${t("Text281")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "Invalid recipient address." };
+        return { success: false, error: `${t("Text281")}` };
       }
 
       // Check balance
@@ -1240,11 +1251,11 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error10",
-            message: "Insufficient balance.",
+            message: `${t("Text221")}`,
             severity: "error",
           })
         );
-        return { success: false, error: "Insufficient balance." };
+        return { success: false, error: `${t("Text221")}` };
       }
 
       // Convert amount to sun (fixed type issue)
@@ -1278,7 +1289,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error16",
-            message: `Transaction failed: check your sign transaction`,
+            message: `${t("Text234")}`,
             severity: "error",
           })
         );
@@ -1290,13 +1301,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error11",
-            message: `Transaction failed: ${txResult.code}`,
+            message: `${t("Text234")}`,
             severity: "error",
           })
         );
         return {
           success: false,
-          error: `Transaction failed: ${txResult.code}`,
+          error: `${t("Text234")}`,
         };
       }
 
@@ -1305,13 +1316,13 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         dispatch(
           showNotification({
             name: "tron-error11",
-            message: "Transaction failed: no transaction ID received.",
+            message: `${t("Text234")}`,
             severity: "error",
           })
         );
         return {
           success: false,
-          error: "Transaction failed: no transaction ID received.",
+          error: `${t("Text234")}`,
         };
       }
 
@@ -1320,9 +1331,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         txId: txResult.transaction?.txID || txResult.txid,
       };
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Transfer failed";
-
+      const errorMessage = `${t("Text234")}`
       dispatch(
         showNotification({
           name: "tron-error12",
@@ -1338,7 +1347,6 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
   //-------------------------------------------------------------------------------------
- 
 
   return (
     <TronWalletContext.Provider

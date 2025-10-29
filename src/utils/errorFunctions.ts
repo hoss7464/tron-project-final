@@ -106,6 +106,12 @@ export const serverErrorMessageFunc = (myCode: string, resourceType?: string) =>
       case "TRY_LATER":
         message = `${i18next.t("Text270")}`;
         break;
+      case "WRONG_DATA":
+        message = `${i18next.t("Text283")}`;
+        break;
+      case "SIGNATURE_FAILED":
+        message = `${i18next.t("Text285")}`;
+        break;
 
       default:
         message = `${i18next.t("Text225")}`;

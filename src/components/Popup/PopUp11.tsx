@@ -691,7 +691,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
             accesstoken: accessToken,
           },
           timeout: axiosTimeOut,
-          validateStatus: (status: number) => status < 500,
+          validateStatus: (status: number) => status < 550,
         }
       );
       if (settingResponse.data.success === false) {

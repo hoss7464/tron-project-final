@@ -8,7 +8,7 @@ import React, {
   useRef,
 } from "react";
 import { fetchAllUiData } from "../services/requestService";
-
+import { useTranslation } from "react-i18next";
 import {
   OrdersResponse,
   MyOrdersResponse,
@@ -33,7 +33,7 @@ interface FetchDataContextType {
   tradingRefundInfo: RefundResponse | null;
   tradingOrderInfo: GetOrderResoponse | null;
   sellersOrderInfo: SellersOrdersResponse | null;
-  sellersWithdrawInfo: SellersWithdrawResponse | null
+  sellersWithdrawInfo: SellersWithdrawResponse | null;
   loading: boolean;
   error: Error | null;
   fetchData: (isInitialLoad?: boolean) => Promise<void>;
@@ -46,8 +46,6 @@ const FetchDataContext = createContext<FetchDataContextType | undefined>(
 // Create a ref to expose resourceData
 export const FetchDataResourceRef = React.createRef<ResourceResponse | null>();
 
-
-
 interface FetchDataProviderProps {
   children: ReactNode;
 }
@@ -55,24 +53,40 @@ interface FetchDataProviderProps {
 export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   children,
 }) => {
-  const { address, disconnectWallet2, accessToken, isConnectedTrading, disconnectWallet } = useTronWallet();
+  const { t } = useTranslation();
+  const {
+    address,
+    disconnectWallet2,
+    accessToken,
+    isConnectedTrading,
+    disconnectWallet,
+  } = useTronWallet();
   const { incrementLoading, decrementLoading } = useLoading(); // Get loader functions
   const [orderData, setOrderData] = useState<OrdersResponse | null>(null);
   const [myOrderData, setMyOrderData] = useState<MyOrdersResponse | null>(null);
-  const [resourceData, setResourceData] = useState<ResourceResponse | null>(null);
-  const [availableData, setAvailableData] = useState<AvailableResponse | null>(null)
-  const [tradingAccountInfo, setTradingAccountInfo] = useState<AccountInfoResponse | null>(null)
-  const [tradingRefundInfo, setTradingRefundInfo] = useState<RefundResponse | null>(null)
-  const [tradingOrderInfo, setTradingOrderInfo] = useState<GetOrderResoponse | null>(null)
-  const [sellersOrderInfo, setSellersOrderInfo] = useState<SellersOrdersResponse | null>(null)
-   const [sellersWithdrawInfo, setSellersWithdrawInfo] = useState<SellersWithdrawResponse | null>(null)
+  const [resourceData, setResourceData] = useState<ResourceResponse | null>(
+    null
+  );
+  const [availableData, setAvailableData] = useState<AvailableResponse | null>(
+    null
+  );
+  const [tradingAccountInfo, setTradingAccountInfo] =
+    useState<AccountInfoResponse | null>(null);
+  const [tradingRefundInfo, setTradingRefundInfo] =
+    useState<RefundResponse | null>(null);
+  const [tradingOrderInfo, setTradingOrderInfo] =
+    useState<GetOrderResoponse | null>(null);
+  const [sellersOrderInfo, setSellersOrderInfo] =
+    useState<SellersOrdersResponse | null>(null);
+  const [sellersWithdrawInfo, setSellersWithdrawInfo] =
+    useState<SellersWithdrawResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [authErrorCount, setAuthErrorCount] = useState(0);
   const [shouldStopPolling, setShouldStopPolling] = useState(false);
   const initialLoadRef = useRef(true); // Track initial load
-  const path1 = window.location.pathname
-  
+  const path1 = window.location.pathname;
+
   // Function to handle authentication failures
   const handleAuthFailure = useCallback(() => {
     setAuthErrorCount((prev) => {
@@ -87,49 +101,62 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   }, [disconnectWallet2]);
 
   //Function to fetch data :
-  const fetchData = useCallback(async (isInitialLoad: boolean = false) => {
-    if (shouldStopPolling) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Only show loader for initial load
-      if (isInitialLoad) {
-        incrementLoading();
+  const fetchData = useCallback(
+    async (isInitialLoad: boolean = false) => {
+      if (shouldStopPolling) {
+        return;
       }
 
-      const allData = await fetchAllUiData(address, accessToken,path1,isConnectedTrading,disconnectWallet ,handleAuthFailure );
-      
+      try {
+        setLoading(true);
+        setError(null);
 
-      setOrderData(allData.orders);
-      setMyOrderData(allData.myOrders);
-      setResourceData(allData.resources);
-      setAvailableData(allData.availables);
-      setTradingAccountInfo(allData.tradingAccountInfo)
-      setTradingRefundInfo(allData.tradingRefundInfo)
-      setTradingOrderInfo(allData.tradingOrderInfo)
-      setSellersOrderInfo(allData.sellersOrderInfo)
-      setSellersWithdrawInfo(allData.sellersWithdrawInfo)
+        // Only show loader for initial load
+        if (isInitialLoad) {
+          incrementLoading();
+        }
 
-      if (authErrorCount > 0) {
-        setAuthErrorCount(0);
+        const allData = await fetchAllUiData(
+          address,
+          accessToken,
+          path1,
+          isConnectedTrading,
+          disconnectWallet,
+          handleAuthFailure
+        );
+
+        setOrderData(allData.orders);
+        setMyOrderData(allData.myOrders);
+        setResourceData(allData.resources);
+        setAvailableData(allData.availables);
+        setTradingAccountInfo(allData.tradingAccountInfo);
+        setTradingRefundInfo(allData.tradingRefundInfo);
+        setTradingOrderInfo(allData.tradingOrderInfo);
+        setSellersOrderInfo(allData.sellersOrderInfo);
+        setSellersWithdrawInfo(allData.sellersWithdrawInfo);
+
+        if (authErrorCount > 0) {
+          setAuthErrorCount(0);
+        }
+      } catch (error) {
+        setError(new Error(`${t("Text222")}`));
+      } finally {
+        setLoading(false);
+        // Only decrement for initial load
+        if (isInitialLoad) {
+          decrementLoading();
+        }
       }
-    } catch (error) {
-      console.error("Error in global data fetch:", error);
-      setError(
-        error instanceof Error ? error : new Error("Unknown error occurred")
-      );
-    } finally {
-      setLoading(false);
-      // Only decrement for initial load
-      if (isInitialLoad) {
-        decrementLoading();
-      }
-    }
-  }, [address, handleAuthFailure, authErrorCount, shouldStopPolling, incrementLoading, decrementLoading]);
+    },
+    [
+      address,
+      handleAuthFailure,
+      authErrorCount,
+      shouldStopPolling,
+      incrementLoading,
+      decrementLoading,
+    ]
+  );
 
   useEffect(() => {
     setShouldStopPolling(false);
@@ -137,8 +164,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
     initialLoadRef.current = true; // Reset initial load flag when address changes
   }, [address]);
 
-
-/*
+  /*
 old useEffect :
 
 
@@ -164,24 +190,23 @@ old useEffect :
   
 */
 
-useEffect(() => {
-  // Fetch immediately when route changes
-  fetchData(false);
-  
-  if (shouldStopPolling) {
-    return;
-  }
-
-  const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME);
-  const intervalId = setInterval(() => {
+  useEffect(() => {
+    // Fetch immediately when route changes
     fetchData(false);
-  }, globalReqTime);
 
-  return () => clearInterval(intervalId);
-}, [fetchData, shouldStopPolling, path1]); // Add path1 as dependency
+    if (shouldStopPolling) {
+      return;
+    }
 
+    const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME);
+    const intervalId = setInterval(() => {
+      fetchData(false);
+    }, globalReqTime);
 
-    useEffect(() => {
+    return () => clearInterval(intervalId);
+  }, [fetchData, shouldStopPolling, path1]); // Add path1 as dependency
+
+  useEffect(() => {
     FetchDataResourceRef.current = resourceData;
   }, [resourceData]);
 

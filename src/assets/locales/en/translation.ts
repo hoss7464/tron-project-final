@@ -307,12 +307,19 @@
   "Text270": "Server is busy try again later",
   "Text271": "Data has been sent successfully",
   "Text272": "Your credit is not enough",
-  "Text273": "",
-  "Text274": "",
-  "Text275": "",
-
-
-  
+  "Text273": "Failed to get account data",
+  "Text274": "Failed to refresh wallet data",
+  "Text275": "Error during logout process",
+  "Text276": "Network changed, please check your connection",
+  "Text277": "User rejected signing message",
+  "Text278": "Error during wallet change",
+  "Text279": "Switch to mainnet network",
+  "Text280": "TronWeb is not available",
+  "Text281": "Invalid recipient address",
+  "Text282": "connection failed",
+  "Text283": "Wrong data",
+  "Text284": "Server error",
+  "Text285": "Signature is not valid",
 } as const
 
 export default translation

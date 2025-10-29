@@ -1326,7 +1326,7 @@ const Form2: React.FC = () => {
               accesstoken: accessToken,
             },
             timeout: axiosTimeOut,
-            validateStatus: (status: number) => status < 500,
+            validateStatus: (status: number) => status < 550,
           }
         );
 
