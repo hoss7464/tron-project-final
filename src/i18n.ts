@@ -6,6 +6,12 @@ import HttpApi from "i18next-http-backend";
 import enTranslation from "./assets/locales/en/translation";
 import jaTranslation from "./assets/locales/ja/translation";
 import ruTranslation from "./assets/locales/ru/translation";
+import cnTranslation from "./assets/locales/cn/translation";
+import krTranslation from "./assets/locales/kr/translation";
+import trTranslation from "./assets/locales/tr/translation";
+import idTranslation from "./assets/locales/id/translation";
+import esTranslation from "./assets/locales/es/translation";
+import inTranslation from "./assets/locales/in/translation";
 
 i18n
   .use(initReactI18next)
@@ -13,11 +19,17 @@ i18n
   .use(HttpApi) // optional if you use backend, it's fine
   .init({
     resources: {
-      en: { translation: enTranslation },
-      ja: { translation: jaTranslation },
-      ru: { translation: ruTranslation },
+      en: { translation: enTranslation }, // English (default)
+      ja: { translation: jaTranslation }, // Japenese 
+      ru: { translation: ruTranslation }, // Russian 
+      cn: { translation: cnTranslation }, // Chinese 
+      kr: { translation: krTranslation }, // Korean
+      tr: { translation: trTranslation }, // Turkish 
+      id: { translation: idTranslation }, // Indonesian 
+      es: { translation: esTranslation }, // Spanish
+      in: { translation: inTranslation }, // Indian 
     },
-    supportedLngs: ["en", "ja", "ru"],
+    supportedLngs: ["en", "ja", "ru", "cn", "kr", "tr", "id", "es", "in"],
     fallbackLng: "en",
     detection: {
       // prioritize localStorage so the saved language is used first

@@ -66,35 +66,47 @@ const Sidebar: React.FC<RightSidebarProps> = ({ open, onClose }) => {
   const handleConnect = isMarketPage ? connectWalletMarket : connectWallet;
   const handleDisconnect = isMarketPage ? disconnectWallet2 : disconnectWallet;
 
-   // Update dropdown when language changes
-    useEffect(() => {
-      // Map i18n language codes to your dropdown values
-      const languageMap: { [key: string]: string } = {
-        en: "EN",
-        ja: "JA", 
-        ru: "RU"
-      };
-      
-      const dropdownValue = languageMap[i18n.language] || "EN";
-      setSelectedLanguage(dropdownValue);
-    }, [i18n.language]);
-
-   const handleChange = (event: SelectChangeEvent) => {
-      const newValue = event.target.value;
-      setSelectedLanguage(newValue);
-      
-      // Map dropdown values to i18n language codes
-      const languageCodeMap: { [key: string]: string } = {
-        "EN": "en",
-        "JA": "ja",
-        "RU": "ru"
-      };
-      
-      const languageCode = languageCodeMap[newValue];
-      if (languageCode) {
-        i18n.changeLanguage(languageCode);
-      }
+  // Update dropdown when language changes
+  useEffect(() => {
+    // Map i18n language codes to your dropdown values
+    const languageMap: { [key: string]: string } = {
+      en: "EN",
+      ja: "JA",
+      ru: "RU",
+      cn: "CN",
+      kr: "KR",
+      tr: "TR",
+      id: "ID",
+      es: "ES",
+      in: "IN",
     };
+
+    const dropdownValue = languageMap[i18n.language] || "EN";
+    setSelectedLanguage(dropdownValue);
+  }, [i18n.language]);
+
+  const handleChange = (event: SelectChangeEvent) => {
+    const newValue = event.target.value;
+    setSelectedLanguage(newValue);
+
+    // Map dropdown values to i18n language codes
+    const languageCodeMap: { [key: string]: string } = {
+      EN: "en",
+      JA: "ja",
+      RU: "ru",
+      CN: "cn",
+      KR: "kr",
+      TR: "tr",
+      ID: "id",
+      ES: "es",
+      IN: "in",
+    };
+
+    const languageCode = languageCodeMap[newValue];
+    if (languageCode) {
+      i18n.changeLanguage(languageCode);
+    }
+  };
 
   const shortenAddress = (address: string) => {
     if (address.length <= 6) return address;
@@ -218,6 +230,48 @@ const Sidebar: React.FC<RightSidebarProps> = ({ open, onClose }) => {
                     style={{ marginRight: "0.5rem" }}
                   ></span>
                   РУ
+                </MenuItem>
+                <MenuItem value="CN" onClick={() => i18n.changeLanguage("cn")}>
+                  <span
+                    className="flag-icon flag-icon-cn mx-2"
+                    style={{ marginRight: "0.5rem" }}
+                  ></span>
+                  中文
+                </MenuItem>
+                <MenuItem value="KR" onClick={() => i18n.changeLanguage("kr")}>
+                  <span
+                    className="flag-icon flag-icon-kr mx-2"
+                    style={{ marginRight: "0.5rem" }}
+                  ></span>
+                  한국어
+                </MenuItem>
+                <MenuItem value="TR" onClick={() => i18n.changeLanguage("tr")}>
+                  <span
+                    className="flag-icon flag-icon-tr mx-2"
+                    style={{ marginRight: "0.5rem" }}
+                  ></span>
+                  TR
+                </MenuItem>
+                <MenuItem value="ID" onClick={() => i18n.changeLanguage("id")}>
+                  <span
+                    className="flag-icon flag-icon-id mx-2"
+                    style={{ marginRight: "0.5rem" }}
+                  ></span>
+                  ID
+                </MenuItem>
+                <MenuItem value="ES" onClick={() => i18n.changeLanguage("es")}>
+                  <span
+                    className="flag-icon flag-icon-es mx-2"
+                    style={{ marginRight: "0.5rem" }}
+                  ></span>
+                  ES
+                </MenuItem>
+                <MenuItem value="IN" onClick={() => i18n.changeLanguage("in")}>
+                  <span
+                    className="flag-icon flag-icon-in mx-2"
+                    style={{ marginRight: "0.5rem" }}
+                  ></span>
+                  भारत
                 </MenuItem>
               </Select>
             </FormControl>
