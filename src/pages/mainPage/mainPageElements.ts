@@ -51,11 +51,11 @@ export const MainPageWrapper2 = styled.div`
   width: 100%;
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
-    padding: 0 24px 0 24px;
+    padding: 0 4px 0 4px;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
-    padding: 0 24px 0 24px;
+    padding: 0 16px 0 16px;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
@@ -313,25 +313,30 @@ export const FormWrapper2 = styled.div`
   align-items: center;
   width: 100%;
   border: solid 2px ${ThemeColor.border1};
-  padding: 0.5rem;
+
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     border-radius: 16px;
+    padding: 4px;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
     border-radius: 16px;
+    padding: 6px;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
     border-radius: 16px;
+    padding: 8px;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     border-radius: 20px;
+    padding: 8px;
   }
 
   @media only screen and (min-width: 1921px) {
     border-radius: 24px;
+    padding: 8px;
   }
 `;
 
@@ -344,12 +349,12 @@ export const Form = styled.form`
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     border-radius: 14px;
-    padding: 8px;
+    padding: 6px;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
     border-radius: 14px;
-    padding: 16px;
+    padding: 12px;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
@@ -446,9 +451,31 @@ export const FormAddIconWrapper = styled.div`
   margin-right: 0.3rem;
 `;
 export const FormAddIcon = styled(MdOutlineAccountBalanceWallet)`
-  width: 18px;
-  height: 18px;
   color: ${colors.bg2};
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    width: 18px;
+    height: 18px;
+  }
 `;
 
 export const FormIcon2 = styled.img`
@@ -462,6 +489,33 @@ export const FormAddInputWrapper2 = styled.div`
   align-items: center;
   width: 100%;
   height: 100%;
+`;
+
+export const FormAddInputWrapper3 = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    height: 24px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    height: 27px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    height: 27px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    height: 27px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    height: 27px;
+  }
 `;
 export const FormAddInput = styled.input`
   height: 100%;
@@ -566,20 +620,43 @@ export const OrderSubmitBtnWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 1.2rem;
 `;
 export const OrderSubmitBtn = styled.button`
   border: none;
   font-size: 18px;
   font-weight: 700;
-  padding-top: 10px;
-  padding-bottom: 10px;
+
   width: 100%;
   border-radius: 10px;
   background-color: ${ThemeColor.secondary1};
   color: ${ThemeColor.text2};
   cursor: pointer;
 
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
 `;
 
 export const FormErrorWrapper = styled.div`
@@ -631,33 +708,38 @@ export const OrdersWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  padding: 0.5rem;
+
   border: solid 2px ${ThemeColor.border1};
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     width: 100%;
     border-radius: 16px;
     margin-top: 1rem;
+    padding: 0;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 992px) {
     width: 100%;
     border-radius: 16px;
     margin-top: 1rem;
+    padding: 0;
   }
 
   @media only screen and (min-width: 993px) and (max-width: 1080px) {
     border-radius: 16px;
     width: 66%;
+    padding: 0.5rem;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     border-radius: 20px;
     width: 66%;
+    padding: 0.5rem;
   }
 
   @media only screen and (min-width: 1921px) {
     border-radius: 24px;
     width: 66%;
+    padding: 0.5rem;
   }
 `;
 
@@ -683,7 +765,26 @@ export const OrdersCarouselWrapper = styled.div`
 export const OrdersScroll = styled.div`
   overflow-x: auto;
   width: 100%;
-  height: 550px;
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    height: 618px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    height: 618px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    height: 602px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    height: 602px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    height: 602px;
+  }
 `;
 
 export const OrdersCard = styled.div`
@@ -704,6 +805,7 @@ export const OrdersDetail = styled.div`
   padding: 6px 14px;
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(6px);
+  position: relative;
 `;
 
 export const OrdersNavHeaderWrapper = styled.div`
@@ -832,8 +934,18 @@ export const OrdersSellBtnWrapper = styled.div`
   background-color: ${ThemeColor.secondary1};
   border-radius: 6px;
   cursor: pointer;
-  position: absolute;
-  right: 0.7rem;
+
+  @media only screen and (min-width: 280px) and (max-width: 1080px) {
+    position: sticky;
+    right: 0.7rem;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  @media only screen and (min-width: 1081px) {
+    position: absolute;
+    right: 0.7rem;
+  }
 `;
 
 export const OrdersSell = styled.p`
@@ -884,33 +996,36 @@ export const MyOrdersWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  padding: 0.5rem;
+
   border: solid 2px ${ThemeColor.border1};
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     width: 100%;
     border-radius: 16px;
-
+    padding: 0;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 992px) {
     width: 100%;
     border-radius: 16px;
-
+    padding: 0;
   }
 
   @media only screen and (min-width: 993px) and (max-width: 1080px) {
     border-radius: 16px;
     width: 66%;
+    padding: 0.5rem;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     border-radius: 20px;
     width: 66%;
+    padding: 0.5rem;
   }
 
   @media only screen and (min-width: 1921px) {
     border-radius: 24px;
     width: 66%;
+    padding: 0.5rem;
   }
 `;
 
@@ -976,7 +1091,7 @@ export const MyOrderCardTextWrap = styled.div`
   justify-content: center;
   align-items: flex-start;
   flex-direction: column;
-  width: 17%;
+  width: 16.8%;
   height: 100%;
 `;
 
@@ -1000,8 +1115,17 @@ export const MyOrdersSellBtnWrapper = styled.div`
   background-color: ${ThemeColor.secondary1};
   border-radius: 6px;
   cursor: pointer;
-  position: absolute;
-  right: 0.7rem;
+   @media only screen and (min-width: 280px) and (max-width: 1080px) {
+    position: sticky;
+    right: 0.7rem;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  @media only screen and (min-width: 1081px) {
+    position: absolute;
+    right: 0.7rem;
+  }
 `;
 
 export const MyOrdersSell = styled.p`
@@ -1032,34 +1156,39 @@ export const AvailableWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-direction: column;
-  padding: 0.5rem;
+
   border: solid 2px ${ThemeColor.border1};
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     width: 100%;
     border-radius: 16px;
     margin-top: 1rem;
+    padding: 0;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 992px) {
     width: 100%;
     border-radius: 16px;
     margin-top: 1rem;
+      padding: 0;
   }
 
   @media only screen and (min-width: 993px) and (max-width: 1080px) {
     width: 32.3%;
     border-radius: 16px;
+      padding: 0.5rem;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
     width: 32.3%;
     border-radius: 20px;
+      padding: 0.5rem;
   }
 
   @media only screen and (min-width: 1921px) and (max-width: 2700px) {
     width: 32.3%;
     border-radius: 24px;
+      padding: 0.5rem;
   }
 `;
 export const AvailableNavWrapper = styled.div`

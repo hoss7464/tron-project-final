@@ -46,7 +46,7 @@ function App() {
 
       <MainContainerWrapper>
         <LightMainContainerWrapper>
-          <PrimeMainContainer>
+          <PrimeMainContainer >
             <ScrollToTop />
             <Notification />
             <Navbar />

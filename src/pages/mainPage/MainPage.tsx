@@ -18,11 +18,11 @@ import MobileLegacy from "./MobileLegacy/mobileLegacy";
 const MainPage: React.FC = () => {
   return (
     <>
-      <MainPageContainer>
+      <MainPageContainer >
         <Hero />
         <Legacy />
         <MainPageWrapper2>
-          <MainPageWrapper>
+          <MainPageWrapper  >
             <MainTopSection>
               <OrderFormComponent />
               <OrdersComponent />

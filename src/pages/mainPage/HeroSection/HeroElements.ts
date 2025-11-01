@@ -163,9 +163,34 @@ export const HeroButtonWrapper2 = styled.div`
   justify-content: center;
   align-items: center;
   background-color: ${ThemeColor.secondary1};
-  padding: 10px 14px;
-  border-radius: 10px;
+  
+  
   cursor: pointer;
+
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    border-radius: 8px;
+     padding: 6px 10px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    border-radius: 10px;
+    padding: 8px 12px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+   border-radius: 10px;
+   padding: 10px 14px;
+  }
 `;
 
 export const HeroButtonText = styled.p`
@@ -257,8 +282,13 @@ export const HeroResourceContainer = styled.div`
   width: 100%;
   z-index: 3;
 
-  @media only screen and (min-width: 280px) and (max-width: 768px) {
-    padding: 0 24px 0 24px;
+    @media only screen and (min-width: 280px) and (max-width: 576px) {
+    padding: 0 8px 0 8px;
+    margin-top: 2rem;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    padding: 0 16px 0 16px;
     margin-top: 2rem;
   }
 
@@ -471,16 +501,63 @@ export const HeroGridCardNumberIconWrapper2 = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 10px;
-  padding: 4px;
+  
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    border-radius: 10px;
+    padding: 4px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    border-radius: 10px;
+    padding: 4px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    border-radius: 10px;
+    padding: 4px;
+  }
 `;
 
 export const HeroGridCardNumberIconWrapper3 = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 8px;
-  padding: 6px;
+  
+  
+    @media only screen and (min-width: 280px) and (max-width: 576px) {
+    border-radius: 6px;
+    padding: 4px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    border-radius: 6px;
+    padding: 4px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    border-radius: 8px;
+    padding: 6px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    border-radius: 8px;
+    padding: 6px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    border-radius: 10px;
+    padding: 6px;
+  }
 `;
 
 export const HeroGridCardNumberIcon = styled.img`

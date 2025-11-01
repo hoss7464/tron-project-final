@@ -213,7 +213,7 @@ export const OrdersComponent: React.FC = () => {
           </OrdersNavHeaderWrapper>
 
           <OrdersCarouselWrapper>
-            <OrdersScroll style={{ height: "607px" }}>
+            <OrdersScroll>
               <OrderNavWrapper>
                 <OrderNavTextWrapper1>
                   <OrderNavTextWrapper>

@@ -40,7 +40,7 @@ const Footer: React.FC = () => {
   const { t } = useTranslation();
   return (
     <>
-      <FooterContainer>
+      <FooterContainer >
         <FooterWrapper className="footer-bg1">
           <CooperationWrapper></CooperationWrapper>
           <FooterContentWrapper>

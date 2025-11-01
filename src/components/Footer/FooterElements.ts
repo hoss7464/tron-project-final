@@ -10,10 +10,17 @@ export const FooterContainer = styled.div`
   align-items: center;
   width: 100%;
 
-  @media only screen and (min-width: 280px) and (max-width: 768px) {
+   @media only screen and (min-width: 280px) and (max-width: 576px) {
+    padding: 0 8px 8px 8px;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
-    padding: 0 24px 24px 24px;
+  
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    padding: 0 16px 16px 16px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1920px) {
