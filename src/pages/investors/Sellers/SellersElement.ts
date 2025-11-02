@@ -12,6 +12,7 @@ export const SellersContainer = styled.div`
   flex-direction: column;
   width: 100%;
   position: relative;
+
   @media only screen and (min-width: 280px) and (max-width: 768px) {
     border-radius: 0;
     min-height: 700px;
@@ -43,7 +44,7 @@ export const SellersMainWrapper = styled.div`
   padding-bottom: 20px;
 
   @media only screen and (min-width: 280px) and (max-width: 768px) {
-    width: 93%;
+    width: 95%;
     margin-top: 3rem;
   }
 
@@ -68,7 +69,6 @@ export const SellersMainHeaderBtnWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-
   margin-bottom: 1rem;
 `;
 export const SellersMainHeaderWrapper = styled.div`
@@ -78,19 +78,54 @@ export const SellersMainHeaderWrapper = styled.div`
 `;
 export const SellersMainHeader = styled.p`
   color: ${ThemeColor.primary1};
-  font-size: 22px;
   font-weight: 900;
+    @media only screen and (min-width: 280px) and (max-width: 576px) {
+    font-size: 20px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+    font-size: 20px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+   font-size: 20px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    font-size: 22px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+    font-size: 22px;
+  }
 `;
 
 export const SellersBtnWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 8px 12px;
   border-radius: 10px;
   cursor: pointer;
   background-color: ${ThemeColor.secondary1};
-  
+    @media only screen and (min-width: 280px) and (max-width: 576px) {
+     padding: 6px 8px;
+  }
+
+  @media only screen and (min-width: 577px) and (max-width: 768px) {
+   padding: 6px 10px;
+  }
+
+  @media only screen and (min-width: 769px) and (max-width: 1080px) {
+    padding: 8px 12px;
+  }
+
+  @media only screen and (min-width: 1081px) and (max-width: 1920px) {
+    padding: 8px 12px;
+  }
+
+  @media only screen and (min-width: 1921px) and (max-width: 2700px) {
+   padding: 8px 12px;
+  }
 `;
 
 export const SelersSettingIconWrapper = styled.div`
@@ -225,7 +260,6 @@ export const SellersHistoryWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-
   margin-top: 1rem;
 `
 

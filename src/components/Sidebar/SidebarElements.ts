@@ -8,6 +8,7 @@ export const SidebarContainer = styled.div`
   width: 200px;
   height: 100%;
   background-color: khaki;
+  z-index: 2500;
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     display: flex;

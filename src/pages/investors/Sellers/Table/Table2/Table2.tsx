@@ -21,6 +21,8 @@ import {
   OrdersCardTextWrapper2,
   OrdersCardText1,
   OrdersCardText2,
+  MyOrdersNavWrapper,
+  MyOrdersNavTextWrapper,
 } from "../../../../mainPage/mainPageElements";
 import { SellersWithdrawResponse } from "../../../../../services/requestService";
 import Pagination from "@mui/material/Pagination";
@@ -73,11 +75,11 @@ const SellersTable2: React.FC = () => {
     <>
       <OrderMainWrapper style={{ padding: "0" }}>
         <OrdersCarouselWrapper>
-          <MyOrdersScroll style={{ height: "643px" }}>
-            <AvailableNavWrapper
+          <MyOrdersScroll style={{ height: "659px" }}>
+            <MyOrdersNavWrapper
               style={{ padding: "0.3rem 0.5rem 0.3rem 0.5rem" }}
             >
-              <BuyersAvailableNavbar>
+              <MyOrdersNavTextWrapper style={{  justifyContent: "space-between", width: "92%" }}>
                 <AvailableNavTextWrapper
                   style={{ width: "20%", justifyContent: "flex-start" }}
                 >
@@ -107,8 +109,8 @@ const SellersTable2: React.FC = () => {
                 >
                   <OrderNavText>{t("Text153")}</OrderNavText>
                 </AvailableNavTextWrapper>
-              </BuyersAvailableNavbar>
-            </AvailableNavWrapper>
+              </MyOrdersNavTextWrapper>
+            </MyOrdersNavWrapper>
 
             <OrdersCard>
               {paginatedData.map((myData, index) => {

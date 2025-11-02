@@ -181,8 +181,8 @@ const Sellers: React.FC = () => {
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
                 {/*energy component */}
-                <LegacyCardWrapper2>
-                  <LegacyCardWrapper3 className="card-bg">
+                <LegacyCardWrapper2  >
+                  <LegacyCardWrapper3 className="card-bg" style={{minHeight : "210px"}}>
                     <LegacyCardIconNameWrapper>
                       <LegacyCardIconWrapper1>
                         <LegacyCardIconWrapper2
@@ -275,8 +275,8 @@ const Sellers: React.FC = () => {
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 6, lg: 6 }}>
                 {/*bandwidth component */}
-                <LegacyCardWrapper2>
-                  <LegacyCardWrapper3 className="card-bg">
+                <LegacyCardWrapper2 >
+                  <LegacyCardWrapper3 className="card-bg" style={{minHeight : "210px"}}>
                     <LegacyCardIconNameWrapper>
                       <LegacyCardIconWrapper1>
                         <LegacyCardIconWrapper2>
@@ -369,7 +369,7 @@ const Sellers: React.FC = () => {
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
                 {/*delegated count component */}
                 <LegacyCardWrapper2>
-                  <LegacyCardWrapper3 className="card-bg">
+                  <LegacyCardWrapper3 className="card-bg" style={{minHeight : "210px"}}>
                     <SellersCardIconHeaderWrapper>
                       <LegacyCardIconWrapper1>
                         <LegacyCardIconWrapper2
@@ -468,7 +468,7 @@ const Sellers: React.FC = () => {
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
                 {/* credit component */}
                 <LegacyCardWrapper2>
-                  <LegacyCardWrapper3 className="card-bg">
+                  <LegacyCardWrapper3 className="card-bg" style={{minHeight : "210px"}}>
                     <SellersCardIconHeaderWrapper>
                       <LegacyCardIconWrapper1>
                         <LegacyCardIconWrapper2
@@ -517,7 +517,7 @@ const Sellers: React.FC = () => {
               <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
                 {/* total delegated component */}
                 <LegacyCardWrapper2>
-                  <LegacyCardWrapper3 className="card-bg">
+                  <LegacyCardWrapper3 className="card-bg" style={{minHeight : "210px"}}>
                     <SellersCardIconHeaderWrapper>
                       <LegacyCardIconWrapper1>
                         <LegacyCardIconWrapper2

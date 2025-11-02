@@ -760,6 +760,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
             borderRadius: "16px !important",
             border: "solid 2px #D9E1E3",
             minWidth: "30%",
+            "@media (max-width: 600px)": {
+              margin: "0.5rem",
+            },
             zIndex: 2000,
             marginTop: "5rem",
           },

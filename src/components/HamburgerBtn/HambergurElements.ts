@@ -3,7 +3,7 @@ import { ThemeColor } from "../../core-UI/Theme";
 import { HiOutlineMenuAlt3 } from "react-icons/hi";
 
 export const HambergerContainer = styled.div`
-  z-index: 94;
+  z-index: 150;
   position: fixed;
   top: 1.5rem;
   right: 1.5rem;

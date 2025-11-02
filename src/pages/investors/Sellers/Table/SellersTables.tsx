@@ -61,7 +61,7 @@ const SellersTables: React.FC = () => {
   };
   return (
     <>
-      <BuyersTableContainer1 className="sellerss-table-bg">
+      <BuyersTableContainer1 className="sellerss-table-bg" style={{height : "750px"}}>
         <OrderMainWrapper style={{ padding: "0" }}>
           <OrdersNavHeaderWrapper>
             <FullWidthToggleButtonGroup

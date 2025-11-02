@@ -38,7 +38,6 @@ import LoadingButtonContent from "../LoadingBtnContent/LoadingBtnContent";
 import { useTranslation } from "react-i18next";
 import { serverErrorMessageFunc } from "../../utils/errorFunctions";
 
-
 interface OrderSuccessPopupProps {
   open: boolean;
   onClose: () => void;
@@ -104,7 +103,6 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const baseUrl = process.env.REACT_APP_BASE_URL;
   const [isProcessing, setIsProcessing] = useState(false);
 
-
   //base url :
   const baseURL = process.env.REACT_APP_BASE_URL;
   //to get axios timeout :
@@ -113,7 +111,6 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
   const handleReject = () => {
     onClose();
   };
-
 
   const handleSendTrx = async () => {
     setIsProcessing(true); // Disable buttons
@@ -202,7 +199,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             onClose(); // Close popup automatically on success
             return;
           } else {
-            const serverError = serverErrorMessageFunc(veryfyPayment.data.code)
+            const serverError = serverErrorMessageFunc(veryfyPayment.data.code);
             dispatch(
               showNotification({
                 name: "success1",
@@ -211,7 +208,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
               })
             );
           }
-          return
+          return;
         } else {
           dispatch(
             showNotification({
@@ -224,7 +221,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
         }
       } else {
         //do something with orderResponse
-        const serverError = serverErrorMessageFunc(orderResponse.data.code)
+        const serverError = serverErrorMessageFunc(orderResponse.data.code);
         dispatch(
           showNotification({
             name: "error10",
@@ -242,7 +239,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           severity: "error",
         })
       );
-      return
+      return;
     } finally {
       // Re-enable the button after 300ms
       setTimeout(() => {
@@ -271,6 +268,9 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
             borderRadius: "16px !important",
             border: "solid 2px #D9E1E3",
             minWidth: "30%",
+            "@media (max-width: 600px)": {
+              margin: "0.5rem",
+            },
           },
         }}
       >
