@@ -77,18 +77,22 @@ const Legacy: React.FC = () => {
       ? Math.round((availableEnergy / allEnergy) * 100)
       : 0;
   //Funtion for copy button :
-  const handleCopy = () => {
+  const handleCopy = async () => {
     if (address) {
-      navigator.clipboard.writeText(address).then(() => { dispatch(
-        showNotification({
-          name: "copy-notif",
-          message: `${t("Text19")}`,
-          severity: "success",
+      navigator.clipboard
+        .writeText(address)
+        .then(() => {
+          dispatch(
+            showNotification({
+              name: "copy-notif",
+              message: `${t("Text19")}`,
+              severity: "success",
+            })
+          );
         })
-      );}).catch(() => {
-        alert("something went wrong");
-      });
-     
+        .catch(() => {
+          alert("something went wrong");
+        });
     }
   };
 
