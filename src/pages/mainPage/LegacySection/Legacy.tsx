@@ -77,44 +77,20 @@ const Legacy: React.FC = () => {
       ? Math.round((availableEnergy / allEnergy) * 100)
       : 0;
   //Funtion for copy button :
-  const handleCopy = async () => {
-  if (!address) return;
-
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(address);
-    } else {
-      // ✅ Fallback for older mobile browsers
-      const textarea = document.createElement("textarea");
-      textarea.value = address;
-      textarea.style.position = "fixed"; 
-      textarea.style.opacity = "0";
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      document.body.removeChild(textarea);
+  const handleCopy = () => {
+    if (address) {
+      navigator.clipboard.writeText(address).then(() => { dispatch(
+        showNotification({
+          name: "copy-notif",
+          message: `${t("Text19")}`,
+          severity: "success",
+        })
+      );}).catch(() => {
+        alert("something went wrong");
+      });
+     
     }
-
-    dispatch(
-      showNotification({
-        name: "copy-notif",
-        message: `${t("Text19")}`,
-        severity: "success",
-      })
-    );
-
-  } catch (err) {
-
-    dispatch(
-      showNotification({
-        name: "copy-notif",
-        message: t("CopyFailedMessage"),
-        severity: "error",
-      })
-    );
-  }
-};
-
+  };
 
   return (
     <>
@@ -166,7 +142,7 @@ const Legacy: React.FC = () => {
                           </LegacyAccountInfoAddWrapper>
                         </LegacyIconAddWrapper>
 
-                        <LegacyAccountInfoCopyWrapper onClick={handleCopy} onTouchEnd={handleCopy}>
+                        <LegacyAccountInfoCopyWrapper onClick={handleCopy}>
                           <LegacyAccountInfoCopyIcon />
                         </LegacyAccountInfoCopyWrapper>
                       </LegacyAddCopyWrapper>
