@@ -166,7 +166,7 @@ const Legacy: React.FC = () => {
                           </LegacyAccountInfoAddWrapper>
                         </LegacyIconAddWrapper>
 
-                        <LegacyAccountInfoCopyWrapper onClick={handleCopy}>
+                        <LegacyAccountInfoCopyWrapper onClick={handleCopy} onTouchEnd={handleCopy}>
                           <LegacyAccountInfoCopyIcon />
                         </LegacyAccountInfoCopyWrapper>
                       </LegacyAddCopyWrapper>
