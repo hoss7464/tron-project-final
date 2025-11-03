@@ -75,7 +75,7 @@ const SellersTable2: React.FC = () => {
     <>
       <OrderMainWrapper style={{ padding: "0" }}>
         <OrdersCarouselWrapper>
-          <MyOrdersScroll style={{ height: "659px" }}>
+          <MyOrdersScroll style={{ height: "662px" }}>
             <MyOrdersNavWrapper
               style={{ padding: "0.3rem 0.5rem 0.3rem 0.5rem" }}
             >

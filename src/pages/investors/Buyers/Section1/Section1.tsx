@@ -308,7 +308,7 @@ const Section1: React.FC = () => {
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
               <LegacyCardWrapper2>
-                <LegacyCardWrapper3 className="card-bg">
+                <LegacyCardWrapper3 className="card-bg" style={{minHeight : "210px"}}>
                   <LegacyCardIconNameWrapper>
                     <LegacyCardIconWrapper1>
                       <LegacyCardIconWrapper2>
@@ -367,7 +367,7 @@ const Section1: React.FC = () => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
               <LegacyCardWrapper2>
-                <LegacyCardWrapper3 className="card-bg">
+                <LegacyCardWrapper3 className="card-bg" style={{minHeight : "210px"}}>
                   <LegacyCardIconNameWrapper>
                     <LegacyCardIconWrapper1>
                       <LegacyCardIconWrapper2>
@@ -408,7 +408,7 @@ const Section1: React.FC = () => {
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }}>
               <LegacyCardWrapper2>
-                <LegacyCardWrapper3 className="card-bg">
+                <LegacyCardWrapper3 className="card-bg" style={{minHeight : "210px"}}>
                   <LegacyCardIconNameWrapper>
                     <LegacyCardIconWrapper1>
                       <LegacyCardIconWrapper2>

@@ -32,6 +32,7 @@ import {
   FormAddInputIconWrapper,
   FormAddIcon,
   FormAddInputWrapper2,
+  FormAddInputWrapper3,
   FormAddInput,
   InputMiniBtnWrapper,
   InputMiniBtnWrapper2,
@@ -1236,7 +1237,7 @@ const Form1: React.FC = () => {
                     <HeroGridCardNumberIcon
                       alt="energy icon"
                       src={energyIcon}
-                      style={{ width: "18px", height: "18px" }}
+                      
                     />
                   </HeroGridCardNumberIconWrapper3>
                 ) : (
@@ -1246,7 +1247,7 @@ const Form1: React.FC = () => {
                     <HeroGridCardNumberIcon
                       alt="bandwidth icon"
                       src={bandwidthIcon}
-                      style={{ width: "18px", height: "18px" }}
+                      
                     />
                   </HeroGridCardNumberIconWrapper3>
                 )}
@@ -1377,7 +1378,12 @@ const Form1: React.FC = () => {
                     fullWidth
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        height: "40px",
+                        height: {
+                            xs: "35.5px",    // mobile
+                            sm: "38px",    // tablet
+                            md: "40px",    // small desktop
+                            lg: "40px",    // large desktop
+                          },
                         border: "2px solid #D9E1E3",
                         backgroundColor: "#ffffff",
                         color: "#003543",
@@ -1514,7 +1520,12 @@ const Form1: React.FC = () => {
                     }}
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        height: "40px",
+                         height: {
+                            xs: "35.5px",    // mobile
+                            sm: "38px",    // tablet
+                            md: "40px",    // small desktop
+                            lg: "40px",    // large desktop
+                          },
                         border: "2px solid #D9E1E3",
                         backgroundColor: "#ffffff",
                         color: "#003543",
@@ -1628,13 +1639,13 @@ const Form1: React.FC = () => {
                 </FormAddLabelWrapper>
                 <FormAddInputWrapper>
                   <FormAddInputIconWrapper>
-                    <FormAddInputWrapper2 style={{ height: "27px" }}>
+                    <FormAddInputWrapper3>
                       <FormAddInput
                         value={partialField}
                         onChange={handlePartialField}
                         style={{ fontSize: "16px", marginLeft: "0.5rem" }}
                       />
-                    </FormAddInputWrapper2>
+                    </FormAddInputWrapper3>
                   </FormAddInputIconWrapper>
                 </FormAddInputWrapper>
               </FormAddInputLabelWrapper>

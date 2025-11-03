@@ -271,6 +271,9 @@ const handleBulkOrderClick = () => {
             borderRadius: "16px !important",
             border: "solid 2px #D9E1E3",
             minWidth: "30%",
+            "@media (max-width: 600px)": {
+              margin: "0.5rem",
+            },
           },
         }}
       >

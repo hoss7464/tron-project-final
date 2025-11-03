@@ -11,7 +11,7 @@ export const FooterContainer = styled.div`
   width: 100%;
 
    @media only screen and (min-width: 280px) and (max-width: 576px) {
-    padding: 0 8px 8px 8px;
+    padding: 0 4px 6px 4px;
     border-bottom-right-radius: 0;
     border-bottom-left-radius: 0;
   

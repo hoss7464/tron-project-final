@@ -11,7 +11,7 @@ export const BuyersTableContainer1 = styled.div`
   align-items: center;
   flex-direction: column;
   width: 100%;
-  height: 730px;
+  height: 748px;
   border: solid 2px ${ThemeColor.border1};
   padding: 0.5rem;
 

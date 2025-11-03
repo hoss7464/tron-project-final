@@ -80,8 +80,8 @@ const BuyersTable2: React.FC = () => {
     <>
       <OrderMainWrapper style={{ padding: "0" }}>
         <OrdersCarouselWrapper >
-          <MyOrdersScroll style={{ height: "647px" }}  >
-            <MyOrdersNavWrapper >
+          <MyOrdersScroll style={{ height: "667px" }}  >
+            <MyOrdersNavWrapper style={{ padding: "0.3rem 0.5rem 0.3rem 0.5rem" }}>
               <MyOrdersNavTextWrapper style={{width: "91%"}} >
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}} >
                   <OrderNavText>{t("Text80")}</OrderNavText>

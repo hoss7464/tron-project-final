@@ -64,7 +64,7 @@ const BuyerForms: React.FC = () => {
   return (
     <>
       <BuyersFormsContainer>
-        <FormWrapper2 className="form-bg1" style={{ height: "100%" }}>
+        <FormWrapper2 className="form-bg1" style={{ minHeight: "745px" }}>
           <BuyersForm className="form-bg2" style={{ height: "100%", padding : "0"}}>
             {/*Switch btn 1 to change the form */}
             <FormSwitchBtnWrapper>

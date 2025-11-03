@@ -19,9 +19,9 @@ const Buyers: React.FC = () => {
     <>
       {!isConnectedTrading ?  <PopUp7 /> : ""}
 
-      <BuyersContainer>
+      <BuyersContainer  >
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>
-        <BuyerssMainWrapper>
+        <BuyerssMainWrapper >
           <Section1 />
           <Sec2Wrapper>
             <Grid container spacing={2}>

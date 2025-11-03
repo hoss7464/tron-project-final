@@ -39,27 +39,33 @@ export const SellersMainWrapper = styled.div`
   align-items: center;
   flex-direction: column;
   height: 100%;
+   width: 100%;
   z-index: 10;
   padding-top: 20px;
   padding-bottom: 20px;
 
-  @media only screen and (min-width: 280px) and (max-width: 768px) {
-    width: 95%;
+  @media only screen and (min-width: 280px) and (max-width: 576px) {
+    padding: 0 4px 0 4px;
+    margin-top: 3rem;
+  }
+
+   @media only screen and (min-width: 577px) and (max-width: 768px) {
+    padding: 0 16px 0 16px;
     margin-top: 3rem;
   }
 
   @media only screen and (min-width: 769px) and (max-width: 1080px) {
-    width: 93%;
+  padding: 0 32px 0 32px;
     margin-top: 3rem;
   }
 
   @media only screen and (min-width: 1081px) and (max-width: 1920px) {
-    width: 80%;
+     padding: 0 32px 0 32px;
     margin-top: 4rem;
   }
 
   @media only screen and (min-width: 1921px) and (max-width: 2700px) {
-    width: 80%;
+    padding: 0 56px 0 56px;
     margin-top: 4rem;
   }
 `;
@@ -261,6 +267,7 @@ export const SellersHistoryWrapper = styled.div`
   align-items: center;
   width: 100%;
   margin-top: 1rem;
+  margin-bottom: 1rem;
 `
 
 export const SellersNavTextWrapper = styled.div`

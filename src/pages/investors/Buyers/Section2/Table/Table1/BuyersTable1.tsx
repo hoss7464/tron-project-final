@@ -104,8 +104,8 @@ const BuyersTable1: React.FC = () => {
     <>
       <OrderMainWrapper style={{ padding: "0" }}>
         <OrdersCarouselWrapper  >
-          <MyOrdersScroll style={{ height: "647px" }}>
-            <MyOrdersNavWrapper >
+          <MyOrdersScroll style={{ height: "667px" }}>
+            <MyOrdersNavWrapper style={{ padding: "0.3rem 0.5rem 0.3rem 0.5rem" }}>
               <MyOrdersNavTextWrapper>
                 <MyOrdersTextWrapper style={{ marginLeft: "3rem" }}>
                   <OrderNavText>{t("Text80")}</OrderNavText>
@@ -268,7 +268,7 @@ const BuyersTable1: React.FC = () => {
         </OrdersCarouselWrapper>
       </OrderMainWrapper>
 
-      <OedersPaginationWrapper >
+      <OedersPaginationWrapper  >
         <Pagination
           count={totalPages}
           page={currentPage}

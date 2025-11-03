@@ -38,17 +38,15 @@ export const BuyerssMainWrapper = styled.div`
   width: 100%;
   height: 100%;
   z-index: 10;
-  padding-top: 20px;
-  padding-bottom: 20px;
   margin-bottom: 1rem;
  
   @media only screen and (min-width: 280px) and (max-width: 576px) {
-    padding: 0 24px 0 24px;
+    padding: 0 4px 0 4px;
     margin-top: 3rem;
   }
 
   @media only screen and (min-width: 577px) and (max-width: 768px) {
-    padding: 0 24px 0 24px;
+    padding: 0 16px 0 16px;
     margin-top: 3rem;
   }
 
