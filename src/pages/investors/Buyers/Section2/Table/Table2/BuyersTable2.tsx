@@ -7,14 +7,12 @@ import {
   CheckedSign,
   CanceledSign,
   ProcessSign,
-  BuyersAvailableNavbar,
 } from "../BuyersTableElements";
 import { Link } from "@mui/material";
 import {
   OrderMainWrapper,
   OrdersCarouselWrapper,
   MyOrdersScroll,
-  AvailableNavWrapper,
   AvailableNavTextWrapper,
   OrderNavText,
   OedersPaginationWrapper,
@@ -23,6 +21,8 @@ import {
   OrdersCardTextWrapper2,
   OrdersCardText1,
   OrdersCardText2,
+  MyOrdersNavWrapper,
+  MyOrdersNavTextWrapper,
 } from "../../../../../mainPage/mainPageElements";
 import { RefundResponse } from "../../../../../../services/requestService";
 import Pagination from "@mui/material/Pagination";
@@ -81,8 +81,8 @@ const BuyersTable2: React.FC = () => {
       <OrderMainWrapper style={{ padding: "0" }}>
         <OrdersCarouselWrapper >
           <MyOrdersScroll style={{ height: "647px" }}  >
-            <AvailableNavWrapper style={{padding: "0.4rem 0.5rem 0.4rem 0.5rem"}}>
-              <BuyersAvailableNavbar>
+            <MyOrdersNavWrapper >
+              <MyOrdersNavTextWrapper style={{width: "91%"}} >
                 <AvailableNavTextWrapper style={{width: "20%", justifyContent: "flex-start"}} >
                   <OrderNavText>{t("Text80")}</OrderNavText>
                 </AvailableNavTextWrapper>
@@ -104,8 +104,8 @@ const BuyersTable2: React.FC = () => {
                 </AvailableNavTextWrapper>
 
                
-              </BuyersAvailableNavbar>
-            </AvailableNavWrapper>
+              </MyOrdersNavTextWrapper>
+            </MyOrdersNavWrapper>
 
             <OrdersCard>
               {paginatedData.map((myData, index) => {

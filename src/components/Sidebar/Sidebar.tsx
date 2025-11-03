@@ -139,7 +139,7 @@ const Sidebar: React.FC<RightSidebarProps> = ({ open, onClose }) => {
         onClose={onClose}
         sx={{
           "& .MuiDrawer-paper": {
-            width: isMobile ? "100%" : 300,
+            width: isMobile ? "60%" : 300,
             boxSizing: "border-box",
             backgroundColor: "#ffffff",
           },
