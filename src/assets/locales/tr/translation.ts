@@ -320,6 +320,8 @@ const translation = {
   "Text283": "Yanlış veri",
   "Text284": "Sunucu hatası",
   "Text285": "İmza geçerli değil",
+  "Text286": "Satın Al",
+"Text287": "satın al",
 } as const
 
 export default translation

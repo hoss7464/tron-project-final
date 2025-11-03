@@ -319,7 +319,9 @@ const translation = {
   "Text282": "接続に失敗しました",
   "Text283": "データが不正です",
   "Text284": "サーバーエラー",
-  "Text285": "署名が無効です"
+  "Text285": "署名が無効です",
+  "Text286": "購入",
+"Text287": "購入",
 } as const
 
 export default translation

@@ -1134,7 +1134,7 @@ const Form1: React.FC = () => {
                       <HeroGridCardNumberIcon
                         alt="energy icon"
                         src={energyIcon}
-                        style={{ width: "18px", height: "18px" }}
+
                       />
                     </HeroGridCardNumberIconWrapper3>
                   </HeroGridCardNumberIconWrapper2>
@@ -1148,7 +1148,7 @@ const Form1: React.FC = () => {
                       <HeroGridCardNumberIcon
                         alt="bandwidth icon"
                         src={bandwidthIcon}
-                        style={{ width: "18px", height: "18px" }}
+                        
                       />
                     </HeroGridCardNumberIconWrapper3>
                   </HeroGridCardNumberIconWrapper2>
@@ -1157,11 +1157,11 @@ const Form1: React.FC = () => {
               <FormHeaderWrapper>
                 {switchBtn === "energy" ? (
                   <HeroGridCardHeader style={{ color: "#003543" }}>
-                    {t("Text7")}
+                    {t("Text6")}
                   </HeroGridCardHeader>
                 ) : (
                   <HeroGridCardHeader style={{ color: "#003543" }}>
-                    {t("Text10")}
+                    {t("Text9")}
                   </HeroGridCardHeader>
                 )}
               </FormHeaderWrapper>
@@ -1173,10 +1173,10 @@ const Form1: React.FC = () => {
                 onChange={handleChange}
               >
                 <CustomToggleButton value="energy">
-                  {t("Text7")}
+                  {t("Text6")}
                 </CustomToggleButton>
                 <CustomToggleButton value="bandwidth">
-                  {t("Text10")}
+                  {t("Text9")}
                 </CustomToggleButton>
               </ToggleButtonGroup>
             </FormSwitchWrapper>

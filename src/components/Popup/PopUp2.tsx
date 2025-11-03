@@ -345,9 +345,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
           />
 
           <Box mb={2}>
-            <Popup2SubheaderWrapper>
-              <Popup2Subheader>{t("Text69")}</Popup2Subheader>
-            </Popup2SubheaderWrapper>
+            
             <Popup2NameItemWrapper
               style={{ flexDirection: "column", alignItems: "flex-start" }}
             >
@@ -450,7 +448,7 @@ const PopUp2: React.FC<OrderSuccessPopupProps> = ({
               loading={isProcessing}
               loadingText={`${t("Text74")}...`}
               normalText={
-                mySwitchBtn === "energy" ? `${t("Text75")}` : `${t("Text76")}`
+                mySwitchBtn === "energy" ? `${t("Text286")} ${t("Text7")}` : `${t("Text286")} ${t("Text9")}`
               }
             />
           </Button>

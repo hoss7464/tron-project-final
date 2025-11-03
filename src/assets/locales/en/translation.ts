@@ -320,6 +320,8 @@
   "Text283": "Wrong data",
   "Text284": "Server error",
   "Text285": "Signature is not valid",
+   "Text286": "Buy",
+   "Text287": "buy",
 } as const
 
 export default translation

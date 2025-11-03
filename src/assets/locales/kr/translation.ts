@@ -320,6 +320,8 @@ const translation = {
   "Text283": "잘못된 데이터",
   "Text284": "서버 오류",
   "Text285": "서명이 유효하지 않습니다",
+  "Text286": "구매",
+"Text287": "구매",
 } as const
 
 export default translation
