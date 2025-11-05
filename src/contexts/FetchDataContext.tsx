@@ -86,6 +86,7 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const [shouldStopPolling, setShouldStopPolling] = useState(false);
   const initialLoadRef = useRef(true); // Track initial load
   const path1 = window.location.pathname;
+  const [useShortTimeout, setUseShortTimeout] = useState(false);
 
   // Ref to store last successful data
   const lastSuccessfulData = useRef({
@@ -135,11 +136,16 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
           path1,
           isConnectedTrading,
           disconnectWallet,
-          handleAuthFailure
+          handleAuthFailure,
+          useShortTimeout
         );
 
               // Update each piece of state if data exists, else fallback to last successful
         setOrderData(allData.orders?.data?.length ? allData.orders : lastSuccessfulData.current.orders);
+        // ✅ If the orders request was successful → enable short timeout
+        if (allData.orders?.success) {
+          setUseShortTimeout(true);
+        }
         setMyOrderData(allData.myOrders?.data?.length ? allData.myOrders : lastSuccessfulData.current.myOrders);
         setResourceData(allData.resources?.data ? allData.resources : lastSuccessfulData.current.resources);
         setAvailableData(allData.availables?.energy?.length || allData.availables?.bandwidth?.length ? allData.availables : lastSuccessfulData.current.availables);

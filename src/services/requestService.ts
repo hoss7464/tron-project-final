@@ -305,11 +305,131 @@ interface SellersWithdrawData {
   __v: number;
 }
 //Public interface for fetchAllUiData :
+const DEFAULT_RESOURCE = {
+  DappAddress: "",
+  readyResource: { energy: 0, bandwidth: 0 },
+  dailyRecovery: { energy: 0, bandwidth: 0 },
+  fastSellRate: { energy: 0, bandwidth: 0 },
+  fastChargeSetting: {
+    fastChargeRate: { energy: 0, bandwidth: 0 },
+    fastChargeMin: { energy: 0, bandwidth: 0 },
+    fastChargeMax: { energy: 0, bandwidth: 0 },
+    fastChargeMinUser: { energy: 0, bandwidth: 0 },
+    fastChargeMaxUser: { energy: 0, bandwidth: 0 },
+    fastChargeLimitMin: { energy: 0, bandwidth: 0 },
+    fastChargeLimitMax: { energy: 0, bandwidth: 0 },
+  },
+  settingsOrder: {
+    partialFill: { energy: 0, bandwidth: 0 },
+  },
+  apy: { energy: 0, bandwidth: 0 },
+  minAmount: { energy: 0, bandwidth: 0 },
+  minSellersPrice: { energy: 0, bandwidth: 0 },
+  profitSellers: { min: 0, max: 0 },
+  maxSellers: { bandwidth: 0, energy: 0 },
+  ratesByDuration: [],
+};
+
+const DEFAULT_TRADING_ACCOUNT_INFO = {
+  success: false,
+  data: {
+    buyerCredit: 0,
+    sellerCredit: 0,
+    apiKey: "",
+    settings: {
+      minDurationBandwidth: 0,
+      minDurationEnergy: 0,
+      isActive: false,
+      minPriceBandwidth: 0,
+      minPriceEnergy: 0,
+      minUnitBandwidth: 0,
+      minUnitEnergy: 0,
+      profit: 0,
+    },
+    seller: {
+      delegationedCount: { energy: 0, bandwidth: 0 },
+      delegationedTotal: { energy: 0, bandwidth: 0 },
+    },
+  },
+};
+
+const getDefaultValue = (key: string) => {
+  switch (key) {
+    case "orders":
+      return { success: false, data: [] } as OrdersResponse;
+
+    case "myOrders":
+      return {
+        success: true,
+        message: "",
+        data: [],
+      } as MyOrdersResponse;
+
+    case "resources":
+      return {
+        success: false,
+        data: DEFAULT_RESOURCE,
+      } as ResourceResponse;
+
+    case "availables":
+      return {
+        success: false,
+        energy: [],
+        bandwidth: [],
+      } as AvailableResponse;
+
+    case "tradingAccountInfo":
+      return DEFAULT_TRADING_ACCOUNT_INFO as AccountInfoResponse;
+
+    case "tradingRefundInfo":
+      return {
+        success: false,
+        message: "",
+        data: [],
+      } as RefundResponse;
+
+    case "tradingOrderInfo":
+      return {
+        success: false,
+        message: "",
+        data: [],
+      } as GetOrderResoponse;
+
+    case "sellersOrderInfo":
+      return {
+        success: false,
+        message: "",
+        data: [],
+      } as SellersOrdersResponse;
+
+    case "sellersWithdrawInfo":
+      return {
+        success: false,
+        message: "",
+        data: [],
+      } as SellersWithdrawResponse;
+
+    default:
+      return null;
+  }
+};
 
 //-------------------------------------------------------------------------------------
 //to get data from .env :
 const baseUrl = process.env.REACT_APP_BASE_URL;
 const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
+
+const lastSuccessfulData: Record<string, any> = {
+  orders: null,
+  myOrders: null,
+  resources: null,
+  availables: null,
+  tradingAccountInfo: null,
+  tradingRefundInfo: null,
+  tradingOrderInfo: null,
+  sellersOrderInfo: null,
+  sellersWithdrawInfo: null,
+};
 
 export const fetchAllUiData = async (
   walletAddress: string | null,
@@ -317,14 +437,14 @@ export const fetchAllUiData = async (
   pathname: string,
   isConnectedTrading: boolean,
   disConnectWallet: () => void,
-  onAuthFailure?: () => void
+  onAuthFailure?: () => void,
+  useShortTimeout: boolean = false
 ) => {
   try {
     const hasConnectedWallet = !!walletAddress;
 
     const promises: { key: string; promise: Promise<any> }[] = [];
-
-    const lastSuccessfulData: Record<string, any> = {};
+    const dynamicTimeout = useShortTimeout ? 1 : 3000;
 
     // Always fetch resources
     promises.push({
@@ -345,7 +465,7 @@ export const fetchAllUiData = async (
         promise: Promise.resolve(
           axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
             headers: { "Content-Type": "application/json" },
-            timeout: axiosTimeOut,
+            timeout: dynamicTimeout,
             validateStatus: (status: number) => status < 500,
           })
         ),
@@ -598,12 +718,14 @@ export const fetchAllUiData = async (
     // Helper function for settled promises
     const handleSettledPromise = <T>(
       result: PromiseSettledResult<any>,
+      key: string,
       defaultValue: T
     ): T => {
       if (result.status === "fulfilled") {
+        lastSuccessfulData[key] = result.value.data;
         return result.value.data;
       } else {
-        console.error("Request failed:", result.reason);
+        if (lastSuccessfulData[key]) return lastSuccessfulData[key];
         return defaultValue;
       }
     };
@@ -612,7 +734,11 @@ export const fetchAllUiData = async (
     const responseMap: any = {};
 
     promises.forEach((p, index) => {
-      responseMap[p.key] = handleSettledPromise(results[index], null);
+      responseMap[p.key] = handleSettledPromise(
+        results[index],
+        p.key,
+        getDefaultValue(p.key)
+      );
     });
 
     // Set defaults if missing
