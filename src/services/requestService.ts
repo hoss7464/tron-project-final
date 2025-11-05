@@ -324,6 +324,8 @@ export const fetchAllUiData = async (
 
     const promises: { key: string; promise: Promise<any> }[] = [];
 
+    const lastSuccessfulData: Record<string, any> = {};
+
     // Always fetch resources
     promises.push({
       key: "resources",

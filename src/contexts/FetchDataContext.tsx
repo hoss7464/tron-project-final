@@ -87,6 +87,19 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
   const initialLoadRef = useRef(true); // Track initial load
   const path1 = window.location.pathname;
 
+  // Ref to store last successful data
+  const lastSuccessfulData = useRef({
+    orders: orderData,
+    myOrders: myOrderData,
+    resources: resourceData,
+    availables: availableData,
+    tradingAccountInfo,
+    tradingRefundInfo,
+    tradingOrderInfo,
+    sellersOrderInfo,
+    sellersWithdrawInfo,
+  });
+
   // Function to handle authentication failures
   const handleAuthFailure = useCallback(() => {
     setAuthErrorCount((prev) => {
@@ -125,21 +138,45 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
           handleAuthFailure
         );
 
-        setOrderData(allData.orders);
-        setMyOrderData(allData.myOrders);
-        setResourceData(allData.resources);
-        setAvailableData(allData.availables);
-        setTradingAccountInfo(allData.tradingAccountInfo);
-        setTradingRefundInfo(allData.tradingRefundInfo);
-        setTradingOrderInfo(allData.tradingOrderInfo);
-        setSellersOrderInfo(allData.sellersOrderInfo);
-        setSellersWithdrawInfo(allData.sellersWithdrawInfo);
+              // Update each piece of state if data exists, else fallback to last successful
+        setOrderData(allData.orders?.data?.length ? allData.orders : lastSuccessfulData.current.orders);
+        setMyOrderData(allData.myOrders?.data?.length ? allData.myOrders : lastSuccessfulData.current.myOrders);
+        setResourceData(allData.resources?.data ? allData.resources : lastSuccessfulData.current.resources);
+        setAvailableData(allData.availables?.energy?.length || allData.availables?.bandwidth?.length ? allData.availables : lastSuccessfulData.current.availables);
+        setTradingAccountInfo(allData.tradingAccountInfo?.data ? allData.tradingAccountInfo : lastSuccessfulData.current.tradingAccountInfo);
+        setTradingRefundInfo(allData.tradingRefundInfo?.data?.length ? allData.tradingRefundInfo : lastSuccessfulData.current.tradingRefundInfo);
+        setTradingOrderInfo(allData.tradingOrderInfo?.data?.length ? allData.tradingOrderInfo : lastSuccessfulData.current.tradingOrderInfo);
+        setSellersOrderInfo(allData.sellersOrderInfo?.data?.length ? allData.sellersOrderInfo : lastSuccessfulData.current.sellersOrderInfo);
+        setSellersWithdrawInfo(allData.sellersWithdrawInfo?.data?.length ? allData.sellersWithdrawInfo : lastSuccessfulData.current.sellersWithdrawInfo);
+
+            // Update last successful data ref
+        lastSuccessfulData.current = {
+          orders: allData.orders || lastSuccessfulData.current.orders,
+          myOrders: allData.myOrders || lastSuccessfulData.current.myOrders,
+          resources: allData.resources || lastSuccessfulData.current.resources,
+          availables: allData.availables || lastSuccessfulData.current.availables,
+          tradingAccountInfo: allData.tradingAccountInfo || lastSuccessfulData.current.tradingAccountInfo,
+          tradingRefundInfo: allData.tradingRefundInfo || lastSuccessfulData.current.tradingRefundInfo,
+          tradingOrderInfo: allData.tradingOrderInfo || lastSuccessfulData.current.tradingOrderInfo,
+          sellersOrderInfo: allData.sellersOrderInfo || lastSuccessfulData.current.sellersOrderInfo,
+          sellersWithdrawInfo: allData.sellersWithdrawInfo || lastSuccessfulData.current.sellersWithdrawInfo,
+        };
 
         if (authErrorCount > 0) {
           setAuthErrorCount(0);
         }
       } catch (error) {
         setError(new Error(`${t("Text222")}`));
+        // Fallback to last successful data
+        setOrderData(lastSuccessfulData.current.orders);
+        setMyOrderData(lastSuccessfulData.current.myOrders);
+        setResourceData(lastSuccessfulData.current.resources);
+        setAvailableData(lastSuccessfulData.current.availables);
+        setTradingAccountInfo(lastSuccessfulData.current.tradingAccountInfo);
+        setTradingRefundInfo(lastSuccessfulData.current.tradingRefundInfo);
+        setTradingOrderInfo(lastSuccessfulData.current.tradingOrderInfo);
+        setSellersOrderInfo(lastSuccessfulData.current.sellersOrderInfo);
+        setSellersWithdrawInfo(lastSuccessfulData.current.sellersWithdrawInfo);
       } finally {
         setLoading(false);
         // Only decrement for initial load
