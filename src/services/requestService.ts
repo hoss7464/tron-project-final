@@ -304,7 +304,7 @@ interface SellersWithdrawData {
   createdAt: string;
   __v: number;
 }
-//Public interface for fetchAllUiData :
+//Default data to prevent the data to be null :
 const DEFAULT_RESOURCE = {
   DappAddress: "",
   readyResource: { energy: 0, bandwidth: 0 },
@@ -352,7 +352,7 @@ const DEFAULT_TRADING_ACCOUNT_INFO = {
     },
   },
 };
-
+//Global function to apply default data to prevent he data to be null:
 const getDefaultValue = (key: string) => {
   switch (key) {
     case "orders":
@@ -419,6 +419,7 @@ const getDefaultValue = (key: string) => {
 const baseUrl = process.env.REACT_APP_BASE_URL;
 const axiosTimeOut = Number(process.env.AXIOS_TIME_OUT);
 
+//To store current data in local memory so that to prevent getting data null
 const lastSuccessfulData: Record<string, any> = {
   orders: null,
   myOrders: null,
@@ -438,15 +439,13 @@ export const fetchAllUiData = async (
   isConnectedTrading: boolean,
   disConnectWallet: () => void,
   onAuthFailure?: () => void,
-  useShortTimeout: boolean = false
+ 
 ) => {
   try {
     const hasConnectedWallet = !!walletAddress;
-
     const promises: { key: string; promise: Promise<any> }[] = [];
-    const dynamicTimeout = useShortTimeout ? 1 : 3000;
-
-    // Always fetch resources
+    //----------------------------------------------------------------------------------------
+    // Always fetch resources data for all pages : 
     promises.push({
       key: "resources",
       promise: Promise.resolve(
@@ -457,20 +456,20 @@ export const fetchAllUiData = async (
         })
       ),
     });
-
-    // Fetch orders and availables only on "/"
+    //----------------------------------------------------------------------------------------
     if (pathname === "/") {
+      // Fetch orders data on "/"
       promises.push({
         key: "orders",
         promise: Promise.resolve(
           axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
             headers: { "Content-Type": "application/json" },
-            timeout: dynamicTimeout,
+            timeout: axiosTimeOut,
             validateStatus: (status: number) => status < 500,
           })
         ),
       });
-
+    // Fetch availables data on "/"
       promises.push({
         key: "availables",
         promise: Promise.resolve(
@@ -485,7 +484,7 @@ export const fetchAllUiData = async (
         ),
       });
     }
-
+    //----------------------------------------------------------------------------------------
     // Fetch myOrders only on "/" with wallet connected
     if (hasConnectedWallet && pathname === "/") {
       promises.push({
@@ -499,8 +498,8 @@ export const fetchAllUiData = async (
         ),
       });
     }
-
-    // Fetch account info only on Buyers or Sellers with connected trading
+    //----------------------------------------------------------------------------------------
+    // Fetch account info data on Buyers and Sellers with connected trading :
     if (
       isConnectedTrading &&
       (pathname === "/Buyers" || pathname === "/Sellers")
@@ -545,9 +544,10 @@ export const fetchAllUiData = async (
         ),
       });
     }
-
-    // Fetch refund info only for Buyers
+    //----------------------------------------------------------------------------------------
+    
     if (isConnectedTrading && pathname === "/Buyers") {
+      // Fetch refund data only for Buyers:
       promises.push({
         key: "tradingRefundInfo",
         promise: Promise.resolve(
@@ -587,7 +587,7 @@ export const fetchAllUiData = async (
             })
         ),
       });
-
+    //Fetch order data for Buyers :
       promises.push({
         key: "tradingOrderInfo",
         promise: Promise.resolve(
@@ -628,9 +628,10 @@ export const fetchAllUiData = async (
         ),
       });
     }
-
-    // Fetch sellers order and withdraw info only for Sellers
+    //----------------------------------------------------------------------------------------
+    
     if (isConnectedTrading && pathname === "/Sellers") {
+      // Fetch sellers order data only for Sellers
       promises.push({
         key: "sellersOrderInfo",
         promise: Promise.resolve(
@@ -670,7 +671,7 @@ export const fetchAllUiData = async (
             })
         ),
       });
-
+      // Fetch sellers withdraw data only for Sellers
       promises.push({
         key: "sellersWithdrawInfo",
         promise: Promise.resolve(
@@ -711,7 +712,7 @@ export const fetchAllUiData = async (
         ),
       });
     }
-
+    //----------------------------------------------------------------------------------------
     // Run all promises in parallel
     const results = await Promise.allSettled(promises.map((p) => p.promise));
 
