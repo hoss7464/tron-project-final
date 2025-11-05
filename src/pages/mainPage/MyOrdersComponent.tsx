@@ -117,7 +117,6 @@ const MyOrdersComponent: React.FC = () => {
       refreshData();
     }
   }, [refreshTrigger, fetchData]);
-
   // Filter by status first (only processing and completed)
   const statusFilteredData2 = myOrderData?.data
     ? myOrderData.data.filter(
@@ -127,7 +126,7 @@ const MyOrdersComponent: React.FC = () => {
           myOrder.status === "cancelled"
       )
     : [];
-
+   
   // Then sort the filtered data
   const filteredAndSortedData = sortAndFilterOrders2(
     statusFilteredData2,

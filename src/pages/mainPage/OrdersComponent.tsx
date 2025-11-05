@@ -48,6 +48,7 @@ import { formatStrictDuration } from "../../utils/fromSec";
 import { durationToNumber } from "../../utils/durationToNum";
 import PopUp3 from "../../components/Popup/PopUp3";
 import { useFetchData } from "../../contexts/FetchDataContext";
+import { OrdersResponse } from "../../services/requestService";
 
 export interface MarketOrder {
   _id: string;
@@ -124,7 +125,7 @@ export const OrdersComponent: React.FC = () => {
 
   // Filter by status first (only processing and completed)
   const statusFilteredData = orderData?.data
-    ? orderData.data.filter(
+    ? orderData?.data.filter(
         (order) => order.status === "processing" || order.status === "completed"
       )
     : [];

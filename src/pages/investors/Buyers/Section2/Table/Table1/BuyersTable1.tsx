@@ -45,10 +45,14 @@ import bandwidthIcon from "../../../../../../assets/svg/BandwidthIcon.svg";
 import PopUp9 from "../../../../../../components/Popup/PopUp9";
 import PopUp10 from "../../../../../../components/Popup/PopUp10";
 import { useTranslation } from "react-i18next";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../../../../../../redux/store/store";
+import { showNotification } from "../../../../../../redux/actions/notifSlice";
 
 const BuyersTable1: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { tradingOrderInfo } = useFetchData();
+  const dispatch = useDispatch();
+  const { tradingOrderInfo, fetchData } = useFetchData();
   const [wholeOrderInfo, setWholeOrderInfo] =
     useState<GetOrderResoponse | null>(null);
   const [myModalOpen, setMyModalOpen] = useState(false);
@@ -58,13 +62,21 @@ const BuyersTable1: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const rowsPerPage = i18n.language === "en" ? 10 : 9;
-
+  
+  const refreshTrigger = useSelector(
+    (state: RootState) => state.refresh.refreshTrigger
+  );
+  
   //to get data from server :
   useEffect(() => {
+    
     if (tradingOrderInfo) {
+    
       setWholeOrderInfo(tradingOrderInfo);
     }
+    
   }, [tradingOrderInfo]);
+   console.log(tradingOrderInfo)
   //------------------------------------------------------------------------------------------------------------
 
   //Functions for info popup :
@@ -103,9 +115,11 @@ const BuyersTable1: React.FC = () => {
   return (
     <>
       <OrderMainWrapper style={{ padding: "0" }}>
-        <OrdersCarouselWrapper  >
+        <OrdersCarouselWrapper>
           <MyOrdersScroll style={{ height: "667px" }}>
-            <MyOrdersNavWrapper style={{ padding: "0.3rem 0.5rem 0.3rem 0.5rem" }}>
+            <MyOrdersNavWrapper
+              style={{ padding: "0.3rem 0.5rem 0.3rem 0.5rem" }}
+            >
               <MyOrdersNavTextWrapper>
                 <MyOrdersTextWrapper style={{ marginLeft: "3rem" }}>
                   <OrderNavText>{t("Text80")}</OrderNavText>
@@ -138,7 +152,7 @@ const BuyersTable1: React.FC = () => {
                 );
                 const isDisabled = progressValue === 0;
                 return (
-                  <OrdersDetail key={index} style={{padding: "5px 14px"}}>
+                  <OrdersDetail key={index} style={{ padding: "5px 14px" }}>
                     <MyOrdersInfoWrapper
                       onClick={isDisabled ? undefined : () => handleInfoClick()}
                       style={{
@@ -268,7 +282,7 @@ const BuyersTable1: React.FC = () => {
         </OrdersCarouselWrapper>
       </OrderMainWrapper>
 
-      <OedersPaginationWrapper  >
+      <OedersPaginationWrapper>
         <Pagination
           count={totalPages}
           page={currentPage}

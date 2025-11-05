@@ -151,10 +151,7 @@ const Sellers: React.FC = () => {
     return trxValue.toFixed(2);
   };
   //----------------------------------------------------------------------------------------
-  if (accountInfoData?.data.seller.delegationedTotal === undefined) {
-    return;
-  }
-
+  const tradingSellersCredit =  accountInfoData?.data.sellerCredit
   return (
     <>
       {isConnectedTrading === true && sellersPermission === true ? null : (
@@ -499,7 +496,7 @@ const Sellers: React.FC = () => {
                           {isConnectedTrading === true ? (
                             <SellersCardThingsNumber>
                               {sunToTrx(
-                                accountInfoData.data.sellerCredit
+                               tradingSellersCredit ?? 0
                               ).toLocaleString()}{" "}
                               TRX
                             </SellersCardThingsNumber>

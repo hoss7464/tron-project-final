@@ -301,6 +301,7 @@ const OrderFormComponent: React.FC = () => {
       refreshData();
     }
   }, [refreshTrigger, fetchData]);
+  
   //Function to get states from stored data :
   useEffect(() => {
     //Function to get minium amount and minimum price :

@@ -88,6 +88,8 @@ const Section1: React.FC = () => {
     (state: RootState) => state.refresh.refreshTrigger
   );
 
+  
+
   //to get data from server :
   useEffect(() => {
     const refreshData = async () => {
@@ -108,11 +110,12 @@ const Section1: React.FC = () => {
       refreshData();
     }
   }, [refreshTrigger, fetchData]);
-
+  
   useEffect(() => {
     if (tradingAccountInfo) {
       setApiKey(tradingAccountInfo.data.apiKey);
     }
+    
   }, [tradingAccountInfo]);
   //Function for deposit botton :
   const handleDepositChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -296,10 +299,8 @@ const Section1: React.FC = () => {
     const trxValue = value / 1_000_000;
     return trxValue.toFixed(2);
   };
-
-  if (tradingAccountInfo?.data.buyerCredit === undefined) {
-    return;
-  }
+  
+ const tradingCredit = tradingAccountInfo?.data.buyerCredit ?? 0
 
   return (
     <>
@@ -393,7 +394,7 @@ const Section1: React.FC = () => {
                         {isConnectedTrading === true ? (
                           <SellersCardThingsNumber>
                             {sunToTrx(
-                              tradingAccountInfo?.data.buyerCredit
+                              tradingCredit
                             ).toLocaleString()}{" "}
                             TRX
                           </SellersCardThingsNumber>

@@ -222,7 +222,7 @@ export interface GetOrderResoponse {
   success: boolean;
   message: string;
   data: GetOrderData[];
-  code?:string;
+  code?: string;
 }
 
 export interface GetOrderData {
@@ -304,6 +304,8 @@ interface SellersWithdrawData {
   createdAt: string;
   __v: number;
 }
+//Public interface for fetchAllUiData :
+
 //-------------------------------------------------------------------------------------
 //to get data from .env :
 const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -319,486 +321,279 @@ export const fetchAllUiData = async (
 ) => {
   try {
     const hasConnectedWallet = !!walletAddress;
-    //--------------------------------------------------------------------------------------------
-    //1.resourceData request :(Always fetch resources)
-    const resourcesPromise = axios.get<ResourceResponse>(
-      `${baseUrl}/Setting/UI`,
-      {
-        headers: { "Content-Type": "application/json" },
-        timeout: axiosTimeOut,
-        validateStatus: (status: number) => status < 500,
-      }
-    );
-    //--------------------------------------------------------------------------------------------
-    //2.orders request :(Only fetch these on "/")
-    let ordersPromise: ReturnType<typeof axios.get<OrdersResponse>> | null =
-      null;
-    let availablePromise: ReturnType<
-      typeof axios.get<AvailableResponse>
-    > | null = null;
 
-    if (pathname === "/") {
-      ordersPromise = axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
-        headers: { "Content-Type": "application/json" },
-        timeout: axiosTimeOut,
-        validateStatus: (status: number) => status < 500,
-      });
+    const promises: { key: string; promise: Promise<any> }[] = [];
 
-      availablePromise = axios.get<AvailableResponse>(
-        `${baseUrl}/Setting/resource-available`,
-        {
+    // Always fetch resources
+    promises.push({
+      key: "resources",
+      promise: Promise.resolve(
+        axios.get<ResourceResponse>(`${baseUrl}/Setting/UI`, {
           headers: { "Content-Type": "application/json" },
           timeout: axiosTimeOut,
           validateStatus: (status: number) => status < 500,
-        }
-      );
+        })
+      ),
+    });
+
+    // Fetch orders and availables only on "/"
+    if (pathname === "/") {
+      promises.push({
+        key: "orders",
+        promise: Promise.resolve(
+          axios.get<OrdersResponse>(`${baseUrl}/order/orders`, {
+            headers: { "Content-Type": "application/json" },
+            timeout: axiosTimeOut,
+            validateStatus: (status: number) => status < 500,
+          })
+        ),
+      });
+
+      promises.push({
+        key: "availables",
+        promise: Promise.resolve(
+          axios.get<AvailableResponse>(
+            `${baseUrl}/Setting/resource-available`,
+            {
+              headers: { "Content-Type": "application/json" },
+              timeout: axiosTimeOut,
+              validateStatus: (status: number) => status < 500,
+            }
+          )
+        ),
+      });
     }
-    //--------------------------------------------------------------------------------------------
-    // myOrders request : (only on "/" + wallet connected)
-    let myOrdersResponse: MyOrdersResponse;
+
+    // Fetch myOrders only on "/" with wallet connected
     if (hasConnectedWallet && pathname === "/") {
-      try {
-        const myOrdersRes = await axios.get<MyOrdersResponse>(
-          `${baseUrl}/order/myOrder`,
-          {
+      promises.push({
+        key: "myOrders",
+        promise: Promise.resolve(
+          axios.get<MyOrdersResponse>(`${baseUrl}/order/myOrder`, {
             params: { requester: walletAddress },
             timeout: axiosTimeOut,
             validateStatus: (status: number) => status < 500,
-          }
-        );
-
-        if (myOrdersRes.data.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          myOrdersResponse = {
-            success: false,
-            message: myOrdersRes.data.message || "Authentication failed",
-            data: [],
-          };
-        } else {
-          myOrdersResponse = myOrdersRes.data;
-        }
-      } catch (error: any) {
-        if (error.response?.data?.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          myOrdersResponse = {
-            success: false,
-            message: error.response.data.message || "Authentication failed",
-            data: [],
-          };
-        } else {
-          throw error;
-        }
-      }
-    } else {
-      myOrdersResponse = {
-        success: true,
-        message: "No wallet connected or not on /",
-        data: [],
-      };
+          })
+        ),
+      });
     }
-    //--------------------------------------------------------------------------------------------
-    //accountInfo request : (only for "/Buyers" & "/Sellers")
-    let accountInfoResponse: AccountInfoResponse;
-    const shouldFetchAccountInfo =
-      isConnectedTrading === true &&
-      (pathname === "/Buyers" || pathname === "/Sellers");
 
-    if (shouldFetchAccountInfo) {
-      try {
-        const accountInfoRes = await axios.get<AccountInfoResponse>(
-          `${baseUrl}/Buyer/getAccountInfo`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              accesstoken: accessToken,
-            },
-            timeout: axiosTimeOut,
-            validateStatus: (status: number) => status < 500,
-          }
-        );
-
-        if (accountInfoRes.data.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          accountInfoResponse = {
-            success: false,
-            data: {
-              buyerCredit: 0,
-              sellerCredit: 0,
-              apiKey: "",
-              settings: {
-                isActive: false,
-                minDurationBandwidth: 0,
-                minDurationEnergy: 0,
-                minPriceBandwidth: 0,
-                minPriceEnergy: 0,
-                minUnitBandwidth: 0,
-                minUnitEnergy: 0,
-                profit: 0,
+    // Fetch account info only on Buyers or Sellers with connected trading
+    if (
+      isConnectedTrading &&
+      (pathname === "/Buyers" || pathname === "/Sellers")
+    ) {
+      promises.push({
+        key: "tradingAccountInfo",
+        promise: Promise.resolve(
+          axios
+            .get<AccountInfoResponse>(`${baseUrl}/Buyer/getAccountInfo`, {
+              headers: {
+                "Content-Type": "application/json",
+                accesstoken: accessToken,
               },
-              seller: {
-                delegationedCount: {
-                  energy: 0,
-                  bandwidth: 0,
-                },
-                delegationedTotal: {
-                  energy: 0,
-                  bandwidth: 0,
-                },
-              },
-            },
-          };
-          disConnectWallet();
-        } else {
-          accountInfoResponse = accountInfoRes.data;
-        }
-      } catch (error: any) {
-        if (error.response?.data?.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          accountInfoResponse = {
-            success: false,
-            data: {
-              buyerCredit: 0,
-              sellerCredit: 0,
-              apiKey: "",
-              settings: {
-                isActive: false,
-                minDurationBandwidth: 0,
-                minDurationEnergy: 0,
-                minPriceBandwidth: 0,
-                minPriceEnergy: 0,
-                minUnitBandwidth: 0,
-                minUnitEnergy: 0,
-                profit: 0,
-              },
-              seller: {
-                delegationedCount: {
-                  energy: 0,
-                  bandwidth: 0,
-                },
-                delegationedTotal: {
-                  energy: 0,
-                  bandwidth: 0,
-                },
-              },
-            },
-          };
-          disConnectWallet();
-        } else {
-          throw error;
-        }
-      }
-    } else {
-      // No request made, just return default empty data
-      accountInfoResponse = {
-        success: true,
-        data: {
-          buyerCredit: 0,
-          sellerCredit: 0,
-          apiKey: "",
-          settings: {
-            isActive: false,
-            minDurationBandwidth: 0,
-            minDurationEnergy: 0,
-            minPriceBandwidth: 0,
-            minPriceEnergy: 0,
-            minUnitBandwidth: 0,
-            minUnitEnergy: 0,
-            profit: 0,
-          },
-          seller: {
-            delegationedCount: {
-              energy: 0,
-              bandwidth: 0,
-            },
-            delegationedTotal: {
-              energy: 0,
-              bandwidth: 0,
-            },
-          },
-        },
-      };
+              timeout: axiosTimeOut,
+              validateStatus: (status: number) => status < 500,
+            })
+            .then((response) => {
+              // Check for authentication errors based on success flag
+              if (response.data && response.data.success === false) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+                throw new Error("Authentication failed");
+              }
+              return response;
+            })
+            .catch((error) => {
+              // Handle authentication errors from the catch block as well
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.success === false
+              ) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+              }
+              throw error;
+            })
+        ),
+      });
     }
-    //--------------------------------------------------------------------------------------------
-    //getRefund request (only for "/Buyers")
-    let getRefundResponse: RefundResponse;
-    const shouldFetchRefundInfo =
-      isConnectedTrading === true && pathname === "/Buyers";
 
-    if (shouldFetchRefundInfo) {
-      try {
-        const refundRes = await axios.get<RefundResponse>(
-          `${baseUrl}/Buyer/getRefund`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              accesstoken: accessToken,
-            },
-            timeout: axiosTimeOut,
-            validateStatus: (status: number) => status < 500,
-          }
-        );
-
-        if (refundRes.data.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          getRefundResponse = {
-            success: false,
-            message: refundRes.data.message,
-            data: [
-              {
-                _id: "",
-                requester: "",
-                depositAmount: 0,
-                status: "",
-                paidAt: null,
-                createdAt: "string",
-                depositTxId: "string",
+    // Fetch refund info only for Buyers
+    if (isConnectedTrading && pathname === "/Buyers") {
+      promises.push({
+        key: "tradingRefundInfo",
+        promise: Promise.resolve(
+          axios
+            .get<RefundResponse>(`${baseUrl}/Buyer/getRefund`, {
+              headers: {
+                "Content-Type": "application/json",
+                accesstoken: accessToken,
               },
-            ],
-          };
-          disConnectWallet();
-        } else {
-          getRefundResponse = refundRes.data;
-        }
-      } catch (error: any) {
-        if (error.response?.data?.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          getRefundResponse = {
-            success: false,
-            message: error.response?.data?.message || "An error occurred",
-            data: [],
-          };
-          disConnectWallet();
-        } else {
-          throw error;
-        }
-      }
-    } else {
-      getRefundResponse = {
-        success: true,
-        message: "No refund data requested",
-        data: [],
-      };
-    }
-    //--------------------------------------------------------------------------------------------
-    //getOrder request : (only for "/Buyers"):
-    let getOrderResponse: GetOrderResoponse;
-    const shouldFetchOrderInfo =
-      isConnectedTrading === true && pathname === "/Buyers";
+              timeout: axiosTimeOut,
+              validateStatus: (status: number) => status < 500,
+            })
+            .then((response) => {
+              // Check for authentication errors based on success flag
+              if (response.data && response.data.success === false) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+                throw new Error("Authentication failed");
+              }
+              return response;
+            })
+            .catch((error) => {
+              // Handle authentication errors from the catch block as well
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.success === false
+              ) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+              }
+              throw error;
+            })
+        ),
+      });
 
-    if (shouldFetchOrderInfo) {
-      try {
-        const getOrderRes = await axios.get<GetOrderResoponse>(
-          `${baseUrl}/Buyer/getOrder`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              accesstoken: accessToken,
-            },
-            timeout: axiosTimeOut,
-            validateStatus: (status: number) => status < 500,
-          }
-        );
-
-        if (getOrderRes.data.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          getOrderResponse = {
-            success: false,
-            message: getOrderRes.data.message,
-            data: [
-              {
-                _id: "",
-                type: "",
-                receiver: "",
-                resourceType: "",
-                resourceAmount: 0,
-                price: 0,
-                totalPrice: 0,
-                energyPairTrx: 0,
-                durationSec: 0,
-                options: {
-                  allow_partial: false,
-                  partial_min: 0,
-                  partial_min_trx: 0,
-                  bulk_order: false,
-                },
-                freeze: 0,
-                frozen: 0,
-                lock: false,
-                status: "",
-                createdAt: "",
-                holds: [],
+      promises.push({
+        key: "tradingOrderInfo",
+        promise: Promise.resolve(
+          axios
+            .get<GetOrderResoponse>(`${baseUrl}/Buyer/getOrder`, {
+              headers: {
+                "Content-Type": "application/json",
+                accesstoken: accessToken,
               },
-            ],
-          };
-          disConnectWallet();
-        } else {
-          getOrderResponse = getOrderRes.data;
-        }
-      } catch (error: any) {
-        if (error.response?.data?.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          getOrderResponse = {
-            success: false,
-            message: error.response?.data?.message || "An error occurred",
-            data: [],
-          };
-          disConnectWallet();
-        } else {
-          throw error;
-        }
-      }
-    } else {
-      getOrderResponse = {
-        success: true,
-        message: "No order data requested",
-        data: [],
-      };
+              timeout: axiosTimeOut,
+              validateStatus: (status: number) => status < 500,
+            })
+            .then((response) => {
+              // Check for authentication errors based on success flag
+              if (response.data && response.data.success === false) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+                throw new Error("Authentication failed");
+              }
+              return response;
+            })
+            .catch((error) => {
+              // Handle authentication errors from the catch block as well
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.success === false
+              ) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+              }
+              throw error;
+            })
+        ),
+      });
     }
-    //--------------------------------------------------------------------------------------------
-    //sellersOrderRequest : (only for /Sellers):
-    let sellersOrderResponse: SellersOrdersResponse;
-    const shouldFetchSellersOrderInfo =
-      isConnectedTrading === true && pathname === "/Sellers";
 
-    if (shouldFetchSellersOrderInfo) {
-      try {
-        const getSellersOrderRes = await axios.get<SellersOrdersResponse>(
-          `${baseUrl}/Buyer/sellerOrders`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              accesstoken: accessToken,
-            },
-            timeout: axiosTimeOut,
-            validateStatus: (status: number) => status < 500,
-          }
-        );
-
-        if (getSellersOrderRes.data.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          sellersOrderResponse = {
-            success: false,
-            message: getSellersOrderRes.data.message,
-            data: [
-              {
-                _id: "",
-                orderId: "",
-                userId: "",
-                seller: "",
-                buyer: "",
-                receiver: "",
-                resourceType: "",
-                amount: 0,
-                durationSec: 0,
-                price: 0,
-                profitSun: 0,
-                orderType: "",
-                snapshot: {
-                  energyPairUnit: 0,
-                  freeze: 0,
-                },
-                delegatedTxId: "",
-                status: "",
-                createdAt: "",
-                expiredAt: "",
-                __v: 0,
+    // Fetch sellers order and withdraw info only for Sellers
+    if (isConnectedTrading && pathname === "/Sellers") {
+      promises.push({
+        key: "sellersOrderInfo",
+        promise: Promise.resolve(
+          axios
+            .get<SellersOrdersResponse>(`${baseUrl}/Buyer/sellerOrders`, {
+              headers: {
+                "Content-Type": "application/json",
+                accesstoken: accessToken,
               },
-            ],
-          };
-          disConnectWallet();
-        } else {
-          sellersOrderResponse = getSellersOrderRes.data;
-        }
-      } catch (error: any) {
-        if (error.response?.data?.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          sellersOrderResponse = {
-            success: false,
-            message: error.response?.data?.message || "An error occurred",
-            data: [],
-          };
-          disConnectWallet();
-        } else {
-          throw error;
-        }
-      }
-    } else {
-      sellersOrderResponse = {
-        success: true,
-        message: "No order data requested",
-        data: [],
-      };
-    }
-    //--------------------------------------------------------------------------------------------
-    //sellersWithdrawRequest : (only for /Sellers):
-    let sellersWithdrawResponse: SellersWithdrawResponse;
-    const shouldFetchSellersWithdrawInfo =
-      isConnectedTrading === true && pathname === "/Sellers";
+              timeout: axiosTimeOut,
+              validateStatus: (status: number) => status < 500,
+            })
+            .then((response) => {
+              // Check for authentication errors based on success flag
+              if (response.data && response.data.success === false) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+                throw new Error("Authentication failed");
+              }
+              return response;
+            })
+            .catch((error) => {
+              // Handle authentication errors from the catch block as well
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.success === false
+              ) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+              }
+              throw error;
+            })
+        ),
+      });
 
-    if (shouldFetchSellersWithdrawInfo) {
-      try {
-        const getSellersWithdrawRes = await axios.get<SellersWithdrawResponse>(
-          `${baseUrl}/Buyer/sellerWithdraws`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              accesstoken: accessToken,
-            },
-            timeout: axiosTimeOut,
-            validateStatus: (status: number) => status < 500,
-          }
-        );
-
-        if (getSellersWithdrawRes.data.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          sellersWithdrawResponse = {
-            success: false,
-            message: getSellersWithdrawRes.data.message,
-            data: [
-              {
-                _id: "",
-                parentUserId: "",
-                receiver: "",
-                withdrawAmount: 0,
-                withdrawTxId: "",
-                status: "",
-                paidAt: "",
-                createdAt: "",
-                __v: 0,
+      promises.push({
+        key: "sellersWithdrawInfo",
+        promise: Promise.resolve(
+          axios
+            .get<SellersWithdrawResponse>(`${baseUrl}/Buyer/sellerWithdraws`, {
+              headers: {
+                "Content-Type": "application/json",
+                accesstoken: accessToken,
               },
-            ],
-          };
-          disConnectWallet();
-        } else {
-          sellersWithdrawResponse = getSellersWithdrawRes.data;
-        }
-      } catch (error: any) {
-        if (error.response?.data?.success === false) {
-          if (onAuthFailure) onAuthFailure();
-          sellersWithdrawResponse = {
-            success: false,
-            message: error.response?.data?.message || "An error occurred",
-            data: [],
-          };
-          disConnectWallet();
-        } else {
-          throw error;
-        }
-      }
-    } else {
-      sellersWithdrawResponse = {
-        success: true,
-        message: "No order data requested",
-        data: [],
-      };
+              timeout: axiosTimeOut,
+              validateStatus: (status: number) => status < 500,
+            })
+            .then((response) => {
+              // Check for authentication errors based on success flag
+              if (response.data && response.data.success === false) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+                throw new Error("Authentication failed");
+              }
+              return response;
+            })
+            .catch((error) => {
+              // Handle authentication errors from the catch block as well
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.success === false
+              ) {
+                if (onAuthFailure) {
+                  onAuthFailure();
+                }
+                disConnectWallet();
+              }
+              throw error;
+            })
+        ),
+      });
     }
-    //--------------------------------------------------------------------------------------------
-    // Collect promises dynamically
-    const results = await Promise.allSettled(
-      [ordersPromise, resourcesPromise, availablePromise].filter(Boolean)
-    ); // filter out nulls
 
-    // Helper for settled promises
+    // Run all promises in parallel
+    const results = await Promise.allSettled(promises.map((p) => p.promise));
+
+    // Helper function for settled promises
     const handleSettledPromise = <T>(
       result: PromiseSettledResult<any>,
       defaultValue: T
@@ -810,107 +605,49 @@ export const fetchAllUiData = async (
         return defaultValue;
       }
     };
-    //--------------------------------------------------------------------------------------------
-    // Defaults
-    const defaultOrdersResponse: OrdersResponse = { success: false, data: [] };
-    const defaultResourceResponse: ResourceResponse = {
+
+    // Map results dynamically by key
+    const responseMap: any = {};
+
+    promises.forEach((p, index) => {
+      responseMap[p.key] = handleSettledPromise(results[index], null);
+    });
+
+    // Set defaults if missing
+    responseMap.orders ||= { success: false, data: [] };
+    responseMap.myOrders ||= {
+      success: true,
+      message: "No wallet connected or not on /",
+      data: [],
+    };
+    responseMap.resources ||= {
       success: false,
       data: {
         DappAddress: "",
         readyResource: { energy: 0, bandwidth: 0 },
         dailyRecovery: { energy: 0, bandwidth: 0 },
-        fastSellRate: {
-          energy: 0,
-          bandwidth: 0,
-        },
+        fastSellRate: { energy: 0, bandwidth: 0 },
         fastChargeSetting: {
-          fastChargeRate: {
-            energy: 0,
-            bandwidth: 0,
-          },
-          fastChargeMin: {
-            energy: 0,
-            bandwidth: 0,
-          },
-          fastChargeMax: {
-            energy: 0,
-            bandwidth: 0,
-          },
-          fastChargeMinUser: {
-            energy: 0,
-            bandwidth: 0,
-          },
-          fastChargeMaxUser: {
-            energy: 0,
-            bandwidth: 0,
-          },
-          fastChargeLimitMin: {
-            energy: 0,
-            bandwidth: 0,
-          },
-          fastChargeLimitMax: {
-            energy: 0,
-            bandwidth: 0,
-          },
+          fastChargeRate: { energy: 0, bandwidth: 0 },
+          fastChargeMin: { energy: 0, bandwidth: 0 },
+          fastChargeMax: { energy: 0, bandwidth: 0 },
+          fastChargeMinUser: { energy: 0, bandwidth: 0 },
+          fastChargeMaxUser: { energy: 0, bandwidth: 0 },
+          fastChargeLimitMin: { energy: 0, bandwidth: 0 },
+          fastChargeLimitMax: { energy: 0, bandwidth: 0 },
         },
-        settingsOrder: {
-          partialFill: {
-            energy: 0,
-            bandwidth: 0,
-          },
-        },
+        settingsOrder: { partialFill: { energy: 0, bandwidth: 0 } },
         apy: { energy: 0, bandwidth: 0 },
         minAmount: { energy: 0, bandwidth: 0 },
-        minSellersPrice: {
-          energy: 0,
-          bandwidth: 0,
-        },
-        profitSellers: {
-          min: 0,
-          max: 0,
-        },
-        maxSellers: {
-          bandwidth: 0,
-          energy: 0,
-        },
+        minSellersPrice: { energy: 0, bandwidth: 0 },
+        profitSellers: { min: 0, max: 0 },
+        maxSellers: { bandwidth: 0, energy: 0 },
         ratesByDuration: [],
       },
     };
-    const defaultAvailableResponse: AvailableResponse = {
-      success: false,
-      energy: [],
-      bandwidth: [],
-    };
-    //--------------------------------------------------------------------------------------------
-    // Map results back
-    let orders = defaultOrdersResponse;
-    let resources = defaultResourceResponse;
-    let availables = defaultAvailableResponse;
-    //--------------------------------------------------------------------------------------------
-    // results[0] = orders (if pathname === "/")
-    // results[1] = resources
-    // results[2] = available (if pathname === "/")
-    //--------------------------------------------------------------------------------------------
-    let i = 0;
-    if (pathname === "/") {
-      orders = handleSettledPromise(results[i++], defaultOrdersResponse);
-    }
-    resources = handleSettledPromise(results[i++], defaultResourceResponse);
-    if (pathname === "/") {
-      availables = handleSettledPromise(results[i++], defaultAvailableResponse);
-    }
-    //--------------------------------------------------------------------------------------------
-    return {
-      orders,
-      myOrders: myOrdersResponse,
-      resources,
-      availables,
-      tradingAccountInfo: accountInfoResponse,
-      tradingRefundInfo: getRefundResponse,
-      tradingOrderInfo: getOrderResponse,
-      sellersOrderInfo: sellersOrderResponse,
-      sellersWithdrawInfo: sellersWithdrawResponse,
-    };
+    responseMap.availables ||= { success: false, energy: [], bandwidth: [] };
+
+    return responseMap;
   } catch (error) {
     throw error;
   }
