@@ -46,7 +46,7 @@ export const SellersMainWrapper = styled.div`
 
   @media only screen and (min-width: 280px) and (max-width: 576px) {
     padding: 0 4px 0 4px;
-    margin-top: 3rem;
+    margin-top: 4.5rem;
   }
 
    @media only screen and (min-width: 577px) and (max-width: 768px) {

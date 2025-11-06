@@ -160,7 +160,7 @@ const Sellers: React.FC = () => {
       {!isConnectedTrading ? <PopUp7 /> : null}
       <SellersContainer>
         <HeroMainbgPhotoWrapper className="Hero-bg"></HeroMainbgPhotoWrapper>
-        <SellersMainWrapper>
+        <SellersMainWrapper  >
           {/*Sellers header */}
           <SellersMainHeaderBtnWrapper>
             <SellersMainHeaderWrapper>
