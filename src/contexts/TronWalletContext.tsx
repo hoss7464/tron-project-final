@@ -728,6 +728,23 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   //Funtion to connect wallet :
   const connectWallet = async () => {
     try {
+      const isTronLinkInstalled =
+      typeof window !== "undefined" &&
+      (window as any).tronWeb &&
+      (window as any).tronWeb.defaultAddress &&
+      (window as any).tronWeb.defaultAddress.base58;
+
+      if (!isTronLinkInstalled) {
+      dispatch(
+        showNotification({
+          name: "tron-error-market",
+          message: `${t("Text209")}`, 
+          severity: "error",
+        })
+      );
+      return; 
+    }
+    
       await adapter.connect();
       //wallet address :
       const addr = adapter.address;
@@ -902,8 +919,26 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const connectWalletMarket = async () => {
     try {
+      const isTronLinkInstalled =
+      typeof window !== "undefined" &&
+      (window as any).tronWeb &&
+      (window as any).tronWeb.defaultAddress &&
+      (window as any).tronWeb.defaultAddress.base58;
+
+      if (!isTronLinkInstalled) {
+      dispatch(
+        showNotification({
+          name: "tron-error-market",
+          message: `${t("Text209")}`, 
+          severity: "error",
+        })
+      );
+      return; 
+    }
       await adapter.connect();
       const addr = adapter.address;
+
+
 
       if (!addr) {
         dispatch(
