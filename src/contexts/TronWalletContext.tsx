@@ -681,18 +681,14 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       tw.on("addressChanged", handleAccountChanged);
       tw.on("networkChanged", handleNetworkChanged);
       eventListenersAdded.current = true;
-    } catch (e) {
-      
-    }
+    } catch (e) {}
 
     return () => {
       try {
         tw.off("addressChanged", handleAccountChanged);
         tw.off("networkChanged", handleNetworkChanged);
         eventListenersAdded.current = false;
-      } catch (e) {
-        
-      }
+      } catch (e) {}
     };
   }, [isConnected, handleAccountChanged, handleNetworkChanged]);
 
@@ -729,22 +725,22 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const connectWallet = async () => {
     try {
       const isTronLinkInstalled =
-      typeof window !== "undefined" &&
-      (window as any).tronWeb &&
-      (window as any).tronWeb.defaultAddress &&
-      (window as any).tronWeb.defaultAddress.base58;
+        typeof window !== "undefined" &&
+        (window as any).tronWeb &&
+        (window as any).tronWeb.defaultAddress &&
+        (window as any).tronWeb.defaultAddress.base58;
 
       if (!isTronLinkInstalled) {
-      dispatch(
-        showNotification({
-          name: "tron-error-market",
-          message: `${t("Text209")}`, 
-          severity: "error",
-        })
-      );
-      return; 
-    }
-    
+        dispatch(
+          showNotification({
+            name: "tron-error-market",
+            message: `${t("Text209")}`,
+            severity: "error",
+          })
+        );
+        return;
+      }
+
       await adapter.connect();
       //wallet address :
       const addr = adapter.address;
@@ -769,7 +765,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //Message in signature form based nonce :
       const generate_msg = await axios.get<{
         success: boolean;
-        code? :string;
+        code?: string;
         data: { nonce: string };
       }>(`${baseURL}/Auth/get-message`, {
         headers: { "Content-Type": "application/json" },
@@ -779,7 +775,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //To convert he message into json :
       const responseBody = generate_msg.data;
       if (responseBody.success === false) {
-        const serverError = serverErrorMessageFunc(responseBody.code ?? "")
+        const serverError = serverErrorMessageFunc(responseBody.code ?? "");
         dispatch(
           showNotification({
             name: "tron-error2",
@@ -809,7 +805,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //To send address , message , signature hash towards the server :
       const postServerData = await axios.post<{
         success: boolean;
-        code? :string;
+        code?: string;
         data: { access_token: string };
       }>(
         `${baseURL}/Auth/verify-request`,
@@ -829,7 +825,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //To convert postServerData into json
       const server_data_json = postServerData.data;
       if (server_data_json.success === false) {
-        const serverError = serverErrorMessageFunc(server_data_json.code ?? "")
+        const serverError = serverErrorMessageFunc(server_data_json.code ?? "");
         dispatch(
           showNotification({
             name: "tron-error4",
@@ -920,25 +916,23 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
   const connectWalletMarket = async () => {
     try {
       const isTronLinkInstalled =
-      typeof window !== "undefined" &&
-      (window as any).tronWeb &&
-      (window as any).tronWeb.defaultAddress &&
-      (window as any).tronWeb.defaultAddress.base58;
+        typeof window !== "undefined" &&
+        (window as any).tronWeb &&
+        (window as any).tronWeb.defaultAddress &&
+        (window as any).tronWeb.defaultAddress.base58;
 
       if (!isTronLinkInstalled) {
-      dispatch(
-        showNotification({
-          name: "tron-error-market",
-          message: `${t("Text209")}`, 
-          severity: "error",
-        })
-      );
-      return; 
-    }
+        dispatch(
+          showNotification({
+            name: "tron-error-market",
+            message: `${t("Text209")}`,
+            severity: "error",
+          })
+        );
+        return;
+      }
       await adapter.connect();
       const addr = adapter.address;
-
-
 
       if (!addr) {
         dispatch(
@@ -963,7 +957,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       dispatch(
         showNotification({
           name: "tron-error-market",
-          message:`${t("Text282")}`,
+          message: `${t("Text282")}`,
           severity: "error",
         })
       );
@@ -1070,15 +1064,18 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
       //To import TronWeb localy :
       const tronWeb = await getTronWeb();
       const MainAddress = process.env.REACT_APP_TRON_API;
-      if (window?.tronWeb?.fullNode.host !== MainAddress) {
-        dispatch(
-          showNotification({
-            name: "tron-error100",
-            message: `${t("Text279")}`,
-            severity: "error",
-          })
-        );
-        return { success: false, error: `${t("Text279")}` };
+
+      if (window.innerWidth >= 1080) {
+        if (window?.tronWeb?.fullNode.host !== MainAddress) {
+          dispatch(
+            showNotification({
+              name: "tron-error100",
+              message: `${t("Text279")}`,
+              severity: "error",
+            })
+          );
+          return { success: false, error: `${t("Text279")}` };
+        }
       }
 
       if (!tronWeb) {
@@ -1235,15 +1232,17 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const MainAddress = process.env.REACT_APP_TRON_API;
 
-      if (window?.tronWeb?.fullNode.host !== MainAddress) {
-        dispatch(
-          showNotification({
-            name: "tron-error100",
-            message: `${t("Text279")}`,
-            severity: "error",
-          })
-        );
-        return { success: false, error: `${t("Text279")}` };
+      if (window.innerWidth >= 1080) {
+        if (window?.tronWeb?.fullNode.host !== MainAddress) {
+          dispatch(
+            showNotification({
+              name: "tron-error100",
+              message: `${t("Text279")}`,
+              severity: "error",
+            })
+          );
+          return { success: false, error: `${t("Text279")}` };
+        }
       }
 
       if (!tronWeb) {
@@ -1366,7 +1365,7 @@ export const TronWalletProvider: React.FC<{ children: React.ReactNode }> = ({
         txId: txResult.transaction?.txID || txResult.txid,
       };
     } catch (err) {
-      const errorMessage = `${t("Text234")}`
+      const errorMessage = `${t("Text234")}`;
       dispatch(
         showNotification({
           name: "tron-error12",

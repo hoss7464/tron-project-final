@@ -5,7 +5,7 @@ import {
   LightMainContainerWrapper,
   PrimeMainContainer,
 } from "./core-UI/mainContainer";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { RootState } from "./redux/store/store";
 import { useSelector } from "react-redux";
 import Navbar from "./components/Navbar/Navbar";
@@ -56,6 +56,8 @@ function App() {
               <Route path="/" element={<MainPage />} />
               <Route path="/Buyers" element={<Buyers />} />
               <Route path="/Sellers" element={<Sellers />} />
+
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             <Footer />
           </PrimeMainContainer>
