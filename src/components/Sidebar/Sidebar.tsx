@@ -28,6 +28,7 @@ import {
   NavMarketIcon,
   NavBuyersIcon,
   NavSellersIcon,
+  NavDocIcon,
   NavbarLogoWrapper,
   NavbarLogo,
   TranslateWrapper,
@@ -128,6 +129,11 @@ const Sidebar: React.FC<RightSidebarProps> = ({ open, onClose }) => {
       text: `${t("Text4")}`,
       icon: <NavSellersIcon />,
       to: "/Sellers",
+    },
+    {
+      text: `${t("Text289")}`,
+      icon: <NavDocIcon />,
+      to: "",
     },
   ];
 

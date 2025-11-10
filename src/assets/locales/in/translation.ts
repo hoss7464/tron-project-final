@@ -322,6 +322,8 @@ const translation = {
   "Text285": "हस्ताक्षर मान्य नहीं है",
   "Text286": "खरीदें",
 "Text287": "खरीदें",
+"Text288": "नहीं मिला",
+"Text289": "एपीआई दस्तावेज़"
 } as const
 
 export default translation

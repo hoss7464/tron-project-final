@@ -322,6 +322,8 @@ const translation = {
   "Text285": "서명이 유효하지 않습니다",
   "Text286": "구매",
 "Text287": "구매",
+"Text288": "찾을 수 없습니다",
+"Text289": "API 문서"
 } as const
 
 export default translation

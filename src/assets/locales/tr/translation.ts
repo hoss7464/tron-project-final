@@ -322,6 +322,8 @@ const translation = {
   "Text285": "İmza geçerli değil",
   "Text286": "Satın Al",
 "Text287": "satın al",
+"Text288": "Bulunamadı",
+"Text289": "API Belgesi"
 } as const
 
 export default translation

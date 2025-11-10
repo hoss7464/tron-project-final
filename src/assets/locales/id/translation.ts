@@ -322,6 +322,8 @@ const translation = {
   "Text285": "Tanda tangan tidak valid",
   "Text286": "Beli",
 "Text287": "beli",
+"Text288": "Tidak Ditemukan",
+"Text289": "Dokumen API"
 } as const
 
 export default translation

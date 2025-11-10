@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { BsShopWindow } from "react-icons/bs";
 import { FaShoppingCart } from "react-icons/fa";
 import { FaHandshake } from "react-icons/fa";
+import { IoDocumentText } from "react-icons/io5";
 
 export const NavContainer = styled.div<{ $isHighZ: boolean }>`
   z-index: ${({ $isHighZ }) => ($isHighZ ? 1500 : 95)};
@@ -33,7 +34,7 @@ export const NavContainer = styled.div<{ $isHighZ: boolean }>`
     align-items: center;
     position: fixed;
     padding: 4px;
-    width: 90%;
+    width: 93%;
     border-radius: 14px;
     border: solid 2px ${ThemeColor.border1};
   }
@@ -44,7 +45,7 @@ export const NavContainer = styled.div<{ $isHighZ: boolean }>`
     align-items: center;
     position: fixed;
     padding: 4px;
-    width: 70%;
+    width: 77%;
     border-radius: 14px;
     border: solid 2px ${ThemeColor.border1};
   }
@@ -142,6 +143,11 @@ export const NavBuyersIcon = styled(FaShoppingCart)`
 `;
 
 export const NavSellersIcon = styled(FaHandshake)`
+  width: 20px;
+  height: 20px;
+`;
+
+export const NavDocIcon = styled(IoDocumentText)`
   width: 20px;
   height: 20px;
 `;

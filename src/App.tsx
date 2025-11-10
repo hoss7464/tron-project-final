@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import "./App.css";
+import ErrorPage from "./pages/errors/404";
 import {
   MainContainerWrapper,
   LightMainContainerWrapper,
@@ -46,20 +47,49 @@ function App() {
 
       <MainContainerWrapper>
         <LightMainContainerWrapper>
-          <PrimeMainContainer >
+          <PrimeMainContainer>
             <ScrollToTop />
             <Notification />
-            <Navbar />
-            <HamburgerBtn onClick={openSidebar} />
-            <Sidebar open={isSidebarOpen} onClose={closeSidebar} />
-            <Routes>
-              <Route path="/" element={<MainPage />} />
-              <Route path="/Buyers" element={<Buyers />} />
-              <Route path="/Sellers" element={<Sellers />} />
 
-              <Route path="*" element={<Navigate to="/" replace />} />
+            <HamburgerBtn onClick={openSidebar} />
+
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Navbar />
+                    <Sidebar open={isSidebarOpen} onClose={closeSidebar} />
+                    <MainPage />
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/Buyers"
+                element={
+                  <>
+                    <Navbar />
+                    <Sidebar open={isSidebarOpen} onClose={closeSidebar} />
+                    <Buyers />
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/Sellers"
+                element={
+                  <>
+                    <Navbar />
+                    <Sidebar open={isSidebarOpen} onClose={closeSidebar} />
+                    <Sellers />
+                    <Footer />
+                  </>
+                }
+              />
+              {/* 404 page */}
+              <Route path="*" element={<ErrorPage />} />
             </Routes>
-            <Footer />
           </PrimeMainContainer>
         </LightMainContainerWrapper>
       </MainContainerWrapper>

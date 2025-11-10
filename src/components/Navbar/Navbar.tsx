@@ -14,6 +14,7 @@ import {
   NavMarketIcon,
   NavBuyersIcon,
   NavSellersIcon,
+  NavDocIcon,
   NavbarRightSection,
   TranslateConnectWrapper,
   TranslateWrapper,
@@ -110,6 +111,7 @@ const Navbar: React.FC = () => {
             </NavbarLogoWrapper>
           </NavbarLeftSection>
           <NavbarLinkWrapper>
+            
             <NavLink
               className="navlink-margin"
               to="/"
@@ -130,6 +132,7 @@ const Navbar: React.FC = () => {
               </NavLinkIconWrapper>{" "}
               {t("Text2")}
             </NavLink>
+
             <NavLink
               className="navlink-margin"
               to="/Buyers"
@@ -150,6 +153,7 @@ const Navbar: React.FC = () => {
               </NavLinkIconWrapper>{" "}
               {t("Text3")}
             </NavLink>
+
             <NavLink
               to="/Sellers"
               style={
@@ -169,6 +173,28 @@ const Navbar: React.FC = () => {
               </NavLinkIconWrapper>{" "}
               {t("Text4")}
             </NavLink>
+
+            <NavLink
+              to=""
+              target="_blank"
+              style={
+                Location.pathname === ""
+                  ? { backgroundColor: "#003543", color: "#ffffff" }
+                  : { backgroundColor: "", color: "#003543" }
+              }
+            >
+              <NavLinkIconWrapper>
+                <NavDocIcon
+                  style={
+                    Location.pathname === ""
+                      ? { color: "#ffffff" }
+                      : { color: "#003543" }
+                  }
+                />
+              </NavLinkIconWrapper>{" "}
+              {t("Text289")}
+            </NavLink>
+
           </NavbarLinkWrapper>
           <NavbarRightSection>
             <TranslateConnectWrapper>
