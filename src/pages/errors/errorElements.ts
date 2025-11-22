@@ -6,7 +6,7 @@ display: flex;
 justify-content: center;
 align-items: center;
 width: 100%;
-height: 710px;
+height: 100vh;
 `
 
 export const ErrorTextWrapper = styled.div`

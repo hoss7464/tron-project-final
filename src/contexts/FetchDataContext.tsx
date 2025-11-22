@@ -135,33 +135,80 @@ export const FetchDataProvider: React.FC<FetchDataProviderProps> = ({
           path1,
           isConnectedTrading,
           disconnectWallet,
-          handleAuthFailure,
-          
+          handleAuthFailure
         );
 
-              // Update each piece of state if data exists, else fallback to last successful
-        setOrderData(allData.orders?.data?.length ? allData.orders : lastSuccessfulData.current.orders);
-        
-        setMyOrderData(allData.myOrders?.data?.length ? allData.myOrders : lastSuccessfulData.current.myOrders);
-        setResourceData(allData.resources?.data ? allData.resources : lastSuccessfulData.current.resources);
-        setAvailableData(allData.availables?.energy?.length || allData.availables?.bandwidth?.length ? allData.availables : lastSuccessfulData.current.availables);
-        setTradingAccountInfo(allData.tradingAccountInfo?.data ? allData.tradingAccountInfo : lastSuccessfulData.current.tradingAccountInfo);
-        setTradingRefundInfo(allData.tradingRefundInfo?.data?.length ? allData.tradingRefundInfo : lastSuccessfulData.current.tradingRefundInfo);
-        setTradingOrderInfo(allData.tradingOrderInfo?.data?.length ? allData.tradingOrderInfo : lastSuccessfulData.current.tradingOrderInfo);
-        setSellersOrderInfo(allData.sellersOrderInfo?.data?.length ? allData.sellersOrderInfo : lastSuccessfulData.current.sellersOrderInfo);
-        setSellersWithdrawInfo(allData.sellersWithdrawInfo?.data?.length ? allData.sellersWithdrawInfo : lastSuccessfulData.current.sellersWithdrawInfo);
+        // Update each piece of state if data exists, else fallback to last successful
+        setOrderData(
+          allData.orders?.data?.length
+            ? allData.orders
+            : lastSuccessfulData.current.orders
+        );
 
-            // Update last successful data ref
+        setMyOrderData(
+          allData.myOrders?.data?.length
+            ? allData.myOrders
+            : lastSuccessfulData.current.myOrders
+        );
+        setResourceData(
+          allData.resources?.data
+            ? allData.resources
+            : lastSuccessfulData.current.resources
+        );
+        setAvailableData(
+          allData.availables?.energy?.length ||
+            allData.availables?.bandwidth?.length
+            ? allData.availables
+            : lastSuccessfulData.current.availables
+        );
+        setTradingAccountInfo(
+          allData.tradingAccountInfo?.data
+            ? allData.tradingAccountInfo
+            : lastSuccessfulData.current.tradingAccountInfo
+        );
+        setTradingRefundInfo(
+          allData.tradingRefundInfo?.data?.length
+            ? allData.tradingRefundInfo
+            : lastSuccessfulData.current.tradingRefundInfo
+        );
+        setTradingOrderInfo(
+          allData.tradingOrderInfo?.data?.length
+            ? allData.tradingOrderInfo
+            : lastSuccessfulData.current.tradingOrderInfo
+        );
+        setSellersOrderInfo(
+          allData.sellersOrderInfo?.data?.length
+            ? allData.sellersOrderInfo
+            : lastSuccessfulData.current.sellersOrderInfo
+        );
+        setSellersWithdrawInfo(
+          allData.sellersWithdrawInfo?.data?.length
+            ? allData.sellersWithdrawInfo
+            : lastSuccessfulData.current.sellersWithdrawInfo
+        );
+
+        // Update last successful data ref
         lastSuccessfulData.current = {
           orders: allData.orders || lastSuccessfulData.current.orders,
           myOrders: allData.myOrders || lastSuccessfulData.current.myOrders,
           resources: allData.resources || lastSuccessfulData.current.resources,
-          availables: allData.availables || lastSuccessfulData.current.availables,
-          tradingAccountInfo: allData.tradingAccountInfo || lastSuccessfulData.current.tradingAccountInfo,
-          tradingRefundInfo: allData.tradingRefundInfo || lastSuccessfulData.current.tradingRefundInfo,
-          tradingOrderInfo: allData.tradingOrderInfo || lastSuccessfulData.current.tradingOrderInfo,
-          sellersOrderInfo: allData.sellersOrderInfo || lastSuccessfulData.current.sellersOrderInfo,
-          sellersWithdrawInfo: allData.sellersWithdrawInfo || lastSuccessfulData.current.sellersWithdrawInfo,
+          availables:
+            allData.availables || lastSuccessfulData.current.availables,
+          tradingAccountInfo:
+            allData.tradingAccountInfo ||
+            lastSuccessfulData.current.tradingAccountInfo,
+          tradingRefundInfo:
+            allData.tradingRefundInfo ||
+            lastSuccessfulData.current.tradingRefundInfo,
+          tradingOrderInfo:
+            allData.tradingOrderInfo ||
+            lastSuccessfulData.current.tradingOrderInfo,
+          sellersOrderInfo:
+            allData.sellersOrderInfo ||
+            lastSuccessfulData.current.sellersOrderInfo,
+          sellersWithdrawInfo:
+            allData.sellersWithdrawInfo ||
+            lastSuccessfulData.current.sellersWithdrawInfo,
         };
 
         if (authErrorCount > 0) {
@@ -208,33 +255,38 @@ old useEffect :
 
 
   useEffect(() => {
-    // For initial load, pass true to show loader
-    if (initialLoadRef.current) {
-      fetchData(true);
-      initialLoadRef.current = false; // Mark initial load as done
-    }
-
-    if (shouldStopPolling) {
-      return;
-    }
-
-    const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME)
-    const intervalId = setInterval(() => {
-      // Subsequent calls don't show loader
-      fetchData(false);
-    }, globalReqTime);
-
-    return () => clearInterval(intervalId);
-  }, [fetchData, shouldStopPolling]);
-  
-*/
-
-  useEffect(() => {
     // Fetch immediately when route changes
     fetchData(false);
 
     if (shouldStopPolling) {
       return;
+    }
+
+    const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME);
+    const intervalId = setInterval(() => {
+      fetchData(false);
+    }, globalReqTime);
+
+    return () => clearInterval(intervalId);
+  }, [fetchData, shouldStopPolling, path1]); // Add path1 as dependency
+
+  useEffect(() => {
+    FetchDataResourceRef.current = resourceData;
+  }, [resourceData]);
+  
+*/
+
+  useEffect(() => {
+    if (shouldStopPolling) {
+      return;
+    }
+
+    // Show loader only on initial load
+    if (initialLoadRef.current) {
+      fetchData(true); // show loader
+      initialLoadRef.current = false; // mark initial load done
+    } else {
+      fetchData(false); // subsequent route change without loader
     }
 
     const globalReqTime = Number(process.env.REACT_APP_GLOBAL_REQ_TIME);

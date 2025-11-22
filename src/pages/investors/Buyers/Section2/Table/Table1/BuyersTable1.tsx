@@ -76,7 +76,6 @@ const BuyersTable1: React.FC = () => {
     }
     
   }, [tradingOrderInfo]);
-   console.log(tradingOrderInfo)
   //------------------------------------------------------------------------------------------------------------
 
   //Functions for info popup :
