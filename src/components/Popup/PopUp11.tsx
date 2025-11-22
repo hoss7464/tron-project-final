@@ -701,7 +701,6 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       profit: profit / 100,
       isActive: activeSell,
     };
-     console.log(profit)
     try {
       const settingResponse = await axios.post<AccountInfoResponse>(
         `${baseURL}/Buyer/updateAccountInfo`,

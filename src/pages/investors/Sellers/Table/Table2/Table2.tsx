@@ -77,9 +77,10 @@ const SellersTable2: React.FC = () => {
         <OrdersCarouselWrapper>
           <MyOrdersScroll style={{ height: "662px" }}>
             <MyOrdersNavWrapper
-              style={{ padding: "0.3rem 0.5rem 0.3rem 0.5rem" }}
+              style={{ padding: "0.3rem 0.5rem 0.3rem 0.5rem"  }}
             >
-              <MyOrdersNavTextWrapper style={{  justifyContent: "space-between", width: "92%" }}>
+              
+              <MyOrdersNavTextWrapper style={{  justifyContent: "space-between", width: "94%" }}>
                 <AvailableNavTextWrapper
                   style={{ width: "20%", justifyContent: "flex-start" }}
                 >
