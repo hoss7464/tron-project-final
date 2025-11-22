@@ -150,7 +150,7 @@ const SellersTable1: React.FC = () => {
                           </OrderCardIconWrapper2>
                         )}
                         <OrdersCardText1>
-                          {myData.amount.toLocaleString()}
+                          {(myData.amount / 1_000_000).toLocaleString()}
                         </OrdersCardText1>
                       </OrdersCardTextWrapper2>
                       <OrdersCardTextWrapper2>
@@ -162,7 +162,7 @@ const SellersTable1: React.FC = () => {
 
                     <MyOrderCardTextWrap>
                       <OrdersCardTextWrapper2>
-                        <OrdersCardText1>
+                        <OrdersCardText1 >
                           {(myData.profitSun / 1_000_000).toLocaleString()} TRX
                         </OrdersCardText1>
                       </OrdersCardTextWrapper2>

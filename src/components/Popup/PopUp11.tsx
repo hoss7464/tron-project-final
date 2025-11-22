@@ -147,6 +147,8 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
   //Profit states :
   const [profit, setProfit] = useState<number>(0);
   const [profitValue, setProfitValue] = useState<number>(0);
+  const [minProfitValue, setMinProfitValue] = useState<number>(0);
+  const [maxProfitValue, setMaxProfitValue] = useState<number>(0);
   //------------------------------------------------
   //states for active sell :
   const [activeSell, setActiveSell] = useState<boolean>(false);
@@ -198,6 +200,13 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     if (resourceData?.data?.minSellersPrice) {
       setMinPrice(resourceData.data.minSellersPrice);
     }
+
+    if (resourceData?.data?.profitSellers.min) {
+      setMinProfitValue(resourceData.data.profitSellers.min);
+    }
+    if (resourceData?.data?.profitSellers.max) {
+      setMaxProfitValue(resourceData.data.profitSellers.max);
+    }
   }, [resourceData]);
   //Function to get data from accountInfo request :
   useEffect(() => {
@@ -240,8 +249,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     //profit
     const percentageProfit = settings.profit * 100;
     setProfitValue(percentageProfit);
-    if (!initialSetRef.current || profit === 0) {
+    if (!initialSetRef.current) {
       setProfit(percentageProfit);
+      initialSetRef.current = true;
     }
     //active sell
     setActiveSellValue(settings.isActive);
@@ -249,6 +259,8 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       setActiveSell(activeSellValue);
     }
   }, [tradingAccountInfo]);
+
+  
   //----------------------------------------------------------------------------
   //Functions for duration :
   //To create an array of 30 days
@@ -598,13 +610,21 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
     const value = newValue;
 
     initialSetRef.current = true;
+    const maxProfitPercentage = maxProfitValue * 100
+    const minProfitPercentage = minProfitValue * 100
 
-    if (value <= profitValue) {
-      setProfit(value);
+    if (value >= maxProfitPercentage) {
+      setProfit(maxProfitPercentage)
+    } else if (value <= minProfitPercentage) {
+      setProfit(minProfitPercentage)
     } else {
-      setProfit(profitValue);
+      setProfit(value)
     }
+
+    
   };
+
+ 
   //----------------------------------------------------------------------------
   //Function for active sell :
   const handleActiveSellChange = (
@@ -681,6 +701,7 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       profit: profit / 100,
       isActive: activeSell,
     };
+     console.log(profit)
     try {
       const settingResponse = await axios.post<AccountInfoResponse>(
         `${baseURL}/Buyer/updateAccountInfo`,
@@ -696,9 +717,9 @@ const PopUp11: React.FC<SettingPopupProps> = ({ open, onClose }) => {
       );
       if (settingResponse.data.success === false) {
         if (settingResponse.data.code === undefined) {
-          return 
+          return;
         }
-        const serverError = serverErrorMessageFunc(settingResponse.data.code)
+        const serverError = serverErrorMessageFunc(settingResponse.data.code);
         dispatch(
           showNotification({
             name: "setting-error1",
